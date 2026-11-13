@@ -14,14 +14,26 @@
 
 html,body{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
 body.app [data-demo]{display:none!important}
+body.app [data-ui]{display:none!important}
 #stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%}
+#scene,#ui{position:absolute;left:0;top:0;width:100%;height:100%}
+#ui{pointer-events:none}
+#ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{pointer-events:auto}
+#ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{pointer-events:auto}
+body.theme-open #ui{display:none}
+body.narrow #scene{display:none}
 </style></head>
-<body><div id="stage"></div>
+<body><div id="stage"><div id="scene"></div><div id="ui"></div></div>
+<script>window.TC_VERSION = '0.9.5-beta';</script>
 <script src="dcmini.js"></script>
-<script src="board.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
 <script src="glue.js"></script>
 <script>
-window.__tc = dcMount(document.getElementById('stage'), window.__TPL, Component, window.__PROPS, { post: window.tcPost });
+window.__tc = dcMount(document.getElementById('scene'), window.__SCENE_TPL, window.__SceneComp, window.__SCENE_PROPS, { post: function (v, c) { v = (window.tcPost ? window.tcPost(v, c) : v) || v; return window.tcScenePost ? window.tcScenePost(v, c) : v; } });
+if (window.tcSceneInit) window.tcSceneInit(window.__tc);
+window.__ui = dcMount(document.getElementById('ui'), window.__APP_TPL, window.__AppComp, window.__APP_PROPS, {});
+if (window.tcFit) window.tcFit();
 if (window.TCNative) { try { window.TCNative.call('ready', ''); } catch (e) {} }
 </script>
 </body></html>

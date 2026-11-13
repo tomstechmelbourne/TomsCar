@@ -65,6 +65,7 @@
       handlers.push(fn);
       return " data-tc-" + ev.toLowerCase() + '="' + (handlers.length - 1) + '"';
     });
+    s = s.replace(/\s(disabled|checked|hidden)="\{\{([^}]+)\}\}"/g, (m, attr, path) => get(ctx, path) ? " " + attr : "");
     return s.replace(/\{\{([^}]+)\}\}/g, (_, path) => {
       const v = get(ctx, path);
       if (v == null || typeof v === "function") return "";
@@ -125,18 +126,44 @@
         requestAnimationFrame(draw);
       }
     };
-    root.addEventListener("click", (e) => {
+    const MAP = {
+      click: ["click"],
+      doubleclick: ["dblclick"],
+      pointerdown: ["pointerdown"],
+      pointermove: ["pointermove"],
+      pointerup: ["pointerup", "pointercancel"],
+      pointerleave: ["pointercancel"],
+      wheel: ["wheel"],
+      change: ["input", "change"],
+      input: ["input"]
+    };
+    const fire = (name, e) => {
       let el = e.target;
-      while (el && el !== root) {
-        const id = el.getAttribute && el.getAttribute("data-tc-click");
+      while (el && el !== root.parentNode) {
+        const id = el.getAttribute && el.getAttribute("data-tc-" + name);
         if (id != null) {
           const fn = handlers[+id];
-          if (fn) fn(e);
-          return;
+          if (fn) {
+            const cur = el;
+            fn({
+              type: e.type,
+              target: e.target,
+              currentTarget: cur,
+              clientX: e.clientX,
+              clientY: e.clientY,
+              deltaY: e.deltaY,
+              pointerId: e.pointerId,
+              preventDefault: () => e.preventDefault(),
+              stopPropagation: () => e.stopPropagation(),
+              nativeEvent: e
+            });
+          }
+          if (name === "click" || name === "doubleclick" || name === "change" || name === "input") return;
         }
         el = el.parentNode;
       }
-    });
+    };
+    Object.keys(MAP).forEach((name) => MAP[name].forEach((dom) => root.addEventListener(dom, (e) => fire(name, e), dom === "wheel" ? { passive: true } : false)));
     draw();
     if (comp.componentDidMount) comp.componentDidMount();
     return comp;

@@ -75,6 +75,28 @@ for a, b in PATCHES:
         sys.exit(f'patch anchor found {n}x: {a[:70]}')
     s = s.replace(a, b)
 
+# ---- hide the scene board's own UI in the app (the App board draws the UI on top) ----
+def wrap_block(src, start):
+    i = src.index(start)
+    m = re.match(r'<([a-zA-Z-]+)', src[i:]); tag = m.group(1)
+    rx = re.compile(r'<' + tag + r'\b|</' + tag + r'>')
+    depth = 0
+    for mm in rx.finditer(src, i):
+        depth += -1 if mm.group(0).startswith('</') else 1
+        if depth == 0:
+            j = mm.end(); break
+    return src[:i] + '<div data-ui="1" style="display: contents">' + src[i:j] + '</div>' + src[j:]
+for start in ['<sc-if value="{{isRain}}"', '<sc-if value="{{sc.rainOn}}"', '<sc-if value="{{g.on}}"', '<sc-if value="{{listening}}"',
+              '<header style="position: absolute; left: 20px; right: 20px; top: 34px', '<sc-if value="{{pickerOpen}}"',
+              '<section aria-label="Workspace" style="position: absolute; left: 20px; top: 100px', '<footer style="position: absolute; left: 20px; right: 20px; bottom: 16px',
+              '<sc-if value="{{showCover}}"', '<sc-if value="{{rt.on}}"', '<sc-if value="{{showRun}}"', '<sc-if value="{{introSplash}}"',
+              '<sc-if value="{{introAbout}}"', '<sc-if value="{{introStepOn}}"']:
+    s = wrap_block(s, start)
+s = s.replace('<div role="tablist" style="position: absolute; right: 20px; top: 4px;', '<div data-ui="1" role="tablist" style="position: absolute; right: 20px; top: 4px;', 1)
+s = s.replace('  <g opacity="0.92">', '  <g data-ui="1" opacity="0.92">', 1)
+i = s.index('  <rect x="700" y="548" width="480" height="96"'); j = s.index('  <g class="{{wheelClass}}"', i)
+s = s[:i] + '  <g data-ui="1">\n' + s[i:j] + '  </g>\n' + s[j:]
+
 # template = everything inside <x-dc> except <link> tags (fonts are bundled)
 tpl = s[s.index('<x-dc>') + 6: s.index('</x-dc>')]
 tpl = re.sub(r'<link[^>]*>\s*', '', tpl)
@@ -86,16 +108,31 @@ props_def = json.loads(script_m.group(1))
 props = {k: v.get('default') for k, v in props_def.items()}
 code = script_m.group(2)
 
+def board_parts(text):
+    t = text[text.index('<x-dc>') + 6: text.index('</x-dc>')]
+    t = re.sub(r'<link[^>]*>\s*', '', t)
+    t = re.sub(r'inset: ?0(px)?;', 'top: 0; right: 0; bottom: 0; left: 0;', t)
+    t = re.sub(r'inset: ?0(px)?"', 'top: 0; right: 0; bottom: 0; left: 0"', t)
+    sm = re.search(r'<script type="text/x-dc"[^>]*data-props=\'([^\']*)\'[^>]*>(.*?)</script>', text, re.S)
+    pd = json.loads(sm.group(1))
+    return t, {k: v.get('default') for k, v in pd.items()}, sm.group(2)
+
+app_src = open(here / 'App.dc.html', encoding='utf-8').read()
+app_tpl, app_props, app_code = board_parts(app_src)
+version = sys.argv[3] if len(sys.argv) > 3 else '0.9.5-beta'
+
 out_dir.mkdir(parents=True, exist_ok=True)
 (out_dir / 'fonts').mkdir(exist_ok=True)
 for f in (here.parent / 'fonts').glob('*'):
     shutil.copy(f, out_dir / 'fonts' / f.name)
 shutil.copy(here / 'dcmini.js', out_dir / 'dcmini.js')
 shutil.copy(here / 'glue.js', out_dir / 'glue.js')
-(out_dir / 'board.js').write_text(
-    code + '\nwindow.__TPL = ' + json.dumps(tpl, ensure_ascii=False) + ';\nwindow.__PROPS = ' + json.dumps(props) + ';\n',
+(out_dir / 'scene.js').write_text(
+    'window.__SceneComp = (function () {\n' + code + '\nreturn Component;\n})();\nwindow.__SCENE_TPL = ' + json.dumps(tpl, ensure_ascii=False) + ';\nwindow.__SCENE_PROPS = ' + json.dumps(props) + ';\n',
     encoding='utf-8')
-
+(out_dir / 'app.js').write_text(
+    'window.__AppComp = (function () {\n' + app_code + '\nreturn Component;\n})();\nwindow.__APP_TPL = ' + json.dumps(app_tpl, ensure_ascii=False) + ';\nwindow.__APP_PROPS = ' + json.dumps(app_props) + ';\n',
+    encoding='utf-8')
 FONTS = """
 @font-face{font-family:'Chakra Petch';font-weight:400;src:url(fonts/ChakraPetch-Regular.ttf)}
 @font-face{font-family:'Chakra Petch';font-weight:500;src:url(fonts/ChakraPetch-Medium.ttf)}
@@ -113,20 +150,32 @@ FONTS = """
 <style>{FONTS}
 html,body{{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}}
 body.app [data-demo]{{display:none!important}}
+body.app [data-ui]{{display:none!important}}
 #stage{{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%}}
+#scene,#ui{{position:absolute;left:0;top:0;width:100%;height:100%}}
+#ui{{pointer-events:none}}
+#ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{{pointer-events:auto}}
+#ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{{pointer-events:auto}}
+body.theme-open #ui{{display:none}}
+body.narrow #scene{{display:none}}
 </style></head>
-<body><div id="stage"></div>
+<body><div id="stage"><div id="scene"></div><div id="ui"></div></div>
+<script>window.TC_VERSION = '{version}';</script>
 <script src="dcmini.js"></script>
-<script src="board.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
 <script src="glue.js"></script>
 <script>
-window.__tc = dcMount(document.getElementById('stage'), window.__TPL, Component, window.__PROPS, {{ post: window.tcPost }});
+window.__tc = dcMount(document.getElementById('scene'), window.__SCENE_TPL, window.__SceneComp, window.__SCENE_PROPS, {{ post: function (v, c) {{ v = (window.tcPost ? window.tcPost(v, c) : v) || v; return window.tcScenePost ? window.tcScenePost(v, c) : v; }} }});
+if (window.tcSceneInit) window.tcSceneInit(window.__tc);
+window.__ui = dcMount(document.getElementById('ui'), window.__APP_TPL, window.__AppComp, window.__APP_PROPS, {{}});
+if (window.tcFit) window.tcFit();
 if (window.TCNative) {{ try {{ window.TCNative.call('ready', ''); }} catch (e) {{}} }}
 </script>
 </body></html>
 """, encoding='utf-8')
 import subprocess, os
 esb = os.environ.get('ESBUILD', '/tmp/node_modules/.bin/esbuild')
-for f in ('board.js', 'glue.js', 'dcmini.js'):
+for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js'):
     subprocess.run([esb, str(out_dir / f), '--target=chrome61', '--allow-overwrite', '--log-level=warning', '--outfile=' + str(out_dir / f)], check=True)
 print('web UI written to', out_dir)

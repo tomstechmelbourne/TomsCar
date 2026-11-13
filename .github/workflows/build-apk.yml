@@ -30,6 +30,14 @@ jobs:
           fi
           ls $ANDROID_HOME/platforms
           echo "sdk=37" >> $GITHUB_OUTPUT
+      - name: Offline "Hey Tom" model (Vosk small English, Apache-2.0)
+        run: |
+          mkdir -p app/src/main/assets
+          curl -sSL -o /tmp/vosk.zip https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip
+          cd /tmp && unzip -q vosk.zip && rm -rf $GITHUB_WORKSPACE/app/src/main/assets/model-en
+          mv /tmp/vosk-model-small-en-us-0.15 $GITHUB_WORKSPACE/app/src/main/assets/model-en
+          echo "small-en-us-0.15" > $GITHUB_WORKSPACE/app/src/main/assets/model-en/uuid
+          du -sh $GITHUB_WORKSPACE/app/src/main/assets/model-en
       - uses: gradle/actions/setup-gradle@v4
       - name: Build release APK (API 37, falls back to 36)
         run: |

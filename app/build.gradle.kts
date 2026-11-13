@@ -14,8 +14,9 @@ android {
         applicationId = "com.tomstechsolutions.car"
         minSdk = 26
         targetSdk = tcSdk
-        versionCode = 910
-        versionName = "0.9.1-beta"
+        versionCode = 950
+        versionName = "0.9.5-beta"
+        ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
 
     signingConfigs {
@@ -46,4 +47,6 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.webkit:webkit:1.14.0")
+    implementation("com.alphacephei:vosk-android:0.3.47@aar")
+    implementation("net.java.dev.jna:jna:5.13.0@aar")
 }

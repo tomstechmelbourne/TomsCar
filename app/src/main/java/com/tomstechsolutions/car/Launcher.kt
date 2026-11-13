@@ -55,20 +55,64 @@ object Launcher {
 
         val h = Handler(Looper.getMainLooper())
         if (isDesktop(a)) {
-            // DeX / freeform: place each app in its own window, side by side by percentage
-            val w = a.window.decorView.rootView.width.takeIf { it > 0 } ?: a.resources.displayMetrics.widthPixels
-            val ht = a.window.decorView.rootView.height.takeIf { it > 0 } ?: a.resources.displayMetrics.heightPixels
+            // DeX / freeform: fill the whole DeX screen (minus the taskbar and a thin Tom's Car strip), side by side by percentage
+            val area = screenArea(a)
+            val strip = (56 * a.resources.displayMetrics.density).toInt()
+            val w = area.width() - strip
             val total = found.sumOf { it.second }.coerceAtLeast(1)
-            var x = 0
+            var x = area.left
             found.forEachIndexed { i, (_, pct, intent) ->
-                val ww = if (i == found.lastIndex) w - x else w * pct / total
-                val r = Rect(x, 0, x + ww, ht); x += ww
+                val ww = if (i == found.lastIndex) area.left + w - x else w * pct / total
+                val r = Rect(x, area.top, x + ww, area.bottom); x += ww
                 h.postDelayed({ start(a, intent, ActivityOptions.makeBasic().setLaunchBounds(r).toBundle(), false) }, i * 450L)
             }
+            // Tom's Car itself becomes the thin strip at the right edge (DeX may ignore this for a running window)
+            h.postDelayed({ reposition(a, Rect(area.left + w, area.top, area.right, area.bottom)) }, found.size * 450L + 300L)
         } else {
             // Phone / tablet: first app full screen, second app next to it (split screen where the phone allows)
             start(a, found[0].third, null, false)
             if (found.size > 1) h.postDelayed({ start(a, found[1].third, null, true) }, 900L)
+        }
+    }
+
+    /** Usable screen: the whole display minus the DeX taskbar / system bars. */
+    fun screenArea(a: Activity): Rect {
+        return if (android.os.Build.VERSION.SDK_INT >= 30) {
+            val wm = a.windowManager.maximumWindowMetrics
+            val ins = wm.windowInsets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+            Rect(wm.bounds.left + ins.left, wm.bounds.top + ins.top, wm.bounds.right - ins.right, wm.bounds.bottom - ins.bottom)
+        } else {
+            val dm = android.util.DisplayMetrics()
+            @Suppress("DEPRECATION") a.windowManager.defaultDisplay.getRealMetrics(dm)
+            val taskbar = (48 * dm.density).toInt()
+            Rect(0, 0, dm.widthPixels, dm.heightPixels - taskbar)
+        }
+    }
+
+    private fun reposition(a: Activity, r: Rect) {
+        try {
+            val i = Intent(a, a.javaClass).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            a.startActivity(i, ActivityOptions.makeBasic().setLaunchBounds(r).toBundle())
+        } catch (_: Exception) {}
+    }
+
+    /** Road Trip + Bản Đồ: the map app beside Tom's Car. json = {frac, side, map} or "off". */
+    fun split(a: Activity, arg: String) {
+        if (arg == "off") { if (isDesktop(a)) reposition(a, screenArea(a)); return }
+        val o = try { org.json.JSONObject(arg) } catch (_: Exception) { return }
+        val frac = o.optDouble("frac", 0.36).coerceIn(0.05, 0.8)
+        val key = when (o.optString("map")) { "gmaps" -> "maps"; "here" -> "here"; else -> "waze" }
+        val intent = launchIntent(a, key) ?: run { toast(a, "Chưa cài app bản đồ"); return }
+        if (isDesktop(a)) {
+            val area = screenArea(a)
+            val carW = (area.width() * frac).toInt()
+            val left = o.optString("side") != "right"   // map on the left by default
+            val mapR = if (left) Rect(area.left, area.top, area.right - carW, area.bottom) else Rect(area.left + carW, area.top, area.right, area.bottom)
+            val carR = if (left) Rect(area.right - carW, area.top, area.right, area.bottom) else Rect(area.left, area.top, area.left + carW, area.bottom)
+            start(a, intent, ActivityOptions.makeBasic().setLaunchBounds(mapR).toBundle(), false)
+            Handler(Looper.getMainLooper()).postDelayed({ reposition(a, carR) }, 600)
+        } else {
+            start(a, intent, null, true)   // phone / tablet: Android split screen
         }
     }
 
@@ -81,8 +125,9 @@ object Launcher {
     /** Navigate with Waze (main), else Google Maps, else any map app. */
     fun navigate(a: Activity, address: String) {
         val q = Uri.encode(address)
+        val ll = Regex("^-?\\d+\\.\\d+,-?\\d+\\.\\d+$").matches(address.trim())
         val tries = listOf(
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://waze.com/ul?q=$q&navigate=yes")).setPackage("com.waze"),
+            Intent(Intent.ACTION_VIEW, Uri.parse(if (ll) "https://waze.com/ul?ll=${address.trim()}&navigate=yes" else "https://waze.com/ul?q=$q&navigate=yes")).setPackage("com.waze"),
             Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$q")).setPackage("com.google.android.apps.maps"),
             Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=$q"))
         )
