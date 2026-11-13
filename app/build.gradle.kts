@@ -14,8 +14,8 @@ android {
         applicationId = "com.tomstechsolutions.car"
         minSdk = 26
         targetSdk = tcSdk
-        versionCode = 900
-        versionName = "0.9.0-beta"
+        versionCode = 910
+        versionName = "0.9.1-beta"
     }
 
     signingConfigs {

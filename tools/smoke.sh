@@ -20,23 +20,23 @@ adb logcat -c
 adb shell settings put system accelerometer_rotation 0
 adb shell settings put system user_rotation 1; sleep 3
 adb shell am start -W -n $P/.MainActivity
-sleep 3; adb exec-out screencap -p > shots/api${API}_1_splash.png
-sleep 6; adb exec-out screencap -p > shots/api${API}_2_about.png
+sleep 3; timeout 20 adb exec-out screencap -p > shots/api${API}_1_splash.png
+sleep 6; timeout 20 adb exec-out screencap -p > shots/api${API}_2_about.png
 # a fake GPS position near Ballarat (Western Hwy) so the board gets live data
-adb emu geo fix 143.85 -37.56 2>/dev/null || true
-sleep 12; adb exec-out screencap -p > shots/api${API}_3_main.png
+timeout 10 adb emu geo fix 143.85 -37.56 2>/dev/null || true
+sleep 12; timeout 20 adb exec-out screencap -p > shots/api${API}_3_main.png
 # tablet size
 adb shell wm size 2560x1600; adb shell wm density 320; sleep 6
-adb exec-out screencap -p > shots/api${API}_4_tablet.png
+timeout 20 adb exec-out screencap -p > shots/api${API}_4_tablet.png
 adb shell wm size reset; adb shell wm density reset; sleep 3
 # portrait
 adb shell settings put system user_rotation 0; sleep 5
-adb exec-out screencap -p > shots/api${API}_5_portrait.png
+timeout 20 adb exec-out screencap -p > shots/api${API}_5_portrait.png
 # background and back: intro must NOT show again
 adb shell input keyevent 3; sleep 3
 adb shell am start -n $P/.MainActivity; sleep 4
 adb shell settings put system user_rotation 1; sleep 4
-adb exec-out screencap -p > shots/api${API}_6_resume.png
+timeout 20 adb exec-out screencap -p > shots/api${API}_6_resume.png
 PID=$(adb shell pidof $P)
 adb logcat -d > shots/api${API}_logcat.txt
 grep -i "chromium\|console" shots/api${API}_logcat.txt | tail -60 > shots/api${API}_console.txt || true

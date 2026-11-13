@@ -283,7 +283,12 @@ class Component extends DCLogic {
   componentDidMount() {
     this.timer = setInterval(() => this.setState({ now: /* @__PURE__ */ new Date() }), 15e3);
     this.introTimer = setTimeout(() => {
-      if (this.state.intro === "splash") this.setState({ intro: "about" });
+      if (this.state.intro === "splash") {
+        this.setState({ intro: "about" });
+        this.introTimer = setTimeout(() => {
+          if (this.state.intro === "about") this.setState({ intro: null });
+        }, 6e3);
+      }
     }, 4500);
   }
   componentWillUnmount() {
@@ -351,6 +356,7 @@ class Component extends DCLogic {
     const sunOp = { clear: 1, cloudy: 0.45, rain: 0, storm: 0, fog: 0.35 }[wx];
     let temp = { summer: 27, autumn: 17, winter: 11, spring: 20 }[season];
     temp += { clear: 0, cloudy: -1, rain: -3, storm: -2, fog: -4 }[wx] + { day: 0, dawn: -4, dusk: -2, night: -6 }[phase];
+    if (this.state.live && this.state.live.wx && this.state.live.wx.temp != null) temp = Math.round(this.state.live.wx.temp);
     const icons = {
       sun: "M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4",
       moon: "M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z",
@@ -1084,7 +1090,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
       <button onClick="{{themeToggle}}" aria-expanded="{{themeExpanded}}" class="tc-btn" style="height: 48px; padding: 0 16px; border: 0; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: rgba(3,17,28,0.8); box-shadow: inset 0 0 0 1px #FBB040; color: #FFE2A8; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.5-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4.1-4-7.6-9-7.6zM7.5 11.5h.01M10 7.5h.01M14.5 7.5h.01M17 11h.01"></path></svg>{{themeBtn}}</button>
       <button data-demo="1" onClick="{{togglePicker}}" aria-expanded="{{pickerExpanded}}" class="tc-btn" style="height: 48px; padding: 0 16px; border: 0; clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px); background: #FBB040; color: #2A1A00; font-size: 14px; font-weight: 700; box-shadow: 0 0 16px rgba(251,176,64,0.55)">{{t.tryScene}}</button>
       <button aria-label="{{t.addWs}}" class="tc-btn" style="width: 48px; height: 48px; border: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); background: rgba(3,17,28,0.8); box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55); color: #CFF6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
-      <button aria-label="{{aboutTitle}}" onClick="{{introToAbout}}" class="tc-btn" style="width: 48px; height: 48px; border: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); background: rgba(3,17,28,0.8); box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55); color: #CFF6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 11v6M12 7.5v.5"></path></svg></button>
+      <button data-demo="1" aria-label="{{aboutTitle}}" onClick="{{introToAbout}}" class="tc-btn" style="width: 48px; height: 48px; border: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); background: rgba(3,17,28,0.8); box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55); color: #CFF6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18zM12 11v6M12 7.5v.5"></path></svg></button>
       <button onClick="{{openSettings}}" aria-label="{{t.settings}}" class="tc-btn" style="width: 48px; height: 48px; border: 0; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); background: rgba(3,17,28,0.8); box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55); color: #CFF6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9a3 3 0 1 0 0 6a3 3 0 1 0 0-6zM12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"></path></svg></button>
     </div>
   </header>
