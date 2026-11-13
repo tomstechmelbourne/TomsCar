@@ -1019,11 +1019,11 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
   <polygon points="1280,0 1206,0 1266,470 1280,480" fill="#010407"></polygon>
   <line x1="74" y1="0" x2="14" y2="470" stroke="#5FD4F0" stroke-width="2" opacity="0.7"></line>
   <line x1="1206" y1="0" x2="1266" y2="470" stroke="#5FD4F0" stroke-width="2" opacity="0.7"></line>
-  <rect x="552" y="34" width="176" height="56" rx="10" fill="#020A12" stroke="#5FD4F0" stroke-width="2"></rect>
-  <path d="M640 86 L596 44 M640 86 L684 44" stroke="#FBB040" stroke-width="2" opacity="0.6"></path>
-  <line x1="640" y1="86" x2="640" y2="44" stroke="#5FD4F0" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.7"></line>
-  <text x="566" y="52" fill="#5FD4F0" font-size="9" font-weight="700" font-family="Chakra Petch, sans-serif">{{rearCam}}</text>
-  <circle cx="714" cy="48" r="3" fill="#E5484D"></circle>
+  <rect x="552" y="96" width="176" height="56" rx="10" fill="#020A12" stroke="#5FD4F0" stroke-width="2"></rect>
+  <path d="M640 148 L596 106 M640 148 L684 106" stroke="#FBB040" stroke-width="2" opacity="0.6"></path>
+  <line x1="640" y1="148" x2="640" y2="106" stroke="#5FD4F0" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.7"></line>
+  <text x="566" y="114" fill="#5FD4F0" font-size="9" font-weight="700" font-family="Chakra Petch, sans-serif">{{rearCam}}</text>
+  <circle cx="714" cy="110" r="3" fill="#E5484D"></circle>
   <g opacity="0.92">
     <text x="1000" y="372" text-anchor="middle" fill="#CFF6FF" font-size="54" font-weight="700" font-family="Chakra Petch, sans-serif">{{speed}}</text>
     <text x="1000" y="392" text-anchor="middle" fill="#5FD4F0" font-size="12" font-family="Chakra Petch, sans-serif">KM/H</text>
