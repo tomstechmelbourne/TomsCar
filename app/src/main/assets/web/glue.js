@@ -290,7 +290,13 @@
     if (window.__tc) window.__tc.setState({ live });
     if (window.__ui) window.__ui.setState({ live: narrow ? Object.assign({}, live, { vw: 420, vh: Math.round(420 * window.innerHeight / window.innerWidth) }) : live });
   };
+  let fitW = 0, fitH = 0;
   window.tcLive = function(json) {
+    if (window.innerWidth !== fitW || window.innerHeight !== fitH) {
+      fitW = window.innerWidth;
+      fitH = window.innerHeight;
+      fit();
+    }
     let d;
     try {
       d = typeof json === "string" ? JSON.parse(json) : json;
