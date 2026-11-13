@@ -73,6 +73,9 @@ for a, b in PATCHES:
 # template = everything inside <x-dc> except <link> tags (fonts are bundled)
 tpl = s[s.index('<x-dc>') + 6: s.index('</x-dc>')]
 tpl = re.sub(r'<link[^>]*>\s*', '', tpl)
+# older Android System WebView (< 87) has no CSS 'inset'
+tpl = re.sub(r'inset: ?0(px)?;', 'top: 0; right: 0; bottom: 0; left: 0;', tpl)
+tpl = re.sub(r'inset: ?0(px)?"', 'top: 0; right: 0; bottom: 0; left: 0"', tpl)
 script_m = re.search(r'<script type="text/x-dc"[^>]*data-props=\'([^\']*)\'[^>]*>(.*?)</script>', s, re.S)
 props_def = json.loads(script_m.group(1))
 props = {k: v.get('default') for k, v in props_def.items()}
