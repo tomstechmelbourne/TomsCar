@@ -1,0 +1,131 @@
+// dcmini.js – tiny runtime that runs a Tom's Car .dc.html board outside the design tool.
+// Supports {{path}}, <sc-if value>, <sc-for list as>, onClick handlers, and keeps DOM nodes
+// alive between renders (morphing) so CSS animations do not restart.
+(function () {
+  'use strict';
+
+  class DCLogic {
+    constructor(props) { this.props = props || {}; this.state = {}; this.__dirty = false; }
+    setState(patch) {
+      const p = typeof patch === 'function' ? patch(this.state) : patch;
+      this.state = Object.assign({}, this.state, p);
+      if (this.__schedule) this.__schedule();
+    }
+  }
+  window.DCLogic = DCLogic;
+
+  const get = (ctx, path) => {
+    path = path.trim();
+    if (path === 'true') return true;
+    if (path === 'false') return false;
+    if (/^-?\d+(\.\d+)?$/.test(path)) return Number(path);
+    return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), ctx);
+  };
+
+  // ---------- template -> HTML string ----------
+  function compile(tpl) {
+    // strip editor-only hint attributes
+    return tpl.replace(/\s+hint-placeholder-(?:val|count)="[^"]*"/g, '');
+  }
+
+  function render(tpl, ctx, handlers) {
+    let out = '', i = 0;
+    const open = /<sc-(if|for)\b([^>]*)>/g;
+    while (i < tpl.length) {
+      open.lastIndex = i;
+      const r = open.exec(tpl);
+      if (!r) { out += sub(tpl.slice(i), ctx, handlers); break; }
+      out += sub(tpl.slice(i, r.index), ctx, handlers);
+      const tag = 'sc-' + r[1];
+      const re = new RegExp('<' + tag + '\\b[^>]*>|</' + tag + '>', 'g');
+      re.lastIndex = r.index + r[0].length;
+      let depth = 1, m;
+      while (depth && (m = re.exec(tpl))) { depth += m[0].startsWith('</') ? -1 : 1; if (!depth) break; }
+      const inner = tpl.slice(r.index + r[0].length, m.index);
+      i = m.index + m[0].length;
+      const am = r[2].match(/(?:value|list)="\{\{([^}]+)\}\}"/);
+      const val = am ? get(ctx, am[1]) : undefined;
+      if (r[1] === 'if') {
+        if (val) out += render(inner, ctx, handlers);
+      } else {
+        const as = (r[2].match(/as="(\w+)"/) || [])[1] || 'item';
+        (val || []).forEach((it, idx) => { out += render(inner, Object.assign(Object.create(ctx), { [as]: it, $index: idx }), handlers); });
+      }
+    }
+    return out;
+  }
+
+  const esc = (v) => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  function sub(s, ctx, handlers) {
+    // event attributes first: onClick="{{fn}}" -> data-tc-click="id"
+    s = s.replace(/\son([A-Z][a-zA-Z]*)="\{\{([^}]+)\}\}"/g, (_, ev, path) => {
+      const fn = get(ctx, path);
+      if (typeof fn !== 'function') return '';
+      handlers.push(fn);
+      return ' data-tc-' + ev.toLowerCase() + '="' + (handlers.length - 1) + '"';
+    });
+    return s.replace(/\{\{([^}]+)\}\}/g, (_, path) => {
+      const v = get(ctx, path);
+      if (v == null || typeof v === 'function') return '';
+      if (typeof v === 'boolean') return v ? 'true' : 'false';
+      return esc(v);
+    });
+  }
+
+  // ---------- DOM morphing ----------
+  function morphAttrs(from, to) {
+    const ta = to.attributes;
+    for (let i = 0; i < ta.length; i++) {
+      const a = ta[i];
+      if (from.getAttribute(a.name) !== a.value) from.setAttribute(a.name, a.value);
+    }
+    const fa = from.attributes;
+    for (let i = fa.length - 1; i >= 0; i--) {
+      if (!to.hasAttribute(fa[i].name)) from.removeAttribute(fa[i].name);
+    }
+  }
+
+  function morphChildren(from, to) {
+    const fk = from.childNodes, tk = Array.from(to.childNodes);
+    let i = 0;
+    for (; i < tk.length; i++) {
+      const t = tk[i], f = fk[i];
+      if (!f) { from.appendChild(t); continue; }
+      if (f.nodeType !== t.nodeType || f.nodeName !== t.nodeName) { from.replaceChild(t, f); continue; }
+      if (f.nodeType === 3 || f.nodeType === 8) { if (f.nodeValue !== t.nodeValue) f.nodeValue = t.nodeValue; continue; }
+      morphAttrs(f, t);
+      morphChildren(f, t);
+    }
+    while (fk.length > tk.length) from.removeChild(from.lastChild);
+  }
+
+  // ---------- mount ----------
+  window.dcMount = function (root, tpl, Component, props, hooks) {
+    tpl = compile(tpl);
+    const comp = new Component(props || {});
+    let handlers = [], queued = false;
+    const draw = () => {
+      queued = false;
+      let vals = comp.renderVals();
+      if (hooks && hooks.post) vals = hooks.post(vals, comp) || vals;
+      handlers = [];
+      const html = render(tpl, vals, handlers);
+      const t = document.createElement('template');
+      t.innerHTML = html;
+      morphChildren(root, t.content);
+    };
+    comp.__schedule = () => { if (!queued) { queued = true; requestAnimationFrame(draw); } };
+    root.addEventListener('click', (e) => {
+      let el = e.target;
+      while (el && el !== root) {
+        const id = el.getAttribute && el.getAttribute('data-tc-click');
+        if (id != null) { const fn = handlers[+id]; if (fn) fn(e); return; }
+        el = el.parentNode;
+      }
+    });
+    draw();
+    if (comp.componentDidMount) comp.componentDidMount();
+    return comp;
+  };
+})();

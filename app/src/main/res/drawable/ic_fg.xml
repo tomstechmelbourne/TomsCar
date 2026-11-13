@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Approved Tom's Car swoosh car (same paths as the header logo), centred on a 108dp adaptive canvas. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <group android:translateX="24" android:translateY="35" android:scaleX="0.2" android:scaleY="0.2">
+        <group android:translateY="-10">
+            <path android:fillColor="#FBB040" android:pathData="M12 74 C60 46 104 22 160 20 C204 18 232 30 262 54 C236 36 206 28 162 30 C110 32 66 52 12 74 Z" />
+            <path android:fillColor="#FBB040" android:pathData="M96 58 C120 40 150 34 178 34 C204 34 222 42 236 54 C214 48 190 46 166 46 C140 46 118 50 96 58 Z" />
+            <path android:fillColor="#FBB040" android:pathData="M176 58 C214 54 256 56 290 64 C296 66 296 71 290 71 C254 63 216 60 176 58 Z" />
+            <path android:fillColor="#FBB040" android:pathData="M296 76 C292 82 286 86 276 88 C282 84 288 80 296 76 Z M200 86 C176 90 150 90 128 87 C150 87 176 87 200 86 Z M54 86 C40 86 26 82 16 76 C28 80 40 83 54 86 Z" />
+            <path android:fillColor="#FBB040" android:pathData="M58 86 C62 70 76 62 92 62 C108 62 120 72 124 86 C116 76 106 70 92 70 C78 70 66 76 58 86 Z" />
+            <path android:fillColor="#FBB040" android:pathData="M206 86 C210 70 224 62 240 62 C256 62 268 72 272 86 C264 76 254 70 240 70 C226 70 214 76 206 86 Z" />
+            <path android:fillColor="#FFE9A8" android:pathData="M281 63 L291 66 L282 67 Z" />
+        </group>
+    </group>
+</vector>

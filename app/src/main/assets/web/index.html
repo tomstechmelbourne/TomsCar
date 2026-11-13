@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Tom's Car</title>
+<style>
+@font-face{font-family:'Chakra Petch';font-weight:400;src:url(fonts/ChakraPetch-Regular.ttf)}
+@font-face{font-family:'Chakra Petch';font-weight:500;src:url(fonts/ChakraPetch-Medium.ttf)}
+@font-face{font-family:'Chakra Petch';font-weight:600;src:url(fonts/ChakraPetch-SemiBold.ttf)}
+@font-face{font-family:'Chakra Petch';font-weight:700 900;src:url(fonts/ChakraPetch-Bold.ttf)}
+@font-face{font-family:'Overpass';font-weight:100 900;src:url('fonts/Overpass[wght].ttf')}
+@font-face{font-family:'Barlow Semi Condensed';font-weight:600;src:url(fonts/BarlowSemiCondensed-SemiBold.ttf)}
+@font-face{font-family:'Barlow Semi Condensed';font-weight:700;src:url(fonts/BarlowSemiCondensed-Bold.ttf)}
+@font-face{font-family:'Bahnschrift';font-weight:400 900;src:local('Bahnschrift'),url(fonts/BarlowSemiCondensed-Bold.ttf)}
+
+html,body{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}
+body.app [data-demo]{display:none!important}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%}
+</style></head>
+<body><div id="stage"></div>
+<script src="dcmini.js"></script>
+<script src="board.js"></script>
+<script src="glue.js"></script>
+<script>
+window.__tc = dcMount(document.getElementById('stage'), window.__TPL, Component, window.__PROPS, { post: window.tcPost });
+if (window.TCNative) { try { window.TCNative.call('ready', ''); } catch (e) {} }
+</script>
+</body></html>
