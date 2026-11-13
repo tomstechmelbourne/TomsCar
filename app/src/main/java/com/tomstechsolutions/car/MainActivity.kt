@@ -63,7 +63,6 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        immersive()
 
         val loader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
@@ -84,6 +83,7 @@ class MainActivity : Activity() {
         }
         web.addJavascriptInterface(Bridge(), "TCNative")
         setContentView(web)
+        immersive()
         web.loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
 
         askPermissions()
@@ -112,6 +112,7 @@ class MainActivity : Activity() {
     override fun onBackPressed() { moveTaskToBack(true) }
 
     private fun immersive() {
+        if (!::web.isInitialized) return
         if (Build.VERSION.SDK_INT >= 30) {
             window.setDecorFitsSystemWindows(false)
             window.insetsController?.let {

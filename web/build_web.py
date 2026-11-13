@@ -117,4 +117,8 @@ if (window.TCNative) {{ try {{ window.TCNative.call('ready', ''); }} catch (e) {
 </script>
 </body></html>
 """, encoding='utf-8')
+import subprocess, os
+esb = os.environ.get('ESBUILD', '/tmp/node_modules/.bin/esbuild')
+for f in ('board.js', 'glue.js', 'dcmini.js'):
+    subprocess.run([esb, str(out_dir / f), '--target=chrome61', '--allow-overwrite', '--log-level=warning', '--outfile=' + str(out_dir / f)], check=True)
 print('web UI written to', out_dir)
