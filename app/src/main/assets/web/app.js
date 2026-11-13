@@ -1366,8 +1366,8 @@ window.__AppComp = function() {
         font: cs.font || "'Chakra Petch', sans-serif",
         fw: cs.fw || 700,
         fst: cs.fst || "normal",
-        c: cs.c || "#CFF6FF",
-        glow: cs.glow || "none",
+        c: night ? "#F2D3A6" : cs.c || "#CFF6FF",
+        glow: night ? "none" : cs.glow || "none",
         ls: cs.ls || "0px",
         colonOp: C.clkBlink && !drive && d.getSeconds() % 2 ? 0.25 : 1,
         hx: (20 + 9 * Math.sin((H % 12 + M / 60) / 12 * 2 * Math.PI)).toFixed(1),
@@ -1379,7 +1379,7 @@ window.__AppComp = function() {
         line2On: !!line2,
         line2,
         line2C: "#FFD08A",
-        filter: night ? "sepia(0.35) brightness(0.85)" : "none",
+        op: night ? 0.82 : 1,
         aria: "\u0110\u1ED3ng h\u1ED3 " + hh + ":" + mm + " \u2014 ch\u1EA1m \u0111\u1EC3 ph\xF3ng to",
         tap: () => self.setState({ clkBig: true }),
         closeBig: () => self.setState({ clkBig: false, parkedAt: S.now }),
@@ -1449,6 +1449,8 @@ window.__AppComp = function() {
       };
       const delP = S.delId ? ALLP[S.delId] : null;
       return {
+        rootW: nar ? "100%" : "1280px",
+        rootH: nar ? "100%" : "720px",
         verL: window.TC_VERSION || "0.9.x-beta",
         rootBg: APP ? "transparent" : "#03111C",
         opaqueBg: APP && (nar || S.scr !== "home"),
@@ -1515,8 +1517,8 @@ window.__AppComp = function() {
         isContacts: !nar && S.scr === "contacts",
         isCompact: nar,
         appTop: APP ? 0 : 40,
-        appW: nar ? LV.vw || 420 : 1280,
-        appH: nar ? LV.vh || 720 : APP ? 720 : 680,
+        appW: nar ? "100%" : "1280px",
+        appH: nar ? "100%" : APP ? "720px" : "680px",
         appBg: APP ? "transparent" : "linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)",
         touch: () => {
           if (!S.dragging && !S.panning) self.setState({ last: Date.now() });
@@ -1721,7 +1723,7 @@ input[type=range]{accent-color:#FBB040}
 .ph{background:linear-gradient(135deg,#2B4A5E,#132A38);display:flex;align-items:center;justify-content:center;color:#8FC3D3}
 </style>
 </helmet>
-<div onPointerDown="{{touch}}" style="position: relative; width: 1280px; height: 720px; overflow: hidden; background: {{rootBg}}; color: #E8F1F5; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif">
+<div onPointerDown="{{touch}}" style="position: relative; width: {{rootW}}; height: {{rootH}}; overflow: hidden; background: {{rootBg}}; color: #E8F1F5; font-family: 'Chakra Petch', 'Segoe UI', system-ui, sans-serif">
 
   <!-- ===== thanh demo (kh\xF4ng thu\u1ED9c app) ===== -->
   <nav data-demo="1" aria-label="Ch\u1ECDn m\xE0n h\xECnh b\u1EA3n m\u1EABu" style="position: absolute; left: 0; right: 0; top: 0; height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 10px; background: #0A1E2C; border-bottom: 1px solid rgba(95,212,240,0.35); z-index: 50">
@@ -1735,7 +1737,7 @@ input[type=range]{accent-color:#FBB040}
   </nav>
 
   <!-- ===== m\xE0n h\xECnh app (1280 x 680) ===== -->
-  <div style="position: absolute; left: 0; top: {{appTop}}px; width: {{appW}}px; height: {{appH}}px; overflow: hidden; background: {{appBg}}">
+  <div style="position: absolute; left: 0; top: {{appTop}}px; width: {{appW}}; height: {{appH}}; overflow: hidden; background: {{appBg}}">
 
     <sc-if value="{{opaqueBg}}" hint-placeholder-val="{{ false }}"><div aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: radial-gradient(ellipse at 70% 0%, #0B2C40, #020A12 70%)"></div></sc-if>
     <!-- ========== 1. M\xC0N H\xCCNH CH\xCDNH ========== -->
@@ -1773,7 +1775,7 @@ input[type=range]{accent-color:#FBB040}
           <span style="font-size: 18px; font-weight: 700; flex-shrink: 0">{{wxT}}</span>
           <span style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0"><span style="font-size: 12px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{wxL1}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap">{{wxL2}}</span></span>
         </div>
-        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 54px; padding: 0 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); filter: {{clk.filter}}">
+        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 54px; padding: 0 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
           <sc-if value="{{clk.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 2px"><sc-for list="{{clk.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
           <sc-if value="{{clk.analog}}" hint-placeholder-val="{{ false }}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0B141B" stroke="#A9C7D4" stroke-width="1.5"></circle><line x1="20" y1="20" x2="{{clk.hx}}" y2="{{clk.hy}}" stroke="#E8F1F5" stroke-width="2.6" stroke-linecap="round"></line><line x1="20" y1="20" x2="{{clk.mx}}" y2="{{clk.my}}" stroke="#FBB040" stroke-width="1.8" stroke-linecap="round"></line><circle cx="20" cy="20" r="2" fill="#FBB040"></circle></svg></sc-if>
           <sc-if value="{{clk.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 24px; font-weight: {{clk.fw}}; font-family: {{clk.font}}; font-style: {{clk.fst}}; color: {{clk.c}}; text-shadow: {{clk.glow}}; letter-spacing: {{clk.ls}}">{{clk.h}}<span style="opacity: {{clk.colonOp}}">:</span>{{clk.m}}<span style="font-size: 12px; margin-left: 3px">{{clk.ap}}</span></span></sc-if>

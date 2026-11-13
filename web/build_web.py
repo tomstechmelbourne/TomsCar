@@ -151,7 +151,7 @@ FONTS = """
 html,body{{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}}
 body.app [data-demo]{{display:none!important}}
 body.app [data-ui]{{display:none!important}}
-#stage{{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%}}
+#stage{{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden}}
 #scene,#ui{{position:absolute;left:0;top:0;width:100%;height:100%}}
 #ui{{pointer-events:none}}
 #ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{{pointer-events:auto}}
