@@ -28,12 +28,10 @@
   ]
  },
  {
-  "key": "EG",
+  "key": "EG Ampol",
   "re": "^eg\\b|\\beg (ampol|fuel|australia|group)\\b",
   "domains": [
-   "eg.group",
-   "egfuel.com.au",
-   "egaustralia.com.au"
+   "ampol.com.au"
   ]
  },
  {
@@ -90,14 +88,6 @@
   "re": "\\botr\\b|on the run",
   "domains": [
    "otr.com.au"
-  ]
- },
- {
-  "key": "Speedway",
-  "re": "\\bspeedway\\b",
-  "domains": [
-   "speedwayfuels.com.au",
-   "speedwaypetroleum.com.au"
   ]
  },
  {
@@ -216,8 +206,7 @@
   "key": "Bakers Delight",
   "re": "bakers delight",
   "domains": [
-   "bakersdelight.com.au",
-   "bakersdelight.co.nz"
+   "bakersdelight.com.au"
   ]
  },
  {
@@ -231,9 +220,7 @@
   "key": "Woolworths",
   "re": "woolworths|woolies",
   "domains": [
-   "woolworths.com.au",
-   "woolworthsgroup.com.au",
-   "woolworths.co.nz"
+   "woolworths.com.au"
   ]
  },
  {

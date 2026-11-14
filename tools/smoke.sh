@@ -17,6 +17,7 @@ for i in 1 2 3; do
 done
 [ $ok = 1 ] || { echo "INSTALL FAILED (emulator)"; exit 1; }
 adb logcat -c
+adb shell settings put secure immersive_mode_confirmations confirmed
 adb shell settings put system accelerometer_rotation 0
 adb shell settings put system user_rotation 1; sleep 3
 adb shell am start -W -n $P/.MainActivity
