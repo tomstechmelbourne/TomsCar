@@ -1,0 +1,60 @@
+11-14 20:39:54.706  3629  3712 E chromium: [ERROR:raster_decoder.cc(2161)] [.RenderWorker-0xd43a5300]GL ERROR :GL_INVALID_OPERATION : glRasterCHROMIUM: RasterCHROMIUM: serialization failure
+11-14 20:39:54.748  3629  3712 I chromium: [INFO:SkGlyph.cpp(48)] ../../third_party/skia/src/core/SkGlyph.cpp:48: fatal error: "Unknown mask format."
+11-14 20:39:54.748  3629  3712 I chromium: 
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #02 pc 00000000034ffcc1  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #03 pc 0000000001e9797c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #04 pc 0000000001e979d8  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #05 pc 0000000001ee337c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #06 pc 0000000003bec1a7  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #07 pc 0000000003bec044  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #08 pc 0000000003be8bb2  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #09 pc 0000000003be4e52  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #10 pc 0000000003be6c9a  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #11 pc 00000000039ed717  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #12 pc 0000000003c5d15d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #13 pc 0000000003c5c821  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #14 pc 0000000003c61d91  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #15 pc 0000000003c60a89  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #16 pc 00000000039f033c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #17 pc 0000000002e732c3  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #18 pc 0000000002e81a2b  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #19 pc 0000000002e81827  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #20 pc 0000000002e4e453  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.784  4264  4264 F DEBUG   :       #21 pc 0000000002e823a0  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.785  4264  4264 F DEBUG   :       #22 pc 0000000002e61088  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.785  4264  4264 F DEBUG   :       #23 pc 0000000002e9828d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:54.785  4264  4264 F DEBUG   :       #24 pc 0000000002ec058d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:39:55.176  1955  3628 I ActivityManager: Killing 3680:com.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0/u0a116i0 (adj 0): isolated not needed
+11-14 20:40:30.265  4404  4404 I chromium: [INFO:library_loader_hooks.cc(50)] Chromium logging enabled: level = 0, default verbosity = 0
+11-14 20:40:30.272  4404  4404 I cr_BrowserStartup: Initializing chromium process, singleProcess=false
+11-14 20:40:30.284  1955  1984 I ActivityManager: Start proc 4433:com.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0/u0i1 for  {com.tomstechsolutions.car/org.chromium.content.app.SandboxedProcessService0}
+11-14 20:40:30.404  4433  4457 I chromium: [INFO:library_loader_hooks.cc(50)] Chromium logging enabled: level = 0, default verbosity = 0
+11-14 20:40:33.296  4404  4464 E chromium: [ERROR:raster_decoder.cc(2126)] [.RenderWorker-0xd43a5300]GL ERROR :GL_INVALID_VALUE : glRasterCHROMIUM: Invalid font buffer.
+11-14 20:40:33.297  4404  4464 E chromium: [ERROR:raster_decoder.cc(2126)] [.RenderWorker-0xd43a5300]GL ERROR :GL_INVALID_VALUE : glRasterCHROMIUM: Invalid font buffer.
+11-14 20:40:33.299  4404  4464 E chromium: [ERROR:raster_decoder.cc(2161)] [.RenderWorker-0xd43a5300]GL ERROR :GL_INVALID_OPERATION : glRasterCHROMIUM: RasterCHROMIUM: serialization failure
+11-14 20:40:33.300  4404  4464 I chromium: [INFO:SkGlyph.cpp(48)] ../../third_party/skia/src/core/SkGlyph.cpp:48: fatal error: "Unknown mask format."
+11-14 20:40:33.300  4404  4464 I chromium: 
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #02 pc 00000000034ffcc1  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #03 pc 0000000001e9797c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #04 pc 0000000001e979d8  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #05 pc 0000000001ee337c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #06 pc 0000000003bec1a7  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #07 pc 0000000003bec044  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #08 pc 0000000003be8bb2  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #09 pc 0000000003be4e52  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #10 pc 0000000003be6c9a  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.348  5014  5014 F DEBUG   :       #11 pc 00000000039ed717  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #12 pc 0000000003c5d15d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #13 pc 0000000003c5c821  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #14 pc 0000000003c61d91  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #15 pc 0000000003c60a89  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #16 pc 00000000039f033c  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #17 pc 0000000002e732c3  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #18 pc 0000000002e81a2b  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #19 pc 0000000002e81827  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #20 pc 0000000002e4e453  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #21 pc 0000000002e823a0  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #22 pc 0000000002e61088  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #23 pc 0000000002e9828d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.349  5014  5014 F DEBUG   :       #24 pc 0000000002ec058d  /system/product/app/webview/webview.apk!libwebviewchromium.so (offset 0x534e000) (BuildId: 815956a188765ff5a3a2c98a73b3f508d0ebfeaa)
+11-14 20:40:33.699  1955  2928 I ActivityManager: Killing 4433:com.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0/u0a116i1 (adj 0): isolated not needed
