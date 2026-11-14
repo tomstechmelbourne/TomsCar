@@ -1,0 +1,14 @@
+name: Brand logos check
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  logos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install pillow >/dev/null && python3 tools/fetch_logos.py out/logos | tee out_log.txt && cp out_log.txt out/
+      - run: |
+          cd out && git init -q && git checkout -q -b logos && git add -A
+          git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm logos
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" logos

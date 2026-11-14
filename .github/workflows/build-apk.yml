@@ -39,7 +39,7 @@ jobs:
           echo "small-en-us-0.15" > $GITHUB_WORKSPACE/app/src/main/assets/model-en/uuid
           du -sh $GITHUB_WORKSPACE/app/src/main/assets/model-en
       - name: Brand logos (#53, packed into the app)
-        run: python3 tools/fetch_logos.py app/src/main/assets/web/logos
+        run: pip install pillow > /dev/null 2>&1; python3 tools/fetch_logos.py app/src/main/assets/web/logos
       - name: Unpack signing key
         env:
           SIGN_SECRET: ${{ secrets.SIGN_SECRET }}
