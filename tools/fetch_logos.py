@@ -67,28 +67,32 @@ def page_icons(domain):
         if found: break
     return [u for s, u in sorted(found, key=lambda x: -x[0]) if not u.endswith('.svg')]
 
+def fetch(d):
+    """(png, quality, how) for one domain: quality 3 = big icon, 2 = page icon, 1 = DuckDuckGo, 0 = small favicon."""
+    for x in (d, 'www.' + d):
+        png, s = to_png(get('https://www.google.com/s2/favicons?domain=%s&sz=256' % x)[0])
+        if s >= 96: return png, 3, 'google ' + x
+    for url in page_icons(d)[:8]:
+        png, s = to_png(get(url)[0])
+        if s >= 64: return png, 2, url
+    png, s = to_png(get('https://icons.duckduckgo.com/ip3/%s.ico' % d)[0])
+    if s >= 48: return png, 1, 'duckduckgo ' + d
+    for x in (d, 'www.' + d):
+        png, s = to_png(get('https://www.google.com/s2/favicons?domain=%s&sz=256' % x)[0])
+        if s >= 32: return png, 0, 'google small %d %s' % (s, x)
+    return None, -1, ''
+
 ok, man = 0, {}
 for br in brands:
     slug = re.sub(r'[^a-z0-9]+', '-', br['key'].lower()).strip('-')
-    d = br['domain']; best = None; how = ''
-    tries = [(96, 'https://www.google.com/s2/favicons?domain=%s&sz=256' % x) for x in (d, 'www.' + d)]
-    for need, url in tries:
-        png, s = to_png(get(url)[0])
-        if s >= need: best, how = png, url; break
-    if not best:
-        for url in page_icons(d)[:8]:
-            png, s = to_png(get(url)[0])
-            if s >= 64: best, how = png, url; break
-    if not best:
-        png, s = to_png(get('https://icons.duckduckgo.com/ip3/%s.ico' % d)[0])
-        if s >= 48: best, how = png, 'duckduckgo'
-    if not best:
-        for x in (d, 'www.' + d):
-            png, s = to_png(get('https://www.google.com/s2/favicons?domain=%s&sz=256' % x)[0])
-            if s >= 32: best, how = png, 'google small %d' % s; break
-    if best:
-        open(os.path.join(out, slug + '.png'), 'wb').write(best); man[br['key']] = 'logos/' + slug + '.png'; ok += 1
-        print('%-18s <- %s' % (br['key'], how))
+    best = (None, -1, '')
+    for d in br['domains']:
+        r = fetch(d)
+        if r[1] > best[1]: best = r
+        if best[1] >= 2: break
+    if best[0]:
+        open(os.path.join(out, slug + '.png'), 'wb').write(best[0]); man[br['key']] = 'logos/' + slug + '.png'; ok += 1
+        print('%-18s <- %s' % (br['key'], best[2]))
     else: print('%-18s NO LOGO' % br['key'])
 rules = [[b['key'], b['re']] for b in brands]
 open(os.path.join(out, 'logos.js'), 'w').write('window.__LOGOS = ' + json.dumps(man) + ';\nwindow.__BRAND_RULES = ' + json.dumps(rules) + ';\n')

@@ -1,37 +1,260 @@
 [
-  {"key": "Shell", "domain": "shell.com.au", "re": "\\bshell\\b|coles express"},
-  {"key": "Reddy Express", "domain": "reddyexpress.com.au", "re": "reddy express"},
-  {"key": "BP", "domain": "bp.com", "re": "\\bbp\\b"},
-  {"key": "Ampol", "domain": "ampol.com.au", "re": "\\bampol\\b|\\bampol foodary\\b"},
-  {"key": "EG", "domain": "egaustralia.com.au", "re": "^eg\\b|\\beg (ampol|fuel|australia|group)\\b"},
-  {"key": "Caltex", "domain": "caltex.com", "re": "\\bcaltex\\b"},
-  {"key": "United Petroleum", "domain": "unitedpetroleum.com.au", "re": "\\bunited\\b"},
-  {"key": "7-Eleven", "domain": "7eleven.com.au", "re": "7.?eleven|seven.?eleven"},
-  {"key": "Puma Energy", "domain": "pumaenergy.com", "re": "\\bpuma\\b"},
-  {"key": "Liberty", "domain": "libertyoil.com.au", "re": "\\bliberty\\b"},
-  {"key": "Mobil", "domain": "mobil.com.au", "re": "\\bmobil\\b"},
-  {"key": "Metro Petroleum", "domain": "metropetroleum.com.au", "re": "\\bmetro (petroleum|fuel)\\b"},
-  {"key": "OTR", "domain": "otr.com.au", "re": "\\botr\\b|on the run"},
-  {"key": "Speedway", "domain": "speedwayfuels.com.au", "re": "\\bspeedway\\b"},
-  {"key": "McDonald's", "domain": "mcdonalds.com.au", "re": "maccas|mc ?donald"},
-  {"key": "Hungry Jack's", "domain": "hungryjacks.com.au", "re": "hungry ?jack"},
-  {"key": "KFC", "domain": "kfc.com.au", "re": "\\bkfc\\b|kentucky"},
-  {"key": "Subway", "domain": "subway.com", "re": "\\bsubway\\b"},
-  {"key": "Domino's", "domain": "dominos.com.au", "re": "domino"},
-  {"key": "Pizza Hut", "domain": "pizzahut.com.au", "re": "pizza hut"},
-  {"key": "Red Rooster", "domain": "redrooster.com.au", "re": "red rooster"},
-  {"key": "Oporto", "domain": "oporto.com.au", "re": "\\boporto\\b"},
-  {"key": "Guzman y Gomez", "domain": "guzmanygomez.com.au", "re": "guzman|\\bgyg\\b"},
-  {"key": "Nando's", "domain": "nandos.com.au", "re": "nando"},
-  {"key": "Hog's Breath", "domain": "hogsbreath.com.au", "re": "hog.?s breath"},
-  {"key": "Starbucks", "domain": "starbucks.com.au", "re": "starbucks"},
-  {"key": "Gloria Jean's", "domain": "gloriajeanscoffees.com.au", "re": "gloria jean"},
-  {"key": "The Coffee Club", "domain": "coffeeclub.com.au", "re": "coffee club"},
-  {"key": "Muffin Break", "domain": "muffinbreak.com.au", "re": "muffin break"},
-  {"key": "Bakers Delight", "domain": "bakersdelight.com.au", "re": "bakers delight"},
-  {"key": "Coles", "domain": "coles.com.au", "re": "^coles\\b(?! express)"},
-  {"key": "Woolworths", "domain": "woolworths.com.au", "re": "woolworths|woolies"},
-  {"key": "Aldi", "domain": "aldi.com.au", "re": "\\baldi\\b"},
-  {"key": "IGA", "domain": "iga.com.au", "re": "\\biga\\b"},
-  {"key": "Foodworks", "domain": "foodworks.com.au", "re": "food ?works"}
+ {
+  "key": "Shell",
+  "re": "\\bshell\\b|coles express",
+  "domains": [
+   "shell.com.au"
+  ]
+ },
+ {
+  "key": "Reddy Express",
+  "re": "reddy express",
+  "domains": [
+   "reddyexpress.com.au"
+  ]
+ },
+ {
+  "key": "BP",
+  "re": "\\bbp\\b",
+  "domains": [
+   "bp.com"
+  ]
+ },
+ {
+  "key": "Ampol",
+  "re": "\\bampol\\b|\\bampol foodary\\b",
+  "domains": [
+   "ampol.com.au"
+  ]
+ },
+ {
+  "key": "EG",
+  "re": "^eg\\b|\\beg (ampol|fuel|australia|group)\\b",
+  "domains": [
+   "eg.group",
+   "egfuel.com.au",
+   "egaustralia.com.au"
+  ]
+ },
+ {
+  "key": "Caltex",
+  "re": "\\bcaltex\\b",
+  "domains": [
+   "caltex.com"
+  ]
+ },
+ {
+  "key": "United Petroleum",
+  "re": "\\bunited\\b",
+  "domains": [
+   "unitedpetroleum.com.au"
+  ]
+ },
+ {
+  "key": "7-Eleven",
+  "re": "7.?eleven|seven.?eleven",
+  "domains": [
+   "7eleven.com.au"
+  ]
+ },
+ {
+  "key": "Puma Energy",
+  "re": "\\bpuma\\b",
+  "domains": [
+   "pumaenergy.com"
+  ]
+ },
+ {
+  "key": "Liberty",
+  "re": "\\bliberty\\b",
+  "domains": [
+   "libertyoil.com.au"
+  ]
+ },
+ {
+  "key": "Mobil",
+  "re": "\\bmobil\\b",
+  "domains": [
+   "mobil.com.au"
+  ]
+ },
+ {
+  "key": "Metro Petroleum",
+  "re": "\\bmetro (petroleum|fuel)\\b",
+  "domains": [
+   "metropetroleum.com.au"
+  ]
+ },
+ {
+  "key": "OTR",
+  "re": "\\botr\\b|on the run",
+  "domains": [
+   "otr.com.au"
+  ]
+ },
+ {
+  "key": "Speedway",
+  "re": "\\bspeedway\\b",
+  "domains": [
+   "speedwayfuels.com.au",
+   "speedwaypetroleum.com.au"
+  ]
+ },
+ {
+  "key": "McDonald's",
+  "re": "maccas|mc ?donald",
+  "domains": [
+   "mcdonalds.com.au"
+  ]
+ },
+ {
+  "key": "Hungry Jack's",
+  "re": "hungry ?jack",
+  "domains": [
+   "hungryjacks.com.au"
+  ]
+ },
+ {
+  "key": "KFC",
+  "re": "\\bkfc\\b|kentucky",
+  "domains": [
+   "kfc.com.au"
+  ]
+ },
+ {
+  "key": "Subway",
+  "re": "\\bsubway\\b",
+  "domains": [
+   "subway.com",
+   "subway.com.au",
+   "subway.co.uk"
+  ]
+ },
+ {
+  "key": "Domino's",
+  "re": "domino",
+  "domains": [
+   "dominos.com.au",
+   "dominos.com",
+   "dominos.co.nz"
+  ]
+ },
+ {
+  "key": "Pizza Hut",
+  "re": "pizza hut",
+  "domains": [
+   "pizzahut.com.au"
+  ]
+ },
+ {
+  "key": "Red Rooster",
+  "re": "red rooster",
+  "domains": [
+   "redrooster.com.au"
+  ]
+ },
+ {
+  "key": "Oporto",
+  "re": "\\boporto\\b",
+  "domains": [
+   "oporto.com.au"
+  ]
+ },
+ {
+  "key": "Guzman y Gomez",
+  "re": "guzman|\\bgyg\\b",
+  "domains": [
+   "guzmanygomez.com.au",
+   "guzmanygomez.com"
+  ]
+ },
+ {
+  "key": "Nando's",
+  "re": "nando",
+  "domains": [
+   "nandos.com.au"
+  ]
+ },
+ {
+  "key": "Hog's Breath",
+  "re": "hog.?s breath",
+  "domains": [
+   "hogsbreath.com.au"
+  ]
+ },
+ {
+  "key": "Starbucks",
+  "re": "starbucks",
+  "domains": [
+   "starbucks.com.au"
+  ]
+ },
+ {
+  "key": "Gloria Jean's",
+  "re": "gloria jean",
+  "domains": [
+   "gloriajeanscoffees.com.au"
+  ]
+ },
+ {
+  "key": "The Coffee Club",
+  "re": "coffee club",
+  "domains": [
+   "coffeeclub.com.au",
+   "thecoffeeclub.com.au",
+   "coffeeclub.co.nz"
+  ]
+ },
+ {
+  "key": "Muffin Break",
+  "re": "muffin break",
+  "domains": [
+   "muffinbreak.com.au"
+  ]
+ },
+ {
+  "key": "Bakers Delight",
+  "re": "bakers delight",
+  "domains": [
+   "bakersdelight.com.au",
+   "bakersdelight.co.nz"
+  ]
+ },
+ {
+  "key": "Coles",
+  "re": "^coles\\b(?! express)",
+  "domains": [
+   "coles.com.au"
+  ]
+ },
+ {
+  "key": "Woolworths",
+  "re": "woolworths|woolies",
+  "domains": [
+   "woolworths.com.au",
+   "woolworthsgroup.com.au",
+   "woolworths.co.nz"
+  ]
+ },
+ {
+  "key": "Aldi",
+  "re": "\\baldi\\b",
+  "domains": [
+   "aldi.com.au"
+  ]
+ },
+ {
+  "key": "IGA",
+  "re": "\\biga\\b",
+  "domains": [
+   "iga.com.au"
+  ]
+ },
+ {
+  "key": "Foodworks",
+  "re": "food ?works",
+  "domains": [
+   "foodworks.com.au"
+  ]
+ }
 ]
