@@ -71,7 +71,8 @@
     const wet = kind === "rain" || kind === "storm", grey = wet || kind === "cloudy" || kind === "fog";
     let c = SKY[tod] || SKY.day;
     if (grey) {
-      const m = wet ? "#56687A" : kind === "fog" ? "#AAB5BC" : "#8A9AA8";
+      const nt = tod === "night";
+      const m = nt ? wet ? "#0B111B" : "#141E2E" : wet ? "#56687A" : kind === "fog" ? "#AAB5BC" : "#8A9AA8";
       const f = wet ? 0.6 : 0.4;
       c = c.map((x) => mix(x, m, f));
     }
@@ -88,14 +89,7 @@
         g.fillRect(s.x, s.y, s.r, s.r);
       }
       g.globalAlpha = 1;
-      g.fillStyle = "#F3EFDC";
-      g.beginPath();
-      g.arc(w * 0.18, h * 0.2, 28 * K + 6, 0, 6.2832);
-      g.fill();
-      g.fillStyle = c[0];
-      g.beginPath();
-      g.arc(w * 0.18 + 12 * K + 2, h * 0.2 - 6 * K, 26 * K + 5, 0, 6.2832);
-      g.fill();
+      if (window.tcMoonDraw) window.tcMoonDraw(g, w * 0.18, h * 0.24, 24 * K + 5, Date.now());
     } else if (!wet && kind !== "fog") {
       const sx = tod === "dusk" ? w * 0.82 : tod === "dawn" ? w * 0.18 : w * 0.8, sy = tod === "day" ? h * 0.16 : h * 0.62;
       const sg = g.createRadialGradient(sx, sy, 0, sx, sy, Math.max(w, h) * 0.28);
@@ -168,6 +162,7 @@
     last = ts;
     const dt = frozen ? 0 : Math.min(80, gap) * (ws.calm ? 0.5 : 1);
     draw(document.getElementById("wxmini"), ws, dt, ts);
+    draw(document.getElementById("phsky"), ws, dt, ts);
     if (window.__idleOn) draw(document.getElementById("idlesky"), ws, dt, ts);
   }
   requestAnimationFrame(loop);

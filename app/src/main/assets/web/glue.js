@@ -11,10 +11,16 @@
   window.TCN = N ? { call } : null;
   if (N) document.body.classList.add("app");
   const stage = document.getElementById("stage");
-  let narrow = false;
+  let narrow = false, forceWide = false;
+  window.tcForceWide = (on) => {
+    forceWide = !!on;
+    live.forceWide = forceWide;
+    fit();
+    if (window.__ui) window.__ui.setState({ live: Object.assign({}, live) });
+  };
   const fit = () => {
     const w = window.innerWidth, h = window.innerHeight;
-    narrow = w / h < 1.1;
+    narrow = w / h < 1.1 && !forceWide;
     document.body.classList.toggle("narrow", narrow);
     if (narrow) {
       const vw = 420, vh = Math.round(420 * h / w), s = w / vw;
@@ -185,22 +191,33 @@
     rest: "[highway=rest_area]",
     shop: "[shop=supermarket]"
   };
+  const LOCAL = window.__LOGOS || {};
   const logoCache = (() => {
     try {
-      return JSON.parse(localStorage.getItem("tc-logos") || "{}");
+      const c = JSON.parse(localStorage.getItem("tc-logos2") || "{}");
+      localStorage.removeItem("tc-logos");
+      return c;
     } catch (e) {
       return {};
     }
   })();
   const saveLogos = () => {
     try {
-      localStorage.setItem("tc-logos", JSON.stringify(logoCache));
+      localStorage.setItem("tc-logos2", JSON.stringify(logoCache));
     } catch (x) {
     }
   };
   const BRANDS = ["Ampol", "BP", "Shell", "Caltex", "7-Eleven", "United Petroleum", "Puma Energy", "Liberty", "Mobil", "Metro Petroleum", "OTR", "EG Ampol", "McDonald's", "Hungry Jack's", "KFC", "Subway", "Domino's", "Red Rooster", "Oporto", "Guzman y Gomez", "Starbucks", "Gloria Jean's Coffees", "The Coffee Club", "Coles", "Woolworths", "Aldi", "IGA", "Foodworks", "Bakers Delight"];
+  const BRULES = (window.__BRAND_RULES || []).map(([k, r]) => {
+    try {
+      return [k, new RegExp(r, "i")];
+    } catch (e) {
+      return null;
+    }
+  }).filter(Boolean);
   const brandKey = (n) => {
     const t = (n || "").toLowerCase().replace(/[’']/g, "'");
+    for (const [k, re] of BRULES) if (re.test(t)) return k;
     if (/maccas|mcdonald/.test(t)) return "McDonald's";
     if (/hungry jack/.test(t)) return "Hungry Jack's";
     if (/\bkfc\b|kentucky/.test(t)) return "KFC";
@@ -216,27 +233,18 @@
   });
   const brandLogo = (qid, name) => new Promise((res) => {
     const bk = brandKey(name);
-    const key = qid || (bk ? "n:" + bk : "");
-    if (!key) return res("");
-    if (logoCache[key] !== void 0) return res(logoCache[key]);
-    const p = qid ? logoOf(qid) : fetch("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&origin=*&limit=1&search=" + encodeURIComponent(bk)).then((r) => r.json()).then((j) => j.search && j.search[0] ? logoOf(j.search[0].id) : "");
-    p.then((url) => {
-      logoCache[key] = url;
-      if (bk && url) logoCache["n:" + bk] = url;
+    if (bk && LOCAL[bk]) return res(LOCAL[bk]);
+    if (!qid) return res("");
+    const c = logoCache[qid];
+    if (c && (c.u || Date.now() - c.t < 3 * 864e5)) return res(c.u || "");
+    logoOf(qid).then((url) => {
+      logoCache[qid] = { u: url || "", t: Date.now() };
       saveLogos();
-      res(url);
+      res(url || "");
     }).catch(() => res(""));
   });
   window.tcBrandKey = brandKey;
-  window.tcLogo = (n) => logoCache["n:" + brandKey(n)] || "";
-  setTimeout(() => {
-    let i = 0;
-    const step = () => {
-      if (i >= BRANDS.length) return;
-      brandLogo("", BRANDS[i++]).then(() => setTimeout(step, 400));
-    };
-    step();
-  }, 2e4);
+  window.tcLogo = (n) => LOCAL[brandKey(n)] || "";
   const isOpenNow = (oh) => {
     if (!oh) return null;
     if (oh === "24/7") return true;
@@ -391,8 +399,9 @@
   window.tcPlanTrip = (fromQ, toQ) => {
     const u = window.__ui;
     const say = (m) => u && u.setState({ ntMsg: m });
-    say("\u0110ang t\xECm " + fromQ + " v\xE0 " + toQ + "\u2026");
-    return Promise.all([geocode(fromQ), geocode(toQ)]).then(([a, b]) => {
+    say("\u0110ang t\xECm " + (typeof fromQ === "object" ? fromQ.name || "v\u1ECB tr\xED c\u1EE7a Tom" : fromQ) + " v\xE0 " + toQ + "\u2026");
+    const geo = (q) => q && typeof q === "object" && q.lat != null ? Promise.resolve({ name: q.name || "V\u1ECB tr\xED c\u1EE7a Tom", st: q.st || "", lat: q.lat, lon: q.lon }) : geocode(q);
+    return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say("\u0110ang t\xECm \u0111\u01B0\u1EDDng " + a.name + " \u2192 " + b.name + "\u2026");
       return fetch("https://router.project-osrm.org/route/v1/driving/" + a.lon + "," + a.lat + ";" + b.lon + "," + b.lat + "?overview=full&geometries=geojson").then((r) => r.json()).then((j) => {
         const rt = j.routes && j.routes[0];
@@ -643,6 +652,34 @@
     return out;
   };
   let live = {};
+  let gpsStart = null;
+  window.tcHome = () => {
+    try {
+      return JSON.parse(localStorage.getItem("tc-home") || "null");
+    } catch (e) {
+      return null;
+    }
+  };
+  window.tcSetHome = (clear) => {
+    try {
+      if (clear) {
+        localStorage.removeItem("tc-home");
+        return null;
+      }
+      if (live.lat == null) return false;
+      const h = { lat: live.lat, lon: live.lon, name: live.place && live.place.suburb || "Nh\xE0" };
+      localStorage.setItem("tc-home", JSON.stringify(h));
+      return h;
+    } catch (e) {
+      return false;
+    }
+  };
+  window.tcStartPt = () => {
+    const h = window.tcHome();
+    if (h) return Object.assign({ home: true }, h);
+    if (gpsStart) return { lat: gpsStart.lat, lon: gpsStart.lon, name: gpsStart.name || "V\u1ECB tr\xED c\u1EE7a Tom" };
+    return null;
+  };
   const push = (patch) => {
     live = Object.assign({}, live, patch);
     if (window.__tc) window.__tc.setState({ live });
@@ -662,6 +699,8 @@
       return;
     }
     const patch = Object.assign({}, d, tripUpdate(d));
+    if (d.lat != null && d.lon != null && !gpsStart && !(d.speed > 8)) gpsStart = { lat: d.lat, lon: d.lon, name: "" };
+    if (gpsStart && !gpsStart.name && live.place && live.place.suburb) gpsStart.name = live.place.suburb;
     if (d.lat != null && d.lon != null) {
       fetchWx(d.lat, d.lon);
       fetchLimit(d.lat, d.lon, d.bearing, d.speed || 0);

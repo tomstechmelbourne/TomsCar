@@ -74,6 +74,29 @@ class MainActivity : Activity() {
 
     // ---------------------------------------------------------------- lifecycle
     @SuppressLint("SetJavaScriptEnabled")
+    /** #56: the start-up sound — once per app start, not when the phone is on silent/vibrate or something is already playing.
+     *  arg = {"name":"chime_soft","vol":60, "test":false}; test = the "Nghe Thử" button in Settings (plays whatever the state). */
+    private fun chime(arg: String) {
+        try {
+            val o = org.json.JSONObject(arg); val test = o.optBoolean("test")
+            val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            if (!test) {
+                if (TomsCarApp.chimed) return
+                TomsCarApp.chimed = true
+                if (am.ringerMode != AudioManager.RINGER_MODE_NORMAL || am.isMusicActive) return
+            }
+            val name = o.optString("name", "chime_soft").replace(Regex("[^a-z_]"), "")
+            val afd = assets.openFd("web/sounds/$name.ogg")
+            val mp = android.media.MediaPlayer()
+            mp.setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length); afd.close()
+            val v = (o.optInt("vol", 60).coerceIn(0, 100)) / 100f
+            mp.setVolume(v, v)
+            mp.setOnCompletionListener { it.release() }
+            mp.prepare(); mp.start()
+        } catch (_: Exception) { }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -594,6 +617,7 @@ class MainActivity : Activity() {
                         push()
                     }
                     "settings" -> settings()
+                    "chime" -> chime(arg)
                     "media" -> mediaAction(arg)
                     "launch" -> Launcher.workspace(this@MainActivity, arg)
                     "nav" -> Launcher.navigate(this@MainActivity, arg)

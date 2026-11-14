@@ -38,6 +38,8 @@ jobs:
           mv /tmp/vosk-model-small-en-us-0.15 $GITHUB_WORKSPACE/app/src/main/assets/model-en
           echo "small-en-us-0.15" > $GITHUB_WORKSPACE/app/src/main/assets/model-en/uuid
           du -sh $GITHUB_WORKSPACE/app/src/main/assets/model-en
+      - name: Brand logos (#53, packed into the app)
+        run: python3 tools/fetch_logos.py app/src/main/assets/web/logos
       - name: Unpack signing key
         env:
           SIGN_SECRET: ${{ secrets.SIGN_SECRET }}
@@ -58,6 +60,7 @@ jobs:
         run: |
           mkdir -p out
           cp app/build/outputs/apk/release/*.apk out/TomsCar.apk
+          cp -r app/src/main/assets/web/logos out/logos 2>/dev/null || true
           echo "$(cat sdk_used.txt) commit=${GITHUB_SHA}" > out/build_info.txt; cp build37.log out/ 2>/dev/null || true
           cd out && git init -q && git checkout -q -b apk && git add -A
           git -c user.name=ci -c user.email=ci@users.noreply.github.com commit -qm "APK ${GITHUB_SHA::7}"

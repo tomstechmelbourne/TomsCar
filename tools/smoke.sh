@@ -37,6 +37,12 @@ adb shell input keyevent 3; sleep 3
 adb shell am start -n $P/.MainActivity; sleep 4
 adb shell settings put system user_rotation 1; sleep 4
 timeout 20 adb exec-out screencap -p > shots/api${API}_6_resume.png
+# Tìm Chỗ (#53 logos): tap the "Tìm Chỗ" tab of the 1280x720 stage, scaled to the screen
+read W H <<< "$(adb shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1 | tr x ' ')"
+if [ "$W" -lt "$H" ]; then t=$W; W=$H; H=$t; fi
+X=$(python3 -c "s=min($W/1280,$H/720);print(int(($W-1280*s)/2+383*s))"); Y=$(python3 -c "s=min($W/1280,$H/720);print(int(($H-720*s)/2+147*s))")
+adb shell input tap $X $Y; sleep 25
+timeout 20 adb exec-out screencap -p > shots/api${API}_7_search.png
 PID=$(adb shell pidof $P)
 adb logcat -d > shots/api${API}_logcat.txt
 grep -i "chromium\|console" shots/api${API}_logcat.txt | tail -60 > shots/api${API}_console.txt || true

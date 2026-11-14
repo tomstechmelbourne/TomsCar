@@ -8,10 +8,12 @@
 
   // ---- scale the 1280x720 stage to the window; a narrow window (next to a map) gets the compact column ----
   const stage = document.getElementById('stage');
-  let narrow = false;
+  let narrow = false, forceWide = false;
+  // phone (#44): the compact screen can open the full screens; "Màn Hình Gọn" brings it back
+  window.tcForceWide = (on) => { forceWide = !!on; live.forceWide = forceWide; fit(); if (window.__ui) window.__ui.setState({ live: Object.assign({}, live) }); };
   const fit = () => {
     const w = window.innerWidth, h = window.innerHeight;
-    narrow = w / h < 1.1;
+    narrow = w / h < 1.1 && !forceWide;
     document.body.classList.toggle('narrow', narrow);
     if (narrow) {
       const vw = 420, vh = Math.round(420 * h / w), s = w / vw;
@@ -120,25 +122,29 @@
     cafe: '[amenity=cafe]', wc: '[amenity=toilets]', rest: '[highway=rest_area]', shop: '[shop=supermarket]'
   };
   // brand logos: cached; OSM brand:wikidata first, otherwise look the brand up by name on Wikidata
-  const logoCache = (() => { try { return JSON.parse(localStorage.getItem('tc-logos') || '{}'); } catch (e) { return {}; } })();
-  const saveLogos = () => { try { localStorage.setItem('tc-logos', JSON.stringify(logoCache)); } catch (x) {} };
+  // #53: logos of the common Australian brands are packed into the app at build time (logos/logos.js) — never looked up by name.
+  // Only a shop whose map entry names its exact brand item (brand:wikidata) and is not in the list is looked up, and an empty answer is retried after 3 days.
+  const LOCAL = window.__LOGOS || {};
+  const logoCache = (() => { try { const c = JSON.parse(localStorage.getItem('tc-logos2') || '{}'); localStorage.removeItem('tc-logos'); return c; } catch (e) { return {}; } })();
+  const saveLogos = () => { try { localStorage.setItem('tc-logos2', JSON.stringify(logoCache)); } catch (x) {} };
   const BRANDS = ['Ampol', 'BP', 'Shell', 'Caltex', '7-Eleven', 'United Petroleum', 'Puma Energy', 'Liberty', 'Mobil', 'Metro Petroleum', 'OTR', 'EG Ampol', "McDonald's", "Hungry Jack's", 'KFC', 'Subway', "Domino's", 'Red Rooster', 'Oporto', 'Guzman y Gomez', 'Starbucks', 'Gloria Jean\'s Coffees', 'The Coffee Club', 'Coles', 'Woolworths', 'Aldi', 'IGA', 'Foodworks', 'Bakers Delight'];
-  const brandKey = (n) => { const t = (n || '').toLowerCase().replace(/[’']/g, "'"); if (/maccas|mcdonald/.test(t)) return "McDonald's"; if (/hungry jack/.test(t)) return "Hungry Jack's"; if (/\bkfc\b|kentucky/.test(t)) return 'KFC'; if (/woolies|woolworths/.test(t)) return 'Woolworths'; if (/\bservo\b/.test(t)) return ''; return BRANDS.find((b) => t.indexOf(b.toLowerCase()) >= 0) || ''; };
+  const BRULES = (window.__BRAND_RULES || []).map(([k, r]) => { try { return [k, new RegExp(r, 'i')]; } catch (e) { return null; } }).filter(Boolean);
+  const brandKey = (n) => { const t = (n || '').toLowerCase().replace(/[’']/g, "'"); for (const [k, re] of BRULES) if (re.test(t)) return k; if (/maccas|mcdonald/.test(t)) return "McDonald's"; if (/hungry jack/.test(t)) return "Hungry Jack's"; if (/\bkfc\b|kentucky/.test(t)) return 'KFC'; if (/woolies|woolworths/.test(t)) return 'Woolworths'; if (/\bservo\b/.test(t)) return ''; return BRANDS.find((b) => t.indexOf(b.toLowerCase()) >= 0) || ''; };
   const logoOf = (qid) => fetch('https://www.wikidata.org/wiki/Special:EntityData/' + qid + '.json').then((r) => r.json()).then((j) => {
     const e = j.entities && j.entities[qid]; const c = e && e.claims && (e.claims.P154 || e.claims.P8972);
     const f = c && c[0] && c[0].mainsnak && c[0].mainsnak.datavalue && c[0].mainsnak.datavalue.value;
     return f ? 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(f) + '?width=96' : '';
   });
   const brandLogo = (qid, name) => new Promise((res) => {
-    const bk = brandKey(name); const key = qid || (bk ? 'n:' + bk : '');
-    if (!key) return res('');
-    if (logoCache[key] !== undefined) return res(logoCache[key]);
-    const p = qid ? logoOf(qid) : fetch('https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&origin=*&limit=1&search=' + encodeURIComponent(bk)).then((r) => r.json()).then((j) => (j.search && j.search[0]) ? logoOf(j.search[0].id) : '');
-    p.then((url) => { logoCache[key] = url; if (bk && url) logoCache['n:' + bk] = url; saveLogos(); res(url); }).catch(() => res(''));
+    const bk = brandKey(name);
+    if (bk && LOCAL[bk]) return res(LOCAL[bk]);
+    if (!qid) return res('');
+    const c = logoCache[qid];
+    if (c && (c.u || Date.now() - c.t < 3 * 86400000)) return res(c.u || '');
+    logoOf(qid).then((url) => { logoCache[qid] = { u: url || '', t: Date.now() }; saveLogos(); res(url || ''); }).catch(() => res(''));
   });
   window.tcBrandKey = brandKey;
-  window.tcLogo = (n) => logoCache['n:' + brandKey(n)] || '';
-  setTimeout(() => { let i = 0; const step = () => { if (i >= BRANDS.length) return; brandLogo('', BRANDS[i++]).then(() => setTimeout(step, 400)); }; step(); }, 20000);
+  window.tcLogo = (n) => LOCAL[brandKey(n)] || '';
   const isOpenNow = (oh) => { if (!oh) return null; if (oh === '24/7') return true; return null; };
   // staged search 5 → 15 → 30 km; remembers last results; status shown on screen
   const placeCache = (() => { try { return JSON.parse(localStorage.getItem('tc-places') || '{}'); } catch (e) { return {}; } })();
@@ -229,8 +235,9 @@
   window.tcPlanTrip = (fromQ, toQ) => {
     const u = window.__ui;
     const say = (m) => u && u.setState({ ntMsg: m });
-    say('Đang tìm ' + fromQ + ' và ' + toQ + '…');
-    return Promise.all([geocode(fromQ), geocode(toQ)]).then(([a, b]) => {
+    say('Đang tìm ' + (typeof fromQ === 'object' ? (fromQ.name || 'vị trí của Tom') : fromQ) + ' và ' + toQ + '…');
+    const geo = (q) => (q && typeof q === 'object' && q.lat != null) ? Promise.resolve({ name: q.name || 'Vị trí của Tom', st: q.st || '', lat: q.lat, lon: q.lon }) : geocode(q);
+    return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say('Đang tìm đường ' + a.name + ' → ' + b.name + '…');
       return fetch('https://router.project-osrm.org/route/v1/driving/' + a.lon + ',' + a.lat + ';' + b.lon + ',' + b.lat + '?overview=full&geometries=geojson').then((r) => r.json()).then((j) => {
         const rt = j.routes && j.routes[0]; if (!rt) throw new Error('route');
@@ -373,6 +380,11 @@
 
   // ---- live state from native → both layers ----
   let live = {};
+  // ---- #49: trip start = where Tom is (home address if saved, else the first GPS fix while parked) ----
+  let gpsStart = null;
+  window.tcHome = () => { try { return JSON.parse(localStorage.getItem('tc-home') || 'null'); } catch (e) { return null; } };
+  window.tcSetHome = (clear) => { try { if (clear) { localStorage.removeItem('tc-home'); return null; } if (live.lat == null) return false; const h = { lat: live.lat, lon: live.lon, name: (live.place && live.place.suburb) || 'Nhà' }; localStorage.setItem('tc-home', JSON.stringify(h)); return h; } catch (e) { return false; } };
+  window.tcStartPt = () => { const h = window.tcHome(); if (h) return Object.assign({ home: true }, h); if (gpsStart) return { lat: gpsStart.lat, lon: gpsStart.lon, name: gpsStart.name || 'Vị trí của Tom' }; return null; };
   const push = (patch) => {
     live = Object.assign({}, live, patch);
     if (window.__tc) window.__tc.setState({ live });
@@ -383,6 +395,8 @@
     if (window.innerWidth !== fitW || window.innerHeight !== fitH) { fitW = window.innerWidth; fitH = window.innerHeight; fit(); }
     let d; try { d = typeof json === 'string' ? JSON.parse(json) : json; } catch (e) { return; }
     const patch = Object.assign({}, d, tripUpdate(d));
+    if (d.lat != null && d.lon != null && !gpsStart && !(d.speed > 8)) gpsStart = { lat: d.lat, lon: d.lon, name: '' };   // #49: where the car was when the app started
+    if (gpsStart && !gpsStart.name && live.place && live.place.suburb) gpsStart.name = live.place.suburb;
     if (d.lat != null && d.lon != null) { fetchWx(d.lat, d.lon); fetchLimit(d.lat, d.lon, d.bearing, d.speed || 0); loadRadio(d.lat, d.lon); checkRegion(d.lat, d.lon); }
     push(patch);
   };

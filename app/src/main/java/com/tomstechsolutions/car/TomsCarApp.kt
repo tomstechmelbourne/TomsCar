@@ -7,5 +7,6 @@ class TomsCarApp : Application() {
     companion object {
         /** True once the splash + About screens have been shown in this process. */
         @Volatile var introShown = false
+        @Volatile var chimed = false
     }
 }

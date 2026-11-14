@@ -1022,11 +1022,11 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
   <polygon points="1280,0 1206,0 1266,470 1280,480" fill="#010407"></polygon>
   <line x1="74" y1="0" x2="14" y2="470" stroke="#5FD4F0" stroke-width="2" opacity="0.7"></line>
   <line x1="1206" y1="0" x2="1266" y2="470" stroke="#5FD4F0" stroke-width="2" opacity="0.7"></line>
-  <rect x="552" y="96" width="176" height="56" rx="10" fill="#020A12" stroke="#5FD4F0" stroke-width="2"></rect>
-  <path d="M640 148 L596 106 M640 148 L684 106" stroke="#FBB040" stroke-width="2" opacity="0.6"></path>
-  <line x1="640" y1="148" x2="640" y2="106" stroke="#5FD4F0" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.7"></line>
-  <text x="566" y="114" fill="#5FD4F0" font-size="9" font-weight="700" font-family="Chakra Petch, sans-serif">{{rearCam}}</text>
-  <circle cx="714" cy="110" r="3" fill="#E5484D"></circle>
+  <rect display="none" x="552" y="96" width="176" height="56" rx="10" fill="#020A12" stroke="#5FD4F0" stroke-width="2"></rect>
+  <path display="none" d="M640 148 L596 106 M640 148 L684 106" stroke="#FBB040" stroke-width="2" opacity="0.6"></path>
+  <line display="none" x1="640" y1="148" x2="640" y2="106" stroke="#5FD4F0" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.7"></line>
+  <text display="none" x="566" y="114" fill="#5FD4F0" font-size="9" font-weight="700" font-family="Chakra Petch, sans-serif">{{rearCam}}</text>
+  <circle display="none" cx="714" cy="110" r="3" fill="#E5484D"></circle>
   <g data-ui="1" opacity="0.92">
     <text x="1000" y="372" text-anchor="middle" fill="#CFF6FF" font-size="54" font-weight="700" font-family="Chakra Petch, sans-serif">{{speed}}</text>
     <text x="1000" y="392" text-anchor="middle" fill="#5FD4F0" font-size="12" font-family="Chakra Petch, sans-serif">KM/H</text>
@@ -1050,7 +1050,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
   <rect x="880" y="606" width="120" height="5" rx="2.5" fill="#123044"></rect><rect x="880" y="606" width="84" height="5" rx="2.5" fill="#5FD4F0"></rect>
   <rect x="880" y="620" width="120" height="5" rx="2.5" fill="#123044"></rect><rect x="880" y="620" width="56" height="5" rx="2.5" fill="#7BD88F"></rect>
   </g>
-  <g class="{{wheelClass}}" style="transform-origin: 940px 860px">
+  <g display="none" class="{{wheelClass}}" style="transform-origin: 940px 860px">
     <path d="M750 798 A200 200 0 0 1 1130 798" fill="none" stroke="#020A12" stroke-width="34" stroke-linecap="round"></path>
     <path d="M758 778 A200 200 0 0 1 1122 778" fill="none" stroke="#5FD4F0" stroke-width="2" opacity="0.8"></path>
     <rect x="935" y="646" width="10" height="26" rx="3" fill="#FBB040"></rect>

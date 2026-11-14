@@ -235,6 +235,31 @@
       rect(b.x - 1, b.y - hh, 2, hh * 0.25, "#fff");
     }
   }
+  function moonDraw(g2, x, y, r, now) {
+    const syn = 29.530588853, ref = Date.UTC(2e3, 0, 6, 18, 14);
+    const p = ((now - ref) / 864e5 % syn + syn) % syn / syn;
+    const gl = g2.createRadialGradient(x, y, r * 0.6, x, y, r * 2.8);
+    gl.addColorStop(0, "rgba(243,239,220,0.22)");
+    gl.addColorStop(1, "rgba(243,239,220,0)");
+    g2.fillStyle = gl;
+    g2.beginPath();
+    g2.arc(x, y, r * 2.8, 0, 6.2832);
+    g2.fill();
+    g2.fillStyle = "rgba(200,210,235,0.10)";
+    g2.beginPath();
+    g2.arc(x, y, r, 0, 6.2832);
+    g2.fill();
+    if (p < 0.025 || p > 0.975) return;
+    const litRight = !(p < 0.5);
+    const k = Math.cos(2 * Math.PI * p);
+    g2.fillStyle = "#f3efdc";
+    g2.beginPath();
+    g2.arc(x, y, r, -Math.PI / 2, Math.PI / 2, !litRight);
+    g2.ellipse(x, y, Math.max(0.01, r * Math.abs(k)), r, 0, Math.PI / 2, -Math.PI / 2, k > 0 === litRight);
+    g2.closePath();
+    g2.fill();
+  }
+  window.tcMoonDraw = moonDraw;
   let stars = null;
   function sky(T, scn, t) {
     const hz = HZ();
@@ -244,17 +269,18 @@
       c0 = "#1b0a3a";
       c1 = "#ff6fb1";
     }
+    const NT = S.tod === "night";
     if (S.wx === "rain" || S.wx === "storm") {
-      c0 = mix(c0, "#4d5d6d", 0.6);
-      c1 = mix(c1, "#7f8f9d", 0.6);
+      c0 = mix(c0, NT ? "#0b111b" : "#4d5d6d", 0.6);
+      c1 = mix(c1, NT ? "#1b2533" : "#7f8f9d", 0.6);
     }
     if (S.wx === "cloud") {
-      c0 = mix(c0, "#8a9aa8", 0.45);
-      c1 = mix(c1, "#c3ccd3", 0.45);
+      c0 = mix(c0, NT ? "#0d1524" : "#8a9aa8", 0.45);
+      c1 = mix(c1, NT ? "#1f2b40" : "#c3ccd3", 0.45);
     }
     if (S.wx === "fog") {
-      c0 = mix(c0, "#b8c1c7", 0.7);
-      c1 = mix(c1, "#d6dbde", 0.7);
+      c0 = mix(c0, NT ? "#1a2230" : "#b8c1c7", 0.7);
+      c1 = mix(c1, NT ? "#2a3445" : "#d6dbde", 0.7);
     }
     sk.addColorStop(0, c0);
     sk.addColorStop(1, c1);
@@ -270,8 +296,7 @@
         g.fillStyle = "rgba(255,255,255," + (0.35 + 0.55 * Math.abs(Math.sin(t * 6e-4 + st[3]))).toFixed(2) + ")";
         g.fillRect(st[0] / 1280 * W, st[1] / 720 * H, st[2] * DPR, st[2] * DPR);
       }
-      circ(W * 0.3, H * 0.2, H * 0.026, "#f3efdc");
-      circ(W * 0.3 + H * 0.011, H * 0.195, H * 0.023, c0);
+      moonDraw(g, W * 0.6, H * 0.27, H * 0.018, Date.now());
     } else if (S.wx === "clear" || S.tod === "dawn" || S.tod === "dusk") {
       const sx = W * T.sun[0], sy = H * T.sun[1];
       const sg = g.createRadialGradient(sx, sy, 0, sx, sy, W * 0.11);
@@ -524,6 +549,15 @@
   function cockpit(t) {
     const c = CP[S.cockpit] || CP.lowpoly;
     const night = S.tod === "night";
+    if (S.slim) {
+      const sd = H * 0.07, sp = c.pillar || "#2a3038", sdash = c.dash ? night ? c.dashN : c.dash : night ? "#0b1118" : "#1d2630";
+      poly([[0, 0], [W * 0.04, 0], [W * 0.09, H - sd], [0, H - sd]], night ? shade(sp, -0.7) : shade(sp, -0.15));
+      poly([[W, 0], [W * 0.96, 0], [W * 0.91, H - sd], [W, H - sd]], night ? shade(sp, -0.7) : shade(sp, -0.15));
+      rect(0, H - sd, W, sd, sdash);
+      rect(0, H - sd, W, 2 * DPR, night ? "rgba(255,255,255,0.08)" : c.trim || "#9aa4ad");
+      if (c.pixel) pixelate();
+      return;
+    }
     if (c.hud || !c.dash) {
       if (!S.noGauge) gaugeHud();
       return;

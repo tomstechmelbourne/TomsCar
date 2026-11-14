@@ -96,6 +96,11 @@ s = s.replace('<div role="tablist" style="position: absolute; right: 20px; top: 
 s = s.replace('  <g opacity="0.92">', '  <g data-ui="1" opacity="0.92">', 1)
 i = s.index('  <rect x="700" y="548" width="480" height="96"'); j = s.index('  <g class="{{wheelClass}}"', i)
 s = s[:i] + '  <g data-ui="1">\n' + s[i:j] + '  </g>\n' + s[j:]
+# 0.9.8 (#46): no steering wheel and no rear-view mirror in any theme
+s = s.replace('<g class="{{wheelClass}}"', '<g display="none" class="{{wheelClass}}"', 1)
+s = s.replace('<rect x="552" y="96" width="176" height="56"', '<rect display="none" x="552" y="96" width="176" height="56"', 1)
+for a in ['<path d="M640 148 L596 106', '<line x1="640" y1="148" x2="640" y2="106"', '<text x="566" y="114"', '<circle cx="714" cy="110" r="3"']:
+    s = s.replace(a, a.replace(' ', ' display="none" ', 1), 1)
 
 # template = everything inside <x-dc> except <link> tags (fonts are bundled)
 tpl = s[s.index('<x-dc>') + 6: s.index('</x-dc>')]
@@ -129,6 +134,7 @@ shutil.copy(here / 'dcmini.js', out_dir / 'dcmini.js')
 shutil.copy(here / 'glue.js', out_dir / 'glue.js')
 shutil.copy(here / 'sky.js', out_dir / 'sky.js')
 shutil.copy(here / 'lowpoly.js', out_dir / 'lowpoly.js')
+shutil.copytree(here / 'sounds', out_dir / 'sounds', dirs_exist_ok=True)
 LF = pathlib.Path(os.environ.get('LEAFLET', '/tmp/node_modules/leaflet/dist'))
 shutil.copy(LF / 'leaflet.js', out_dir / 'leaflet.js')
 shutil.copy(LF / 'leaflet.css', out_dir / 'leaflet.css')
@@ -170,6 +176,7 @@ body.narrow #scene{{display:none}}
 </style></head>
 <body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="ui"></div></div>
 <script>window.TC_VERSION = '{version}';</script>
+<script src="logos/logos.js"></script>
 <script src="dcmini.js"></script>
 <script src="scene.js"></script>
 <script src="app.js"></script>

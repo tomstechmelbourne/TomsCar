@@ -145,6 +145,23 @@
     for (let i = 0; i < 6; i++) { const z = ((i / 6) + off) % 1; const a = proj(-2.85, 1 - z), b = proj(2.85, 1 - z); const hh = H * 0.012 * a.p * 2.2; rect(a.x - 1, a.y - hh, 2, hh, '#f2f2f2'); rect(a.x - 1, a.y - hh, 2, hh * 0.25, '#e33'); rect(b.x - 1, b.y - hh, 2, hh, '#f2f2f2'); rect(b.x - 1, b.y - hh, 2, hh * 0.25, '#fff'); }
   }
 
+  // ---------- moon: real crescent shape, phase from the lunar cycle, seen from the southern hemisphere ----------
+  function moonDraw(g, x, y, r, now) {
+    const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
+    const p = ((((now - ref) / 86400000) % syn) + syn) % syn / syn;   // 0 new · 0.5 full
+    const gl = g.createRadialGradient(x, y, r * 0.6, x, y, r * 2.8); gl.addColorStop(0, 'rgba(243,239,220,0.22)'); gl.addColorStop(1, 'rgba(243,239,220,0)');
+    g.fillStyle = gl; g.beginPath(); g.arc(x, y, r * 2.8, 0, 6.2832); g.fill();
+    g.fillStyle = 'rgba(200,210,235,0.10)'; g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();   // faint unlit disc
+    if (p < 0.025 || p > 0.975) return;
+    const litRight = !(p < 0.5);              // southern hemisphere: waxing moon lit on the LEFT
+    const k = Math.cos(2 * Math.PI * p);      // 1 new … -1 full
+    g.fillStyle = '#f3efdc'; g.beginPath();
+    g.arc(x, y, r, -Math.PI / 2, Math.PI / 2, !litRight);
+    g.ellipse(x, y, Math.max(0.01, r * Math.abs(k)), r, 0, Math.PI / 2, -Math.PI / 2, (k > 0) === litRight);
+    g.closePath(); g.fill();
+  }
+  window.tcMoonDraw = moonDraw;
+
   // ---------- sky & weather ----------
   let stars = null;
   function sky(T, scn, t) {
@@ -152,14 +169,15 @@
     const sk = g.createLinearGradient(0, 0, 0, hz);
     let c0 = T.sky[0], c1 = T.sky[1];
     if (scn.extra.indexOf('synthsun') >= 0) { c0 = '#1b0a3a'; c1 = '#ff6fb1'; }
-    if (S.wx === 'rain' || S.wx === 'storm') { c0 = mix(c0, '#4d5d6d', 0.6); c1 = mix(c1, '#7f8f9d', 0.6); }
-    if (S.wx === 'cloud') { c0 = mix(c0, '#8a9aa8', 0.45); c1 = mix(c1, '#c3ccd3', 0.45); }
-    if (S.wx === 'fog') { c0 = mix(c0, '#b8c1c7', 0.7); c1 = mix(c1, '#d6dbde', 0.7); }
+    const NT = S.tod === 'night';   // at night clouds/rain darken the sky instead of turning it light grey
+    if (S.wx === 'rain' || S.wx === 'storm') { c0 = mix(c0, NT ? '#0b111b' : '#4d5d6d', 0.6); c1 = mix(c1, NT ? '#1b2533' : '#7f8f9d', 0.6); }
+    if (S.wx === 'cloud') { c0 = mix(c0, NT ? '#0d1524' : '#8a9aa8', 0.45); c1 = mix(c1, NT ? '#1f2b40' : '#c3ccd3', 0.45); }
+    if (S.wx === 'fog') { c0 = mix(c0, NT ? '#1a2230' : '#b8c1c7', 0.7); c1 = mix(c1, NT ? '#2a3445' : '#d6dbde', 0.7); }
     sk.addColorStop(0, c0); sk.addColorStop(1, c1); g.fillStyle = sk; g.fillRect(0, 0, W, hz + 2);
     if (S.tod === 'night' && S.wx !== 'rain' && S.wx !== 'storm') {
       if (!stars) { const r = rnd(7); stars = []; for (let i = 0; i < 80; i++) stars.push([r() * 1280, r() * 300, r() * 1.3 + 0.4, r() * 6]); }
       for (const st of stars) { g.fillStyle = 'rgba(255,255,255,' + (0.35 + 0.55 * Math.abs(Math.sin(t * 0.0006 + st[3]))).toFixed(2) + ')'; g.fillRect(st[0] / 1280 * W, st[1] / 720 * H, st[2] * DPR, st[2] * DPR); }
-      circ(W * 0.3, H * 0.2, H * 0.026, '#f3efdc'); circ(W * 0.3 + H * 0.011, H * 0.195, H * 0.023, c0);
+      moonDraw(g, W * 0.6, H * 0.27, H * 0.018, Date.now());
     } else if (S.wx === 'clear' || S.tod === 'dawn' || S.tod === 'dusk') {
       const sx = W * T.sun[0], sy = H * T.sun[1];
       const sg = g.createRadialGradient(sx, sy, 0, sx, sy, W * 0.11); sg.addColorStop(0, 'rgba(255,248,215,0.95)'); sg.addColorStop(0.3, 'rgba(255,230,150,0.45)'); sg.addColorStop(1, 'rgba(255,230,150,0)');
@@ -266,6 +284,14 @@
   // ---------- cockpit + gauge behind the wheel (right-hand drive) ----------
   function cockpit(t) {
     const c = CP[S.cockpit] || CP.lowpoly; const night = S.tod === 'night';
+    if (S.slim) {   // 0.9.8: no wheel, no gauge — only the pillars and a thin dash strip, dark at night
+      const sd = H * 0.07, sp = c.pillar || '#2a3038', sdash = c.dash ? (night ? c.dashN : c.dash) : (night ? '#0b1118' : '#1d2630');
+      poly([[0, 0], [W * 0.04, 0], [W * 0.09, H - sd], [0, H - sd]], night ? shade(sp, -0.7) : shade(sp, -0.15));
+      poly([[W, 0], [W * 0.96, 0], [W * 0.91, H - sd], [W, H - sd]], night ? shade(sp, -0.7) : shade(sp, -0.15));
+      rect(0, H - sd, W, sd, sdash); rect(0, H - sd, W, 2 * DPR, night ? 'rgba(255,255,255,0.08)' : (c.trim || '#9aa4ad'));
+      if (c.pixel) pixelate();
+      return;
+    }
     if (c.hud || !c.dash) { if (!S.noGauge) gaugeHud(); return; }
     const dh = H * c.top, dash = night ? c.dashN : c.dash;
     // A-pillars

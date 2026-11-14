@@ -76,6 +76,8 @@
 
   // ---------- DOM morphing ----------
   function morphAttrs(from, to) {
+    // canvases size themselves (sky.js); touching width/height would wipe the drawing every render
+    const cvs = from.nodeName === 'CANVAS';
     const ta = to.attributes;
     for (let i = 0; i < ta.length; i++) {
       const a = ta[i];
@@ -83,6 +85,7 @@
     }
     const fa = from.attributes;
     for (let i = fa.length - 1; i >= 0; i--) {
+      if (cvs && (fa[i].name === 'width' || fa[i].name === 'height')) continue;
       if (!to.hasAttribute(fa[i].name)) from.removeAttribute(fa[i].name);
     }
   }

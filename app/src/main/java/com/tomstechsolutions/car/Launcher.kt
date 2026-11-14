@@ -55,10 +55,11 @@ object Launcher {
 
         val h = Handler(Looper.getMainLooper())
         if (isDesktop(a)) {
-            // DeX / freeform: fill the whole DeX screen (minus the taskbar and a thin Tom's Car strip), side by side by percentage
+            // DeX / freeform (Note 8 and newer): the apps share the whole DeX screen by the saved percentages, side by side.
+            // Tom's Car then steps aside to the taskbar instead of calling itself back to the front (#51) —
+            // DeX does not resize a window that is already open, so bringing Tom's Car back would cover the apps.
             val area = screenArea(a)
-            val strip = (56 * a.resources.displayMetrics.density).toInt()
-            val w = area.width() - strip
+            val w = area.width()
             val total = found.sumOf { it.second }.coerceAtLeast(1)
             var x = area.left
             found.forEachIndexed { i, (_, pct, intent) ->
@@ -66,12 +67,14 @@ object Launcher {
                 val r = Rect(x, area.top, x + ww, area.bottom); x += ww
                 h.postDelayed({ start(a, intent, ActivityOptions.makeBasic().setLaunchBounds(r).toBundle(), false) }, i * 450L)
             }
-            // Tom's Car itself becomes the thin strip at the right edge (DeX may ignore this for a running window)
-            h.postDelayed({ reposition(a, Rect(area.left + w, area.top, area.right, area.bottom)) }, found.size * 450L + 300L)
+            h.postDelayed({ try { a.moveTaskToBack(true) } catch (_: Exception) {} }, found.size * 450L + 250L)
         } else {
-            // Phone / tablet: first app full screen, second app next to it (split screen where the phone allows)
+            // Phone / tablet (no DeX): Samsung split screen, top + bottom; Samsung decides the sizes (Tom drags the bar).
+            // One app, or a phone that cannot split: the first app full screen.
             start(a, found[0].third, null, false)
-            if (found.size > 1) h.postDelayed({ start(a, found[1].third, null, true) }, 900L)
+            if (found.size == 1) return
+            h.postDelayed({ start(a, found[1].third, null, true) }, 900L)
+            if (found.size > 2) h.postDelayed({ toast(a, "Điện thoại chỉ chia được 2 app — app thứ 3 mở khi cắm DeX") }, 1200L)
         }
     }
 

@@ -24,6 +24,7 @@
 .glc{background:rgba(8,22,34,.5);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22);border-radius:26px}
 .glr{background:rgba(8,22,34,.5)!important;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22)!important;border-radius:50%!important;clip-path:none!important}
 .glt{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.glb{background:rgba(8,22,34,.55)!important;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22)!important;border-radius:18px!important;clip-path:none!important}
 #ui .lbl{text-shadow:0 1px 3px rgba(0,0,0,.45)}
 .flipc{position:relative;width:250px;height:230px;border-radius:22px;background:linear-gradient(#1d2a36 0 50%,#16212b 50%);box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:Overpass,sans-serif;font-size:190px;font-weight:300;line-height:1;letter-spacing:-6px;color:#fff}
 .flipc:after{content:'';position:absolute;left:0;right:0;top:50%;height:3px;background:rgba(0,0,0,.55)}
@@ -143,7 +144,7 @@ input[type=range]{accent-color:#FBB040}
           </span>
         </button>
         <button onClick="{{wxc.open}}" aria-label="Thời tiết: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
-          <canvas id="wxmini" width="230" height="58" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas><span aria-hidden="true" style="position: absolute; inset: 0; background: rgba(10,30,50,0.3); pointer-events: none"></span>
+          <canvas id="wxmini" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas><span aria-hidden="true" style="position: absolute; inset: 0; background: rgba(10,30,50,0.3); pointer-events: none"></span>
           <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true" style="position: relative; flex-shrink: 0"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg>
           <span style="position: relative; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; min-width: 0">
             <span style="font-size: 26px; font-weight: 300">{{wxT}}</span>
@@ -174,7 +175,7 @@ input[type=range]{accent-color:#FBB040}
       <section aria-label="Workspace" style="position: absolute; left: 20px; top: 138px; width: 330px; bottom: 100px; display: flex; flex-direction: column; gap: 8px">
         <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">WORKSPACE</span><sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}"><button onClick="{{openCreate}}" class="btn" style="height: 34px; font-size: 12px">+ Tạo</button></sc-if></div>
         <sc-if value="{{wsEmpty}}" hint-placeholder-val="{{ true }}">
-        <div class="pnl" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+        <div class="pnl glb" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
           <button onClick="{{openCreate}}" class="btn btn-o" style="height: 64px; font-size: 18px; width: 100%">+ Tạo Workspace Đầu Tiên</button>
           <div style="font-size: 13px; color: #CFE6EE; line-height: 1.55">
             <div>1. Chọn 1, 2 hoặc 3 app (Waze, nhạc, YouTube…)</div>
@@ -186,8 +187,8 @@ input[type=range]{accent-color:#FBB040}
         <sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}">
         <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px">
           <sc-for list="{{wsCards}}" as="w" hint-placeholder-count="2">
-            <div class="pnl" style="flex-shrink: 0; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
-              <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><sc-if value="{{w.rt}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px">Road Trip</span></sc-if><button onClick="{{w.del}}" aria-label="Xoá Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">✕</button></div>
+            <div class="pnl glb" style="flex-shrink: 0; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
+              <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><sc-if value="{{w.rt}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px">Road Trip</span></sc-if><button onClick="{{w.edit}}" aria-label="Sửa Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #CFF6FF">✎</button><button onClick="{{w.del}}" aria-label="Xoá Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">✕</button></div>
               <div aria-hidden="true" style="display: flex; gap: 4px; height: 30px"><sc-for list="{{w.boxes}}" as="b" hint-placeholder-count="2"><span style="flex: {{b.flex}}; min-width: 0; border-radius: 4px; background: {{b.bg}}; font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; padding: 0 4px">{{b.name}}</span></sc-for></div>
               <button onClick="{{w.open}}" class="btn btn-o" style="height: 44px">Mở Workspace</button>
             </div>
@@ -252,31 +253,25 @@ input[type=range]{accent-color:#FBB040}
       <!-- thanh dưới cùng (làm mờ) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
         <button onClick="{{startListen}}" aria-label="Trợ lý giọng nói ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
-        <div class="pnl" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHIỆT MÁY</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span></div>
-        <div class="pnl" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">BÌNH ĐIỆN</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
-        <sc-if value="{{drive}}" hint-placeholder-val="{{ false }}">
-          <div class="pnl" style="width: 230px; height: 64px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center"><span class="lbl">{{upL}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{upMain}}</span></div>
-        </sc-if>
+        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHIỆT MÁY</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span></div>
+        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">BÌNH ĐIỆN</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
       </div>
+      <sc-if value="{{drive}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb dimbox" style="position: absolute; right: 20px; bottom: 102px; width: 300px; height: 56px; padding: 0 16px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; opacity: {{opBottom}}"><span class="lbl">{{upL}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{upMain}}</span></div>
+      </sc-if>
 
 
-      <!-- đồng hồ tốc độ theo kiểu đã chọn (#32): kính nổi / ôm thanh nhạc / sau vô lăng -->
-      <sc-if value="{{dk.glass}}" hint-placeholder-val="{{ false }}">
-        <div class="glc" aria-label="Tốc độ {{sb.num}} {{sb.unit}}" style="position: absolute; right: 24px; bottom: 104px; width: 220px; height: 140px">
-          <svg width="120" height="120" viewBox="0 0 170 170" aria-hidden="true" style="position: absolute; left: 14px; top: 10px"><circle cx="85" cy="85" r="74" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="7" stroke-dasharray="348 465" transform="rotate(135 85 85)" stroke-linecap="round"></circle><circle cx="85" cy="85" r="74" fill="none" stroke="{{dk.arcC}}" stroke-width="7" stroke-dasharray="{{dk.arc}}" transform="rotate(135 85 85)" stroke-linecap="round"></circle></svg>
-          <div style="position: absolute; left: 14px; width: 120px; top: 40px; text-align: center"><div class="tnum" style="font-size: 44px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</div><div style="font-size: 10px; letter-spacing: 2px; opacity: 0.8">{{dk.unit}}</div></div>
-          <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; right: 16px; top: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 10px; color: #CFE6EE; text-align: center; max-width: 70px">{{dk.note}}</span></div></sc-if>
+      <!-- đồng hồ tốc độ cố định giữa đáy màn hình (#46) + biển giới hạn sát bên -->
+      <sc-if value="{{dk.on}}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{sb.tap}}" class="glr" aria-label="Tốc độ {{sb.num}} {{sb.unit}} — chạm xem chuyến hôm nay" style="position: absolute; left: 585px; bottom: 8px; width: 110px; height: 110px; border: 0; padding: 0; cursor: pointer; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; justify-content: center">
+          <svg width="110" height="110" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
+          <span style="text-align: center; position: relative"><span class="tnum" style="display: block; font-size: 38px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.85; margin-top: 2px">{{dk.unit}}</span></span>
+        </button>
+        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 9px; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></div></sc-if>
+        <div style="position: absolute; left: 640px; bottom: 128px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none">
+          <sc-if value="{{sb.ahead}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 6px 14px; font-size: 14px; color: #FFD08A; text-align: center; white-space: nowrap">Phía trước 300 m: {{sb.aheadL}}</div></sc-if>
+          <sc-if value="{{sb.statsOpen}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center; white-space: nowrap">{{sb.stats}}</div></sc-if>
         </div>
-      </sc-if>
-      <sc-if value="{{dk.pill}}" hint-placeholder-val="{{ false }}">
-        <div class="glr" aria-label="Tốc độ {{sb.num}} {{sb.unit}}" style="position: absolute; left: {{dk.gx}}px; bottom: 6px; width: 94px; height: 94px; display: flex; align-items: center; justify-content: center">
-          <svg width="94" height="94" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
-          <div style="text-align: center; position: relative"><div class="tnum" style="font-size: 32px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</div><div style="font-size: 8px; letter-spacing: 2px; opacity: 0.8">{{dk.unit}}</div></div>
-        </div>
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: {{dk.sx}}px; bottom: 24px; width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div></sc-if>
-      </sc-if>
-      <sc-if value="{{dk.wheel}}" hint-placeholder-val="{{ false }}">
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: 1080px; top: 568px; width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div></sc-if>
       </sc-if>
       <!-- thanh nhạc: viên thuốc kiểu Tom's Jukebox (đĩa than trái, tên giữa, ⏮ ▶ ⏭ bên phải, thanh thời gian trong viên thuốc, sóng lụa ở mép dưới) -->
       <div class="pnl dimbox jbpill {{mpCls}}" style="position: absolute; left: {{mpL}}; right: {{mpR}}; bottom: {{mpB}}px; width: {{mpW}}px; height: {{mpH}}px; padding: 0 12px 0 8px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
@@ -301,10 +296,10 @@ input[type=range]{accent-color:#FBB040}
           <button onClick="{{jb.recTap}}" aria-label="Thâu đài đang nghe" class="jbbtn" style="width: 40px; height: 40px; border-color: #E5484D"><span style="width: 14px; height: 14px; border-radius: 50%; background: #E5484D; display: block"></span></button>
         </sc-if>
         <div style="position: relative; display: flex; align-items: center; gap: 8px; flex-shrink: 0">
-          <button onClick="{{togglePanel}}" aria-label="Danh sách phát" aria-expanded="{{panelExp}}" class="jbbtn" style="width: 44px; height: 44px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h10v2H4z" fill="#FBB040"></path></svg></button>
-          <button onClick="{{prevF}}" aria-label="Bài trước" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect><path d="M19 5v14L9 12z" fill="#FBB040"></path></svg></button>
-          <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" class="jbbtn" style="width: 60px; height: 60px"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="{{playIcon}}" fill="#FBB040"></path></svg></button>
-          <button onClick="{{nextF}}" aria-label="Bài kế" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z" fill="#FBB040"></path><rect x="16" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect></svg></button>
+          <button onClick="{{togglePanel}}" aria-label="Danh sách phát" aria-expanded="{{panelExp}}" class="jbbtn" style="width: 40px; height: 40px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h10v2H4z" fill="#FBB040"></path></svg></button>
+          <button onClick="{{prevF}}" aria-label="{{prevLabel}}" class="jbbtn" style="width: 42px; height: 42px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect><path d="M19 5v14L9 12z" fill="#FBB040"></path></svg></button>
+          <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" class="jbbtn" style="width: 54px; height: 54px"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="{{playIcon}}" fill="#FBB040"></path></svg></button>
+          <button onClick="{{nextF}}" aria-label="{{nextLabel}}" class="jbbtn" style="width: 42px; height: 42px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z" fill="#FBB040"></path><rect x="16" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect></svg></button>
         </div>
       </div>
 
@@ -324,7 +319,7 @@ input[type=range]{accent-color:#FBB040}
           </div>
           <div style="padding: 0 14px 8px; display: flex; align-items: center; gap: 6px">
             <sc-for list="{{mp.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="height: 30px; font-size: 12px; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
-            <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">Tìm</span><input type="text" placeholder="{{mp.searchPh}}" disabled="{{drive}}" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
+            <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">Tìm</span><input type="text" value="{{mp.q}}" onInput="{{mp.setQ}}" placeholder="{{mp.searchPh}}" disabled="{{drive}}" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
           </div>
           <sc-if value="{{mp.regionOn}}" hint-placeholder-val="{{ false }}">
             <div style="margin: 0 14px 8px; padding: 6px 10px; border-radius: 6px; background: rgba(123,216,143,0.12); font-size: 12px; color: #BFF0CA">{{mp.regionL}}</div>
@@ -362,8 +357,8 @@ input[type=range]{accent-color:#FBB040}
         </div>
       </sc-if>
 
-      <sc-if value="{{dimmedAny}}" hint-placeholder-val="{{ false }}">
-        <div class="fadein" style="position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%); font-size: 12px; color: #8FC3D3">Thanh dưới + thanh nhạc tự mờ sau 5 giây — chạm để sáng lại</div>
+      <sc-if value="{{dimHint}}" hint-placeholder-val="{{ false }}">
+        <div class="fadein" style="position: absolute; left: 50%; bottom: 130px; transform: translateX(-50%); font-size: 12px; color: #8FC3D3">Thanh dưới + thanh nhạc tự mờ sau 5 giây — chạm để sáng lại</div>
       </sc-if>
     </sc-if>
 
@@ -427,19 +422,16 @@ input[type=range]{accent-color:#FBB040}
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px">
             <sc-for list="{{gp.items}}" as="it" hint-placeholder-count="6">
               <button onClick="{{it.pick}}" aria-pressed="{{it.on}}" style="border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; background: #0A1E2C; border-radius: 10px; overflow: hidden; box-shadow: {{it.ring}}; text-align: left">
-                <img src="{{it.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: {{it.sw}}">
+                <span style="position: relative; display: block"><img src="{{it.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: {{it.sw}}"><sc-if value="{{it.badgeOn}}" hint-placeholder-val="{{ false }}"><span onClick="{{it.drop}}" style="position: absolute; right: 6px; top: 6px; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; background: {{it.badgeBg}}; color: {{it.badgeFg}}">{{it.badge}}</span></sc-if></span>
                 <span style="display: block; padding: 6px 8px; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.label}}</span>
               </button>
             </sc-for>
           </div>
         </sc-for>
-        <div style="margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">BUỒNG LÁI</div>
+        <button onClick="{{th.toggleMore}}" aria-pressed="{{th.more}}" class="pill" style="margin-top: 14px; height: 44px; padding: 0 20px; background: #0D2C40; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040">{{th.moreL}}</button>
+        <div style="margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">MÀU TRỤ XE + TAPLÔ</div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px">
           <sc-for list="{{th.cockpits}}" as="o" hint-placeholder-count="12"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
-        </div>
-        <div style="margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">ĐỒNG HỒ TỐC ĐỘ (SAU VÔ LĂNG)</div>
-        <div style="display: flex; flex-wrap: wrap; gap: 8px">
-          <sc-for list="{{th.gauges}}" as="o" hint-placeholder-count="8"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
         <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px">
           <sc-for list="{{th.toggles}}" as="o" hint-placeholder-count="4"><button onClick="{{o.pick}}" role="switch" aria-checked="{{o.on}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; height: 56px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700">{{o.label}}</span><span style="font-size: 11px; color: #8FC3D3">{{o.sub}}</span></span><span class="sw2" style="margin-left: 8px; background: {{o.swBg}}"><span class="kn" style="left: {{o.knobX}}px">{{o.tick}}</span></span></button></sc-for>
@@ -829,7 +821,7 @@ input[type=range]{accent-color:#FBB040}
     <!-- ===== màn hình chờ kiểu Thời Tiết Samsung (đậu xe lâu không đụng màn hình / chạm ô thời tiết / chạm đồng hồ) ===== -->
     <sc-if value="{{idl.on}}" hint-placeholder-val="{{ false }}">
       <button onClick="{{idl.close}}" aria-label="Đóng màn hình chờ" class="fadein" style="position: absolute; inset: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; background: #0B1A2A; overflow: hidden; text-align: left">
-        <canvas id="idlesky" width="1280" height="720" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; opacity: {{idl.bgOp}}"></canvas>
+        <canvas id="idlesky" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; opacity: {{idl.bgOp}}"></canvas>
         <div style="position: absolute; inset: 0; background: rgba(0,0,0,{{idl.dark}})"></div>
         <div style="position: absolute; left: {{idl.x}}px; top: {{idl.y}}px; width: 1280px; height: 720px">
           <sc-if value="{{idl.htc}}" hint-placeholder-val="{{ true }}">
@@ -891,30 +883,55 @@ input[type=range]{accent-color:#FBB040}
       </button>
     </sc-if>
 
-    <!-- ===== cửa sổ hẹp: cột Road Trip gọn cạnh bản đồ ===== -->
+    <!-- ===== điện thoại / cửa sổ hẹp (#44): viên thuốc trên, đồng hồ kính tròn, thẻ chuyến hoặc thời tiết, thanh nhạc, 4 nút ===== -->
     <sc-if value="{{isCompact}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; inset: 0; padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: #03111C">
-        <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 18px; font-weight: 700; color: #FBB040">Tom's Car</span><span style="flex: 1"></span><span class="tnum" style="font-size: 18px; font-weight: 700; color: #CFF6FF">{{clock}}</span></div>
-        <div style="display: flex; align-items: center; justify-content: center; gap: 14px">
-          <span class="tnum" style="font-size: 64px; font-weight: 700; line-height: 1; color: {{sb.c}}; text-align: center">{{sb.num}}</span>
-          <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="width: 52px; height: 68px; background: #FFFFFF; border-radius: 5px; box-sizing: border-box; border: {{sb.limBorder}}; display: flex; align-items: center; justify-content: center"><div style="width: 42px; height: 42px; border-radius: 50%; border: 5px solid #D0202E; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: Overpass, sans-serif; font-weight: 800; font-size: 16px; color: #111111">{{sb.lim}}</div></div></sc-if>
-        </div>
-        <div class="pnl nxt" style="padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px"><span class="lbl">CHẶNG GHÉ KẾ</span><span style="font-size: 18px; font-weight: 700">{{cp.next}}</span><span style="font-size: 14px; color: #FFD08A">{{cp.nextSub}}</span></div>
-        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
-          <div class="pnl" style="padding: 10px; text-align: center"><div class="lbl">CÒN LẠI</div><div style="font-size: 18px; font-weight: 700">{{cp.left}}</div></div>
-          <div class="pnl" style="padding: 10px; text-align: center"><div class="lbl">TỚI NƠI</div><div style="font-size: 18px; font-weight: 700">{{cp.eta}}</div></div>
-        </div>
-        <div class="pnl" style="padding: 10px; text-align: center; font-size: 14px; color: #CFE6EE">{{cp.rest}}</div>
-        <div class="pnl" style="padding: 8px 10px; display: flex; align-items: center; gap: 10px">
-          <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" style="width: 40px; height: 40px; border: 0; border-radius: 50%; cursor: pointer; flex-shrink: 0; background: #FBB040; color: #2A1A00; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{playIcon}}"></path></svg></button>
-          <span style="flex: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{songTitle}}</span>
-        </div>
-        <span style="flex: 1"></span>
-        <div style="display: flex; gap: 8px">
-          <button onClick="{{startListen}}" class="btn" aria-label="Trợ lý giọng nói" style="flex: 1; height: 52px; color: #5FD4F0">Trợ Lý</button>
-          <button onClick="{{cp.full}}" class="btn" style="flex: 1; height: 52px">Mở Rộng</button>
+      <div style="position: absolute; inset: 0; overflow: hidden; background: #050E18">
+        <canvas id="phsky" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0.45; pointer-events: none"></canvas>
+        <div aria-hidden="true" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3,10,18,0.35), rgba(3,10,18,0.75)); pointer-events: none"></div>
+        <div style="position: absolute; inset: 0; padding: 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+          <div class="glc" style="padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-radius: 999px">
+            <span class="tnum" style="font-size: 26px; font-weight: 300; line-height: 1">{{clock}}</span>
+            <span style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0"><span style="font-size: 11px; color: #CFE6EE; white-space: nowrap">{{ph.date}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span></span>
+            <span style="flex: 1"></span>
+            <button onClick="{{wxc.open}}" aria-label="Thời tiết: {{wxc.aria}}" style="border: 0; background: transparent; cursor: pointer; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 6px; padding: 0"><svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg><span style="font-size: 22px; font-weight: 300">{{wxT}}</span></button>
+          </div>
+          <div style="display: flex; justify-content: center; gap: 10px; font-size: 11px; font-weight: 700"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></div>
+          <div style="position: relative; display: flex; justify-content: center; align-items: center; height: 200px; flex-shrink: 0">
+            <button onClick="{{sb.tap}}" class="glr" aria-label="Tốc độ {{sb.num}} {{sb.unit}}" style="position: relative; width: 196px; height: 196px; border: 0; padding: 0; cursor: pointer; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; justify-content: center">
+              <svg width="196" height="196" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="7" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="7" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
+              <span style="position: relative; text-align: center"><span class="tnum" style="display: block; font-size: 70px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 12px; letter-spacing: 3px; opacity: 0.85; margin-top: 4px">{{dk.unit}}</span></span>
+            </button>
+            <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; right: 6px; bottom: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 50px; height: 64px; background: #FFFFFF; border-radius: 6px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4)"><div style="width: 42px; height: 42px; border-radius: 50%; border: 5px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 10px; color: {{sb.limNoteC}}; white-space: nowrap">{{sb.limNote}}</span></div></sc-if>
+          </div>
+          <sc-if value="{{ph.trip}}" hint-placeholder-val="{{ false }}">
+            <div class="glc" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 8px">
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px"><span class="lbl">CHẶNG GHÉ KẾ</span><span style="font-size: 18px; font-weight: 700">{{cp.next}}</span><span style="font-size: 13px; color: #FFD08A">{{cp.nextSub}}</span></div>
+              <div style="display: flex; gap: 8px"><div style="flex: 1; text-align: center"><div class="lbl">CÒN LẠI</div><div style="font-size: 17px; font-weight: 700">{{cp.left}}</div></div><div style="flex: 1; text-align: center"><div class="lbl">TỚI NƠI</div><div style="font-size: 17px; font-weight: 700">{{cp.eta}}</div></div></div>
+              <div style="font-size: 12px; color: #CFE6EE; text-align: center">{{cp.rest}}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ph.noTrip}}" hint-placeholder-val="{{ true }}">
+            <div class="glc" style="padding: 12px 10px; display: flex; flex-direction: column; gap: 10px">
+              <div style="display: flex; justify-content: space-between"><sc-for list="{{ph.hours}}" as="hh" hint-placeholder-count="6"><span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px"><span style="font-size: 11px; color: #CFE6EE; white-space: nowrap">{{hh.t}}</span><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{hh.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 14px; font-weight: 700">{{hh.v}}</span><span style="font-size: 10px; color: #9FD8FF; min-height: 12px">{{hh.p}}</span></span></sc-for></div>
+              <button onClick="{{ph.start}}" class="pill" style="height: 44px; background: #FBB040; color: #2A1A00; font-size: 15px">Bắt Đầu Chuyến</button>
+            </div>
+          </sc-if>
+          <span style="flex: 1"></span>
+          <div class="glc" style="padding: 8px 10px 8px 8px; display: flex; align-items: center; gap: 8px; border-radius: 999px">
+            <button onClick="{{ph.list}}" aria-label="Danh sách bài và đài" style="width: 44px; height: 44px; border: 0; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer; background: transparent"><svg viewBox="0 0 60 60" width="44" height="44" aria-hidden="true" class="{{jb.discCls}}"><circle cx="30" cy="30" r="29" fill="#1A1A1A"></circle><circle cx="30" cy="30" r="20" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="11" fill="#FBB040"></circle><circle cx="30" cy="30" r="3" fill="#2A1A00"></circle></svg></button>
+            <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{songTitle}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{songSub}}</span></span>
+            <button onClick="{{prevF}}" aria-label="{{prevLabel}}" class="jbbtn" style="width: 38px; height: 38px"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect><path d="M19 5v14L9 12z" fill="#FBB040"></path></svg></button>
+            <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" class="jbbtn" style="width: 48px; height: 48px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="{{playIcon}}" fill="#FBB040"></path></svg></button>
+            <button onClick="{{nextF}}" aria-label="{{nextLabel}}" class="jbbtn" style="width: 38px; height: 38px"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z" fill="#FBB040"></path><rect x="16" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect></svg></button>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{ph.btns}}" as="bt" hint-placeholder-count="4"><button onClick="{{bt.go}}" aria-label="{{bt.l}}" class="glc" style="height: 62px; border: 0; cursor: pointer; font-family: inherit; color: {{bt.c}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 22px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{bt.ic}}"></path></svg><span style="font-size: 11px; color: #E8F1F5; white-space: nowrap">{{bt.l}}</span></button></sc-for>
+          </div>
         </div>
       </div>
+    </sc-if>
+    <sc-if value="{{ph.backOn}}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ph.back}}" class="pill gl" style="position: absolute; left: 50%; top: 4px; transform: translateX(-50%); z-index: 30; height: 38px; color: #FFD08A; font-size: 14px">◀ Màn Hình Gọn</button>
     </sc-if>
 
     <!-- ===== hộp thoại: Thoát ===== -->
@@ -937,7 +954,7 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; inset: 0; background: rgba(1,6,10,0.7); display: flex; align-items: center; justify-content: center; z-index: 20">
         <div role="dialog" aria-label="Tạo Workspace" class="pnl fadein" style="width: 1040px; height: 620px; padding: 20px 22px; box-sizing: border-box; display: flex; gap: 20px; background: #06192A">
           <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
-            <div style="display: flex; align-items: center; gap: 12px"><span style="font-size: 22px; font-weight: 700">Tạo Workspace</span><span style="font-size: 12px; color: #8FC3D3">Chọn tối đa 3 ô — app hoặc widget</span></div>
+            <div style="display: flex; align-items: center; gap: 12px"><span style="font-size: 22px; font-weight: 700">{{wsTitle}}</span><span style="font-size: 12px; color: #8FC3D3">Chọn tối đa 3 ô — app hoặc widget</span></div>
             <label style="display: flex"><span style="position: absolute; left: -9999px">Tìm app</span><input type="text" value="{{ws.q}}" onChange="{{ws.setQ}}" placeholder="Tìm app trong máy (vd: spo)" style="flex: 1; height: 42px; padding: 0 12px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
             <div style="display: flex; gap: 6px; flex-wrap: wrap">
               <sc-for list="{{ws.groups}}" as="g" hint-placeholder-count="8"><button onClick="{{g.pick}}" aria-pressed="{{g.on}}" class="pill" style="height: 30px; font-size: 12px; background: {{g.bg}}; color: {{g.fg}}">{{g.label}}</button></sc-for>
@@ -956,9 +973,10 @@ input[type=range]{accent-color:#FBB040}
           <div style="width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px">
             <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #8FC3D3">Tên Workspace<input type="text" value="{{wsName}}" onChange="{{setWsName}}" placeholder="vd: Đi Adelaide" style="height: 42px; padding: 0 12px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
             <div class="lbl">CÁCH CHIA MÀN HÌNH</div>
-            <div aria-label="Hình thu nhỏ cách chia" style="height: 150px; display: flex; gap: 4px; padding: 4px; border-radius: 8px; background: #0A1B28; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.4)">
-              <sc-for list="{{ws.thumb}}" as="b" hint-placeholder-count="2"><div style="flex: {{b.flex}}; min-width: 0; border-radius: 5px; background: {{b.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px; text-align: center"><span style="width: 22px; height: 22px; border-radius: 50%; background: #FBB040; color: #2A1A00; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center">{{b.n}}</span><span style="font-size: 12px">{{b.name}}</span></div></sc-for>
+            <div aria-label="Cách chia — kéo thanh giữa để chỉnh" onPointerMove="{{ws.move}}" onPointerUp="{{ws.up}}" style="height: 150px; display: flex; padding: 4px; border-radius: 8px; background: #0A1B28; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.4); touch-action: none">
+              <sc-for list="{{ws.thumb}}" as="b" hint-placeholder-count="2"><sc-if value="{{b.div}}" hint-placeholder-val="{{ false }}"><span role="separator" aria-orientation="vertical" aria-label="Kéo để chỉnh độ rộng" onPointerDown="{{b.drag}}" style="width: 16px; flex-shrink: 0; cursor: col-resize; touch-action: none; display: flex; align-items: center; justify-content: center"><span style="width: 6px; height: 46px; border-radius: 3px; background: #FBB040"></span></span></sc-if><div style="flex: {{b.flex}}; min-width: 0; border-radius: 5px; background: {{b.bg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 4px; text-align: center"><span style="width: 22px; height: 22px; border-radius: 50%; background: #FBB040; color: #2A1A00; font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center">{{b.n}}</span><span style="font-size: 12px">{{b.name}}</span><span class="tnum" style="font-size: 13px; font-weight: 700; color: #FFD08A">{{b.pctL}}</span></div></sc-for>
             </div>
+            <sc-if value="{{ws.hasPresets}}" hint-placeholder-val="{{ true }}"><div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{ws.presets}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 30px; font-size: 12px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for></div></sc-if>
             <div style="font-size: 12px; color: {{ws.hintC}}">{{ws.hint}}</div>
             <button onClick="{{toggleRtCheck}}" role="checkbox" aria-checked="{{rtCheck}}" style="border: 0; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 10px; background: transparent; color: #E8F1F5; font-size: 14px; padding: 0; text-align: left">
               <span style="width: 26px; height: 26px; flex-shrink: 0; border-radius: 6px; box-shadow: inset 0 0 0 2px #FBB040; display: flex; align-items: center; justify-content: center; color: #2A1A00; background: {{rtCheckBg}}; font-weight: 700">{{rtCheckMark}}</span>
@@ -1163,7 +1181,7 @@ const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rn
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
 const DEFAULTS = { lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
-  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true };
+  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chime: 'soft', chimeVol: 60 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
 const APPS = [
   ['waze', 'Waze', 'map', '#2D8FD6', 'W'], ['gmaps', 'Google Maps', 'map', '#3C8F5A', 'GM'], ['here', 'HERE WeGo', 'map', '#2A6F8F', 'H'],
@@ -1222,7 +1240,7 @@ class Component extends DCLogic {
     try { sv = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { sv = {}; }
     this.state = {
       scr: 'home', boot: 'splash', drive: false, playing: false, perm: false, now: Date.now(), last: Date.now(),
-      grp: 'chung', exitOpen: false, createOpen: false, rtCheck: true, listOpen: false,
+      grp: 'chung', exitOpen: false, createOpen: false, rtCheck: false, listOpen: false,
       leg: 'go', pos: 167, trips: sv.trips || [], tripId: sv.tripId || 'mel-adl', melStore: sv.melStore || null, tripDlg: false, ntFrom: '', ntTo: '', ntMsg: '', ntBusy: false, goList: sv.goList || DEF_GO.slice(), backList: sv.backList || DEF_BACK.slice(), skip: sv.skip || {}, dlg: null, delId: null, stopId: null,
       split: 0.36, lastSplit: 0.5, dragging: false, cat: 'fuel', dexMode: 'after', dexTwo: true, dexTask: true,
       z: 1, zMode: 'all', fx: 400, panning: false, panX0: 0, fx0: 400, panAt: 0,
@@ -1246,6 +1264,7 @@ class Component extends DCLogic {
     }, 1000);
     this.startBoot();
     // hand the saved choices to the Android side once the bridge is up
+    setTimeout(() => { const c0 = this.state.set || {}; if (APP && c0.chimeOn !== false) tcn('chime', JSON.stringify({ name: 'chime_' + (c0.chime || 'soft'), vol: c0.chimeVol == null ? 60 : c0.chimeVol })); }, 250);   // #56
     setTimeout(() => { this.syncNative(this.state.set); if (APP && this.state.set.autoPlay) tcn('media', 'autoplay'); if (APP) { tcn('media', 'jbquery'); tcn('voice', 'report'); } }, 1500);
   }
   syncNative(C) {
@@ -1288,7 +1307,7 @@ class Component extends DCLogic {
     const go = (scr) => () => self.setState({ scr, dlg: null, listOpen: false, exitOpen: false, createOpen: false });
     const priv = C.privacy;
     const nar = APP && !!S.narrow;
-    let dk = { glass: false, pill: false, wheel: false }, mpPos = null;
+    let dk = { on: false }, mpPos = null;
 
     // ---- màn hình (Tìm Chỗ sau Workspace DeX) ----
     const SCR = [['home', 'Màn Hình Chính'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ'], ['contacts', 'Liên Lạc']];
@@ -1352,6 +1371,9 @@ class Component extends DCLogic {
         ch('lang', 'Ngôn ngữ', 'Chữ trên mọi màn hình', [['vi', 'Tiếng Việt'], ['en', 'English']]),
         ch('clock', 'Kiểu giờ', 'Mặc định 24h', [['24', '24h'], ['12', '12h']]),
         ch('unit', 'Đơn vị tốc độ', 'Mặc định km/g', [['kmg', 'km/g'], ['mph', 'mph']]),
+        tg('chimeOn', 'Nhạc chào khi mở app', 'Khoảng 2 giây · không kêu khi máy để im lặng hoặc đang phát nhạc'),
+        Object.assign(ch('chime', 'Kiểu nhạc chào', 'Bấm là nghe thử', [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']]), { opts: [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']].map(([v, l]) => { const on = (C.chime || 'soft') === v; return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { self.setS('chime', v); tcn('chime', JSON.stringify({ name: 'chime_' + v, vol: C.chimeVol == null ? 60 : C.chimeVol, test: true })); } }; }) }),
+        ch('chimeVol', 'Âm lượng nhạc chào', 'So với âm lượng nhạc của máy', [[30, 'Nhỏ'], [60, 'Vừa'], [100, 'Lớn']]),
         stt('Màn hình chào', 'Logo + phiên bản, tự vào Màn Hình Chính sau 3 giây, chạm để vào sớm', true, 'Luôn bật', '', '', null),
         info('Mở app vào thẳng', 'Luôn vào tab này sau màn hình chào', 'Màn Hình Chính'),
         stt('Nhớ mọi lựa chọn khi thoát', 'Giao diện, tính năng, Workspace, chặng Road Trip…', true, 'Luôn nhớ', '', '', null),
@@ -1361,7 +1383,6 @@ class Component extends DCLogic {
         ch('msgKeep', 'Tự xoá tin nhắn đã lưu (WhatsApp, Messenger…)', 'Tin bắt từ thông báo', [[7, '7 ngày'], [30, '30 ngày'], [0, 'Không xoá']])] },
       gd: { label: 'Giao Diện', icon: 'M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01', desc: 'Kiểu màn hình, số tốc độ, mưa, làm mờ, dịu mắt', rows: [
         stt('Kiểu giao diện', '23 kiểu + kiểu đồng hồ buồng lái', false, '', 'Bấm để chọn', 'Mở Giao Diện', () => openTheme()),
-        ch('dashLayout', 'Kiểu đồng hồ tốc độ + thanh nhạc', 'Cảnh Low-Poly', [['wheel', 'Sau vô lăng'], ['glass', 'Kính nổi'], ['pill', 'Cạnh thanh nhạc']]),
         tg('idleOn', 'Màn hình chờ', 'Khi đậu xe và lâu không đụng màn hình'),
         ch('idleLayout', 'Kiểu màn hình chờ', '', [['htc', 'HTC lật số'], ['glass', 'Thẻ kính'], ['analog', 'Đồng hồ kim']]),
         ch('idleMin', 'Hiện màn hình chờ sau', '', [[1, '1 phút'], [3, '3 phút'], [5, '5 phút'], [10, '10 phút']]),
@@ -1412,6 +1433,7 @@ class Component extends DCLogic {
         tg('oil', 'Nhắc thay nhớt', 'Theo km đã chạy')] },
       map: { label: 'Bản Đồ & Road Trip', icon: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14', desc: 'App bản đồ, chia màn hình, quãng đường, km, hình, giới hạn', rows: [
         ch('mapApp', 'Bản đồ chính', 'Dùng khi chỉ đường và chia màn hình', [['waze', 'Waze'], ['gmaps', 'Google Maps'], ['here', 'HERE']]),
+        (() => { const hm0 = APP && window.tcHome ? window.tcHome() : null; return { isStatus: true, label: 'Nhà (điểm xuất phát Road Trip)', hint: hm0 ? 'Đã lưu: ' + hm0.name + ' — chuyến đi bắt đầu và chuyến về kết thúc ở đây' : 'Chưa lưu — đang lấy vị trí GPS lúc mở app làm điểm xuất phát', stL: hm0 ? '✓ ' + hm0.name : '⚠ Chưa lưu', stC: hm0 ? '#7BD88F' : '#FFD08A', hasAct: true, actL: hm0 ? 'Lưu Lại Chỗ Này' : 'Lưu Chỗ Này Là Nhà', act: () => { if (!APP || !window.tcSetHome) { self.toast('Bản mẫu: cần app thật có GPS'); return; } const h = window.tcSetHome(); self.toast(h ? 'Đã lưu Nhà: ' + h.name : 'Chưa bắt được GPS — thử lại sau'); self.setState({ homeAt: Date.now() }); } }; })(),
         ch('mapSide', 'Bản đồ nằm bên', 'Road Trip + Bản Đồ', [['left', 'Trái'], ['right', 'Phải']]),
         ch('rtView', 'Kiểu hiển thị quãng đường', 'Đổi nhanh ngay trên khung', [['road', 'Con Đường'], ['map', 'Bản Đồ']]),
         tg('kmUnder', 'Km còn lại dưới mỗi chặng', ''),
@@ -1459,7 +1481,8 @@ class Component extends DCLogic {
     const TRIP = S.tripId === 'mel-adl' ? null : ((S.trips || []).find((t) => t.id === S.tripId) || null);
     if (TRIP) { TOTAL = TRIP.km; PLACES = TRIP.places || {}; BORDER = TRIP.border > 0 ? TRIP.border : -1; MINE_GO = {}; MINE_BACK = {}; } else { TOTAL = MA.total; PLACES = MA.places; BORDER = MA.border; MINE_GO = MA.mineGo; MINE_BACK = MA.mineBack; }
     const hasBorder = BORDER > 0, saFirst = TRIP ? (TRIP.from.st === 'SA') : false;
-    const FROM = TRIP ? TRIP.from.name : 'Melbourne', TO = TRIP ? TRIP.to.name : 'Adelaide', FROMS = TRIP ? TRIP.from.st : 'VIC', TOS = TRIP ? TRIP.to.st : 'SA';
+    const SP = !TRIP && APP && window.tcStartPt ? window.tcStartPt() : null;   // #49: the built-in trip starts where Tom is
+    const FROM = TRIP ? TRIP.from.name : (SP && SP.name ? SP.name : 'Melbourne'), TO = TRIP ? TRIP.to.name : 'Adelaide', FROMS = TRIP ? TRIP.from.st : 'VIC', TOS = TRIP ? TRIP.to.st : 'SA';
     if (window.__tripId !== S.tripId) { window.__tripId = S.tripId; if (window.tcSetRoute) window.tcSetRoute(TRIP ? TRIP.pts : null, TRIP ? TRIP.km : 727); window.__tripRoutes = (S.trips || []).map((t) => ({ id: t.id, name: t.name, pts: t.pts })); }
     const leg = (APP && LT && LT.dir && !S.legManual) ? LT.dir : S.leg, isGo = leg === 'go';
     // Con Đường đi theo bản đồ thật: điểm xuất phát nằm phía đông thì nằm bên phải
@@ -1642,9 +1665,9 @@ class Component extends DCLogic {
       open: S.tripDlg, close: () => self.setState({ tripDlg: false, tripEdit: null, tripDel: null }), rows: tripRows,
       from: S.ntFrom, to: S.ntTo, msg: S.ntMsg, busy: S.ntBusy, lock: drive, lockL: drive ? 'Xe đang chạy — đậu xe rồi mới tạo chuyến mới' : 'Gõ nơi đi và nơi tới (vd "Melbourne" → "Sydney"). App tự tìm đường, gợi ý chỗ ghé; chặng về = chặng đi đảo ngược.',
       setFrom: (e) => self.setState({ ntFrom: e.target.value }), setTo: (e) => self.setState({ ntTo: e.target.value }),
-      fromPh: (LV.place && LV.place.suburb) || 'Melbourne',
+      fromPh: '📍 Vị trí của Tom' + ((LV.place && LV.place.suburb) ? ' (' + LV.place.suburb + ')' : ''),
       create: () => {
-        if (drive || S.ntBusy) return; const f = (S.ntFrom || (LV.place && LV.place.suburb) || 'Melbourne').trim(), t2 = (S.ntTo || '').trim();
+        if (drive || S.ntBusy) return; const sp0 = window.tcStartPt ? window.tcStartPt() : null; const f = (S.ntFrom || '').trim() || (sp0 ? sp0 : ((LV.place && LV.place.suburb) || 'Melbourne')), t2 = (S.ntTo || '').trim();
         if (!t2) { self.setState({ ntMsg: 'Gõ nơi tới trước nha' }); return; }
         if (!APP || !window.tcPlanTrip) { self.setState({ ntMsg: 'Bản mẫu: tạo chuyến cần app thật (có mạng)' }); return; }
         self.setState({ ntBusy: true });
@@ -1660,10 +1683,10 @@ class Component extends DCLogic {
       const night = sun && sun.rise ? !(nowT > new Date(sun.rise).getTime() && nowT < new Date(sun.set).getTime()) : (d.getHours() < 6 || d.getHours() >= 19);
       const styleKey = C.mapStyle === 'auto' || !C.mapStyle ? (night ? 'dark' : 'light') : C.mapStyle;
       const showMap = S.scr === 'rt' && C.rtView === 'map' && !nar && !S.tripDlg && !S.logOpen && !S.dlg;
-      window.tcMapSync({ show: showMap, style: C.mapStyle || 'auto', styleKey, night, bright: C.calm ? Math.min(C.mapBright || 100, 75) : (C.mapBright || 100), tint: styleKey === 'light', tripId: S.tripId, isGo, total: TOTAL,
-        pts: TRIP ? TRIP.pts : window.__routePts, follow: false, drive: drive, brg: LV.bearing || 0,
+      window.tcMapSync({ show: showMap, style: C.mapStyle || 'auto', styleKey, night, bright: C.calm ? Math.min(C.mapBright || 100, 75) : (C.mapBright || 100), tint: styleKey === 'light', tripId: S.tripId + (SP ? '@' + SP.lat.toFixed(3) : ''), isGo, total: TOTAL,
+        pts: TRIP ? TRIP.pts : (SP && window.__routePts ? [[SP.lat, SP.lon]].concat(window.__routePts) : window.__routePts), follow: false, drive: drive, brg: LV.bearing || 0,
         van: LV.lat != null ? [LV.lat, LV.lon] : null,
-        stops: [{ id: '', start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 5, bg: '#00653A' }].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === 'end', short: x.id === 'end' ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, '').split(' (')[0], lat: x.lat, lon: x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === 'end' ? 5 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? '#3E7A4E' : x.id === 'end' ? '#00653A' : SIGN[x.k] || '#1F5FAE' })))
+        stops: [Object.assign({ id: '', start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 5, bg: '#00653A' }, SP && isGo ? { lat: SP.lat, lon: SP.lon } : {})].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === 'end', short: x.id === 'end' ? (SP && !isGo ? SP.name : x.name) : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, '').split(' (')[0], lat: x.id === 'end' && SP && !isGo ? SP.lat : x.lat, lon: x.id === 'end' && SP && !isGo ? SP.lon : x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === 'end' ? 5 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? '#3E7A4E' : x.id === 'end' ? '#00653A' : SIGN[x.k] || '#1F5FAE' })))
       });
     }
     const curIds = isGo ? S.goList : S.backList;
@@ -1724,18 +1747,26 @@ class Component extends DCLogic {
     const SRCAPPS = (APP && S.apps) ? S.apps.map((a) => [a.pkg, a.name, a.cat || 'other', '#0D2C40', '', a.icon]).concat(APPS.filter((a) => a[2] === 'widget')) : APPS;
     const appList = SRCAPPS.filter((a) => q ? a[1].toLowerCase().indexOf(q) >= 0 : S.wsGrp === 'all' ? a[2] !== 'widget' : S.wsGrp === 'often' ? (APP ? (S.apps ? (S.apps.find((x) => x.pkg === a[0]) || {}).often : false) : OFTEN.indexOf(a[0]) >= 0) : S.wsGrp === 'tt' ? a[1].indexOf("Tom's") === 0 : a[2] === S.wsGrp);
     const nameOf = (id) => (SRCAPPS.find((a) => a[0] === id) || APPS.find((a) => a[0] === id) || [id, id])[1];
+    const wsEq = (n) => n === 3 ? [33, 34, 33] : n === 2 ? [50, 50] : [100];   // #55: new workspaces start split evenly
+    const wsP = (S.wsPct && S.wsPct.length === S.wsSel.length) ? S.wsPct : wsEq(S.wsSel.length);
     const ws = {
       q: S.wsQ, setQ: (e) => self.setState({ wsQ: e.target.value }),
       groups: WG.map(([k, label]) => { const on = !q && S.wsGrp === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setState({ wsGrp: k, wsQ: '' }) }; }),
       apps: appList.map((a) => { const idx = S.wsSel.indexOf(a[0]); return { name: a[1], letter: a[5] ? '' : a[4], icon: a[5] || '', hasIcon: !!a[5], tile: a[5] ? 'url(' + a[5] + ') center/cover no-repeat' : a[3], radius: a[2] === 'widget' ? '8px' : '12px', sel: idx >= 0, n: idx + 1, on: idx >= 0 ? 'true' : 'false', bg: idx >= 0 ? 'rgba(251,176,64,0.16)' : '#0D2C40', ring: idx >= 0 ? 'inset 0 0 0 2px #FBB040' : 'none', pick: () => { const sel = S.wsSel.slice(); if (idx >= 0) sel.splice(idx, 1); else if (sel.length < 3) sel.push(a[0]); else { self.toast('Tối đa 3 ô — bấm bỏ một app trước'); return; } self.setState({ wsSel: sel }); } }; }),
-      thumb: S.wsSel.length ? S.wsSel.map((id, i) => ({ n: i + 1, name: nameOf(id), flex: S.wsSel.length === 3 ? (i === 0 ? 2 : 1) : S.wsSel.length === 2 ? (i === 0 ? 1.8 : 1) : 1, bg: ['#1B3A52', '#2A2440', '#203A2A'][i] })) : [{ n: '–', name: 'Chưa chọn app', flex: 1, bg: '#0D2C40' }],
+      thumb: S.wsSel.length ? S.wsSel.map((id, i) => ({ n: i + 1, name: nameOf(id), flex: wsP[i], pctL: wsP[i] + '%', div: i > 0, drag: (e) => { try { e.currentTarget.setPointerCapture(e.pointerId); } catch (x) {} self.setState({ wsDrag: i }); }, bg: ['#1B3A52', '#2A2440', '#203A2A'][i] })) : [{ n: '–', name: 'Chưa chọn app', flex: 100, pctL: '', div: false, drag: () => {}, bg: '#0D2C40' }],
+      move: (e) => { const k = S.wsDrag; if (k == null || k < 1) return; const r = e.currentTarget.getBoundingClientRect(); const f = (e.clientX - r.left) / r.width * 100; const P = wsP.slice(); const lo = P.slice(0, k - 1).reduce((a, b) => a + b, 0), hi = lo + P[k - 1] + P[k]; const b = Math.max(lo + 20, Math.min(hi - 20, Math.round(f / 5) * 5)); P[k - 1] = b - lo; P[k] = hi - b; self.setState({ wsPct: P }); },
+      up: () => { if (S.wsDrag != null) self.setState({ wsDrag: null }); },
+      presets: (S.wsSel.length === 2 ? [['Chia Đều', [50, 50]], ['2 : 1', [65, 35]], ['1 : 2', [35, 65]]] : S.wsSel.length === 3 ? [['Chia Đều', [33, 34, 33]], ['Giữa Lớn', [25, 50, 25]], ['Trái Lớn', [50, 25, 25]], ['Phải Lớn', [25, 25, 50]]] : []).map(([l, v]) => { const on = v.join() === wsP.join(); return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setState({ wsPct: v }) }; }),
+      hasPresets: S.wsSel.length > 1,
       hint: S.wsSel.length + '/3 ô đã chọn' + (S.wsSel.length === 3 ? ' — đủ rồi' : ''), hintC: S.wsSel.length === 3 ? '#FFD08A' : '#8FC3D3'
     };
 
     // Workspace đã lưu
     const WCOL = ['#1B3A52', '#2A2440', '#203A2A'];
-    const wsCards = S.wsList.map((w, i) => ({ name: w.name, rt: !!w.rt, boxes: w.apps.map((id, k) => ({ name: nameOf(id), flex: w.apps.length === 3 ? (k === 0 ? 2 : 1) : w.apps.length === 2 ? (k === 0 ? 1.8 : 1) : 1, bg: WCOL[k] })),
-      open: () => { const pcts = w.apps.length === 3 ? [50, 25, 25] : w.apps.length === 2 ? [64, 36] : [100]; tcn('launch', JSON.stringify(w.apps.filter((a) => a.indexOf('w-') !== 0).map((a, k) => [a, pcts[k]]))); if (w.rt) self.setState({ scr: 'rt' }); },
+    const wsPcts = (w) => (w.pcts && w.pcts.length === w.apps.length) ? w.pcts : wsEq(w.apps.length);
+    const wsCards = S.wsList.map((w, i) => ({ name: w.name, rt: !!w.rt, boxes: w.apps.map((id, k) => ({ name: nameOf(id), flex: wsPcts(w)[k], bg: WCOL[k] })),
+      edit: () => { self.setState({ createOpen: true, wsEdit: i, wsSel: w.apps.slice(), wsPct: wsPcts(w).slice(), wsName: w.name, rtCheck: !!w.rt }); if (APP && !S.apps) tcn('apps'); },
+      open: () => { const pcts = wsPcts(w); tcn('launch', JSON.stringify(w.apps.filter((a) => a.indexOf('w-') !== 0).map((a, k) => [a, pcts[k]]))); if (w.rt) self.setState({ scr: 'rt' }); },
       del: () => self.save({ wsList: S.wsList.filter((_, k) => k !== i) }) }));
 
     // ---- cuộc gọi ----
@@ -1803,7 +1834,19 @@ class Component extends DCLogic {
         }
       }
       if (S.src === 'radio') rowsRaw = tabOk === 'fav' ? toRows([].concat(RL.near || [], RL.au || [], RL.vn || []).filter((r) => S.favs[r.id])) : toRows(RL[tabOk]);
-      if (S.src === 'podcast') rowsRaw = window.__jbLib && (window.__jbLib.podcasts || []).length ? window.__jbLib.podcasts.map((x) => ({ t: x.name, s: 'Phát tập mới nhất · Tom’s Jukebox', letter: 'P', tile: '#7A4BB5', rad: '8px', jb: { kind: 'podcast', name: x.name } })) : [{ t: 'Mở app podcast', s: 'Kênh theo dõi bên Tom’s Jukebox sẽ hiện ở đây', letter: 'P', tile: '#7A4BB5', rad: '8px', open: true }];
+      if (S.src === 'podcast') {   // #50: subscribed channels + Tom's Jukebox's built-in directory
+        const LB = window.__jbLib;
+        if (!LB) rowsRaw = [{ t: 'Chưa nối được Tom’s Jukebox', s: 'Bấm để thử lại · cần Tom’s Jukebox 0.9.6 trở lên', letter: '↻', tile: '#5A3A10', rad: '50%', retry: true }];
+        else {
+          const pc = (x, grp) => ({ t: x.name, s: (grp ? grp + ' · ' : (x.author ? x.author + ' · ' : '')) + 'Phát tập mới nhất', letter: (x.name || 'P').charAt(0), tile: '#7A4BB5', rad: '8px', jb: { kind: 'podcast', name: x.id || x.name } });
+          const subs = (LB.podcasts || []).map((x) => pc(x, 'Đã theo dõi')), groups = LB.podGroups || [];
+          const hdr = (t) => ({ t: t.toUpperCase(), s: '', letter: '', tile: 'transparent', rad: '0', hdr: true });
+          if (tabOk === 'pnew') { const seen = {}; rowsRaw = subs.concat(...groups.filter((g) => /news|catholic/.test(g.key)).map((g) => g.items.map((x) => pc(x, g.name)))).filter((r) => !seen[r.t] && (seen[r.t] = 1)); }
+          else rowsRaw = (subs.length ? [hdr('Kênh Tom theo dõi')].concat(subs) : []).concat(...groups.map((g) => [hdr(g.name)].concat(g.items.map((x) => pc(x, g.name)))));
+          if (!rowsRaw.length) rowsRaw = [{ t: 'Đang tải danh mục podcast từ Tom’s Jukebox…', s: 'Bấm để thử lại', letter: '↻', tile: '#5A3A10', rad: '50%', retry: true }];
+        }
+        const q = (S.mpQ || '').trim().toLowerCase(); if (q) rowsRaw = rowsRaw.filter((r) => !r.hdr && !r.retry && (r.t + ' ' + r.s).toLowerCase().indexOf(q) >= 0);
+      }
       if (S.src === 'radio' && !rowsRaw.length) rowsRaw = [{ t: S.radioLists ? 'Không tìm thấy đài' : 'Đang tải danh sách đài…', s: 'Cần có mạng', letter: '…', tile: '#2B2B2B', rad: '50%' }];
       if (APP && S.src !== 'radio' && !rowsRaw.length) rowsRaw = [{ t: !window.__jbLib ? (C.musicApp === 'jukebox' ? 'Chưa đọc được thư viện Tom\'s Jukebox' : 'App nhạc này không cho xem danh sách') : (S.src === 'podcast' ? 'Chưa theo dõi podcast nào trong Tom\'s Jukebox' : 'Thư viện trống'), s: !window.__jbLib ? 'Cần Tom\'s Jukebox 0.9.5 trở lên — mở Jukebox một lần rồi bấm lại' : 'Thêm nhạc trong Tom\'s Jukebox', letter: '!', tile: '#2B2B2B', rad: '50%', open: true }];
     } else if (S.src === 'music') {
@@ -1819,14 +1862,14 @@ class Component extends DCLogic {
     const mpOpen = S.mpOpen && !(drive && S.now - S.panelAt > 8000);
     const mp = {
       open: mpOpen, touch: () => self.setState({ panelAt: Date.now() }), close: () => self.setState({ mpOpen: false }),
-      srcs: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, label]) => { const on = S.src === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setState({ src: k, mpTab: TABS[k][0][0], nowT: '', nowS: '', panelAt: Date.now() }) }; }),
+      srcs: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, label]) => { const on = S.src === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (APP && k === 'podcast') tcn('media', 'jbquery'); self.setState({ src: k, mpTab: TABS[k][0][0], nowT: '', nowS: '', mpQ: '', panelAt: Date.now() }); } }; }),
       srcNote: S.src === 'music' ? (APP ? 'Nguồn: ' + ((MD && MD.app) || 'app nhạc đang phát') : "Nguồn: Tom's Jukebox") : S.src === 'radio' ? 'Radio qua mạng · ~30–60 MB/giờ' : 'Podcast',
       tabs: TABS[S.src].map(([k, label]) => { const on = tabOk === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (k === 'radio') self.setState({ src: 'radio', mpTab: 'near', panelAt: Date.now() }); else self.setState({ mpTab: k, panelAt: Date.now() }); } }; }),
-      searchPh: drive ? 'Khoá gõ khi xe chạy — nói "Hey Tom, phát…"' : (S.src === 'radio' ? 'Tìm đài' : 'Tìm bài, nghệ sĩ'), searchBg: drive ? '#0A1822' : '#0D2C40',
+      searchPh: drive ? 'Khoá gõ khi xe chạy — nói "Hey Tom, phát…"' : (S.src === 'radio' ? 'Tìm đài' : S.src === 'podcast' ? 'Tìm podcast' : 'Tìm bài, nghệ sĩ'), q: S.mpQ || '', setQ: (e) => self.setState({ mpQ: e.target.value, panelAt: Date.now() }), searchBg: drive ? '#0A1822' : '#0D2C40',
       regionOn: S.src === 'radio' && tabOk === 'near', regionL: APP ? ('Vùng hiện tại: ' + ((S.radioLists && S.radioLists.region) || (LV.place && LV.place.suburb) || '…') + ' (theo GPS) · Tự đổi đài theo vùng: Mở') : 'Vùng hiện tại: ' + regName + ' (theo GPS · mẫu) · Tự đổi đài theo vùng: Mở',
-      rows: rowsRaw.slice(0, maxRows).map((r) => { const cur = playing && r.t === curT; return Object.assign({ isRadio: false, id: '' }, r, { bg: cur ? 'rgba(251,176,64,0.14)' : 'rgba(13,44,64,0.55)', st: cur ? 'ĐANG PHÁT' : '', stC: '#FFD08A', play: r.jb ? () => { tcn('media', 'jb:' + JSON.stringify(r.jb)); self.setState({ panelAt: Date.now() }); } : r.open ? () => tcn(S.src === 'podcast' ? 'openApp' : 'openMedia', S.src === 'podcast' ? 'podcast' : '') : r.qid != null ? () => tcn('media', 'queue:' + r.qid) : play(r.t, r.isRadio ? 'Radio · trực tiếp' : r.s, r.isRadio ? 'radio' : S.src, r.url), favOn: S.favs[r.id] ? 'true' : 'false', favC: S.favs[r.id] ? '#FBB040' : '#5E8496', fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) }); }),
+      rows: rowsRaw.slice(0, maxRows).map((r) => { const cur = playing && r.t === curT; return Object.assign({ isRadio: false, id: '' }, r, { bg: r.hdr ? 'transparent' : cur ? 'rgba(251,176,64,0.14)' : 'rgba(13,44,64,0.55)', st: cur ? 'ĐANG PHÁT' : '', stC: '#FFD08A', play: r.hdr ? () => {} : r.retry ? () => { tcn('media', 'jbquery'); self.toast('Đang hỏi lại Tom’s Jukebox…'); self.setState({ panelAt: Date.now() }); } : r.jb ? () => { tcn('media', 'jb:' + JSON.stringify(r.jb)); self.setState({ panelAt: Date.now() }); } : r.open ? () => tcn(S.src === 'podcast' ? 'openApp' : 'openMedia', S.src === 'podcast' ? 'podcast' : '') : r.qid != null ? () => tcn('media', 'queue:' + r.qid) : play(r.t, r.isRadio ? 'Radio · trực tiếp' : r.s, r.isRadio ? 'radio' : S.src, r.url), favOn: S.favs[r.id] ? 'true' : 'false', favC: S.favs[r.id] ? '#FBB040' : '#5E8496', fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) }); }),
       fs: drive ? 18 : 15, rowPad: drive ? '10px 8px' : '6px 8px',
-      foot: drive ? 'Xe đang chạy: chữ to, tối đa 6 dòng, tự đóng sau 8 giây không đụng.' : (S.src === 'music' ? "Tom's Jukebox: đủ 4 tab. Spotify / YouTube Music: chỉ thấy hàng chờ nếu app cho phép, còn lại có nút \"Mở trong …\"." : S.src === 'radio' ? 'Mất sóng (vd Kaniva → Keith) app sẽ hỏi: "Chuyển sang nhạc trong máy?" · Tên bài/đài trong demo là số liệu mẫu.' : 'Số liệu mẫu.')
+      foot: drive ? 'Xe đang chạy: chữ to, tối đa 6 dòng, tự đóng sau 8 giây không đụng.' : (S.src === 'music' ? "Tom's Jukebox: đủ 4 tab. Spotify / YouTube Music: chỉ thấy hàng chờ nếu app cho phép, còn lại có nút \"Mở trong …\"." : S.src === 'radio' ? 'Mất sóng (vd Kaniva → Keith) app sẽ hỏi: "Chuyển sang nhạc trong máy?"' : 'Podcast lấy từ Tom’s Jukebox · ⏮ lùi 15 giây · ⏭ tới 30 giây.')
     };
     const sayV = (t, sens) => { self.setState({ va: false }); self.say(t, sens); };
     const findContact = (name) => { const all = (S.calls || []).concat(S.msgs || []); const n = (name || '').trim().toLowerCase(); return all.find((r) => (r[0] || '').toLowerCase().indexOf(n) >= 0); };
@@ -1989,6 +2032,7 @@ class Component extends DCLogic {
     const CP_AUTO = { outback: 'offroad', lp_outback: 'offroad', rally: 'sport', synth: 'neon', cyber: 'neon', neon: 'neon', neonau: 'neon', sgold: 'retro70', hud: 'none', plane: 'none' };
     const chip = (on) => ({ bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5' });
     const thTheme = C.lpTheme || 'lp_au';
+    const TH_DEF = ['lp_au', 'neon', 'lp_coast', 'lp_saigon'], thExtra = Array.isArray(C.thExtra) ? C.thExtra : [];
     const regionTheme = C.autoScene && thTheme.indexOf('lp_') === 0 && window.__regionScene ? window.__regionScene : null;
     const curTheme = regionTheme || thTheme;
     const curCockpit = C.cockpitAuto && CP_AUTO[curTheme] ? CP_AUTO[curTheme] : (C.cockpit2 || 'lowpoly');
@@ -1996,18 +2040,17 @@ class Component extends DCLogic {
     const engineOn = curTheme.indexOf('lp_') === 0 || BUILT.indexOf(curTheme) < 0 || C.drawStyle === 'poly' || curCockpit !== 'neon';
     const sunNow = tod;
     const LIMV = LV.limit || null;
-    const dashL = C.dashLayout || 'wheel';
-    const sceneCfg = { on: engineOn && !nar, noGauge: dashL !== 'wheel', theme: curTheme, style: curTheme.indexOf('lp_') === 0 ? 'poly' : (C.drawStyle === 'poly' ? 'poly' : 'flat'), cockpit: dashL === 'wheel' ? curCockpit : 'none', gauge: curGauge, tod: sunNow, wx: wk === 'night' ? 'clear' : (wk === 'cloudy' ? 'cloud' : wk), drive: drive, moveMode: C.sceneMove || 'still', dim: drive && C.calm ? 0.25 : 0, unit: C.unit === 'kmg' ? 'km/g' : 'km/h' };
+    const sceneCfg = { on: engineOn && !nar, noGauge: true, slim: true, theme: curTheme, style: curTheme.indexOf('lp_') === 0 ? 'poly' : (C.drawStyle === 'poly' ? 'poly' : 'flat'), cockpit: curCockpit, gauge: curGauge, tod: sunNow, wx: wk === 'night' ? 'clear' : (wk === 'cloudy' ? 'cloud' : wk), drive: drive, moveMode: C.sceneMove || 'still', dim: drive && C.calm ? 0.25 : 0, unit: C.unit === 'kmg' ? 'km/g' : 'km/h' };
     const sk = JSON.stringify(sceneCfg);
     // ---- đồng hồ tốc độ theo kiểu (#32) + vị trí thanh nhạc ----
     const lpOn = engineOn && !nar;
     const spF = Math.min(1, (APP ? (LV.speed || 0) : (drive ? S.speed : 0)) / 160);
     const overC = sb.c === '#FF7A7A' || sb.c === '#FFC46B' ? sb.c : null;
     const nxtStop = (() => { try { return rt && rt.stops ? rt.stops.find((x) => x.cls === 'nxt') : null; } catch (e) { return null; } })();
-    dk = { glass: lpOn && dashL === 'glass', pill: lpOn && dashL === 'pill', wheel: lpOn && dashL === 'wheel',
+    dk = { on: !nar,
       arc: (348 * spF).toFixed(1) + ' 465', arcC: overC || '#5FD4F0', arc2: (292 * spF).toFixed(1) + ' 390', arcC2: overC || '#FBB040', numC: overC || '#FFFFFF',
       unit: C.unit === 'mph' ? 'MPH' : 'KM/G', note: nxtStop ? nxtStop.dist + ' · ' + nxtStop.name.split(' (')[0].slice(0, 14) : (sb.limNote || ''), gx: 846, sx: 950 };
-    mpPos = lpOn ? (dashL === 'wheel' ? { L: '200px', R: 'auto', W: 530 } : dashL === 'glass' ? { L: '375px', R: 'auto', W: 530 } : { L: '310px', R: 'auto', W: 530 }) : null;
+    mpPos = { L: 'auto', R: '20px', W: 552 };   // #46: music bar always on the right, gauge fixed in the centre
     if (window.TCScene && sk !== window.__sceneKey) { window.__sceneKey = sk; window.TCScene.set(sceneCfg); }
     if (window.TCScene) window.TCScene.set({ speed: APP ? (LV.speed || 0) : (drive ? S.speed : 0), limit: LIMV ? LIMV.v : 0 });
     if (!engineOn && window.__tc) { const want = { theme: curTheme, cockpit: 'neon', gauge: curGauge }; const ts = window.__tc.state; if (ts.theme !== want.theme || ts.gauge !== want.gauge || ts.cockpit !== 'neon') window.__tc.setState(want); }
@@ -2015,7 +2058,11 @@ class Component extends DCLogic {
     const thumbOf = (k) => { const key = k + '|' + (k.indexOf('lp_') === 0 ? 'poly' : C.drawStyle); if (!window.__thumbs[key] && window.TCScene && S.scr === 'theme') { try { window.__thumbs[key] = window.TCScene.thumb(k, k.indexOf('lp_') === 0 ? 'poly' : (C.drawStyle === 'poly' ? 'poly' : 'flat'), 'none', 256, 144); } catch (e) { window.__thumbs[key] = ''; } } return window.__thumbs[key] || ''; };
     const th = {
       styles: [['flat', 'Gốc'], ['poly', 'Low-Poly']].map(([k, l]) => Object.assign({ label: l, on: (C.drawStyle || 'poly') === k ? 'true' : 'false', pick: () => self.setS('drawStyle', k) }, chip((C.drawStyle || 'poly') === k))),
-      groups: TGROUPS.map(([label, items]) => ({ label, items: items.map(([k, l]) => ({ label: l, img: thumbOf(k), sw: '#0B2436', on: thTheme === k ? 'true' : 'false', ring: thTheme === k ? 'inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)' : 'inset 0 0 0 1px rgba(255,255,255,0.15)', pick: () => self.setS('lpTheme', k) })) })),
+      // #52: a few themes by default; the rest are added from "Thêm Giao Diện" (only what is shown gets drawn)
+      groups: (S.thMore ? TGROUPS.map(([label, items]) => [label, items.filter(([k]) => TH_DEF.indexOf(k) < 0)]) : [['ĐANG DÙNG', TGROUPS.reduce((a, g) => a.concat(g[1]), []).filter(([k], i, arr) => (TH_DEF.indexOf(k) >= 0 || thExtra.indexOf(k) >= 0 || k === thTheme) && arr.findIndex((x) => x[0] === k) === i).sort((a, b) => (TH_DEF.indexOf(a[0]) < 0 ? 99 : TH_DEF.indexOf(a[0])) - (TH_DEF.indexOf(b[0]) < 0 ? 99 : TH_DEF.indexOf(b[0])))]]).map(([label, items]) => ({ label, items: items.map(([k, l]) => { const added = thExtra.indexOf(k) >= 0, isDef = TH_DEF.indexOf(k) >= 0; return { label: l, img: thumbOf(k), sw: '#0B2436', on: thTheme === k ? 'true' : 'false', badge: S.thMore ? (added ? '✓ Đã thêm' : '+ Thêm') : (isDef ? '' : 'Bỏ'), badgeOn: !!(S.thMore || !isDef), badgeBg: S.thMore ? (added ? '#FBB040' : 'rgba(3,17,28,0.85)') : 'rgba(120,20,30,0.85)', badgeFg: S.thMore && added ? '#2A1A00' : '#FFFFFF', ring: thTheme === k ? 'inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)' : 'inset 0 0 0 1px rgba(255,255,255,0.15)',
+        pick: () => { if (S.thMore) { const nx = added ? thExtra.filter((x) => x !== k) : thExtra.concat([k]); self.setS('thExtra', nx); if (!added) self.toast('Đã thêm ' + l + ' vào Giao Diện'); } else self.setS('lpTheme', k); },
+        drop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); if (isDef) return; self.setS('thExtra', thExtra.filter((x) => x !== k)); if (thTheme === k) self.setS('lpTheme', 'lp_au'); } }; }) })),
+      more: !!S.thMore, moreL: S.thMore ? '✓ Xong' : '+ Thêm Giao Diện (' + (TGROUPS.reduce((a, g) => a + g[1].length, 0) - TH_DEF.length) + ' kiểu)', toggleMore: () => self.setState({ thMore: !S.thMore }),
       cockpits: COCKPITS.map(([k, l]) => Object.assign({ label: l, on: (C.cockpit2 || 'lowpoly') === k ? 'true' : 'false', pick: () => self.setS('cockpit2', k) }, chip((C.cockpit2 || 'lowpoly') === k))),
       gauges: GAUGES.map(([k, l]) => { const on = k === 'auto' ? !!C.gaugeAuto : (!C.gaugeAuto && C.gaugeManual === k); return Object.assign({ label: l, on: on ? 'true' : 'false', pick: () => k === 'auto' ? self.setS('gaugeAuto', true) : self.save({ set: Object.assign({}, C, { gaugeAuto: false, gaugeManual: k }) }) }, chip(on)); }),
       toggles: [
@@ -2040,7 +2087,7 @@ class Component extends DCLogic {
     const cp = { next: nxS ? nxS.name : '—', nextSub: nxS ? 'còn ' + (nxS.km - pos) + ' km · dự kiến ' + fmt(timeAt(nxS.km), inSA(nxS.km)) + (inSA(nxS.km) ? ' giờ SA' : '') : '', left: (TOTAL - pos) + ' km', eta: fmt(endMin, isGo), rest: restLeft <= 20 ? 'Nghỉ chân sau ' + restLeft + ' phút nữa' : 'Nghỉ sau ' + String(C.rest).replace('.', ',') + ' giờ lái liên tục', full: () => tcn('split', 'off') };
 
     // ---- Workspace dialog ----
-    const saveWs = () => { if (!S.wsSel.length) { self.toast('Chọn ít nhất 1 app'); return; } const w = { name: (S.wsName || '').trim() || 'Workspace ' + (S.wsList.length + 1), apps: S.wsSel.slice(), rt: S.rtCheck }; self.save({ wsList: S.wsList.concat([w]), createOpen: false, wsName: '', wsSel: [] }); self.toast('Đã lưu Workspace ' + w.name); };
+    const saveWs = () => { if (!S.wsSel.length) { self.toast('Chọn ít nhất 1 app'); return; } const ed = S.wsEdit != null && S.wsList[S.wsEdit]; const w = { name: (S.wsName || '').trim() || 'Workspace ' + (S.wsList.length + 1), apps: S.wsSel.slice(), pcts: wsP.slice(), rt: S.rtCheck }; const list = ed ? S.wsList.map((x, k) => k === S.wsEdit ? w : x) : S.wsList.concat([w]); self.save({ wsList: list, createOpen: false, wsName: '', wsSel: [], wsPct: null, wsEdit: null, rtCheck: false }); self.toast((ed ? 'Đã sửa Workspace ' : 'Đã lưu Workspace ') + w.name); };
 
     // ---- thêm chặng ----
     const addHere = () => { if (!APP) { self.setState({ dlg: null }); return; } if (LV.lat == null) { self.setState({ addMsg: 'Chưa có GPS' }); return; } addPlaceStop({ name: (PL && PL.street) || 'Chỗ đã lưu', addr: PL ? [PL.suburb, PL.state].filter(Boolean).join(' ') : '', lat: LV.lat, lon: LV.lon, k: 'rest' }); self.setState({ dlg: null }); };
@@ -2131,15 +2178,30 @@ class Component extends DCLogic {
     window.__idleOn = idlOn;
 
     const delP = S.delId ? ALLP[S.delId] : null;
+    // ---- điện thoại (#44) ----
+    const phTrip = !!S.tripStarted || !!(LT && LT.km > 25 && LT.km < TOTAL - 25);
+    const DOWV = ['CN', 'Th 2', 'Th 3', 'Th 4', 'Th 5', 'Th 6', 'Th 7'];
+    const openFull = (scr, extra) => { if (APP && window.tcForceWide) window.tcForceWide(true); self.setState(Object.assign({ scr: scr }, extra || {})); };
+    const ph = { trip: nar && phTrip, noTrip: nar && !phTrip, date: DOWV[d.getDay()] + ', ' + d.getDate() + '/' + (d.getMonth() + 1) + (lunTxt ? ' · ' + lunTxt : ''),
+      hours: hrs.slice(0, 6).map((h) => ({ t: h.t, icon: icOf(h.code, h.hr), v: h.temp == null ? '--' : Math.round(h.temp) + '°', p: h.p != null && h.p >= 10 ? Math.round(h.p) + '%' : '' })),
+      start: () => openFull('rt', { tripStarted: true }),
+      list: () => openFull('home', { mpOpen: true, panelAt: Date.now() }),
+      backOn: APP && !!LV.forceWide && !nar, back: () => { if (window.tcForceWide) window.tcForceWide(false); },
+      btns: [
+        { l: 'Trợ Lý', c: '#5FD4F0', ic: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3', go: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); } },
+        { l: 'Road Trip', c: '#FBB040', ic: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14', go: () => openFull('rt') },
+        { l: 'Tìm Chỗ', c: '#7BD88F', ic: 'M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14zM20 20l-4-4', go: () => openFull('search') },
+        { l: 'Mở Rộng', c: '#CFE6EE', ic: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', go: () => openFull('home') }
+      ] };
     return {
-      rootW: nar ? '100%' : '1280px', rootH: nar ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || S.scr !== 'home'), clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
+      rootW: nar ? '100%' : '1280px', rootH: nar ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || S.scr !== 'home'), clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
       unreadN: APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3,
-      wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
+      wsTitle: S.wsEdit != null ? 'Sửa Workspace' : 'Tạo Workspace', wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
       exitHard: () => { self.setState({ exitOpen: false }); tcn('exit', 'hard'); }, exitBg: () => { self.setState({ exitOpen: false }); tcn('exit', 'bg'); },
       addQ: S.addQ, setAddQ: (e) => self.setState({ addQ: e.target.value, addLink: '' }), addLink: S.addLink, setAddLink: (e) => self.setState({ addLink: e.target.value }), addHere, addFind, addMsg: S.addMsg,
       srcL: S.src === 'music' ? 'NHẠC' : S.src === 'radio' ? 'RADIO' : 'PODCAST', cycleSrc: () => { const n = { music: 'radio', radio: 'podcast', podcast: 'music' }[S.src]; self.setState({ src: n, mpTab: TABS[n][0][0], nowT: '', nowS: '' }); },
       togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }), panelExp: mpOpen ? 'true' : 'false', startListen: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); }, micOff: APP && PM.mic === false, micCls: (APP && PM.mic === false) ? '' : S.va ? 'mic-listen' : (S.now - (S.replyAt || 0) < 3000) ? 'mic-reply' : drive ? 'mic-idle mic-calm' : 'mic-idle', micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
-      isHome: !nar && S.scr === 'home', isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: !nar && S.scr === 'rt', tp, od, dk, spdDisp: dk.glass || dk.pill || dk.wheel ? 'none' : 'flex', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: mpPos ? parseInt(mpPos.L) + 200 : 640, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => self.setState({ src: k, srcMenu: false, mpOpen: true, mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() }) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
+      isHome: !nar && S.scr === 'home', isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: !nar && S.scr === 'rt', tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => (APP && k === 'podcast' && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
       appTop: APP ? 0 : 40, appW: nar ? '100%' : '1280px', appH: nar ? '100%' : (APP ? '720px' : '680px'), appBg: APP ? 'transparent' : 'linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)',
       touch: () => { if (!S.dragging && !S.panning) self.setState({ last: Date.now() }); },
       drive: drive, drivePressed: drive ? 'true' : 'false', driveBg: drive ? '#7BD88F' : '#0D2C40', driveFg: drive ? '#03111C' : '#CFF6FF', driveLabel: drive ? 'Đang Chạy' : 'Đậu Xe',
@@ -2147,10 +2209,11 @@ class Component extends DCLogic {
       spdVal: S.speed, parkedNow: !drive, setSpeed: (e) => self.setState({ speed: Number(e.target.value) }), spdHint: drive ? S.speed + ' km/g' : 'bấm "Đậu Xe" trên thanh bản mẫu để chạy',
       toggleGps: () => self.setState({ noGps: !S.noGps }), gpsPressed: S.noGps ? 'true' : 'false', gpsBg: S.noGps ? '#FF9A9E' : '#0D2C40', gpsFg: S.noGps ? '#2A0A0A' : '#CFE6EE',
       tint: drive && C.rainFx ? 'rgba(10,40,70,0.35)' : 'transparent', rainOn, rainDriveNote: drive && C.rainFx, drops: DROPS, glass: GLASS,
-      opBottom, opMusic, dimmedAny: idle, jb,
+      opBottom, opMusic, dimmedAny: idle, dimHint: idle && (() => { try { if (!window.__dimHintUntil) { if (localStorage.getItem('tc-dimhint')) { window.__dimHintUntil = 1; } else { localStorage.setItem('tc-dimhint', '1'); window.__dimHintUntil = Date.now() + 6000; } } } catch (e) { window.__dimHintUntil = 1; } return Date.now() < window.__dimHintUntil; })(), jb,
       musicW: drive ? 600 : 660,
       togglePlay: () => { if (APP) { if (S.src === 'radio') tcn('radio', playing ? 'stop' : JSON.stringify({ url: (LV.radio && LV.radio.url) || '', name: (LV.radio && LV.radio.name) || '' })); else tcn('media', playing ? 'pause' : 'play'); } else self.setState({ playing: !S.playing, perm: S.playing ? S.perm : true }); }, playLabel: playing ? 'Dừng' : 'Phát',
-      prevF: () => { if (APP) tcn(S.src === 'radio' ? 'radio' : 'media', S.src === 'radio' ? 'prev' : 'prev'); }, nextF: () => { if (APP) tcn(S.src === 'radio' ? 'radio' : 'media', 'next'); },
+      prevF: () => { if (!APP) return; if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '-15000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'prev'); }, nextF: () => { if (!APP) return; if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '30000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'next'); },
+      prevLabel: S.src === 'podcast' ? 'Lùi 15 giây' : S.src === 'radio' ? 'Đài trước' : 'Bài trước', nextLabel: S.src === 'podcast' ? 'Tới 30 giây' : S.src === 'radio' ? 'Đài kế' : 'Bài kế',
       playIcon: playing && !inCall ? 'M7 5h4v14H7zM13 5h4v14h-4z' : 'M8 5l11 7-11 7z',
       songTitle: APP ? (S.src === 'radio' ? ((LV.radio && LV.radio.name) || DEF_NOW.radio[2]) : (MD && MD.title) || DEF_NOW.music[2]) : (S.playing ? (S.nowT || DEF_NOW[S.src][0]) : DEF_NOW[S.src][2]),
       songSub: inCall && playing ? 'Tạm dừng vì có cuộc gọi' : APP ? (S.src === 'radio' ? (playing ? 'Radio · trực tiếp' : (LV.radio && LV.radio.err) || '') : MD ? [MD.artist, MD.app].filter(Boolean).join(' · ') : 'Bấm ▶ để phát ' + (({ 'com.spotify.music': 'Spotify', 'com.google.android.apps.youtube.music': 'YouTube Music' })[C.musicApp] || "Tom's Jukebox")) : (S.playing ? (S.nowS || DEF_NOW[S.src][1]) : (S.perm ? 'Bấm ▶ để phát' : '')),
@@ -2159,7 +2222,7 @@ class Component extends DCLogic {
       goSettings: go('settings'), goHome: go('home'), goRt: go('rt'), goSplit: () => { go('split')(); if (APP) tcn('split', JSON.stringify({ frac: S.split, side: C.mapSide, map: C.mapApp })); }, goSearch: go('search'), goContacts: () => { go('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } },
       togglePrivacy: () => self.setS('privacy', !priv), privPressed: priv ? 'true' : 'false', privC: priv ? '#7BD88F' : '#CFF6FF', privRing: priv ? 'inset 0 0 0 2px #7BD88F' : 'inset 0 0 0 1px rgba(95,212,240,0.55)', privIcon: priv ? 'M3 3l18 18' : '',
       openExit: () => self.setState({ exitOpen: true }), closeExit: () => self.setState({ exitOpen: false }), exitOpen: S.exitOpen,
-      openCreate: () => { self.setState({ createOpen: true, wsSel: [], wsName: '' }); if (APP && !S.apps) tcn('apps'); }, closeCreate: () => self.setState({ createOpen: false }), createOpen: S.createOpen,
+      openCreate: () => { self.setState({ createOpen: true, wsSel: [], wsName: '', wsPct: null, wsEdit: null, rtCheck: false }); if (APP && !S.apps) tcn('apps'); }, closeCreate: () => self.setState({ createOpen: false }), createOpen: S.createOpen,
       toggleRtCheck: () => self.setState({ rtCheck: !S.rtCheck }), rtCheck: S.rtCheck ? 'true' : 'false', rtCheckBg: S.rtCheck ? '#FBB040' : 'transparent', rtCheckMark: S.rtCheck ? '✓' : '',
       ws,
       groups, grpTitle: G.label, grpDesc: G.desc, rows,
