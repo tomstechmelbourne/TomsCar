@@ -136,10 +136,13 @@ window.__AppComp = function() {
     }
   }
   const THU = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+  const ASI = { fuel: "M5 3h8a1 1 0 0 1 1 1v16H4V4a1 1 0 0 1 1-1zM6 5v5h6V5zM3 20h12v2H3zM14.6 6.4l1-1L19 8.8V17a2.5 2.5 0 0 1-5 0v-4.5h-.6V11H15.6v6a1 1 0 0 0 2 0V9.4z", cafe: "M4 8h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 9h1.5a2.5 2.5 0 0 1 0 5H16v-1.6h1.5a.9.9 0 0 0 0-1.8H16zM3 19h15v1.6H3zM8 2.5c1 1 1 2 0 3s-1 2 0 3H6.6c-1-1-1-2 0-3s1-2 0-3zM12 2.5c1 1 1 2 0 3s-1 2 0 3h-1.4c-1-1-1-2 0-3s1-2 0-3z", wc: "M7 1.6a2 2 0 1 1 0 4a2 2 0 1 1 0-4zM5 6.6h4l1.2 7H9v8.4H5v-8.4H3.8zM17 1.6a2 2 0 1 1 0 4a2 2 0 1 1 0-4zM15 6.6h4l2.4 8.4h-2v7h-4.8v-7h-2zM11.6 2h.8v20h-.8z", rest: "M12 1a5 4 0 0 1 5 4a4 3 0 0 1-2 6H9a4 3 0 0 1-2-6a5 4 0 0 1 5-4zM11.2 10.6h1.6V14h-1.6zM4 14h16v1.6H4zM6 15.6h1.6L5.6 22H4zM16.4 15.6H18l2 6.4h-1.6zM3 18.4h18v1.4H3z", shop: "M1.5 3H5l.6 2H21.5l-2.2 8.4H7.7l.4 1.6H19.5v1.6H6.9L3.9 4.6H1.5zM9 18.2a1.7 1.7 0 1 1 0 3.4a1.7 1.7 0 1 1 0-3.4zM17 18.2a1.7 1.7 0 1 1 0 3.4a1.7 1.7 0 1 1 0-3.4z", food: "M7 2h1.4v6.5a2 2 0 0 0 1.2-1.8V2H11v4.7A3.4 3.4 0 0 1 8.4 10v12H7V10a3.4 3.4 0 0 1-2.6-3.3V2h1.4v4.7A2 2 0 0 0 7 8.5zM15.5 2C18 2 19 5 19 8.5c0 2-1 3.5-2.4 3.8V22h-1.6V2z" };
+  const icF = (k) => ASI[k] ? "#FFFFFF" : "none", icS = (k) => ASI[k] ? "none" : "#FFFFFF";
   const ICO = { cafe: "M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 10h2a2 2 0 0 1 0 4h-2M8 3v3M11 3v3", fuel: "M5 20V5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v15M4 20h11M7 8h5M14 9h2l2 2v6a1.5 1.5 0 0 0 3 0V9l-3-3", food: "M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M16 3c-2 0-3 3-3 6s1 3 3 3v9", lake: "M3 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0M3 19c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 4l4 7H8z", sight: "M4 8h4l2-3h4l2 3h4v11H4zM12 11a3 3 0 1 0 0 6a3 3 0 1 0 0-6z", end: "M5 21V4M5 4h11l-2 4 2 4H5", wc: "M7 4a2 2 0 1 0 0 .1M17 4a2 2 0 1 0 0 .1M5 21v-7H4l1-6h4l1 6H9v7M15 21V8h4v7h-1v6", rest: "M3 14h18M5 14v6M19 14v6M7 14l2-6h6l2 6M12 3v5", shop: "M4 6h16l-2 9H6zM4 6L3 3M8 20a1.5 1.5 0 1 0 0 .1M17 20a1.5 1.5 0 1 0 0 .1" };
+  const ICX = Object.assign({}, ICO, ASI);
   const SIGN = { cafe: "#1F5FAE", fuel: "#1F5FAE", food: "#1F5FAE", wc: "#1F5FAE", rest: "#1F5FAE", shop: "#1F5FAE", lake: "#6B3E26", sight: "#6B3E26", end: "#00653A" };
-  const TOTAL = 727;
-  const PLACES = {
+  let TOTAL = 727;
+  let PLACES = {
     flywheel: { name: "The Flywheel Bar & Cafe", town: "Beaufort VIC", k: "cafe", km: 160, stay: 35 },
     ampolbf: { name: "Ampol Foodary Beaufort", town: "Beaufort VIC", k: "fuel", km: 161, stay: 20 },
     mcd: { name: "McDonald's Horsham", town: "Horsham VIC", k: "food", km: 300, stay: 30 },
@@ -151,11 +154,12 @@ window.__AppComp = function() {
     tailem: { name: "Tailem Bend", town: "Tailem Bend SA", k: "cafe", km: 625, stay: 30 }
   };
   const MAPLINE = [[603, 270], [528.5, 249], [497.2, 238.1], [466.8, 225.8], [417.9, 178.7], [406.3, 156.7], [381.2, 146.8], [353.9, 150.5], [322.4, 145], [294.5, 127.2], [261.3, 93.9], [234.2, 57.1], [195.7, 39.2], [177, 30]];
-  const BORDER = 425;
+  let BORDER = 425;
   const DEF_GO = ["flywheel", "pink", "kaniva", "keith", "coon"];
   const DEF_BACK = ["tailem", "coon", "keithb", "kaniva", "pink", "mcd", "flywheel"];
-  const MINE_BACK = { tailem: 1, keithb: 1, mcd: 1 };
-  const MINE_GO = { flywheel: 1, pink: 1, kaniva: 1, keith: 1, coon: 1 };
+  let MINE_BACK = { tailem: 1, keithb: 1, mcd: 1 };
+  let MINE_GO = { flywheel: 1, pink: 1, kaniva: 1, keith: 1, coon: 1 };
+  const MA = { total: TOTAL, places: PLACES, border: BORDER, mineGo: MINE_GO, mineBack: MINE_BACK };
   const PHOTO_SRC = { pink: "Wikimedia Commons (\u0111i\u1EC3m tham quan) \u2014 ho\u1EB7c h\xECnh b\u1EA1n ch\u1EE5p", kaniva: "Wikimedia Commons (\u0111i\u1EC3m tham quan) \u2014 ho\u1EB7c h\xECnh b\u1EA1n ch\u1EE5p", coon: "Wikimedia Commons (\u0111i\u1EC3m tham quan) \u2014 ho\u1EB7c h\xECnh b\u1EA1n ch\u1EE5p" };
   function rnd(i) {
     const x = Math.sin(i * 12.9898) * 43758.5453;
@@ -216,7 +220,38 @@ window.__AppComp = function() {
     clkDual: true,
     clkBlink: true,
     clkAuto: false,
-    mapApp2: "waze"
+    mapApp2: "waze",
+    musicApp: "jukebox",
+    musicAppName: "Tom's Jukebox",
+    autoPlay: false,
+    jbFollow: false,
+    vizOn: true,
+    lpTheme: "lp_au",
+    drawStyle: "poly",
+    cockpit2: "lowpoly",
+    gaugeAuto: true,
+    gaugeManual: "classic",
+    autoScene: true,
+    sceneMove: "still",
+    idleOn: true,
+    idleMin: 3,
+    idleClock: "min",
+    idleWxBg: true,
+    idleHourly: true,
+    idle3d: true,
+    idleAppt: true,
+    idleVN: false,
+    ttsRate: 1,
+    ttsPitch: 1,
+    ttsVoice: "",
+    hotSens: 1,
+    hotMuteMusic: false,
+    hotOn: true,
+    cockpitAuto: false,
+    mapStyle: "auto",
+    mapBright: 100,
+    odoOn: true,
+    stateRules: true
   };
   const APPS = [
     ["waze", "Waze", "map", "#2D8FD6", "W"],
@@ -318,6 +353,14 @@ window.__AppComp = function() {
         listOpen: false,
         leg: "go",
         pos: 167,
+        trips: sv.trips || [],
+        tripId: sv.tripId || "mel-adl",
+        melStore: sv.melStore || null,
+        tripDlg: false,
+        ntFrom: "",
+        ntTo: "",
+        ntMsg: "",
+        ntBusy: false,
         goList: sv.goList || DEF_GO.slice(),
         backList: sv.backList || DEF_BACK.slice(),
         skip: sv.skip || {},
@@ -399,6 +442,19 @@ window.__AppComp = function() {
         else this.setState({ now });
       }, 1e3);
       this.startBoot();
+      setTimeout(() => {
+        this.syncNative(this.state.set);
+        if (APP && this.state.set.autoPlay) tcn("media", "autoplay");
+        if (APP) {
+          tcn("media", "jbquery");
+          tcn("voice", "report");
+        }
+      }, 1500);
+    }
+    syncNative(C) {
+      if (!APP) return;
+      tcn("media", "app:" + (C.musicApp || "jukebox"));
+      tcn("voice", "cfg:" + JSON.stringify({ rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || "", sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false }));
     }
     componentWillUnmount() {
       clearInterval(this.tick);
@@ -409,25 +465,28 @@ window.__AppComp = function() {
       clearTimeout(this.b1);
       clearTimeout(this.b2);
       this.setState({ boot: "splash", scr: "home", last: Date.now() });
-      this.b1 = setTimeout(() => this.setState({ boot: "about" }), 2700);
-      if (this.state.set.autoBoot) this.b2 = setTimeout(() => this.setState({ boot: null, scr: "home", last: Date.now() }), 6800);
+      this.b2 = setTimeout(() => this.setState({ boot: null, scr: "home", last: Date.now() }), 3200);
     }
     save(patch) {
       const st = Object.assign({}, this.state, patch);
       try {
-        window.localStorage.setItem(STORE, JSON.stringify({ set: st.set, goList: st.goList, backList: st.backList, skip: st.skip, wsList: st.wsList, custom: st.custom, photos: st.photos, savedPl: st.savedPl }));
+        window.localStorage.setItem(STORE, JSON.stringify({ set: st.set, goList: st.goList, backList: st.backList, skip: st.skip, wsList: st.wsList, custom: st.custom, photos: st.photos, savedPl: st.savedPl, trips: st.trips, tripId: st.tripId, melStore: st.melStore }));
       } catch (e) {
       }
       this.setState(patch);
     }
     setS(k, v) {
-      this.save({ set: Object.assign({}, this.state.set, { [k]: v }) });
+      const n = Object.assign({}, this.state.set, { [k]: v });
+      this.save({ set: n });
+      if (/^(musicApp|tts|hot)/.test(k)) this.syncNative(n);
+      if (k === "jbFollow" && v) tcn("media", "jbquery");
     }
     toast(t) {
       this.setState({ toast: t, toastAt: Date.now() });
     }
     say(t, sensitive) {
       this.toast(t);
+      this.setState({ replyAt: Date.now() });
       if (APP && !(sensitive && this.state.set.privacy)) tcn("say", t);
     }
     runVoice(text) {
@@ -441,9 +500,20 @@ window.__AppComp = function() {
           return;
         }
       }
+      const r = this.state.vaRetry || 0;
+      if (r < 1) {
+        setTimeout(() => {
+          this.setState({ va: true, vaRetry: r + 1, vaHint: 'M\xECnh nghe l\xE0 "' + text + '" \u2014 ch\u01B0a hi\u1EC3u, b\u1EA1n n\xF3i l\u1EA1i nha' });
+          this.say("D\u1EA1, m\xECnh ch\u01B0a hi\u1EC3u. B\u1EA1n n\xF3i l\u1EA1i gi\xFAp m\xECnh nha");
+          setTimeout(() => {
+            if (this.state.va) tcn("voice", "start");
+          }, 2600);
+        }, 350);
+        return;
+      }
       setTimeout(() => {
-        this.setState({ va: false });
-        this.say("D\u1EA1, m\xECnh ch\u01B0a hi\u1EC3u. B\u1EA1n n\xF3i l\u1EA1i gi\xFAp m\xECnh nha");
+        this.setState({ va: false, vaRetry: 0 });
+        this.say("D\u1EA1, m\xECnh v\u1EABn ch\u01B0a hi\u1EC3u. B\u1EA1n b\u1EA5m n\xFAt mic th\u1EED l\u1EA1i nha");
       }, 350);
     }
     renderVals() {
@@ -471,8 +541,8 @@ window.__AppComp = function() {
       const playing = APP ? S.src === "radio" ? !!(LV.radio && LV.radio.playing) : !!(MD && MD.playing) : S.playing;
       const showWave = playing && C.wave !== "off" && !drive && !inCall && S.src === "music";
       const waveBars = WAVE.map((w, i) => ({ h: C.wave === "tt" ? w.h : 6 + i % 4 * 3, del: w.del, cls: "wv", c: i < 20 ? "#FBB040" : "rgba(95,212,240,0.75)" }));
-      const wxc = APP ? LV.wx && LV.wx.code : "rain";
-      const rainy = wxc === "rain" || wxc === "storm";
+      const wxCode0 = APP ? LV.wx && LV.wx.code : "rain";
+      const rainy = wxCode0 === "rain" || wxCode0 === "storm";
       const rainOn = C.rainFx && !drive && rainy;
       const LM = APP ? LV.limit : { v: ZONES[S.zone][0], est: S.zone === "none", school: S.zone === "school", label: ZONES[S.zone][1], at: S.popAt, ahead: S.pendZone ? ZONES[S.pendZone][0] : null };
       const zinfo = [LM ? LM.v : 0, LM ? LM.label || "" : ""], lim = LM ? LM.v : 999, est = !!(LM && LM.est);
@@ -516,9 +586,9 @@ window.__AppComp = function() {
         limShow: !!LM && !(est && !C.limitEst),
         lim: LM ? LM.v : "",
         limAria: "Gi\u1EDBi h\u1EA1n " + lim + (est ? " (\u01B0\u1EDBc t\xEDnh)" : ""),
-        limBorder: est ? "3px dashed #D0202E" : "0",
+        limBorder: "0",
         limNote: est ? "\u01B0\u1EDBc t\xEDnh" : LM && LM.school ? "School Zone \xB7 gi\u1EDD h\u1ECDc" : zinfo[1],
-        limNoteC: est ? "#FFD08A" : "#CFE6EE",
+        limNoteC: est ? "#9AAAB2" : "#CFE6EE",
         pop: !!(LM && LM.at && S.now - LM.at < 3200),
         zoneL: (est ? "\u01AF\u1EDBc t\xEDnh \xB7 " : "V\xE0o v\xF9ng m\u1EDBi \xB7 ") + zinfo[1],
         ahead: !!(LM && LM.ahead),
@@ -531,6 +601,7 @@ window.__AppComp = function() {
           if (k !== S.zone) self.setState({ pendZone: k, pendAt: Date.now() });
         } };
       });
+      const VS = window.__voiceState || {};
       const tg = (k, label, hint) => ({ isToggle: true, label, hint, on: C[k] ? "true" : "false", trackBg: C[k] ? "#FBB040" : "#2A3C48", knobX: C[k] ? 34 : 4, stateL: C[k] ? "M\u1EDF" : "T\u1EAFt", stateC: C[k] ? "#FFD08A" : "#8FC3D3", toggle: () => self.setS(k, !C[k]) });
       const ch = (k, label, hint, opts) => ({ isChoice: true, label, hint, opts: opts.map(([v, l]) => {
         const on = C[k] === v;
@@ -545,7 +616,7 @@ window.__AppComp = function() {
           ch("lang", "Ng\xF4n ng\u1EEF", "Ch\u1EEF tr\xEAn m\u1ECDi m\xE0n h\xECnh", [["vi", "Ti\u1EBFng Vi\u1EC7t"], ["en", "English"]]),
           ch("clock", "Ki\u1EC3u gi\u1EDD", "M\u1EB7c \u0111\u1ECBnh 24h", [["24", "24h"], ["12", "12h"]]),
           ch("unit", "\u0110\u01A1n v\u1ECB t\u1ED1c \u0111\u1ED9", "M\u1EB7c \u0111\u1ECBnh km/g", [["kmg", "km/g"], ["mph", "mph"]]),
-          tg("autoBoot", "M\xE0n h\xECnh ch\xE0o + Gi\u1EDBi Thi\u1EC7u t\u1EF1 chuy\u1EC3n", "M\u1EDF app t\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh, kh\xF4ng \u0111\u1EE9ng ch\u1EDD b\u1EA5m"),
+          stt("M\xE0n h\xECnh ch\xE0o", "Logo + phi\xEAn b\u1EA3n, t\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh sau 3 gi\xE2y, ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm", true, "Lu\xF4n b\u1EADt", "", "", null),
           info("M\u1EDF app v\xE0o th\u1EB3ng", "Lu\xF4n v\xE0o tab n\xE0y sau m\xE0n h\xECnh ch\xE0o", "M\xE0n H\xECnh Ch\xEDnh"),
           stt("Nh\u1EDB m\u1ECDi l\u1EF1a ch\u1ECDn khi tho\xE1t", "Giao di\u1EC7n, t\xEDnh n\u0103ng, Workspace, ch\u1EB7ng Road Trip\u2026", true, "Lu\xF4n nh\u1EDB", "", "", null),
           tg("privacy", "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0", "Gi\u1EA5u t\xEAn ng\u01B0\u1EDDi g\u1ECDi, n\u1ED9i dung tin nh\u1EAFn, th\xF4ng tin kh\xE1ch"),
@@ -573,11 +644,27 @@ window.__AppComp = function() {
           tg("clkVN", "Th\xEAm gi\u1EDD Vi\u1EC7t Nam", ""),
           tg("clkBlink", 'D\u1EA5u ":" nh\u1EA5p nh\xE1y', "Xe ch\u1EA1y th\xEC t\u1EF1 \u0111\u1EE9ng y\xEAn")
         ] },
-        nhac: { label: "Nh\u1EA1c", icon: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z", desc: "Thanh nh\u1EA1c, s\xF3ng nh\u1EA1c, ngu\u1ED3n nh\u1EA1c", rows: [
-          ch("wave", "Ki\u1EC3u s\xF3ng nh\u1EA1c", "M\u1EB7c \u0111\u1ECBnh gi\u1ED1ng Tom\u2019s Jukebox", [["tt", "M\u1EB7c \u0110\u1ECBnh (Tom's Tech)"], ["bars", "Thanh \u0110\u1EC1u"], ["off", "T\u1EAFt"]]),
-          ch("src", "Ngu\u1ED3n nh\u1EA1c \u01B0u ti\xEAn", "N\xFAt tr\xEAn thanh nh\u1EA1c \u0111i\u1EC1u khi\u1EC3n app n\xE0y", [["jukebox", "Tom's Jukebox"], ["spotify", "Spotify"], ["ytm", "YouTube Music"]]),
-          stt("Quy\u1EC1n \u0111\u1ECDc b\xE0i \u0111ang ph\xE1t", "\u0110\u1EC3 hi\u1EC7n t\xEAn b\xE0i, \u1EA3nh b\xECa", S.perm, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => self.setState({ perm: true })),
-          tg("shrink", "Thu nh\u1ECF thanh nh\u1EA1c khi xe ch\u1EA1y", "Gi\u1EEF \u23EE \u23F8 \u23ED, t\u1EAFt s\xF3ng nh\u1EA1c")
+        nhac: { label: "Nh\u1EA1c", icon: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z", desc: "App nh\u1EA1c m\u1EB7c \u0111\u1ECBnh, thanh nh\u1EA1c ki\u1EC3u Tom\u2019s Jukebox", rows: [
+          ch("musicApp", "App nh\u1EA1c m\u1EB7c \u0111\u1ECBnh", "B\u1EA5m \u25B6 khi ch\u01B0a c\xF3 nh\u1EA1c l\xE0 ph\xE1t app n\xE0y (kh\xF4ng c\u1EA7n tho\xE1t ra)", [["jukebox", "Tom's Jukebox"], ["com.spotify.music", "Spotify"], ["com.google.android.apps.youtube.music", "YouTube Music"]]),
+          tg("autoPlay", "T\u1EF1 ph\xE1t nh\u1EA1c khi m\u1EDF Tom\u2019s Car", "Ph\xE1t ti\u1EBFp b\xE0i \u0111ang nghe d\u1EDF"),
+          tg("jbFollow", "Theo Tom\u2019s Jukebox", "M\xE0u thanh th\u1EDDi gian, s\xF3ng nh\u1EA1c, n\xFAt\u2026 l\u1EA5y theo giao di\u1EC7n \u0111ang ch\u1ECDn b\xEAn Tom\u2019s Jukebox"),
+          tg("vizOn", "S\xF3ng nh\u1EA1c tr\xEAn vi\xEAn thu\u1ED1c", "Xe ch\u1EA1y th\xEC s\xF3ng t\u1EF1 d\u1ECBu l\u1EA1i"),
+          info("Tom's Jukebox", "C\u1EA7n b\u1EA3n 0.9.5 tr\u1EDF l\xEAn \u0111\u1EC3 Tom\u2019s Car ph\xE1t ng\u1EA7m v\xE0 xem th\u01B0 vi\u1EC7n", window.__jbLook ? "\u0110\xE3 n\u1ED1i \u2713" : APP ? "Ch\u01B0a th\u1EA5y" : "B\u1EA3n m\u1EABu"),
+          stt("Quy\u1EC1n \u0111\u1ECDc b\xE0i \u0111ang ph\xE1t", "\u0110\u1EC3 hi\u1EC7n t\xEAn b\xE0i, th\u1EDDi gian", APP ? !!PM.notif : S.perm, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => {
+            if (APP) tcn("perm", "notif");
+            else self.setState({ perm: true });
+          })
+        ] },
+        tl: { label: "Tr\u1EE3 L\xFD", icon: "M9 3h6v11a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3", desc: 'Gi\u1ECDng n\xF3i ti\u1EBFng Vi\u1EC7t, "Hey Tom", \u0111\u1ED9 nh\u1EA1y', rows: [
+          stt("Gi\u1ECDng Ti\u1EBFng Vi\u1EC7t", VS.google ? "D\xF9ng b\u1ED9 \u0111\u1ECDc Google (c\xF3 ti\u1EBFng Vi\u1EC7t, ch\u1EA1y offline)" : 'M\xE1y ch\u01B0a c\xF3 b\u1ED9 \u0111\u1ECDc Google \u2014 t\u1EA3i "Speech Services by Google"', !!VS.vi, "\u0110\xE3 c\xF3", "Ch\u01B0a c\xF3", "T\u1EA3i Gi\u1ECDng Vi\u1EC7t", () => tcn("voice", "installvi")),
+          ch("ttsVoice", "Gi\u1ECDng \u0111\u1ECDc", "Gi\u1ECDng c\xF3 s\u1EB5n trong m\xE1y", [["", "M\u1EB7c \u0111\u1ECBnh"]].concat((VS.voices || []).slice(0, 6).map((v, i) => [v.name, "Gi\u1ECDng " + (i + 1) + (v.offline ? "" : " (c\u1EA7n m\u1EA1ng)")]))),
+          ch("ttsRate", "T\u1ED1c \u0111\u1ED9 \u0111\u1ECDc", "", [[0.85, "Ch\u1EADm"], [1, "V\u1EEBa"], [1.15, "Nhanh"]]),
+          ch("ttsPitch", "\u0110\u1ED9 cao gi\u1ECDng", "", [[0.9, "Tr\u1EA7m"], [1, "V\u1EEBa"], [1.1, "Cao"]]),
+          stt("Nghe th\u1EED", "Tr\u1EE3 l\xFD n\xF3i m\u1ED9t c\xE2u m\u1EABu", false, "", "B\u1EA5m \u0111\u1EC3 nghe", "Nghe Th\u1EED", () => tcn("voice", "test")),
+          tg("hotOn", 'G\u1ECDi b\u1EB1ng "Hey Tom"', "T\u1EAFt = ch\u1EC9 g\u1ECDi b\u1EB1ng n\xFAt mic / n\xFAt Bluetooth v\xF4 l\u0103ng"),
+          ch("hotSens", '\u0110\u1ED9 nh\u1EA1y "Hey Tom"', "Th\u1EA5p = \xEDt g\u1ECDi nh\u1EA7m nh\u1EA5t", [[0, "Th\u1EA5p"], [1, "V\u1EEBa"], [2, "Cao"]]),
+          tg("hotMuteMusic", 'T\u1EA1m t\u1EAFt "Hey Tom" khi nh\u1EA1c to', "\u0110\u1EE1 b\u1ECB g\u1ECDi nh\u1EA7m v\xEC ti\u1EBFng nh\u1EA1c t\u1EEB loa"),
+          info("L\u1EA7n g\u1ECDi g\u1EA7n \u0111\xE2y", "Gi\u1EDD \xB7 c\xE2u tr\u1EE3 l\xFD nghe \xB7 \u0111\u1ED9 ch\u1EAFc", VS.log && VS.log.length ? VS.log.slice(0, 3).join("   |   ") : "Ch\u01B0a c\xF3")
         ] },
         xe: { label: "Xe & OBD-II", icon: "M5 17h14M6 17V9l2-4h8l2 4v8M7 17v2M17 17v2M8 12h.01M16 12h.01", desc: "C\u1EE5c OBD-II, h\u1ED3 s\u01A1 xe, ngu\u1ED3n t\u1ED1c \u0111\u1ED9, nh\u1EAFc b\u1EA3o d\u01B0\u1EE1ng", rows: [
           stt("C\u1EE5c OBD-II", LV.obd ? "\u0110\xE3 n\u1ED1i \xB7 " + (LV.obd.protocol || "") : "Veepeak OBDCheck BLE (Bluetooth)", !!LV.obd, "\u0110\xE3 n\u1ED1i", "Ch\u01B0a n\u1ED1i", "Ch\u1ECDn C\u1EE5c OBD", () => tcn("settings")),
@@ -595,10 +682,12 @@ window.__AppComp = function() {
           tg("kmSeg", "Km gi\u1EEFa hai ch\u1EB7ng", "Tr\xEAn m\u1EB7t \u0111\u01B0\u1EDDng"),
           tg("kmPost", "C\u1ECDc km d\u1ECDc \u0111\u01B0\u1EDDng", "M\u1ED7i 100 km \u2014 ph\xF3ng to th\xEC m\u1ED7i 10 km"),
           tg("placePhotos", "H\xECnh \u0111\u1EA1i di\u1EC7n \u0111\u1ECBa \u0111i\u1EC3m", "H\xECnh b\u1EA1n ch\u1EE5p \u2192 Wikimedia Commons \u2192 bi\u1EC3n b\xE1o"),
-          tg("limitEst", "Gi\u1EDBi h\u1EA1n \u01B0\u1EDBc t\xEDnh khi thi\u1EBFu d\u1EEF li\u1EC7u", "50 khu d\xE2n c\u01B0 / 100 ngo\xE0i th\u1ECB tr\u1EA5n \u2014 vi\u1EC1n \u0111\u1EE9t"),
+          tg("limitEst", "Gi\u1EDBi h\u1EA1n \u01B0\u1EDBc t\xEDnh khi thi\u1EBFu d\u1EEF li\u1EC7u", '50 khu d\xE2n c\u01B0 / 100 ngo\xE0i th\u1ECB tr\u1EA5n \u2014 c\xF3 ch\u1EEF "\u01B0\u1EDBc t\xEDnh" d\u01B0\u1EDBi bi\u1EC3n'),
           ch("rest", "Nh\u1EAFc ngh\u1EC9 ch\xE2n m\u1ED7i", "Theo gi\u1EDD l\xE1i li\xEAn t\u1EE5c", [[1.5, "1,5 gi\u1EDD"], [2, "2 gi\u1EDD"], [3, "3 gi\u1EDD"]]),
-          tg("offline", "T\u1EA3i s\u1EB5n b\u1EA3n \u0111\u1ED3 offline", "\u0110o\u1EA1n Melbourne \u21C4 Adelaide"),
-          ch("places", "Ngu\u1ED3n t\xECm ch\u1ED7", "Google Places c\u1EA7n kho\xE1 Google Cloud", [["osm", "OpenStreetMap"], ["gp", "Google Places"]])
+          ch("mapStyle", "Ki\u1EC3u b\u1EA3n \u0111\u1ED3", "T\u1EF1 \u0110\u1ED9ng = S\xE1ng ban ng\xE0y, T\u1ED1i ban \u0111\xEAm (theo gi\u1EDD m\u1EB7t tr\u1EDDi m\u1ECDc/l\u1EB7n)", [["auto", "T\u1EF1 \u0110\u1ED9ng"], ["dark", "T\u1ED1i"], ["light", "S\xE1ng"], ["topo", "\u0110\u1ECBa H\xECnh"], ["sat", "V\u1EC7 Tinh"]]),
+          ch("mapBright", "\u0110\u1ED9 s\xE1ng b\u1EA3n \u0111\u1ED3", "B\u1EADt D\u1ECBu M\u1EAFt th\xEC t\u1EF1 gi\u1EA3m", [[70, "70%"], [85, "85%"], [100, "100%"], [115, "115%"]]),
+          tg("odoOn", "\u0110\u1ED3ng h\u1ED3 km ki\u1EC3u cu\u1ED9n", "Trip A, Trip B, km t\u1EDBi ch\u1EB7ng k\u1EBF, v\xF2ng % chuy\u1EBFn"),
+          tg("stateRules", "Nh\u1EAFc lu\u1EADt khi qua ti\u1EC3u bang kh\xE1c", "\u0110\u1ECDc to + hi\u1EC7n tr\xEAn m\xE0n h\xECnh")
         ] },
         ws: { label: "Workspace", icon: "M3 4h8v7H3zM13 4h8v4h-8zM13 10h8v10h-8zM3 13h8v7H3z", desc: "C\xE1ch m\u1EDF app tr\xEAn DeX v\xE0 \u0111i\u1EC7n tho\u1EA1i", rows: [
           tg("dexFull", "Ph\xF3ng to theo m\xE0n h\xECnh DeX", "Tr\u1EEB thanh t\xE1c v\u1EE5; 1 app th\xEC ph\xF3ng to h\u1EBFt"),
@@ -620,15 +709,18 @@ window.__AppComp = function() {
           stt("Nh\u1EADt k\xFD cu\u1ED9c g\u1ECDi + SMS + danh b\u1EA1", "Tab Li\xEAn L\u1EA1c", !!PM.calllog, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => tcn("perm", "calllog")),
           stt("Nghe / t\u1EEB ch\u1ED1i cu\u1ED9c g\u1ECDi, g\u1EEDi SMS", "Thanh g\u1ECDi m\u1ECFng, t\u1EF1 nh\u1EAFn l\u1EA1i", !!PM.phone, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => tcn("perm", "phone")),
           stt("Micro", "Tr\u1EE3 l\xFD gi\u1ECDng n\xF3i", !!PM.mic, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => tcn("perm", "mic")),
+          stt("Gi\u1ECDng Ti\u1EBFng Vi\u1EC7t cho tr\u1EE3 l\xFD", "B\u1ED9 \u0111\u1ECDc Google, t\u1EA3i 1 l\u1EA7n, ch\u1EA1y offline", !!VS.vi, "\u0110\xE3 c\xF3", "Ch\u01B0a c\xF3", "T\u1EA3i Gi\u1ECDng Vi\u1EC7t", () => tcn("voice", "installvi")),
           stt("L\u1ECBch (Google Calendar)", "Nh\u1EAFc h\u1EB9n c\u1EA1nh \u0111\u1ED3ng h\u1ED3", !!PM.cal, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => tcn("perm", "cal")),
           stt("Hi\u1EC7n tr\xEAn app kh\xE1c", "D\u1EA3i Tom\u2019s Car tr\xEAn Waze (b\u1EA3n sau)", !!PM.overlay, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => tcn("perm", "overlay"))
         ] },
         gt: { label: "Gi\u1EDBi Thi\u1EC7u", icon: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01", desc: "Th\xF4ng tin app", rows: [
           info("Phi\xEAn b\u1EA3n", "Tom\u2019s Technology Solutions", window.TC_VERSION || "0.9.5-beta"),
           info("Kh\u1EA9u hi\u1EC7u", "", "Focus On One Thing And Do It Well"),
-          info("Bi\u1EC3n b\xE1o", "Theo chu\u1EA9n \xDAc AS 1742", "Ngu\u1ED3n: Wikimedia Commons"),
+          info("Bi\u1EC3u t\u01B0\u1EE3ng d\u1ECBch v\u1EE5", "Theo AS 1742.6 (n\u1EC1n xanh, h\xECnh tr\u1EAFng)", "D\u1EF1a theo b\u1ED9 bi\u1EC3n c\u1EE7a QLD TMR \u2014 CC BY 4.0"),
           info("H\xECnh \u0111\u1ECBa \u0111i\u1EC3m / logo h\xE3ng", "", "Wikimedia Commons \xB7 Wikidata"),
-          info("Th\u1EDDi ti\u1EBFt / b\u1EA3n \u0111\u1ED3", "", "Open-Meteo \xB7 OpenStreetMap")
+          info("Th\u1EDDi ti\u1EBFt", "", "Open-Meteo"),
+          info("B\u1EA3n \u0111\u1ED3", "T\u1ED1i/S\xE1ng \xA9 CARTO \xB7 \u0110\u1ECBa H\xECnh \xA9 OpenTopoMap \xB7 V\u1EC7 Tinh \xA9 Esri", "\xA9 OpenStreetMap contributors"),
+          info("T\xECm \u0111\u01B0\u1EDDng chuy\u1EBFn m\u1EDBi", "", "OSRM \xB7 Nominatim (OpenStreetMap)")
         ] }
       };
       const warnOf = (g) => GRP[g].rows.some((r) => r.isStatus && r.stL.charAt(0) === "\u26A0");
@@ -641,17 +733,40 @@ window.__AppComp = function() {
       }, stL: "", stC: "", actL: "", val: "" }, r, { act: r.act || (() => {
       }) }));
       const LT = LV.trip || null;
+      const TRIP = S.tripId === "mel-adl" ? null : (S.trips || []).find((t) => t.id === S.tripId) || null;
+      if (TRIP) {
+        TOTAL = TRIP.km;
+        PLACES = TRIP.places || {};
+        BORDER = TRIP.border > 0 ? TRIP.border : -1;
+        MINE_GO = {};
+        MINE_BACK = {};
+      } else {
+        TOTAL = MA.total;
+        PLACES = MA.places;
+        BORDER = MA.border;
+        MINE_GO = MA.mineGo;
+        MINE_BACK = MA.mineBack;
+      }
+      const hasBorder = BORDER > 0, saFirst = TRIP ? TRIP.from.st === "SA" : false;
+      const FROM = TRIP ? TRIP.from.name : "Melbourne", TO = TRIP ? TRIP.to.name : "Adelaide", FROMS = TRIP ? TRIP.from.st : "VIC", TOS = TRIP ? TRIP.to.st : "SA";
+      if (window.__tripId !== S.tripId) {
+        window.__tripId = S.tripId;
+        if (window.tcSetRoute) window.tcSetRoute(TRIP ? TRIP.pts : null, TRIP ? TRIP.km : 727);
+        window.__tripRoutes = (S.trips || []).map((t) => ({ id: t.id, name: t.name, pts: t.pts }));
+      }
       const leg = APP && LT && LT.dir && !S.legManual ? LT.dir : S.leg, isGo = leg === "go";
+      const eastFirst = TRIP ? TRIP.from.lon > TRIP.to.lon : true;
+      const flip = isGo ? eastFirst : !eastFirst;
       const ids = isGo ? S.goList : S.backList;
       const ALLP = Object.assign({}, PLACES, S.custom);
       const kmOf = (id) => isGo ? ALLP[id].km : TOTAL - ALLP[id].km;
-      const list = ids.filter((id) => ALLP[id]).map((id) => Object.assign({ id }, ALLP[id], { km: kmOf(id) })).concat([{ id: "end", name: isGo ? "Adelaide" : "Melbourne", town: isGo ? "SA" : "VIC", k: "end", km: TOTAL }]);
+      const list = ids.filter((id) => ALLP[id]).map((id) => Object.assign({ id }, ALLP[id], { km: kmOf(id) })).concat([{ id: "end", name: isGo ? TO : FROM, town: isGo ? TOS : FROMS, k: "end", km: TOTAL }]);
       const pos = APP && LT ? Math.max(0, Math.min(TOTAL, Math.round(isGo ? LT.km : TOTAL - LT.km))) : APP ? 0 : S.pos;
       const border = isGo ? BORDER : TOTAL - BORDER;
       const baseMin = APP && LT && LT.startMin != null ? LT.startMin : APP ? d.getHours() * 60 + d.getMinutes() : 8 * 60 + 5;
       const active = list.filter((x) => !S.skip[leg + x.id]);
       const timeAt = (km) => baseMin + km / 100 * 60 + active.filter((x) => x.km < km).reduce((a, x) => a + (x.stay || 0), 0);
-      const inSA = (km) => isGo ? km >= border : km < border;
+      const inSA = (km) => hasBorder && (saFirst ? isGo ? km < border : km >= border : isGo ? km >= border : km < border);
       const fmt = (mins, sa) => {
         let m = Math.round(mins - (sa ? 30 : 0));
         m = (m % 1440 + 1440) % 1440;
@@ -674,11 +789,13 @@ window.__AppComp = function() {
       };
       const kmLeft = (x) => x.km <= pos ? "\u2713" : "c\xF2n " + (x.km - pos) + " km";
       const stops = list.map((x, i) => {
-        const done = x.km <= pos, next = i === nextIdx, sk = !!S.skip[leg + x.id], isEnd = x.id === "end";
+        const done = x.km <= pos, next = i === nextIdx, sk2 = !!S.skip[leg + x.id], isEnd = x.id === "end";
         return {
           name: x.name,
           town: x.town,
-          icon: ICO[x.k],
+          icon: ICX[x.k],
+          icF: icF(x.k),
+          icS: icS(x.k),
           sign: SIGN[x.k],
           photo: C.placePhotos && !isEnd,
           noPhoto: !(C.placePhotos && !isEnd),
@@ -686,11 +803,11 @@ window.__AppComp = function() {
           stay: isEnd ? "\u0110i\u1EC3m \u0111\u1EBFn" : "gh\xE9 " + x.stay + " ph",
           tag: isEnd ? "" : mine[x.id] ? isGo ? "ch\u1EB7ng \u0111i c\u1EE7a b\u1EA1n" : "ch\u1EB7ng v\u1EC1 c\u1EE7a b\u1EA1n" : "t\u1EEB ch\u1EB7ng \u0111i",
           tagC: mine[x.id] ? "#7BD88F" : "#8FC3D3",
-          dist: sk ? "b\u1ECF qua chuy\u1EBFn n\xE0y" : done ? "\u2713 \u0111\xE3 gh\xE9" : x.km - pos + " km",
-          distC: sk ? "#8FC3D3" : done ? "#7BD88F" : next ? "#FBB040" : "#E8F1F5",
-          eta: sk ? "" : (done ? "" : "d\u1EF1 ki\u1EBFn ") + fmt(timeAt(x.km), inSA(x.km)) + (inSA(x.km) ? " gi\u1EDD SA" : ""),
-          op: done || sk ? 0.55 : 1,
-          strike: sk ? "line-through" : "none",
+          dist: sk2 ? "b\u1ECF qua chuy\u1EBFn n\xE0y" : done ? "\u2713 \u0111\xE3 gh\xE9" : x.km - pos + " km",
+          distC: sk2 ? "#8FC3D3" : done ? "#7BD88F" : next ? "#FBB040" : "#E8F1F5",
+          eta: sk2 ? "" : (done ? "" : "d\u1EF1 ki\u1EBFn ") + fmt(timeAt(x.km), inSA(x.km)) + (inSA(x.km) ? " gi\u1EDD SA" : ""),
+          op: done || sk2 ? 0.55 : 1,
+          strike: sk2 ? "line-through" : "none",
           bg: next ? "rgba(251,176,64,0.12)" : "rgba(13,44,64,0.55)",
           cls: next ? "nxt" : "",
           up: isEnd ? () => {
@@ -698,8 +815,8 @@ window.__AppComp = function() {
           down: isEnd ? () => {
           } : move(i, 1),
           skip: isEnd ? () => {
-          } : () => self.save({ skip: Object.assign({}, S.skip, { [leg + x.id]: !sk }) }),
-          skipL: sk ? "\u21BA" : "\u2298",
+          } : () => self.save({ skip: Object.assign({}, S.skip, { [leg + x.id]: !sk2 }) }),
+          skipL: sk2 ? "\u21BA" : "\u2298",
           del: isEnd ? () => {
           } : () => self.setState({ dlg: "del", delId: x.id })
         };
@@ -709,18 +826,26 @@ window.__AppComp = function() {
       const driveMin = Math.round(pos / 100 * 60);
       const sinceRest = driveMin % (C.rest * 60);
       const restLeft = C.rest * 60 - sinceRest;
-      const X = (km) => 30 + km / TOTAL * 740;
+      const X = (km) => flip ? 770 - km / TOTAL * 740 : 30 + km / TOTAL * 740;
       const Y = (x) => 190 + 16 * Math.sin((x - 30) / 58) + 6 * Math.sin((x - 30) / 23);
-      const pathTo = (xmax) => {
+      const pathTo = (xa, xb) => {
+        if (xb === void 0) {
+          xb = xa;
+          xa = 30;
+        }
+        const lo = Math.min(xa, xb), hi = Math.max(xa, xb);
         let s = "";
-        for (let x = 30; x <= xmax; x += 6) s += (s ? " L" : "M") + x.toFixed(1) + " " + Y(x).toFixed(1);
-        s += " L" + xmax.toFixed(1) + " " + Y(xmax).toFixed(1);
+        for (let x = lo; x <= hi; x += 6) s += (s ? " L" : "M") + x.toFixed(1) + " " + Y(x).toFixed(1);
+        s += " L" + hi.toFixed(1) + " " + Y(hi).toFixed(1);
         return s;
       };
-      const REG = [[0, 60, "Th\xE0nh ph\u1ED1 Melbourne"], [60, 230, "\u0110\u1ED3ng c\u1ECF Ballarat"], [230, 425, "\u0110\u1ED3ng l\xFAa m\xEC Wimmera"], [425, 610, "B\u1EE5i kh\xF4 v\xF9ng Keith"], [610, 727, "\u0110\u1ED3i Adelaide"]];
+      const REG = TRIP ? [[0, 0.06, "Th\xE0nh ph\u1ED1 " + FROM], [0.06, 0.3, "Ngo\u1EA1i \xF4"], [0.3, 0.6, "\u0110\u01B0\u1EDDng tr\u01B0\u1EDDng"], [0.6, 0.92, "Mi\u1EC1n qu\xEA"], [0.92, 1, "T\u1EDBi " + TO]].map(([a, b, l]) => [a * TOTAL, b * TOTAL, l]) : [[0, 60, "Th\xE0nh ph\u1ED1 Melbourne"], [60, 230, "\u0110\u1ED3ng c\u1ECF Ballarat"], [230, 425, "\u0110\u1ED3ng l\xFAa m\xEC Wimmera"], [425, 610, "B\u1EE5i kh\xF4 v\xF9ng Keith"], [610, 727, "\u0110\u1ED3i Adelaide"]];
       const regs = REG.map(([a, b, label]) => {
         const s = isGo ? a : TOTAL - b, e = isGo ? b : TOTAL - a;
-        return { x: X(s) - (s === 0 ? 30 : 0), w: X(e) - X(s) + (s === 0 ? 30 : 0) + (e === TOTAL ? 30 : 0), label };
+        let x0 = Math.min(X(s), X(e)), x1 = Math.max(X(s), X(e));
+        if (x0 <= 31) x0 = 0;
+        if (x1 >= 769) x1 = 800;
+        return { x: x0, w: x1 - x0, label };
       });
       let cityD = "", hillD = "", wheatD = "", scrubD = "", ahillD = "";
       regs.forEach((r, i) => {
@@ -789,29 +914,51 @@ window.__AppComp = function() {
         });
       }
       const photos = C.placePhotos && z >= 2;
-      const signs = list.map((x, i) => {
-        const sx = X(x.km), isEnd = x.id === "end";
+      const circ = (n) => n <= 20 ? String.fromCharCode(9311 + n) : n + ".";
+      const raw = list.map((x, i) => ({ x, i, sx: X(x.km), isEnd: x.id === "end" }));
+      const sgGroups = [];
+      raw.slice().sort((a, b) => a.sx - b.sx).forEach((r) => {
+        const g = sgGroups[sgGroups.length - 1];
+        if (g && Math.abs(r.sx - g[g.length - 1].sx) * z < 26) g.push(r);
+        else sgGroups.push([r]);
+      });
+      const lastEnd = [-1e9, -1e9, -1e9];
+      const signs = sgGroups.map((g) => {
+        const r = g.find((q2) => q2.i === nextIdx) || g.find((q2) => q2.isEnd) || g[0];
+        const x = r.x, i = r.i, sx = r.sx, isEnd = r.isEnd;
+        const many = g.length > 1;
+        const nameOk = isEnd || i === nextIdx || z >= 1.8;
+        const nm = isEnd ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0];
+        const label = many ? circ(g[0].i + 1) + "\u2013" + circ(g[g.length - 1].i + 1) + (nameOk ? " " + nm : "") : isEnd ? "\u{1F3C1} " + nm : circ(i + 1) + (nameOk ? " " + nm : "");
+        const wpx = (label.length * 6.2 + 10) / z;
+        let lv = 0;
+        while (lv < 2 && sx - wpx / 2 < lastEnd[lv]) lv++;
+        lastEnd[lv] = sx + wpx / 2;
+        const gx = g.reduce((a, q2) => a + q2.sx, 0) / g.length;
         return {
           x: sx.toFixed(1),
           y: (Y(sx) - 14).toFixed(1),
-          icon: ICO[x.k],
+          icon: ICX[x.k],
+          icF: icF(x.k),
+          icS: icS(x.k),
           bg: SIGN[x.k],
-          short: isEnd ? x.name : x.town.replace(/ (VIC|SA)$/, ""),
+          short: label,
           op: x.km <= pos || S.skip[leg + x.id] ? 0.5 : 1,
           cls: i === nextIdx ? "nxt" : "",
-          km: C.kmUnder ? kmLeft(x) : "",
+          km: C.kmUnder && !many ? kmLeft(x) : many ? g.length + " ch\u1ED7" : "",
           kmC: x.km <= pos ? "#7BD88F" : i === nextIdx ? "#FBB040" : "#E8F1F5",
-          photo: photos && !isEnd,
-          sign: !(photos && !isEnd),
-          aria: x.name + " \u2014 b\u1EA5m xem chi ti\u1EBFt, ch\u1EA1m 2 l\u1EA7n \u0111\u1EC3 ph\xF3ng t\u1EDBi",
-          open: openStop(x.id),
+          lead: 8 + lv * 30,
+          photo: photos && !isEnd && !many,
+          sign: !(photos && !isEnd && !many),
+          aria: many ? g.length + " ch\u1EB7ng g\u1EA7n nhau \u2014 b\u1EA5m \u0111\u1EC3 ph\xF3ng to" : x.name + " \u2014 b\u1EA5m xem chi ti\u1EBFt, ch\u1EA1m 2 l\u1EA7n \u0111\u1EC3 ph\xF3ng t\u1EDBi",
+          open: many ? () => self.setState({ zMode: "free", fx: gx, z: Math.min(4, z * 2.2), panAt: Date.now() }) : openStop(x.id),
           focus: () => {
             const dist = Math.abs(sx - vanX) + 80;
             self.setState({ zMode: "free", fx: (sx + vanX) / 2, z: Math.min(4, Math.max(1.6, 700 / dist)), panAt: Date.now() });
           }
         };
       });
-      const etaMin = endMin - (isGo ? 30 : 0);
+      const etaMin = endMin - (inSA(TOTAL) ? 30 : 0);
       const etaH = Math.floor((etaMin % 1440 + 1440) % 1440 / 60);
       const day = etaH >= 6 && etaH < 19;
       const mapDots = list.map((x) => {
@@ -819,12 +966,18 @@ window.__AppComp = function() {
         return { x: mx(p[0]).toFixed(1), y: my(p[1]).toFixed(1), name: (x.id === "end" ? x.name : x.name.split(" (")[0]) + (C.kmUnder ? " \xB7 " + kmLeft(x) : ""), c: x.km <= pos ? "#7BD88F" : SIGN[x.k] === "#6B3E26" ? "#C8875A" : "#5FD4F0" };
       }).concat([{ x: mx(isGo ? 603 : 177).toFixed(1), y: my(isGo ? 270 : 30).toFixed(1), name: isGo ? "Melbourne" : "Adelaide", c: "#7BD88F" }]);
       const rt = {
-        title: isGo ? "Melbourne \u2192 Adelaide" : "Adelaide \u2192 Melbourne",
+        title: isGo ? FROM + " \u2192 " + TO : TO + " \u2192 " + FROM,
+        tripL: "\u{1F9ED} Chuy\u1EBFn \u25BE",
+        autoDir: !S.legManual,
+        autoDirBg: !S.legManual ? "rgba(123,216,143,0.18)" : "rgba(3,17,28,0.85)",
+        autoDirC: !S.legManual ? "#7BD88F" : "#8FC3D3",
+        toggleAutoDir: () => self.setState({ legManual: !S.legManual }),
+        openTrips: () => self.setState({ tripDlg: true, ntMsg: "" }),
         legs: [["go", "Ch\u1EB7ng \u0110i"], ["back", "Ch\u1EB7ng V\u1EC1"]].map(([k, label]) => {
           const on = leg === k;
           return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setState({ leg: k, legManual: true }) };
         }),
-        boxes: [["XU\u1EA4T PH\xC1T", fmt(baseMin, !isGo), isGo ? "gi\u1EDD VIC" : "gi\u1EDD SA"], ["D\u1EF0 KI\u1EBEN T\u1EDAI N\u01A0I", fmt(endMin, isGo), isGo ? "gi\u1EDD SA" : "gi\u1EDD VIC"], ["C\xD2N L\u1EA0I", Math.floor(left / 60) + " gi\u1EDD " + p2(left % 60) + " ph", TOTAL - pos + " km"]].map(([l, v, s]) => ({ l, v, s })),
+        boxes: [["XU\u1EA4T PH\xC1T", fmt(baseMin, inSA(0)), hasBorder ? inSA(0) ? "gi\u1EDD SA" : "gi\u1EDD VIC" : "gi\u1EDD " + (isGo ? FROMS : TOS)], ["D\u1EF0 KI\u1EBEN T\u1EDAI N\u01A0I", fmt(endMin, inSA(TOTAL)), hasBorder ? inSA(TOTAL) ? "gi\u1EDD SA" : "gi\u1EDD VIC" : "gi\u1EDD " + (isGo ? TOS : FROMS)], ["C\xD2N L\u1EA0I", Math.floor(left / 60) + " gi\u1EDD " + p2(left % 60) + " ph", TOTAL - pos + " km"]].map(([l, v, s]) => ({ l, v, s })),
         views: [["road", "Con \u0110\u01B0\u1EDDng"], ["map", "B\u1EA3n \u0110\u1ED3"]].map(([k, label]) => {
           const on = view === k;
           return { label, on: on ? "true" : "false", bg: on ? ON.bg : "rgba(3,17,28,0.85)", fg: on ? ON.fg : "#CFE6EE", pick: () => self.setS("rtView", k) };
@@ -850,16 +1003,19 @@ window.__AppComp = function() {
         regions: regs.map((r) => ({ x: Math.max(0, r.x), w: r.w, label: r.label })),
         ticks,
         segs,
-        roadD: pathTo(770),
-        doneD: pathTo(Math.max(31, vanX)),
+        roadD: pathTo(30, 770),
+        doneD: pathTo(X(0), vanX + (flip ? -0.5 : 0.5)),
         bx: X(border),
-        borderL: isGo ? "V\xF4 SA \xB7 \u221230 ph" : "V\xF4 VIC \xB7 +30 ph",
+        bxOn: hasBorder,
+        bxOp: hasBorder ? 1 : 0,
+        vanFlip: flip ? -1 : 1,
+        borderL: inSA(TOTAL) ? "V\xF4 SA \xB7 \u221230 ph" : "V\xF4 VIC \xB7 +30 ph",
         signs,
         vanX,
         vanY,
         vanL: Math.round(pos / TOTAL * 100) + "% \xB7 " + pos + " km",
-        sunX: X(TOTAL) - 40,
-        eta: fmt(endMin, isGo),
+        sunX: flip ? X(TOTAL) - 10 : X(TOTAL) - 40,
+        eta: fmt(endMin, inSA(TOTAL)),
         sunIcon: day ? "M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10zM12 1v3M12 20v3M1 12h3M20 12h3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" : "M20 15A8 8 0 1 1 9 4a6.5 6.5 0 0 0 11 11z",
         sunC: day ? "#FBB040" : "#F3EBD2",
         mapLine: MAPLINE.map((p) => p[0] + "," + p[1]).join(" "),
@@ -897,24 +1053,202 @@ window.__AppComp = function() {
         panEnd: () => {
           if (S.panning) self.setState({ panning: false, panAt: Date.now() });
         },
-        foot: view === "map" ? "H\xECnh m\u1EABu \u2014 khi build l\xE0 b\u1EA3n \u0111\u1ED3 OpenStreetMap th\u1EADt, k\xE9o hai ng\xF3n \u0111\u1EC3 ph\xF3ng to" : z > 1 ? "K\xE9o \u0111\u1EC3 d\u1EDDi \xB7 xe ch\u1EA1y th\xEC 10 gi\xE2y sau t\u1EF1 v\u1EC1 Theo Xe" : "B\u1EA5m bi\u1EC3n ch\u1EB7ng xem chi ti\u1EBFt \xB7 ch\u1EA1m 2 l\u1EA7n \u0111\u1EC3 ph\xF3ng t\u1EDBi \xB7 cu\u1ED9n chu\u1ED9t / + \u2212 \u0111\u1EC3 ph\xF3ng to",
+        foot: view === "map" ? APP ? "B\u1EA3n \u0111\u1ED3 OpenStreetMap \xB7 k\xE9o \u0111\u1EC3 d\u1EDDi, hai ng\xF3n \u0111\u1EC3 ph\xF3ng to" : "H\xECnh m\u1EABu \u2014 b\u1EA3n th\u1EADt l\xE0 b\u1EA3n \u0111\u1ED3 OpenStreetMap" : z > 1 ? "K\xE9o \u0111\u1EC3 d\u1EDDi \xB7 xe ch\u1EA1y th\xEC 10 gi\xE2y sau t\u1EF1 v\u1EC1 Theo Xe" : "B\u1EA5m bi\u1EC3n ch\u1EB7ng xem chi ti\u1EBFt \xB7 ch\u1EA1m 2 l\u1EA7n \u0111\u1EC3 ph\xF3ng t\u1EDBi \xB7 cu\u1ED9n chu\u1ED9t / + \u2212 \u0111\u1EC3 ph\xF3ng to",
         count: list.length,
         stats: [["\u0110\xC3 \u0110I", pos + " km", "#7BD88F"], ["C\xD2N L\u1EA0I", TOTAL - pos + " km", "#E8F1F5"], ["\u0110\xC3 L\xC1I", Math.floor(driveMin / 60) + " gi\u1EDD " + p2(driveMin % 60) + " ph", "#E8F1F5"], ["NH\u1EAEC NGH\u1EC8 CH\xC2N", restLeft <= 20 ? "Ngh\u1EC9 ch\xE2n sau " + restLeft + " ph\xFAt n\u1EEFa" : "Ngh\u1EC9 sau " + String(C.rest).replace(".", ",") + " gi\u1EDD l\xE1i li\xEAn t\u1EE5c", restLeft <= 20 ? "#FFD08A" : "#E8F1F5"]].map(([l, v, c]) => ({ l, v, c })),
         stops
       };
+      const OD = LV.odo || { a: S.demoA != null ? S.demoA : 128.4, b: pos, leg: 0, legMin: 0 };
+      const gk = window.__curGauge || C.gaugeManual || "classic";
+      const ost = gk === "rally" ? { f: "'Overpass Mono', monospace", c: "#FFD84A", bg: "#141005", sh: "none" } : gk === "neon" ? { f: "Overpass, sans-serif", c: "#5FF0FF", bg: "#031821", sh: "0 0 8px rgba(95,240,255,0.8)" } : gk === "bar" ? { f: "Overpass, sans-serif", c: "#FFFFFF", bg: "#0A2236", sh: "none" } : { f: "Overpass, sans-serif", c: "#F3EBD2", bg: "#0B1620", sh: "none" };
+      const roll = (v, n) => {
+        const t = (Math.max(0, v) * 10).toFixed(0).padStart(n + 1, "0").slice(-(n + 1));
+        return t.split("").map((ch2, k) => ({ y: -+ch2 * 1.15, bl: k === n ? "2px solid rgba(255,255,255,0.35)" : "0", pl: k === n ? "3px" : "0", digs: "0123456789".split("").map((d0) => ({ d: d0 })) }));
+      };
+      const nxStop = nextIdx >= 0 ? list[nextIdx] : null, nxKm = nxStop ? nxStop.km - pos : null;
+      if (nxStop && nxKm <= 5 && nxKm > 0 && self._ting !== leg + nxStop.id) {
+        self._ting = leg + nxStop.id;
+        try {
+          const ac = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ac.createOscillator(), g2 = ac.createGain();
+          o.frequency.value = 1320;
+          o.connect(g2);
+          g2.connect(ac.destination);
+          g2.gain.setValueAtTime(0.25, ac.currentTime);
+          g2.gain.exponentialRampToValueAtTime(1e-3, ac.currentTime + 0.9);
+          o.start();
+          o.stop(ac.currentTime + 0.9);
+        } catch (e) {
+        }
+      }
+      const pct = Math.round(pos / TOTAL * 100), RC = 2 * Math.PI * 30;
+      const OBD = LV.obd || {};
+      const legsAll = APP && window.tcLegs ? window.tcLegs().filter((l) => (l.trip || "mel-adl") === S.tripId) : [];
+      const sumDir = (dr) => legsAll.filter((l) => l.dir === dr).reduce((a, l) => ({ km: a.km + l.km, mins: a.mins + l.mins }), { km: 0, mins: 0 });
+      const gGo = sumDir("go"), gBack = sumDir("back");
+      const od = {
+        on: C.odoOn !== false,
+        f: ost.f,
+        c: ost.c,
+        bg: ost.bg,
+        sh: ost.sh,
+        a: roll(OD.a, 4),
+        b: roll(OD.b, 4),
+        resetA: () => {
+          if (window.tcOdoReset) window.tcOdoReset("a");
+          else self.setState({ demoA: 0 });
+          self.toast("\u0110\xE3 \u0111\u1EB7t l\u1EA1i Trip A");
+        },
+        resetB: () => {
+          if (window.tcOdoReset) window.tcOdoReset("b");
+          self.toast("\u0110\xE3 \u0111\u1EB7t l\u1EA1i Trip B");
+        },
+        nx: nxStop ? (nxStop.id === "end" ? "\u{1F3C1} " : "") + (nxStop.town || nxStop.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0] : "\u2014",
+        nxKm: nxKm != null ? nxKm + " km" : "\u2014",
+        nxC: nxKm != null && nxKm <= 5 ? "#FBB040" : "#E8F1F5",
+        nxBg: nxKm != null && nxKm <= 5 ? "rgba(251,176,64,0.18)" : "transparent",
+        pct: pct + "%",
+        dash: (RC * pct / 100).toFixed(1) + " " + RC.toFixed(1),
+        obd: OBD.odo != null ? "ODO " + Math.round(OBD.odo).toLocaleString("en-AU") + " km" : "",
+        range: OBD.range != null ? "C\xF2n ch\u1EA1y ~" + Math.round(OBD.range) + " km" : "",
+        obdOn: OBD.odo != null || OBD.range != null,
+        legNow: OD.leg ? "Ch\u1EB7ng n\xE0y: " + Math.round(OD.leg * 10) / 10 + " km \xB7 " + OD.legMin + " ph" : "Ch\u1EB7ng n\xE0y: ch\u01B0a ch\u1EA1y",
+        openLog: () => self.setState({ logOpen: true }),
+        logOpen: !!S.logOpen,
+        closeLog: () => self.setState({ logOpen: false }),
+        logRows: legsAll.slice(-40).reverse().map((l) => ({ t: new Date(l.start).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" }) + " " + new Date(l.start).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }), dir: l.dir === "go" ? "Ch\u1EB7ng \u0111i" : "Ch\u1EB7ng v\u1EC1", km: l.km + " km", est: l.est != null ? "\u01B0\u1EDBc t\xEDnh " + l.est + " km" : "", diff: l.est != null ? (l.km - l.est >= 0 ? "+" : "") + Math.round(l.km - l.est) + " km" : "", time: Math.floor(l.mins / 60) + "g" + p2(l.mins % 60), avg: l.avg + " km/g", place: l.place || "" })),
+        logEmpty: !legsAll.length,
+        totGo: "Ch\u1EB7ng \u0111i: " + Math.round(gGo.km) + " km \xB7 " + Math.floor(gGo.mins / 60) + "g" + p2(gGo.mins % 60),
+        totBack: "Ch\u1EB7ng v\u1EC1: " + Math.round(gBack.km) + " km \xB7 " + Math.floor(gBack.mins / 60) + "g" + p2(gBack.mins % 60)
+      };
+      const switchTrip = (id) => {
+        const cur = { goList: S.goList, backList: S.backList, skip: S.skip, custom: S.custom };
+        let trips = (S.trips || []).slice(), mel = S.melStore;
+        if (S.tripId === "mel-adl") mel = cur;
+        else trips = trips.map((t) => t.id === S.tripId ? Object.assign({}, t, { lists: cur }) : t);
+        const nt = id === "mel-adl" ? null : trips.find((t) => t.id === id);
+        const L = id === "mel-adl" ? mel || { goList: DEF_GO.slice(), backList: DEF_BACK.slice(), skip: {}, custom: {} } : nt.lists || { goList: [], backList: [], skip: {}, custom: {} };
+        self.save(Object.assign({ trips, melStore: mel, tripId: id, tripDlg: false, legManual: false, leg: "go" }, L));
+      };
+      const tripRows = [{ id: "mel-adl", name: "Melbourne \u21C4 Adelaide", km: 727, pinned: true, builtin: true }].concat((S.trips || []).slice().sort((a, b) => b.pinned - a.pinned || b.at - a.at)).map((t) => {
+        const on = t.id === S.tripId;
+        return {
+          name: t.builtin ? t.name : t.name.replace(" \u2192 ", " \u21C4 "),
+          sub: t.km + " km" + (t.builtin ? " \xB7 c\xF3 s\u1EB5n" : " \xB7 " + Object.keys(t.places || {}).length + " ch\u1ED7 gh\xE9 g\u1EE3i \xFD") + (t.pinned && !t.builtin ? " \xB7 \u{1F4CC}" : ""),
+          on: on ? "true" : "false",
+          bg: on ? "rgba(251,176,64,0.16)" : "rgba(13,44,64,0.55)",
+          curL: on ? "\u0110ang d\xF9ng" : "Ch\u1ECDn",
+          curBg: on ? "#FBB040" : "#0D2C40",
+          curFg: on ? "#2A1A00" : "#CFE6EE",
+          edit: !t.builtin,
+          pick: () => {
+            if (!on) {
+              switchTrip(t.id);
+              self.toast("\u0110\xE3 \u0111\u1ED5i sang chuy\u1EBFn " + t.name);
+            }
+          },
+          pin: () => self.save({ trips: S.trips.map((q2) => q2.id === t.id ? Object.assign({}, q2, { pinned: !q2.pinned }) : q2) }),
+          copy: () => {
+            const c = JSON.parse(JSON.stringify(t));
+            c.id = "t" + Date.now().toString(36);
+            c.name = t.name + " (b\u1EA3n sao)";
+            c.at = Date.now();
+            c.pinned = false;
+            self.save({ trips: S.trips.concat([c]) });
+          },
+          rename: () => self.setState({ tripEdit: t.id, tripEditName: t.name }),
+          del: () => {
+            if (S.tripDel !== t.id) {
+              self.setState({ tripDel: t.id });
+              self.toast("B\u1EA5m Xo\xE1 l\u1EA7n n\u1EEFa \u0111\u1EC3 xo\xE1 chuy\u1EBFn " + t.name);
+              return;
+            }
+            if (on) switchTrip("mel-adl");
+            self.save({ trips: S.trips.filter((q2) => q2.id !== t.id), tripDel: null });
+            window.tcLegsClear && window.tcLegsClear(t.id);
+          },
+          delL: S.tripDel === t.id ? "Xo\xE1 th\u1EADt?" : "Xo\xE1"
+        };
+      });
+      const tp = {
+        open: S.tripDlg,
+        close: () => self.setState({ tripDlg: false, tripEdit: null, tripDel: null }),
+        rows: tripRows,
+        from: S.ntFrom,
+        to: S.ntTo,
+        msg: S.ntMsg,
+        busy: S.ntBusy,
+        lock: drive,
+        lockL: drive ? "Xe \u0111ang ch\u1EA1y \u2014 \u0111\u1EADu xe r\u1ED3i m\u1EDBi t\u1EA1o chuy\u1EBFn m\u1EDBi" : 'G\xF5 n\u01A1i \u0111i v\xE0 n\u01A1i t\u1EDBi (vd "Melbourne" \u2192 "Sydney"). App t\u1EF1 t\xECm \u0111\u01B0\u1EDDng, g\u1EE3i \xFD ch\u1ED7 gh\xE9; ch\u1EB7ng v\u1EC1 = ch\u1EB7ng \u0111i \u0111\u1EA3o ng\u01B0\u1EE3c.',
+        setFrom: (e) => self.setState({ ntFrom: e.target.value }),
+        setTo: (e) => self.setState({ ntTo: e.target.value }),
+        fromPh: LV.place && LV.place.suburb || "Melbourne",
+        create: () => {
+          if (drive || S.ntBusy) return;
+          const f = (S.ntFrom || LV.place && LV.place.suburb || "Melbourne").trim(), t2 = (S.ntTo || "").trim();
+          if (!t2) {
+            self.setState({ ntMsg: "G\xF5 n\u01A1i t\u1EDBi tr\u01B0\u1EDBc nha" });
+            return;
+          }
+          if (!APP || !window.tcPlanTrip) {
+            self.setState({ ntMsg: "B\u1EA3n m\u1EABu: t\u1EA1o chuy\u1EBFn c\u1EA7n app th\u1EADt (c\xF3 m\u1EA1ng)" });
+            return;
+          }
+          self.setState({ ntBusy: true });
+          window.tcPlanTrip(f, t2).then((trip) => {
+            const trips = (self.state.trips || []).concat([trip]);
+            self.save({ trips, ntBusy: false, ntFrom: "", ntTo: "" });
+            setTimeout(() => {
+              self.switchTripExt && self.switchTripExt(trip.id);
+            }, 60);
+            self.toast("\u0110\xE3 t\u1EA1o chuy\u1EBFn " + trip.name + " \xB7 " + trip.km + " km");
+          }).catch(() => self.setState({ ntBusy: false }));
+        },
+        editing: !!S.tripEdit,
+        editName: S.tripEditName || "",
+        setEditName: (e) => self.setState({ tripEditName: e.target.value }),
+        saveName: () => {
+          const n = (S.tripEditName || "").trim();
+          if (n) self.save({ trips: S.trips.map((q2) => q2.id === S.tripEdit ? Object.assign({}, q2, { name: n }) : q2), tripEdit: null });
+          else self.setState({ tripEdit: null });
+        }
+      };
+      self.switchTripExt = switchTrip;
+      if (APP && window.tcMapSync) {
+        const sun = window.__sun;
+        const nowT = Date.now();
+        const night2 = sun && sun.rise ? !(nowT > new Date(sun.rise).getTime() && nowT < new Date(sun.set).getTime()) : d.getHours() < 6 || d.getHours() >= 19;
+        const styleKey = C.mapStyle === "auto" || !C.mapStyle ? night2 ? "dark" : "light" : C.mapStyle;
+        const showMap = S.scr === "rt" && C.rtView === "map" && !nar && !S.tripDlg && !S.logOpen && !S.dlg;
+        window.tcMapSync({
+          show: showMap,
+          style: C.mapStyle || "auto",
+          styleKey,
+          night: night2,
+          bright: C.calm ? Math.min(C.mapBright || 100, 75) : C.mapBright || 100,
+          tint: styleKey === "light",
+          tripId: S.tripId,
+          isGo,
+          total: TOTAL,
+          pts: TRIP ? TRIP.pts : window.__routePts,
+          follow: drive && S.zMode !== "free",
+          van: LV.lat != null ? [LV.lat, LV.lon] : null,
+          stops: [{ id: "", start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 3, bg: "#00653A" }].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0], lat: x.lat, lon: x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === "end" ? 3 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? "#3E7A4E" : x.id === "end" ? "#00653A" : SIGN[x.k] || "#1F5FAE" })))
+        });
+      }
       const curIds = isGo ? S.goList : S.backList;
       const saved = Object.keys(ALLP).map((id) => {
         const has = curIds.indexOf(id) >= 0;
         const p = ALLP[id];
-        return { name: p.name, town: p.town, km: kmOf(id), icon: ICO[p.k], sign: SIGN[p.k], has, op: has ? 0.5 : 1, st: has ? "\u2713 \u0111\xE3 c\xF3" : "+ Th\xEAm", stC: has ? "#7BD88F" : "#FFD08A", add: () => {
+        return { name: p.name, town: p.town, km: kmOf(id), icon: ICX[p.k], icF: icF(p.k), icS: icS(p.k), sign: SIGN[p.k], has, op: has ? 0.5 : 1, st: has ? "\u2713 \u0111\xE3 c\xF3" : "+ Th\xEAm", stC: has ? "#7BD88F" : "#FFD08A", add: () => {
           if (has) return;
           const arr = curIds.concat([id]).sort((a, b) => kmOf(a) - kmOf(b));
           self.save(isGo ? { goList: arr } : { backList: arr });
         } };
       }).sort((a, b) => a.km - b.km);
-      const sdP = S.stopId === "end" ? { name: isGo ? "Adelaide" : "Melbourne", town: isGo ? "SA" : "VIC", k: "end", km: TOTAL } : S.stopId && ALLP[S.stopId] ? Object.assign({}, ALLP[S.stopId], { km: kmOf(S.stopId) }) : null;
+      const sdP = S.stopId === "end" ? { name: isGo ? TO : FROM, town: isGo ? TOS : FROMS, k: "end", km: TOTAL } : S.stopId && ALLP[S.stopId] ? Object.assign({}, ALLP[S.stopId], { km: kmOf(S.stopId) }) : null;
       const sdImg = S.stopId ? S.photos[S.stopId] || S.commons[S.stopId] || "" : "";
-      const sd = sdP ? { hasPhoto: !!sdImg, noPhoto: !sdImg, photo: sdImg, onPhoto: (e) => readPhoto(e.target, (url) => self.save({ photos: Object.assign({}, S.photos, { [S.stopId]: url }) })), nav: () => tcn("nav", sdP.addr || ADDR[sdP.name] || sdP.name), name: sdP.name, town: sdP.town, sign: SIGN[sdP.k], icon: ICO[sdP.k], info: (sdP.stay ? "gh\xE9 " + sdP.stay + " ph \xB7 " : "") + "d\u1EF1 ki\u1EBFn " + fmt(timeAt(sdP.km), inSA(sdP.km)) + " \xB7 " + (sdP.km <= pos ? "\u0111\xE3 qua" : "c\xF2n " + (sdP.km - pos) + " km"), photoNote: "Ch\u01B0a c\xF3 h\xECnh. H\xECnh b\u1EA1n ch\u1EE5p khi gh\xE9 s\u1EBD hi\u1EC7n \u1EDF \u0111\xE2y" + (PHOTO_SRC[S.stopId] ? " \u2014 \u0111i\u1EC3m tham quan n\xE0y l\u1EA5y \u0111\u01B0\u1EE3c h\xECnh t\u1EEB Wikimedia Commons" : "") } : { name: "", town: "", sign: "", icon: "", info: "", photoNote: "", hasPhoto: false, noPhoto: true, photo: "", onPhoto: () => {
+      const sd = sdP ? { hasPhoto: !!sdImg, noPhoto: !sdImg, photo: sdImg, onPhoto: (e) => readPhoto(e.target, (url) => self.save({ photos: Object.assign({}, S.photos, { [S.stopId]: url }) })), nav: () => tcn("nav", sdP.addr || ADDR[sdP.name] || sdP.name), name: sdP.name, town: sdP.town, sign: SIGN[sdP.k], icon: ICX[sdP.k], icF: icF(sdP.k), icS: icS(sdP.k), info: (sdP.stay ? "gh\xE9 " + sdP.stay + " ph \xB7 " : "") + "d\u1EF1 ki\u1EBFn " + fmt(timeAt(sdP.km), inSA(sdP.km)) + " \xB7 " + (sdP.km <= pos ? "\u0111\xE3 qua" : "c\xF2n " + (sdP.km - pos) + " km"), photoNote: "Ch\u01B0a c\xF3 h\xECnh. H\xECnh b\u1EA1n ch\u1EE5p khi gh\xE9 s\u1EBD hi\u1EC7n \u1EDF \u0111\xE2y" + (PHOTO_SRC[S.stopId] ? " \u2014 \u0111i\u1EC3m tham quan n\xE0y l\u1EA5y \u0111\u01B0\u1EE3c h\xECnh t\u1EEB Wikimedia Commons" : "") } : { name: "", town: "", sign: "", icon: "", info: "", photoNote: "", hasPhoto: false, noPhoto: true, photo: "", onPhoto: () => {
       }, nav: () => {
       } };
       const W = 1280 - 22;
@@ -941,7 +1275,8 @@ window.__AppComp = function() {
       const CATS = [["fuel", "Tr\u1EA1m X\u0103ng", "fuel", false], ["mcd", "McDonald's", "food", true], ["hj", "Hungry Jack's", "food", true], ["kfc", "KFC", "food", true], ["cafe", "Caf\xE9", "cafe", false], ["wc", "Nh\xE0 V\u1EC7 Sinh", "wc", false], ["rest", "Ngh\u1EC9 Ch\xE2n", "rest", false], ["shop", "Si\xEAu Th\u1ECB", "shop", false]];
       const cats = CATS.map(([k, label, ic, logo]) => {
         const on = S.cat === k;
-        return { label, icon: ICO[ic], logo, sign: !logo, on: on ? "true" : "false", bg: "#1F5FAE", ring: on ? "0 0 0 3px #FBB040" : "none", pick: () => {
+        const lu = logo && window.tcLogo ? window.tcLogo(label) : "";
+        return { label, icon: ASI[ic], logoImg: !!lu, logoUrl: lu, sign: !lu, on: on ? "true" : "false", bg: "#1F5FAE", ring: on ? "0 0 0 3px #FBB040" : "none", pick: () => {
           self.setState({ cat: k });
           if (APP && window.tcFindPlaces) window.tcFindPlaces(k);
         } };
@@ -956,7 +1291,7 @@ window.__AppComp = function() {
         rest: [["Ch\u1ED7 ngh\u1EC9 ch\xE2n (Rest Area)", "Western Hwy", 28, true, "b\xEAn tr\xE1i", "", "bi\u1EC3n ngh\u1EC9"]],
         shop: [["Si\xEAu th\u1ECB", "Horsham VIC", 13, true, "b\xEAn ph\u1EA3i", "", "[logo h\xE3ng]"]]
       };
-      const catTitle = (CATS.find((c) => c[0] === S.cat) || CATS[0])[1].toUpperCase();
+      const catTitle = /^q:/.test(S.cat) ? ("\u201C" + S.cat.slice(2) + "\u201D").toUpperCase() : (CATS.find((c) => c[0] === S.cat) || CATS[0])[1].toUpperCase();
       const addPlaceStop = (p) => {
         const km = window.tcRouteKm ? window.tcRouteKm(p.lat, p.lon) : null;
         if (km == null) {
@@ -970,14 +1305,20 @@ window.__AppComp = function() {
         self.toast("\u0110\xE3 th\xEAm v\xE0o ch\u1EB7ng gh\xE9: " + p.name);
       };
       const LIVEP = APP ? S.places[S.cat] || null : null;
-      const results = APP ? LIVEP ? LIVEP.map((p) => ({ name: p.name, addr: p.addr || "", logo: p.logo ? "" : "\u2014", logoUrl: p.logo || "", logoImg: !!p.logo, logoTxt: !p.logo, logoBg: p.logo ? "#FFFFFF" : "transparent", km: p.km + " km", eta: fmt(d.getHours() * 60 + d.getMinutes() + p.km * 0.75, false), open: p.open === true ? "\u0110ang m\u1EDF c\u1EEDa" : p.open === false ? "\u0110\xE3 \u0111\xF3ng c\u1EEDa" : "Gi\u1EDD m\u1EDF: ch\u01B0a r\xF5", openC: p.open === true ? "#7BD88F" : p.open === false ? "#FF9A9E" : "#8FC3D3", side: p.side || "", price: "", nav: () => tcn("nav", p.lat + "," + p.lon), addStop: () => addPlaceStop(p), save: () => {
+      const results = APP ? LIVEP ? LIVEP.map((p) => ({ name: p.name, addr: p.addr || "", sign: ASI[p.k] || ASI.food, logoBd: p.logo ? "0" : "2px solid #FFFFFF", logoUrl: p.logo || "", logoImg: !!p.logo, logoTxt: !p.logo, logoBg: p.logo ? "#FFFFFF" : "#1F5FAE", km: p.km + " km", eta: fmt(d.getHours() * 60 + d.getMinutes() + p.km * 0.75, false), open: p.open === true ? "\u0110ang m\u1EDF c\u1EEDa" : p.open === false ? "\u0110\xE3 \u0111\xF3ng c\u1EEDa" : "Gi\u1EDD m\u1EDF: ch\u01B0a r\xF5", openC: p.open === true ? "#7BD88F" : p.open === false ? "#FF9A9E" : "#8FC3D3", side: p.side || "", price: "", nav: () => tcn("nav", p.lat + "," + p.lon), addStop: () => addPlaceStop(p), save: () => {
         self.save({ savedPl: S.savedPl.concat([p]) });
         self.toast("\u0110\xE3 l\u01B0u: " + p.name);
-      } })) : [] : (RES[S.cat] || []).map(([name, addr, km, open, side, price, logo]) => ({ name, addr, logo, logoUrl: "", logoImg: false, logoTxt: true, logoBg: "transparent", km: km + " km", eta: fmt(d.getHours() * 60 + d.getMinutes() + km * 0.6, false), open: open ? "\u0110ang m\u1EDF c\u1EEDa" : "\u0110\xE3 \u0111\xF3ng c\u1EEDa", openC: open ? "#7BD88F" : "#FF9A9E", side, price: price ? price + " (n\u1EBFu c\xF3 d\u1EEF li\u1EC7u)" : "", nav: () => {
+      } })) : [] : (RES[S.cat] || []).map(([name, addr, km, open, side, price, logo]) => ({ name, addr, sign: ASI[(CATS.find((c) => c[0] === S.cat) || CATS[0])[2]], logoBd: "2px solid #FFFFFF", logoUrl: "", logoImg: false, logoTxt: true, logoBg: "#1F5FAE", km: km + " km", eta: fmt(d.getHours() * 60 + d.getMinutes() + km * 0.6, false), open: open ? "\u0110ang m\u1EDF c\u1EEDa" : "\u0110\xE3 \u0111\xF3ng c\u1EEDa", openC: open ? "#7BD88F" : "#FF9A9E", side, price: price ? price + " (n\u1EBFu c\xF3 d\u1EEF li\u1EC7u)" : "", nav: () => {
       }, addStop: () => {
       }, save: () => {
       } }));
-      const searchNote = APP ? S.placesBusy ? "\u0110ANG T\xCCM\u2026" : LIVEP ? LIVEP.length ? "G\u1EA6N NH\u1EA4T, \u01AFU TI\xCAN PH\xCDA TR\u01AF\u1EDAC" : "KH\xD4NG TH\u1EA4Y CH\u1ED6 N\xC0O TRONG 30 KM" : "B\u1EA4M M\u1ED8T N\xDAT \u0110\u1EC2 T\xCCM" : "PH\xCDA TR\u01AF\u1EDAC TR\xCAN \u0110\u01AF\u1EDCNG \u0110ANG CH\u1EA0Y";
+      const searchNote = APP ? (S.placesMsg || (S.placesBusy ? "\u0110ang t\xECm\u2026" : "B\u1EA5m m\u1ED9t n\xFAt \u0111\u1EC3 t\xECm")).toUpperCase() : "PH\xCDA TR\u01AF\u1EDAC TR\xCAN \u0110\u01AF\u1EDCNG \u0110ANG CH\u1EA0Y";
+      const searchRetry = APP && !S.placesBusy && (S.placesFail || LIVEP && !LIVEP.length), doRetry = () => window.tcFindPlaces && window.tcFindPlaces(S.cat);
+      if (APP && S.scr === "search" && !self._autoS) {
+        self._autoS = true;
+        setTimeout(() => window.tcFindPlaces && window.tcFindPlaces(self.state.cat), 60);
+      }
+      if (S.scr !== "search") self._autoS = false;
       const fuelP = APP ? S.places.fuel || null : null;
       const fuelNote = APP ? fuelP && fuelP.length ? "Tr\u1EA1m x\u0103ng g\u1EA7n nh\u1EA5t c\xE1ch " + fuelP[0].km + " km (" + fuelP[0].name + ")" : 'B\u1EA5m "Tr\u1EA1m X\u0103ng" \u0111\u1EC3 t\xECm tr\u1EA1m g\u1EA7n nh\u1EA5t' : "V\xED d\u1EE5 nh\u1EAFc tr\xEAn Road Trip: Tr\u1EA1m x\u0103ng k\u1EBF ti\u1EBFp c\xE1ch 45 km, sau \u0111\xF3 120 km kh\xF4ng c\xF3 tr\u1EA1m";
       const dx = {
@@ -1122,10 +1463,18 @@ window.__AppComp = function() {
         if (S.src === "music") {
           const qu = MD && MD.queue || [];
           if (tabOk === "queue") rowsRaw = qu.length ? qu.map((q2) => ({ t: q2.title, s: q2.sub || "", letter: "\u266A", tile: "#3A2A10", rad: "6px", qid: q2.id })) : [{ t: MD ? "App nh\u1EA1c n\xE0y ch\u01B0a cho xem h\xE0ng ch\u1EDD" : "Ch\u01B0a ph\xE1t nh\u1EA1c", s: MD ? "B\u1EA5m \u0111\u1EC3 m\u1EDF " + (MD.app || "app nh\u1EA1c") : "M\u1EDF app nh\u1EA1c r\u1ED3i b\u1EA5m ph\xE1t", letter: "\u266A", tile: "#3A2A10", rad: "6px", open: true }];
-          else if (tabOk !== "radio") rowsRaw = [{ t: "M\u1EDF trong " + (MD && MD.app || "app nh\u1EA1c"), s: "Danh s\xE1ch ph\xE1t / album ch\u1ECDn b\xEAn app nh\u1EA1c", letter: "\u2197", tile: "#1B3A52", rad: "6px", open: true }];
+          else if (tabOk !== "radio") {
+            const LB = window.__jbLib;
+            const jbRow = (kind, name, sub, letter, tile) => ({ t: name, s: sub, letter, tile, rad: "6px", jb: { kind, name } });
+            if (LB && (C.musicApp || "jukebox") === "jukebox") {
+              if (tabOk === "lists") rowsRaw = (LB.playlists || []).map((x) => jbRow("playlist", x.name, x.n + " b\xE0i", "\u2261", "#1B3A52"));
+              if (tabOk === "albums") rowsRaw = [jbRow("shuffle", "Tr\u1ED9n t\u1EA5t c\u1EA3 b\xE0i", "Th\u01B0 vi\u1EC7n Tom\u2019s Jukebox", "\u292E", "#3A2A10")].concat((LB.albums || []).slice(0, 60).map((x) => jbRow("album", x.name, x.artist + " \xB7 " + x.n + " b\xE0i", (x.name || "?").charAt(0), "#2A2440")), (LB.artists || []).slice(0, 40).map((x) => jbRow("artist", x.name, "Ngh\u1EC7 s\u0129 \xB7 " + x.n + " b\xE0i", (x.name || "?").charAt(0), "#24402A")));
+              if (!rowsRaw.length) rowsRaw = [{ t: "Tom\u2019s Jukebox ch\u01B0a c\xF3 " + (tabOk === "lists" ? "danh s\xE1ch ph\xE1t" : "b\xE0i"), s: "Th\xEAm b\xE0i b\xEAn Tom\u2019s Jukebox", letter: "\u266A", tile: "#3A2A10", rad: "6px" }];
+            } else rowsRaw = [{ t: "M\u1EDF trong " + (MD && MD.app || "app nh\u1EA1c"), s: (C.musicApp || "jukebox") === "jukebox" ? "C\u1EA7n Tom\u2019s Jukebox 0.9.5 \u0111\u1EC3 xem th\u01B0 vi\u1EC7n ngay \u0111\xE2y" : "Danh s\xE1ch ph\xE1t / album ch\u1ECDn b\xEAn app nh\u1EA1c", letter: "\u2197", tile: "#1B3A52", rad: "6px", open: true }];
+          }
         }
         if (S.src === "radio") rowsRaw = tabOk === "fav" ? toRows([].concat(RL.near || [], RL.au || [], RL.vn || []).filter((r) => S.favs[r.id])) : toRows(RL[tabOk]);
-        if (S.src === "podcast") rowsRaw = [{ t: "M\u1EDF app podcast", s: "Pocket Casts / Spotify \u2014 podcast ph\xE1t b\xEAn app \u0111\xF3", letter: "P", tile: "#7A4BB5", rad: "8px", open: true }];
+        if (S.src === "podcast") rowsRaw = window.__jbLib && (window.__jbLib.podcasts || []).length ? window.__jbLib.podcasts.map((x) => ({ t: x.name, s: "Ph\xE1t t\u1EADp m\u1EDBi nh\u1EA5t \xB7 Tom\u2019s Jukebox", letter: "P", tile: "#7A4BB5", rad: "8px", jb: { kind: "podcast", name: x.name } })) : [{ t: "M\u1EDF app podcast", s: "K\xEAnh theo d\xF5i b\xEAn Tom\u2019s Jukebox s\u1EBD hi\u1EC7n \u1EDF \u0111\xE2y", letter: "P", tile: "#7A4BB5", rad: "8px", open: true }];
         if (S.src === "radio" && !rowsRaw.length) rowsRaw = [{ t: S.radioLists ? "Kh\xF4ng t\xECm th\u1EA5y \u0111\xE0i" : "\u0110ang t\u1EA3i danh s\xE1ch \u0111\xE0i\u2026", s: "C\u1EA7n c\xF3 m\u1EA1ng", letter: "\u2026", tile: "#2B2B2B", rad: "50%" }];
       } else if (S.src === "music") {
         if (tabOk === "queue") rowsRaw = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => ({ t: "B\xE0i h\xE1t m\u1EABu " + i, s: "Ngh\u1EC7 s\u0129 m\u1EABu \xB7 3:" + p2(10 + i * 4), letter: "\u266A", tile: "#3A2A10", rad: "6px" }));
@@ -1160,7 +1509,10 @@ window.__AppComp = function() {
         regionL: APP ? "V\xF9ng hi\u1EC7n t\u1EA1i: " + (S.radioLists && S.radioLists.region || LV.place && LV.place.suburb || "\u2026") + " (theo GPS) \xB7 T\u1EF1 \u0111\u1ED5i \u0111\xE0i theo v\xF9ng: M\u1EDF" : "V\xF9ng hi\u1EC7n t\u1EA1i: " + regName + " (theo GPS \xB7 m\u1EABu) \xB7 T\u1EF1 \u0111\u1ED5i \u0111\xE0i theo v\xF9ng: M\u1EDF",
         rows: rowsRaw.slice(0, maxRows).map((r) => {
           const cur = playing && r.t === curT;
-          return Object.assign({ isRadio: false, id: "" }, r, { bg: cur ? "rgba(251,176,64,0.14)" : "rgba(13,44,64,0.55)", st: cur ? "\u0110ANG PH\xC1T" : "", stC: "#FFD08A", play: r.open ? () => tcn(S.src === "podcast" ? "openApp" : "openMedia", S.src === "podcast" ? "podcast" : "") : r.qid != null ? () => tcn("media", "queue:" + r.qid) : play(r.t, r.isRadio ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : r.s, r.isRadio ? "radio" : S.src, r.url), favOn: S.favs[r.id] ? "true" : "false", favC: S.favs[r.id] ? "#FBB040" : "#5E8496", fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) });
+          return Object.assign({ isRadio: false, id: "" }, r, { bg: cur ? "rgba(251,176,64,0.14)" : "rgba(13,44,64,0.55)", st: cur ? "\u0110ANG PH\xC1T" : "", stC: "#FFD08A", play: r.jb ? () => {
+            tcn("media", "jb:" + JSON.stringify(r.jb));
+            self.setState({ panelAt: Date.now() });
+          } : r.open ? () => tcn(S.src === "podcast" ? "openApp" : "openMedia", S.src === "podcast" ? "podcast" : "") : r.qid != null ? () => tcn("media", "queue:" + r.qid) : play(r.t, r.isRadio ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : r.s, r.isRadio ? "radio" : S.src, r.url), favOn: S.favs[r.id] ? "true" : "false", favC: S.favs[r.id] ? "#FBB040" : "#5E8496", fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) });
         }),
         fs: drive ? 18 : 15,
         rowPad: drive ? "10px 8px" : "6px 8px",
@@ -1186,25 +1538,56 @@ window.__AppComp = function() {
           if (APP && window.tcFindPlaces) window.tcFindPlaces("mcd");
           self.say("D\u1EA1, \u0111ang t\xECm McDonald's");
         } },
+        { t: "C\xF2n bao xa", re: /(bao xa|còn bao nhiêu|how far|bao lâu)/, run: () => sayV("D\u1EA1, c\xF2n " + (TOTAL - pos) + " ki l\xF4 m\xE9t, t\u1EDBi " + (isGo ? TO : FROM) + " kho\u1EA3ng " + fmt(endMin, inSA(TOTAL))) },
+        { t: "B\xE0i k\u1EBF", re: /(bài kế|bài tiếp|bài sau|next|qua bài|chuyển bài)/, run: () => {
+          tcn("media", "next");
+          sayV("D\u1EA1");
+        } },
+        { t: "B\xE0i tr\u01B0\u1EDBc", re: /(bài trước|lùi bài|quay lại bài|previous)/, run: () => {
+          tcn("media", "prev");
+          sayV("D\u1EA1");
+        } },
+        { t: "L\u1EDBn ti\u1EBFng", re: /(lớn tiếng|to lên|lớn lên|tăng âm|vặn to|volume up)/, run: () => {
+          tcn("media", "volup");
+          tcn("media", "volup");
+          sayV("D\u1EA1");
+        } },
+        { t: "Nh\u1ECF ti\u1EBFng", re: /(nhỏ tiếng|nhỏ lại|nhỏ xuống|giảm âm|vặn nhỏ|volume down)/, run: () => {
+          tcn("media", "voldown");
+          tcn("media", "voldown");
+          sayV("D\u1EA1");
+        } },
+        { t: "T\u1EAFt nh\u1EA1c", re: /((tắt|dừng|ngưng|ngừng|thôi) ?(nhạc|bài|hát|đài|radio|phát)|^(tắt|dừng|ngưng|ngừng|pause|stop)$)/, run: () => {
+          if (S.src === "radio") tcn("radio", "stop");
+          else tcn("media", "pause");
+          sayV("D\u1EA1, \u0111\xE3 t\u1EAFt");
+        } },
+        { t: "B\u1EADt playlist \u2026", re: /(bật|mở|phát|cho (?:mình |tui |tôi |em )?nghe|nghe|chơi) (playlist|danh sách|album|ca sĩ|nghệ sĩ|nhạc của|bài hát|bài) (.+)$/, run: (m) => {
+          if (/^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim())) {
+            self.setState({ src: "music" });
+            tcn("media", "play");
+            return sayV("D\u1EA1, ph\xE1t nh\u1EA1c n\xE8");
+          }
+          const k = /playlist|danh sách/.test(m[2]) ? "playlist" : /album/.test(m[2]) ? "album" : /ca sĩ|nghệ sĩ|nhạc của/.test(m[2]) ? "artist" : "search";
+          self.setState({ src: "music" });
+          tcn("media", "jb:" + JSON.stringify({ kind: k, name: m[3] }));
+          sayV("D\u1EA1, \u0111ang m\u1EDF " + m[3]);
+        } },
+        { t: "Tr\u1ED9n b\xE0i", re: /(trộn bài|ngẫu nhiên|shuffle)/, run: () => {
+          self.setState({ src: "music" });
+          tcn("media", "jb:" + JSON.stringify({ kind: "shuffle", name: "" }));
+          sayV("D\u1EA1, ph\xE1t ng\u1EABu nhi\xEAn");
+        } },
+        { t: "B\u1EADt nh\u1EA1c", re: /((bật|mở|phát|chơi|cho (?:mình |tui |tôi |em )?nghe|nghe) ?(nhạc|bài hát|bài|music)|^play|tiếp tục (phát|nghe|nhạc)|^(bật|mở) lên$)/, run: () => {
+          self.setState({ src: "music" });
+          tcn("media", "play");
+          sayV("D\u1EA1, ph\xE1t nh\u1EA1c n\xE8");
+        } },
         { t: "Nghe \u0111\xE0i v\xF9ng n\xE0y", re: /(đài|radio|ra đi ô)/, run: () => {
           self.setState({ va: false, src: "radio", mpOpen: true, mpTab: "near", panelAt: Date.now() });
           const n = S.radioLists && S.radioLists.near && S.radioLists.near[0] || null;
           if (APP && n) tcn("radio", JSON.stringify({ url: n.url, name: n.name }));
           self.say(n ? "D\u1EA1, \u0111ang m\u1EDF " + n.name : "D\u1EA1, m\u1EDF danh s\xE1ch \u0111\xE0i v\xF9ng n\xE0y");
-        } },
-        { t: "C\xF2n bao xa", re: /(bao xa|còn bao nhiêu|how far|bao lâu)/, run: () => sayV("D\u1EA1, c\xF2n " + (TOTAL - pos) + " ki l\xF4 m\xE9t, t\u1EDBi " + (isGo ? "Adelaide" : "Melbourne") + " kho\u1EA3ng " + fmt(endMin, isGo)) },
-        { t: "B\xE0i k\u1EBF", re: /(bài kế|bài tiếp|next|qua bài)/, run: () => {
-          tcn("media", "next");
-          sayV("D\u1EA1");
-        } },
-        { t: "D\u1EEBng nh\u1EA1c", re: /(dừng|tắt nhạc|pause|stop)/, run: () => {
-          tcn(S.src === "radio" ? "radio" : "media", S.src === "radio" ? "stop" : "toggle");
-          sayV("D\u1EA1");
-        } },
-        { t: "Ph\xE1t nh\u1EA1c", re: /(phát nhạc|mở nhạc|play)/, run: () => {
-          self.setState({ src: "music" });
-          tcn("media", "toggle");
-          sayV("D\u1EA1");
         } },
         { t: "B\u1EADt ri\xEAng t\u01B0", re: /(riêng tư|privacy)/, run: () => {
           self.setS("privacy", !/tắt/.test(S.vaHeard || ""));
@@ -1288,7 +1671,7 @@ window.__AppComp = function() {
         ["Ph\xF3ng to / thu nh\u1ECF: + \u2212, Theo Xe, C\u1EA3 Chuy\u1EBFn, k\xE9o, ch\u1EA1m 2 l\u1EA7n", "Road Trip", "rt"],
         ["H\xECnh \u0111\u1EA1i di\u1EC7n cho t\u1EEBng ch\u1EB7ng + th\u1EBB chi ti\u1EBFt", "Road Trip (b\u1EA5m t\xEAn ch\u1EB7ng)", "rt"],
         ["Thanh tr\xEAn c\xF9ng: T\xECm Ch\u1ED7 sau Workspace DeX", "Thanh b\u1EA3n m\u1EABu", "search"],
-        ["T\xECm Ch\u1ED7: logo t\u1EEBng h\xE3ng (app t\u1EF1 l\u1EA5y khi build)", "T\xECm Ch\u1ED7", "search"],
+        ["T\xECm Ch\u1ED7: logo t\u1EEBng h\xE3ng (t\u1EF1 l\u1EA5y, nh\u1EDB s\u1EB5n)", "T\xECm Ch\u1ED7", "search"],
         ["Cu\u1ED9c g\u1ECDi \u0111\u1EBFn: thanh m\u1ECFng, kh\xF4ng \u0111\u1ECDc t\xEAn, ri\xEAng t\u01B0", 'B\u1EA5m "G\u1ECDi Th\u1EED"', "call"],
         ["Tab Li\xEAn L\u1EA1c: l\u1ECBch s\u1EED cu\u1ED9c g\u1ECDi + tin nh\u1EAFn c\xE1c app", "Li\xEAn L\u1EA1c", "contacts"],
         ["S\u1ED1 t\u1ED1c \u0111\u1ED9: m\xE0u theo gi\u1EDBi h\u1EA1n, v\xF2ng cung, 7 ki\u1EC3u, c\u1EE1 s\u1ED1", "M\xE0n H\xECnh Ch\xEDnh / C\xE0i \u0110\u1EB7t \u2192 Giao Di\u1EC7n", "home"],
@@ -1339,6 +1722,29 @@ window.__AppComp = function() {
       const wxT = WX && WX.temp != null ? Math.round(WX.temp) + "\xB0" : "--\xB0";
       const wxL1 = WX ? (WXVI[wk] || "") + (WX.rain != null ? " " + Math.round(WX.rain) + "%" : "") + (WX.hi != null ? " \xB7 \u2191" + Math.round(WX.hi) + "\xB0 \u2193" + Math.round(WX.lo) + "\xB0" : "") : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026";
       const wxL2 = WX && WX.wind != null ? "Gi\xF3 " + Math.round(WX.wind) + " km/g" : "";
+      const hrNow = d.getHours();
+      const tod = hrNow < 6 || hrNow >= 20 ? "night" : hrNow < 8 ? "dawn" : hrNow >= 17 ? "dusk" : "day";
+      const CLOUD = "M14 34h20a8 8 0 0 0 0-16 11 11 0 0 0-21 3 7 7 0 0 0 1 13z";
+      const WP = {
+        clear: [{ d: "M24 6v5M24 37v5M6 24h5M37 24h5M11.3 11.3l3.5 3.5M33.2 33.2l3.5 3.5M11.3 36.7l3.5-3.5M33.2 14.8l3.5-3.5", fill: "none", stroke: "#FFD24D", sw: 2.6, cls: "sr" }, { d: "M24 16a8 8 0 1 0 0.01 0z", fill: "#FFD24D", stroke: "none", sw: 0, cls: "" }],
+        night: [{ d: "M30 10a14 14 0 1 0 8 25 12 12 0 0 1-8-25z", fill: "#F3EFDC", stroke: "none", sw: 0, cls: "" }, { d: "M12 12l1 2 2 1-2 1-1 2-1-2-2-1 2-1z", fill: "#FFFFFF", stroke: "none", sw: 0, cls: "fl" }],
+        cloudy: [{ d: "M30 14a7 7 0 1 0 0.01 0z", fill: "#FFD24D", stroke: "none", sw: 0, cls: "" }, { d: CLOUD, fill: "#E8F1F5", stroke: "none", sw: 0, cls: "cl" }],
+        rain: [{ d: CLOUD, fill: "#C9D6DE", stroke: "none", sw: 0, cls: "cl" }, { d: "M17 38l-1 3M24 38l-1 3M31 38l-1 3", fill: "none", stroke: "#8FD4FF", sw: 2.4, cls: "rd" }],
+        storm: [{ d: CLOUD, fill: "#9AA8B3", stroke: "none", sw: 0, cls: "cl" }, { d: "M25 30l-5 8h5l-3 7", fill: "none", stroke: "#FFE066", sw: 2.6, cls: "fl" }, { d: "M15 38l-1 3M33 38l-1 3", fill: "none", stroke: "#8FD4FF", sw: 2.2, cls: "rd" }],
+        fog: [{ d: "M8 18h32M5 25h38M10 32h28", fill: "none", stroke: "#E1E8EC", sw: 3, cls: "cl" }]
+      };
+      const SKYC = { day: "linear-gradient(180deg,#3f8fd6,#86c1ea)", dawn: "linear-gradient(180deg,#f19a6b,#f9d1a6)", dusk: "linear-gradient(180deg,#d9734f,#f0b27f)", night: "linear-gradient(180deg,#07112a,#22345e)" };
+      const wxSky = wk === "rain" ? "linear-gradient(180deg,#3d4e5e,#6c7f8f)" : wk === "storm" ? "linear-gradient(180deg,#1f2833,#3b4756)" : wk === "fog" ? "linear-gradient(180deg,#8e9aa3,#c3cacf)" : wk === "cloudy" && tod === "day" ? "linear-gradient(180deg,#5d7488,#93a6b4)" : SKYC[tod];
+      const wxc = {
+        parts: WP[wk] || WP.cloudy,
+        sky: wxSky,
+        cls: "wx-anim" + (drive ? " wx-calm" : ""),
+        hl: WX && WX.hi != null ? "\u2191" + Math.round(WX.hi) + "\xB0  \u2193" + Math.round(WX.lo) + "\xB0" : "",
+        desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 " + Math.round(WX.rain) + "%" : "") : "\u0110ang l\u1EA5y\u2026",
+        aria: WX ? wxT + " " + (WXVI[wk] || "") : "\u0111ang l\u1EA5y",
+        open: () => self.setState({ idleOn: true, idleAt: Date.now() })
+      };
+      window.__wxState = { kind: wk, tod, calm: drive };
       const THEMEMAP = { outback: "au", coast: "au", melb: "au", neonau: "neon", dandenong: "au", yarra: "au", snow: "au", sgold: "retro", synth: "neon", cyber: "neon", minimal: "minimal", rally: "led" };
       const ck = C.clkAuto ? THEMEMAP[LV.theme] || "neon" : C.clkStyle;
       const cs = CLK[ck] || CLK.neon;
@@ -1394,9 +1800,75 @@ window.__AppComp = function() {
           else self.toast(AP ? AP.title + " (l\u1ECBch h\u1EB9n kh\xF4ng c\xF3 \u0111\u1ECBa ch\u1EC9)" : "");
         }
       };
-      const openTheme = () => {
-        if (window.__tc) window.__tc.setState({ themeOpen: true });
-        else self.toast("Ch\u1ECDn giao di\u1EC7n \u1EDF b\u1EA3ng 1");
+      const openTheme = () => self.setState({ scr: "theme", last: Date.now() });
+      const BUILT = ["neon", "outback", "coast", "melb", "neonau", "sgcenter", "sgnight", "mekong", "rain"];
+      const TGROUPS = [
+        ["LOW-POLY", [["lp_au", "\u0110\u01B0\u1EDDng \xDAc (m\u1EB7c \u0111\u1ECBnh)"], ["lp_farm", "\u0110\u1ED3ng Qu\xEA Wimmera"], ["lp_coast", "Ven Bi\u1EC3n"], ["lp_outback", "Outback"], ["lp_melb", "Melbourne (tram)"], ["lp_dande", "R\u1EEBng Dandenong"], ["lp_yarra", "V\xF9ng Nho Yarra"], ["lp_snow", "N\xFAi Tuy\u1EBFt"], ["lp_autumn", "M\xF9a Thu L\xE1 V\xE0ng"], ["lp_wheat", "\u0110\u1ED3ng L\xFAa M\xEC"], ["lp_saigon", "S\xE0i G\xF2n"], ["lp_mekong", "Mi\u1EC1n T\xE2y"]]],
+        ["KI\u1EC2U CH\xCDNH", [["neon", "Neon"], ["glass", "K\xEDnh M\u1EDD"], ["hud", "T\u1ED1i Gi\u1EA3n (HUD)"], ["plane", "Bu\u1ED3ng L\xE1i M\xE1y Bay"], ["synth", "Synthwave 80s"], ["cyber", "Th\xE0nh Ph\u1ED1 \u0110\xEAm"], ["rally", "Th\u1EC3 Thao (Rally)"], ["relax", "Th\u01B0 Gi\xE3n"]]],
+        ["THU\u1EA6N \xDAC", [["outback", "Outback"], ["coast", "Ven Bi\u1EC3n"], ["melb", "Melbourne (tram)"], ["neonau", "Neon \xDAc"], ["dandenong", "R\u1EEBng Dandenong"], ["yarra", "Yarra Valley"], ["snow", "N\xFAi Tuy\u1EBFt"]]],
+        ["MI\u1EC0N NAM", [["sgcenter", "Trung T\xE2m (\u0110\u1EE9c B\xE0)"], ["sgnight", "S\xE0i G\xF2n V\u1EC1 \u0110\xEAm"], ["mekong", "Mi\u1EC1n T\xE2y"], ["rain", "M\u01B0a Chi\u1EC1u"], ["benthanh", "Ch\u1EE3 B\u1EBFn Th\xE0nh"], ["sgold", "S\xE0i G\xF2n X\u01B0a"], ["coffee", "C\xE0 Ph\xEA S\xE1ng"], ["tet", "T\u1EBFt Mi\u1EC1n Nam"]]]
+      ];
+      const COCKPITS = [["lowpoly", "Low-Poly"], ["neon", "Neon"], ["real", "Th\u1EADt"], ["hiace", "HiAce C\u1EE7a Tom"], ["lux", "Xe Sang"], ["sport", "Th\u1EC3 Thao"], ["ev", "Xe \u0110i\u1EC7n T\u01B0\u01A1ng Lai"], ["retro70", "C\u1ED5 \u0110i\u1EC3n 70"], ["offroad", "4WD Off-Road"], ["truck", "Xe T\u1EA3i \u0110\u01B0\u1EDDng D\xE0i"], ["none", "Kh\xF4ng Tapl\xF4 (HUD)"], ["pixel", "Retro Pixel 8-bit"]];
+      const GAUGES = [["auto", "Theo Giao Di\u1EC7n"], ["classic", "C\u1ED5 \u0110i\u1EC3n"], ["neon", "Neon"], ["bar", "Thanh Ngang"], ["minimal", "T\u1ED1i Gi\u1EA3n"], ["rings", "V\xF2ng L\u1ED3ng"], ["rally", "Rally"], ["retro", "Retro X\u01B0a"]];
+      const GMAP = { lp_au: "classic", neon: "neon", synth: "neon", cyber: "neon", neonau: "neon", rally: "rally", plane: "rings", sgold: "retro", glass: "classic", outback: "bar", coast: "bar", melb: "bar", dandenong: "bar", yarra: "bar", snow: "bar", lp_farm: "bar", lp_coast: "bar", lp_outback: "bar", lp_melb: "bar", lp_dande: "bar", lp_yarra: "bar", lp_snow: "bar", lp_autumn: "bar", lp_wheat: "bar" };
+      const CP_AUTO = { outback: "offroad", lp_outback: "offroad", rally: "sport", synth: "neon", cyber: "neon", neon: "neon", neonau: "neon", sgold: "retro70", hud: "none", plane: "none" };
+      const chip = (on) => ({ bg: on ? "#FBB040" : "#0D2C40", fg: on ? "#2A1A00" : "#E8F1F5" });
+      const thTheme = C.lpTheme || "lp_au";
+      const regionTheme = C.autoScene && thTheme.indexOf("lp_") === 0 && window.__regionScene ? window.__regionScene : null;
+      const curTheme = regionTheme || thTheme;
+      const curCockpit = C.cockpitAuto && CP_AUTO[curTheme] ? CP_AUTO[curTheme] : C.cockpit2 || "lowpoly";
+      const curGauge = C.gaugeAuto ? GMAP[curTheme] || "minimal" : C.gaugeManual || "classic";
+      window.__curGauge = curGauge;
+      const engineOn = curTheme.indexOf("lp_") === 0 || BUILT.indexOf(curTheme) < 0 || C.drawStyle === "poly" || curCockpit !== "neon";
+      const sunNow = (() => {
+        const sn = window.__sun;
+        if (!sn) return tod;
+        const t = d.getTime(), r = new Date(sn.rise).getTime(), st2 = new Date(sn.set).getTime();
+        return t < r - 18e5 || t > st2 + 18e5 ? "night" : t < r + 36e5 ? "dawn" : t > st2 - 36e5 ? "dusk" : "day";
+      })();
+      const LIMV = LV.limit || null;
+      const sceneCfg = { on: engineOn && !nar, theme: curTheme, style: curTheme.indexOf("lp_") === 0 ? "poly" : C.drawStyle === "poly" ? "poly" : "flat", cockpit: curCockpit, gauge: curGauge, tod: sunNow, wx: wk === "night" ? "clear" : wk === "cloudy" ? "cloud" : wk, drive, moveMode: C.sceneMove || "still", dim: drive && C.calm ? 0.25 : 0, unit: C.unit === "kmg" ? "km/g" : "km/h" };
+      const sk = JSON.stringify(sceneCfg);
+      if (window.TCScene && sk !== window.__sceneKey) {
+        window.__sceneKey = sk;
+        window.TCScene.set(sceneCfg);
+      }
+      if (window.TCScene) window.TCScene.set({ speed: APP ? LV.speed || 0 : drive ? S.speed : 0, limit: LIMV ? LIMV.v : 0 });
+      if (!engineOn && window.__tc) {
+        const want = { theme: curTheme, cockpit: "neon", gauge: curGauge };
+        const ts = window.__tc.state;
+        if (ts.theme !== want.theme || ts.gauge !== want.gauge || ts.cockpit !== "neon") window.__tc.setState(want);
+      }
+      if (!window.__thumbs) window.__thumbs = {};
+      const thumbOf = (k) => {
+        const key = k + "|" + (k.indexOf("lp_") === 0 ? "poly" : C.drawStyle);
+        if (!window.__thumbs[key] && window.TCScene && S.scr === "theme") {
+          try {
+            window.__thumbs[key] = window.TCScene.thumb(k, k.indexOf("lp_") === 0 ? "poly" : C.drawStyle === "poly" ? "poly" : "flat", "none", 256, 144);
+          } catch (e) {
+            window.__thumbs[key] = "";
+          }
+        }
+        return window.__thumbs[key] || "";
+      };
+      const th = {
+        styles: [["flat", "G\u1ED1c"], ["poly", "Low-Poly"]].map(([k, l]) => Object.assign({ label: l, on: (C.drawStyle || "poly") === k ? "true" : "false", pick: () => self.setS("drawStyle", k) }, chip((C.drawStyle || "poly") === k))),
+        groups: TGROUPS.map(([label, items2]) => ({ label, items: items2.map(([k, l]) => ({ label: l, img: thumbOf(k), sw: "#0B2436", on: thTheme === k ? "true" : "false", ring: thTheme === k ? "inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)" : "inset 0 0 0 1px rgba(255,255,255,0.15)", pick: () => self.setS("lpTheme", k) })) })),
+        cockpits: COCKPITS.map(([k, l]) => Object.assign({ label: l, on: (C.cockpit2 || "lowpoly") === k ? "true" : "false", pick: () => self.setS("cockpit2", k) }, chip((C.cockpit2 || "lowpoly") === k))),
+        gauges: GAUGES.map(([k, l]) => {
+          const on = k === "auto" ? !!C.gaugeAuto : !C.gaugeAuto && C.gaugeManual === k;
+          return Object.assign({ label: l, on: on ? "true" : "false", pick: () => k === "auto" ? self.setS("gaugeAuto", true) : self.save({ set: Object.assign({}, C, { gaugeAuto: false, gaugeManual: k }) }) }, chip(on));
+        }),
+        toggles: [
+          ["autoScene", "T\u1EF1 \u0111\u1ED5i c\u1EA3nh theo v\xF9ng", "\u0110i qua th\xE0nh ph\u1ED1, ngo\u1EA1i \xF4, \u0111\u1ED3ng qu\xEA, r\u1EEBng, bi\u1EC3n\u2026 c\u1EA3nh t\u1EF1 \u0111\u1ED5i (c\u1EA3nh Low-Poly)"],
+          ["cockpitAuto", "Bu\u1ED3ng l\xE1i theo giao di\u1EC7n", "Outback \u2192 4WD, Rally \u2192 Th\u1EC3 Thao, Synthwave \u2192 Neon\u2026"],
+          ["sceneSlow", "C\u1EA3nh ch\u1EA1y r\u1EA5t ch\u1EADm khi xe ch\u1EA1y", "T\u1EAFt = c\u1EA3nh \u0111\u1EE9ng y\xEAn khi xe ch\u1EA1y (\u0111\u1EE1 nh\u1EE9c m\u1EAFt)"],
+          ["calm", "D\u1ECBu M\u1EAFt khi xe ch\u1EA1y", "N\u1EC1n t\u1ED1i v\xE0 m\u1EDD h\u01A1n"]
+        ].map(([k, l, sub]) => {
+          const on = k === "sceneSlow" ? C.sceneMove === "slow" : !!C[k];
+          return Object.assign({ label: l, sub, on: on ? "true" : "false", state: on ? "M\u1EDF" : "T\u1EAFt", pick: () => k === "sceneSlow" ? self.setS("sceneMove", on ? "still" : "slow") : self.setS(k, !on) }, chip(on));
+        }),
+        note: regionTheme ? "\u0110ang t\u1EF1 \u0111\u1ED5i c\u1EA3nh theo v\xF9ng: " + (window.TCScene ? window.TCScene.names(regionTheme) : regionTheme) + ' \xB7 kho\xE1 c\u1EA3nh: t\u1EAFt "T\u1EF1 \u0111\u1ED5i c\u1EA3nh theo v\xF9ng"' : "Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay. Ki\u1EC3u v\u1EBD G\u1ED1c / Low-Poly \xE1p d\u1EE5ng cho m\u1ECDi giao di\u1EC7n; nh\xF3m Low-Poly lu\xF4n v\u1EBD Low-Poly."
       };
       const OB = LV.obd || null;
       const engT = APP ? OB && OB.coolant != null ? Math.round(OB.coolant) + "\xB0" : "--" : "88\xB0";
@@ -1447,6 +1919,96 @@ window.__AppComp = function() {
         };
         tcn("geocode", q2);
       };
+      const fmtT = (ms) => {
+        if (!ms || ms < 0) return "0:00";
+        const t = Math.round(ms / 1e3);
+        return Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0");
+      };
+      const silk = (amp, ph) => {
+        let d2 = "M0 40 L0 " + (24 - amp * Math.sin(ph)).toFixed(1);
+        for (let x = 0; x <= 600; x += 25) d2 += " L" + x + " " + (24 - amp * Math.sin(ph + x / 200 * 6.2832)).toFixed(1);
+        return d2 + " L600 40 Z";
+      };
+      const JL = window.__jbLook || {};
+      const jbBar = C.jbFollow && JL.barColour ? JL.barColour : "#FBB040";
+      const jb = {
+        posL: fmtT(MD && MD.pos),
+        durL: fmtT(MD && MD.dur),
+        ring: "#FBB040",
+        bg: "linear-gradient(180deg, rgba(40,62,80,0.88), rgba(9,26,38,0.92))",
+        w1: silk(8, 0),
+        w2: silk(6, 2.1),
+        wc1: "#5FD4F0",
+        wc2: "#FBB040",
+        waveOp: C.vizOn === false ? 0 : drive ? 0.35 : 0.8,
+        discCls: playing && !drive ? "disc-on" : "",
+        bar: jbBar,
+        rec: APP && playing && !!MD && MD.pkg === "com.tomstechsolutions.jukebox" && /radio|trực tiếp|live/i.test((MD.artist || "") + " " + (MD.title || "")),
+        recTap: () => {
+          if (APP) tcn("media", "jb:" + JSON.stringify({ kind: "record", name: "" }));
+        }
+      };
+      const idleMs = (C.idleMin || 3) * 6e4;
+      const idleAuto = C.idleOn && APP && !drive && S.scr === "home" && !S.mpOpen && !S.va && S.now - (S.last || S.now) >= idleMs;
+      const idlOn = !nar && (S.clkBig || S.idleOn || idleAuto);
+      const ist = C.idleClock === "theme" ? { neon: "neon", synth: "neon", cyber: "neon", rally: "led", plane: "led", sgold: "retro", outback: "sign", coast: "sign", melb: "sign", lp_au: "min" }[C.lpTheme] || "min" : C.idleClock || "min";
+      const IS = {
+        min: { fw: 200, font: "'Overpass',sans-serif", c: "#FFFFFF", ls: "0", glow: "0 2px 12px rgba(0,0,0,0.3)", plate: "transparent", border: "0", pad: "0" },
+        neon: { fw: 400, font: "'Chakra Petch',sans-serif", c: "#9FF3FF", ls: "4px", glow: "0 0 18px rgba(63,224,255,0.8)", plate: "transparent", border: "0", pad: "0" },
+        led: { fw: 500, font: "'Courier New',monospace", c: "#FF5A3C", ls: "6px", glow: "0 0 10px rgba(255,90,60,0.7)", plate: "rgba(0,0,0,0.75)", border: "2px solid #333", pad: "6px 18px" },
+        sign: { fw: 700, font: "'Overpass',sans-serif", c: "#FFFFFF", ls: "2px", glow: "none", plate: "#0B6B3A", border: "4px solid #FFFFFF", pad: "6px 22px" },
+        retro: { fw: 400, font: "Georgia,serif", c: "#F3DFAE", ls: "2px", glow: "0 2px 8px rgba(0,0,0,0.5)", plate: "rgba(60,40,20,0.55)", border: "2px solid #C9A86A", pad: "4px 20px" }
+      };
+      const isS = IS[ist] || IS.min;
+      const hA = (d.getHours() % 12 + d.getMinutes() / 60) * 30 * Math.PI / 180, mA = d.getMinutes() * 6 * Math.PI / 180;
+      let tk = "";
+      for (let i = 0; i < 12; i++) {
+        const a = i * 30 * Math.PI / 180, r1 = i % 3 ? 40 : 36;
+        tk += "M" + (50 + Math.sin(a) * r1).toFixed(1) + " " + (50 - Math.cos(a) * r1).toFixed(1) + "L" + (50 + Math.sin(a) * 44).toFixed(1) + " " + (50 - Math.cos(a) * 44).toFixed(1);
+      }
+      const WXH = LV.wx && LV.wx.hourly || [];
+      const WXD = LV.wx && LV.wx.daily || [];
+      const EMO = { clear: "\u2600", night: "\u263E", cloudy: "\u2601", rain: "\u{1F327}", storm: "\u26C8", fog: "\u{1F32B}" };
+      const shift = Math.floor(S.now / 12e4) % 6;
+      const idl = {
+        on: idlOn,
+        close: () => self.setState({ clkBig: false, idleOn: false, last: Date.now(), parkedAt: S.now }),
+        sky: wxc.sky,
+        bgOp: C.idleWxBg === false ? 0 : 1,
+        dark: tod === "night" ? 0.25 : 0.05,
+        x: 40 + [0, 6, 12, 6, -6, -12][shift],
+        y: 30 + [0, 4, 8, 4, -4, -8][shift],
+        flip: ist === "flip",
+        analog: ist === "analog",
+        text: ist !== "flip" && ist !== "analog",
+        cards: mkCards(true),
+        h: (C.clock === "12" ? d.getHours() % 12 || 12 : p2(d.getHours())) + "",
+        m: p2(d.getMinutes()),
+        colon: C.clkBlink && !drive && d.getSeconds() % 2 ? 0.3 : 1,
+        fw: isS.fw,
+        font: isS.font,
+        c: isS.c,
+        ls: isS.ls,
+        glow: isS.glow,
+        plate: isS.plate,
+        border: isS.border,
+        pad: isS.pad,
+        ticks: tk,
+        hx: (50 + Math.sin(hA) * 24).toFixed(1),
+        hy: (50 - Math.cos(hA) * 24).toFixed(1),
+        mx: (50 + Math.sin(mA) * 36).toFixed(1),
+        my: (50 - Math.cos(mA) * 36).toFixed(1),
+        date: THU[d.getDay()] + ", " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1) + "/" + d.getFullYear(),
+        sub: [C.clkLunar ? lunTxt : "", C.idleVN ? "Gi\u1EDD Vi\u1EC7t Nam " + tzTime(d, "Asia/Ho_Chi_Minh") : ""].filter(Boolean).join("   \xB7   "),
+        appt: C.idleAppt !== false && AP && apMin > -15 && apMin < 600 ? "H\u1EB9n " + p2(new Date(AP.start).getHours()) + ":" + p2(new Date(AP.start).getMinutes()) + " \xB7 " + (AP.title || "") : "",
+        place: PL && (PL.suburb || PL.street) ? (PL.suburb || PL.street) + (drive ? "" : " \xB7 \u0111ang \u0111\u1EADu xe") : "",
+        desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 m\u01B0a " + Math.round(WX.rain) + "%" : "") + (WX.wind != null ? " \xB7 gi\xF3 " + Math.round(WX.wind) + " km/g" : "") : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026",
+        hourly: C.idleHourly !== false && WXH.length > 0,
+        days3: C.idle3d !== false && WXD.length > 0,
+        hours: WXH.slice(0, 6).map((h, i) => ({ t: i ? p2(new Date(h.t).getHours()) + "h" : "B\xE2y gi\u1EDD", i: EMO[h.code] || "\u2601", v: Math.round(h.temp) + "\xB0" })),
+        days: WXD.slice(0, 3).map((x, i) => ({ n: i === 0 ? "H\xF4m nay" : i === 1 ? "Ng\xE0y mai" : THU[new Date(x.d).getDay()], i: EMO[x.code] || "\u2601", v: Math.round(x.hi) + "\xB0 / " + Math.round(x.lo) + "\xB0" }))
+      };
+      window.__idleOn = idlOn;
       const delP = S.delId ? ALLP[S.delId] : null;
       return {
         rootW: nar ? "100%" : "1280px",
@@ -1461,10 +2023,12 @@ window.__AppComp = function() {
         mp,
         va,
         clk,
+        idl,
         openTheme,
         street,
         devList,
         wxi,
+        wxc,
         wxT,
         wxL1,
         wxL2,
@@ -1474,6 +2038,16 @@ window.__AppComp = function() {
         upMain,
         cp,
         searchNote,
+        searchRetry,
+        doRetry,
+        searchQ: S.searchQ || "",
+        setSearchQ: (e) => self.setState({ searchQ: e.target.value }),
+        doSearchQ: () => {
+          const q2 = (S.searchQ || "").trim();
+          if (!q2) return;
+          self.setState({ cat: "q:" + q2 });
+          if (APP && window.tcFindPlaces) window.tcFindPlaces("q:" + q2);
+        },
         fuelNote,
         unreadN: APP ? (S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0) : 3,
         wsAny: S.wsList.length > 0,
@@ -1505,12 +2079,23 @@ window.__AppComp = function() {
         togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }),
         panelExp: mpOpen ? "true" : "false",
         startListen: () => {
-          self.setState({ va: true, vaHeard: "", vaHint: "" });
+          self.setState({ va: true, vaHeard: "", vaHint: "", vaRetry: 0 });
           tcn("voice", "start");
         },
+        micOff: APP && PM.mic === false,
+        micCls: APP && PM.mic === false ? "" : S.va ? "mic-listen" : S.now - (S.replyAt || 0) < 3e3 ? "mic-reply" : drive ? "mic-idle mic-calm" : "mic-idle",
+        micBg: APP && PM.mic === false ? "#5E6B73" : "#FBB040",
+        micW: APP && PM.mic === false ? "#5E6B73" : S.va ? "#FBB040" : "#5FD4F0",
+        micA: APP && PM.mic === false ? "ch\u01B0a c\u1EA5p quy\u1EC1n micro" : S.va ? "\u0111ang nghe" : "s\u1EB5n s\xE0ng",
         isHome: !nar && S.scr === "home",
         isSettings: !nar && S.scr === "settings",
+        isTheme: !nar && S.scr === "theme",
+        th,
         isRt: !nar && S.scr === "rt",
+        tp,
+        od,
+        townOn: !!(S.townSign && S.now - S.townSign.at < 6e3 && S.scr === "home"),
+        townL: S.townSign ? S.townSign.name : "",
         isSplit: !nar && S.scr === "split",
         isSearch: !nar && S.scr === "search",
         isDex: !nar && S.scr === "dex",
@@ -1545,11 +2130,12 @@ window.__AppComp = function() {
         opBottom,
         opMusic,
         dimmedAny: idle,
-        musicW: drive ? 560 : 640,
+        jb,
+        musicW: drive ? 600 : 660,
         togglePlay: () => {
           if (APP) {
             if (S.src === "radio") tcn("radio", playing ? "stop" : JSON.stringify({ url: LV.radio && LV.radio.url || "", name: LV.radio && LV.radio.name || "" }));
-            else tcn("media", "toggle");
+            else tcn("media", playing ? "pause" : "play");
           } else self.setState({ playing: !S.playing, perm: S.playing ? S.perm : true });
         },
         playLabel: playing ? "D\u1EEBng" : "Ph\xE1t",
@@ -1561,7 +2147,7 @@ window.__AppComp = function() {
         },
         playIcon: playing && !inCall ? "M7 5h4v14H7zM13 5h4v14h-4z" : "M8 5l11 7-11 7z",
         songTitle: APP ? S.src === "radio" ? LV.radio && LV.radio.name || DEF_NOW.radio[2] : MD && MD.title || DEF_NOW.music[2] : S.playing ? S.nowT || DEF_NOW[S.src][0] : DEF_NOW[S.src][2],
-        songSub: inCall && playing ? "T\u1EA1m d\u1EEBng v\xEC c\xF3 cu\u1ED9c g\u1ECDi" : APP ? S.src === "radio" ? playing ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : LV.radio && LV.radio.err || "" : MD ? [MD.artist, MD.app].filter(Boolean).join(" \xB7 ") : PM.notif ? "M\u1EDF app nh\u1EA1c r\u1ED3i b\u1EA5m ph\xE1t" : "" : S.playing ? S.nowS || DEF_NOW[S.src][1] : S.perm ? "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t" : "",
+        songSub: inCall && playing ? "T\u1EA1m d\u1EEBng v\xEC c\xF3 cu\u1ED9c g\u1ECDi" : APP ? S.src === "radio" ? playing ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : LV.radio && LV.radio.err || "" : MD ? [MD.artist, MD.app].filter(Boolean).join(" \xB7 ") : "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t " + ({ "com.spotify.music": "Spotify", "com.google.android.apps.youtube.music": "YouTube Music" }[C.musicApp] || "Tom's Jukebox") : S.playing ? S.nowS || DEF_NOW[S.src][1] : S.perm ? "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t" : "",
         showWave,
         waveBars,
         prog: APP ? MD && MD.pos != null && MD.dur ? Math.round(MD.pos / MD.dur * 100) : 0 : 38,
@@ -1590,7 +2176,7 @@ window.__AppComp = function() {
         privPressed: priv ? "true" : "false",
         privC: priv ? "#7BD88F" : "#CFF6FF",
         privRing: priv ? "inset 0 0 0 2px #7BD88F" : "inset 0 0 0 1px rgba(95,212,240,0.55)",
-        privIcon: priv ? "M9 12l2 2 4-4" : "M12 8v5M12 16h.01",
+        privIcon: priv ? "M3 3l18 18" : "",
         openExit: () => self.setState({ exitOpen: true }),
         closeExit: () => self.setState({ exitOpen: false }),
         exitOpen: S.exitOpen,
@@ -1668,7 +2254,7 @@ window.__AppComp = function() {
         bootAbout: S.boot === "about",
         skipBoot: () => {
           clearTimeout(self.b2);
-          self.setState({ boot: null, scr: "home", last: Date.now() });
+          self.setState({ boot: null, scr: S.boot === "about" ? S.scr : "home", last: Date.now() });
         },
         restart: () => self.startBoot(),
         listOpen: S.listOpen,
@@ -1683,6 +2269,30 @@ window.__AppComp = function() {
 window.__APP_TPL = `
 <helmet>
 <style>
+.jbbtn{border:0;border-radius:50%;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(3,17,28,0.55);box-shadow:inset 0 0 0 2.5px #48C8C0,inset 0 0 0 3.5px rgba(251,176,64,0.75),0 0 10px rgba(72,200,192,0.35)}
+.jbbtn:active{transform:scale(.94)}
+@keyframes tf-spin{to{transform:rotate(360deg)}}
+.disc-on{animation:tf-spin 6s linear infinite;transform-origin:50% 50%}
+@keyframes tf-silk{from{transform:translateX(0)}to{transform:translateX(-200px)}}
+.jbwave .w1{animation:tf-silk 9s linear infinite}.jbwave .w2{animation:tf-silk 13s linear infinite reverse}
+.jbpill.calm .jbwave path{animation-duration:40s}
+@keyframes tf-breathe{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes tf-jump{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.25)}}
+.odo-d{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}.odo-c{display:flex;flex-direction:column;transition:transform .6s cubic-bezier(.3,1.3,.5,1)}.odo-c span{height:1.15em;line-height:1.15em;text-align:center}
+.mic-idle .mw{animation:tf-breathe 2.4s ease-in-out infinite}
+.mic-listen .mw{animation:tf-jump .45s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.mic-listen .mw2{animation-delay:.15s}
+.mic-reply .mw{stroke:#3FD17A!important;animation:tf-breathe .8s ease-in-out infinite}
+.mic-calm .mw{animation:none;opacity:.7}
+@keyframes tf-cloud{from{transform:translateX(-6px)}to{transform:translateX(6px)}}
+.wx-anim .cl{animation:tf-cloud 4s ease-in-out infinite alternate}
+@keyframes tf-sunr{to{transform:rotate(360deg)}}
+.wx-anim .sr{animation:tf-sunr 24s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes tf-rd{from{transform:translateY(-3px);opacity:0}50%{opacity:1}to{transform:translateY(7px);opacity:0}}
+.wx-anim .rd{animation:tf-rd 1.4s linear infinite}
+@keyframes tf-fl{0%,92%,100%{opacity:0}94%{opacity:1}}
+.wx-anim .fl{animation:tf-fl 5s linear infinite}
+.wx-calm *{animation-duration:20s!important}
 body{margin:0}
 a{color:#5FD4F0}a:hover{color:#CFF6FF}
 .pnl{background:rgba(3,17,28,0.82);box-shadow:inset 0 0 0 1px rgba(95,212,240,0.55);clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px)}
@@ -1764,18 +2374,11 @@ input[type=range]{accent-color:#FBB040}
           <div style="font-size: 28px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 12px rgba(95,212,240,0.6)"><span style="color: #48B0C8">TOM'S</span> <span style="position: relative; display: inline-block; color: #FBB040">CAR<svg aria-hidden="true" viewBox="0 10 300 90" style="position: absolute; left: -0.5em; top: -0.56em; width: 2.7em; height: 1.1em; overflow: visible; pointer-events: none"><path d="M12 74 C60 46 104 22 160 20 C204 18 232 30 262 54 C236 36 206 28 162 30 C110 32 66 52 12 74 Z" fill="#FBB040"></path><path d="M96 58 C120 40 150 34 178 34 C204 34 222 42 236 54 C214 48 190 46 166 46 C140 46 118 50 96 58 Z" fill="#FBB040"></path><path d="M176 58 C214 54 256 56 290 64 C296 66 296 71 290 71 C254 63 216 60 176 58 Z" fill="#FBB040"></path><path d="M296 76 C292 82 286 86 276 88 C282 84 288 80 296 76 Z M200 86 C176 90 150 90 128 87 C150 87 176 87 200 86 Z M54 86 C40 86 26 82 16 76 C28 80 40 83 54 86 Z" fill="#FBB040"></path><path d="M58 86 C62 70 76 62 92 62 C108 62 120 72 124 86 C116 76 106 70 92 70 C78 70 66 76 58 86 Z" fill="#FBB040"></path><path d="M206 86 C210 70 224 62 240 62 C256 62 268 72 272 86 C264 76 254 70 240 70 C226 70 214 76 206 86 Z" fill="#FBB040"></path><path d="M281 63 L291 66 L282 67 Z" fill="#FFE9A8"></path></svg></span></div>
           <div style="font-size: 11px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         </div>
-        <div class="pnl" style="height: 44px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 0">
-          <span class="lbl">\u0110ANG CH\u1EA0Y TR\xCAN</span><span style="font-size: 14px; font-weight: 700; max-width: 170px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
+        <div class="pnl" style="height: 54px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 250px">
+          <span class="lbl">\u0110ANG CH\u1EA0Y TR\xCAN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
+          <span role="group" aria-label="Pin thi\u1EBFt b\u1ECB" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
-        <div class="pnl" role="group" aria-label="Pin thi\u1EBFt b\u1ECB" style="height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; flex-shrink: 0">
-          <sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}; white-space: nowrap">{{dv.l}}</span></sc-for>
-        </div>
-        <div class="pnl" style="margin-left: auto; height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 1; min-width: 0">
-          <svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke-linecap="round" aria-hidden="true" style="flex-shrink: 0"><path d="{{wxi.d1}}" fill="{{wxi.c1}}"></path><path d="{{wxi.d2}}" fill="{{wxi.f2}}" stroke="{{wxi.s2}}" stroke-width="2.6"></path></svg>
-          <span style="font-size: 18px; font-weight: 700; flex-shrink: 0">{{wxT}}</span>
-          <span style="display: flex; flex-direction: column; line-height: 1.2; min-width: 0"><span style="font-size: 12px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{wxL1}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap">{{wxL2}}</span></span>
-        </div>
-        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 54px; padding: 0 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
+        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl" style="position: absolute; left: 640px; top: 0; transform: translateX(-50%); border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 54px; padding: 0 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
           <sc-if value="{{clk.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 2px"><sc-for list="{{clk.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
           <sc-if value="{{clk.analog}}" hint-placeholder-val="{{ false }}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0B141B" stroke="#A9C7D4" stroke-width="1.5"></circle><line x1="20" y1="20" x2="{{clk.hx}}" y2="{{clk.hy}}" stroke="#E8F1F5" stroke-width="2.6" stroke-linecap="round"></line><line x1="20" y1="20" x2="{{clk.mx}}" y2="{{clk.my}}" stroke="#FBB040" stroke-width="1.8" stroke-linecap="round"></line><circle cx="20" cy="20" r="2" fill="#FBB040"></circle></svg></sc-if>
           <sc-if value="{{clk.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 24px; font-weight: {{clk.fw}}; font-family: {{clk.font}}; font-style: {{clk.fst}}; color: {{clk.c}}; text-shadow: {{clk.glow}}; letter-spacing: {{clk.ls}}">{{clk.h}}<span style="opacity: {{clk.colonOp}}">:</span>{{clk.m}}<span style="font-size: 12px; margin-left: 3px">{{clk.ap}}</span></span></sc-if>
@@ -1784,8 +2387,17 @@ input[type=range]{accent-color:#FBB040}
             <sc-if value="{{clk.line2On}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: {{clk.line2C}}; white-space: nowrap">{{clk.line2}}</span></sc-if>
           </span>
         </button>
+        <button onClick="{{wxc.open}}" aria-label="Th\u1EDDi ti\u1EBFt: {{wxc.aria}}" class="pnl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 210px; padding: 0 12px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
+          <canvas id="wxmini" width="210" height="58" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas>
+          <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true" style="position: relative; flex-shrink: 0"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg>
+          <span style="position: relative; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; min-width: 0">
+            <span style="font-size: 26px; font-weight: 300">{{wxT}}</span>
+            <span style="font-size: 11px; white-space: nowrap">{{wxc.hl}}</span>
+          </span>
+          <span style="position: relative; margin-left: auto; font-size: 11px; text-align: right; line-height: 1.2; max-width: 70px">{{wxc.desc}}</span>
+        </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
-        <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="{{privIcon}}"></path></svg></button>
+        <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
         <button onClick="{{openTheme}}" aria-label="Giao Di\u1EC7n" title="Giao Di\u1EC7n" class="btn" style="width: 54px; height: 54px; padding: 0; color: #CFF6FF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01"></path></svg></button>
         <button onClick="{{goSettings}}" aria-label="C\xE0i \u0110\u1EB7t" title="C\xE0i \u0110\u1EB7t" class="btn" style="width: 54px; height: 54px; padding: 0; color: #FBB040"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
         <button onClick="{{openExit}}" aria-label="Tho\xE1t ch\u01B0\u01A1ng tr\xECnh" title="Tho\xE1t" class="btn" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
@@ -1854,6 +2466,7 @@ input[type=range]{accent-color:#FBB040}
           <div class="pnl fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center">{{sb.stats}}</div>
         </sc-if>
       </div>
+      <sc-if value="{{townOn}}" hint-placeholder-val="{{ false }}"><div class="fadein" aria-live="polite" style="position: absolute; left: 50%; top: 92px; transform: translateX(-50%); background: #1F5FAE; border: 3px solid #FFFFFF; border-radius: 8px; padding: 6px 22px; font-family: Overpass, sans-serif; font-weight: 800; font-size: 22px; color: #FFFFFF; box-shadow: 0 6px 20px rgba(0,0,0,0.5); white-space: nowrap">{{townL}}</div></sc-if>
       <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}">
       <div style="position: absolute; left: 826px; top: 196px; display: flex; flex-direction: column; align-items: center; gap: 4px">
         <div aria-label="{{sb.limAria}}" style="width: 66px; height: 86px; background: #FFFFFF; border-radius: 6px; box-sizing: border-box; border: {{sb.limBorder}}; display: flex; align-items: center; justify-content: center"><div style="width: 54px; height: 54px; border-radius: 50%; border: 6px solid #D0202E; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: Overpass, sans-serif; font-weight: 800; font-size: 21px; color: #111111; text-align: center">{{sb.lim}}</div></div>
@@ -1883,7 +2496,7 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- thanh d\u01B0\u1EDBi c\xF9ng (l\xE0m m\u1EDD) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
-        <button onClick="{{startListen}}" class="btn" aria-label="Tr\u1EE3 l\xFD gi\u1ECDng n\xF3i" style="width: 64px; height: 64px; padding: 0; color: #5FD4F0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+        <button onClick="{{startListen}}" aria-label="Tr\u1EE3 l\xFD gi\u1ECDng n\xF3i ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
         <div class="pnl" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHI\u1EC6T M\xC1Y</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span></div>
         <div class="pnl" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">B\xCCNH \u0110I\u1EC6N</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
         <sc-if value="{{drive}}" hint-placeholder-val="{{ false }}">
@@ -1891,28 +2504,35 @@ input[type=range]{accent-color:#FBB040}
         </sc-if>
       </div>
 
-      <!-- thanh nh\u1EA1c (l\xE0m m\u1EDD ri\xEAng) -->
-      <div class="pnl dimbox" style="position: absolute; right: 20px; bottom: 16px; width: {{musicW}}px; height: 64px; padding: 0 14px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}">
-        <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" style="width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer; flex-shrink: 0; background: #FBB040; color: #2A1A00; box-shadow: 0 0 16px rgba(251,176,64,0.7); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{playIcon}}"></path></svg></button>
-        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
-          <div style="display: flex; align-items: baseline; gap: 8px; min-width: 0"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{songTitle}}</span><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap">{{songSub}}</span></div>
-          <sc-if value="{{showWave}}" hint-placeholder-val="{{ true }}">
-            <div aria-hidden="true" style="position: relative; height: 18px; display: flex; align-items: flex-end; gap: 2px">
-              <sc-for list="{{waveBars}}" as="w" hint-placeholder-count="48"><span class="{{w.cls}}" style="width: 4px; height: {{w.h}}px; border-radius: 2px; background: {{w.c}}; animation-delay: {{w.del}}s"></span></sc-for>
-              <span style="position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(95,212,240,0.35)"></span>
-              <span style="position: absolute; left: 0; bottom: 0; height: 2px; width: {{prog}}%; background: #FBB040; box-shadow: 0 0 6px #FBB040"></span>
-            </div>
-          </sc-if>
+      <!-- thanh nh\u1EA1c: vi\xEAn thu\u1ED1c ki\u1EC3u Tom's Jukebox (\u0111\u0129a than tr\xE1i, t\xEAn gi\u1EEFa, \u23EE \u25B6 \u23ED b\xEAn ph\u1EA3i, thanh th\u1EDDi gian trong vi\xEAn thu\u1ED1c, s\xF3ng l\u1EE5a \u1EDF m\xE9p d\u01B0\u1EDBi) -->
+      <div class="pnl dimbox jbpill" style="position: absolute; right: 20px; bottom: 10px; width: {{musicW}}px; height: 80px; padding: 0 16px 0 10px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
+        <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 26px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.55"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.45"></path></svg>
+        <button onClick="{{togglePanel}}" aria-label="Danh s\xE1ch b\xE0i v\xE0 \u0111\xE0i" style="position: relative; width: 60px; height: 60px; border: 0; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer; background: transparent">
+          <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true" class="{{jb.discCls}}"><circle cx="30" cy="30" r="29" fill="#1A1A1A"></circle><circle cx="30" cy="30" r="22" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="17" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="11" fill="#FBB040"></circle><circle cx="30" cy="30" r="3" fill="#2A1A00"></circle></svg>
+        </button>
+        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; align-items: center">
+          <span style="max-width: 100%; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songTitle}}</span>
+          <span style="max-width: 100%; font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songSub}}</span>
+          <div style="width: 100%; display: flex; align-items: center; gap: 8px; font-size: 11px; color: #CFE6EE" class="tnum">
+            <span>{{jb.posL}}</span>
+            <span style="position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.45)"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: {{prog}}%; border-radius: 2px; background: {{jb.bar}}"></span><span style="position: absolute; top: -4px; left: calc({{prog}}% - 6px); width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF"></span></span>
+            <span>{{jb.durL}}</span>
+          </div>
         </div>
-        <button onClick="{{cycleSrc}}" aria-label="\u0110\u1ED5i ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" class="pill" style="height: 30px; padding: 0 10px; font-size: 11px; letter-spacing: 1px; background: #0D2C40; color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6)">{{srcL}}</button>
-        <button onClick="{{togglePanel}}" aria-label="Danh s\xE1ch b\xE0i v\xE0 \u0111\xE0i" aria-expanded="{{panelExp}}" class="btn" style="width: 44px; height: 44px; padding: 0"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"></path></svg></button>
-        <sc-if value="{{needPerm}}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{grantPerm}}" class="btn" style="height: 36px; font-size: 12px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040">\u26A0 C\u1EA5p quy\u1EC1n \u0111\u1ECDc b\xE0i \u0111ang ph\xE1t</button>
+        <button onClick="{{cycleSrc}}" aria-label="\u0110\u1ED5i ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}}</button>
+        <sc-if value="{{needPerm}}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{grantPerm}}" class="btn" style="position: relative; height: 34px; font-size: 11px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040; flex-shrink: 0">\u26A0 C\u1EA5p quy\u1EC1n</button>
         </sc-if>
-        <sc-if value="{{showSkip}}" hint-placeholder-val="{{ false }}">
-          <div style="display: flex; gap: 4px"><button onClick="{{prevF}}" class="btn" aria-label="B\xE0i tr\u01B0\u1EDBc" style="width: 40px; height: 40px; padding: 0">\u23EE</button><button onClick="{{nextF}}" class="btn" aria-label="B\xE0i k\u1EBF" style="width: 40px; height: 40px; padding: 0">\u23ED</button></div>
+        <sc-if value="{{jb.rec}}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{jb.recTap}}" aria-label="Th\xE2u \u0111\xE0i \u0111ang nghe" class="jbbtn" style="width: 40px; height: 40px; border-color: #E5484D"><span style="width: 14px; height: 14px; border-radius: 50%; background: #E5484D; display: block"></span></button>
         </sc-if>
+        <div style="position: relative; display: flex; align-items: center; gap: 8px; flex-shrink: 0">
+          <button onClick="{{prevF}}" aria-label="B\xE0i tr\u01B0\u1EDBc" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect><path d="M19 5v14L9 12z" fill="#FBB040"></path></svg></button>
+          <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" class="jbbtn" style="width: 60px; height: 60px"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="{{playIcon}}" fill="#FBB040"></path></svg></button>
+          <button onClick="{{nextF}}" aria-label="B\xE0i k\u1EBF" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z" fill="#FBB040"></path><rect x="16" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect></svg></button>
+        </div>
       </div>
+
       <!-- b\u1EA3ng ch\u1ECDn b\xE0i / \u0111\xE0i (tr\u01B0\u1EE3t l\xEAn t\u1EEB thanh nh\u1EA1c) -->
       <sc-if value="{{mp.open}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Ch\u1ECDn b\xE0i v\xE0 \u0111\xE0i" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: 640px; height: 400px; z-index: 8; display: flex; flex-direction: column; background: #06192A">
@@ -2012,16 +2632,52 @@ input[type=range]{accent-color:#FBB040}
       </div>
     </sc-if>
 
+    <!-- ========== GIAO DI\u1EC6N: c\u1EA3nh, ki\u1EC3u v\u1EBD, bu\u1ED3ng l\xE1i, \u0111\u1ED3ng h\u1ED3 t\u1ED1c \u0111\u1ED9 ========== -->
+    <sc-if value="{{isTheme}}" hint-placeholder-val="{{ false }}">
+      <div class="scrl" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow-y: auto; padding: 18px 24px 30px; box-sizing: border-box; background: radial-gradient(ellipse at 70% 0%,rgba(95,212,240,0.12),transparent 60%),#03111C">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px">
+          <button onClick="{{goHome}}" aria-label="V\u1EC1 M\xE0n H\xECnh Ch\xEDnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <span style="font-size: 24px; font-weight: 700; color: #FBB040">Giao Di\u1EC7n</span>
+          <span style="flex: 1"></span>
+          <span class="lbl">KI\u1EC2U V\u1EBC</span>
+          <sc-for list="{{th.styles}}" as="o" hint-placeholder-count="2"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 38px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+        </div>
+        <sc-for list="{{th.groups}}" as="gp" hint-placeholder-count="4">
+          <div style="margin: 10px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">{{gp.label}}</div>
+          <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px">
+            <sc-for list="{{gp.items}}" as="it" hint-placeholder-count="6">
+              <button onClick="{{it.pick}}" aria-pressed="{{it.on}}" style="border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; background: #0A1E2C; border-radius: 10px; overflow: hidden; box-shadow: {{it.ring}}; text-align: left">
+                <img src="{{it.img}}" alt="" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: {{it.sw}}">
+                <span style="display: block; padding: 6px 8px; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div style="margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">BU\u1ED2NG L\xC1I</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{th.cockpits}}" as="o" hint-placeholder-count="12"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+        </div>
+        <div style="margin: 16px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">\u0110\u1ED2NG H\u1ED2 T\u1ED0C \u0110\u1ED8 (SAU V\xD4 L\u0102NG)</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{th.gauges}}" as="o" hint-placeholder-count="8"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+        </div>
+        <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px">
+          <sc-for list="{{th.toggles}}" as="o" hint-placeholder-count="4"><button onClick="{{o.pick}}" role="switch" aria-checked="{{o.on}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; height: 56px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700">{{o.label}}</span><span style="font-size: 11px; color: #8FC3D3">{{o.sub}}</span></span><span style="margin-left: 8px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; background: {{o.bg}}; color: {{o.fg}}">{{o.state}}</span></button></sc-for>
+        </div>
+        <div style="margin-top: 12px; font-size: 12px; color: #8FC3D3">{{th.note}}</div>
+      </div>
+    </sc-if>
+
     <!-- ========== 3. ROAD TRIP ========== -->
     <sc-if value="{{isRt}}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; left: 20px; right: 20px; top: 12px; display: flex; align-items: center; gap: 8px">
         <button onClick="{{goHome}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5)">M\xE0n H\xECnh Ch\xEDnh</button>
         <button class="pill" style="background: #FBB040; color: #2A1A00">Road Trip</button>
-        <span style="font-size: 20px; font-weight: 700; margin-left: 8px">{{rt.title}}</span>
+        <span style="font-size: 20px; font-weight: 700; margin-left: 8px; white-space: nowrap">{{rt.title}}</span>
         <sc-for list="{{rt.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-        <span style="font-size: 12px; color: #7BD88F">\u25CF t\u1EF1 nh\u1EADn chi\u1EC1u theo GPS</span>
+        <button onClick="{{rt.toggleAutoDir}}" aria-pressed="{{rt.autoDir}}" class="pill" style="white-space: nowrap; background: {{rt.autoDirBg}}; color: {{rt.autoDirC}}; box-shadow: inset 0 0 0 1px {{rt.autoDirC}}">\u{1F4CD} T\u1EF1 Nh\u1EADn Chi\u1EC1u</button>
         <span style="margin-left: auto"></span>
-        <button class="btn" style="height: 40px; font-size: 13px">Chuy\u1EBFn: Melbourne \u21C4 Adelaide \u25BE</button>
+        <button onClick="{{rt.openTrips}}" class="btn" style="height: 40px; font-size: 13px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis">{{rt.tripL}}</button>
         <button onClick="{{goSearch}}" class="btn" style="height: 40px; font-size: 13px">T\xECm Ch\u1ED7</button>
         <button onClick="{{goSplit}}" class="btn btn-o" style="height: 40px; font-size: 13px">M\u1EDF B\u1EA3n \u0110\u1ED3</button>
       </div>
@@ -2052,7 +2708,7 @@ input[type=range]{accent-color:#FBB040}
               <path d="{{rt.roadD}}" fill="none" stroke="#E8F1F5" stroke-width="1.6" stroke-dasharray="10 10" opacity="0.6"></path>
               <path d="{{rt.doneD}}" fill="none" stroke="#7BD88F" stroke-width="6" stroke-linecap="round" opacity="0.85"></path>
               <path d="{{rt.tickD}}" stroke="#E8F1F5" stroke-width="1.5" opacity="0.7"></path>
-              <line x1="{{rt.bx}}" y1="120" x2="{{rt.bx}}" y2="245" stroke="#FBB040" stroke-width="2" stroke-dasharray="5 4"></line>
+              <line x1="{{rt.bx}}" y1="120" x2="{{rt.bx}}" y2="245" stroke="#FBB040" stroke-width="2" stroke-dasharray="5 4" opacity="{{rt.bxOp}}"></line>
             </svg>
             <sc-for list="{{rt.regions}}" as="g" hint-placeholder-count="5"><span style="position: absolute; left: {{g.x}}px; top: 262px; width: {{g.w}}px; text-align: center; font-size: 11px; color: #A9C7D4; letter-spacing: 0.5px">{{g.label}}</span></sc-for>
             <sc-for list="{{rt.ticks}}" as="t" hint-placeholder-count="7"><span style="position: absolute; left: {{t.x}}px; top: {{t.y}}px; transform: translateX(-50%) scale({{rt.inv}}); transform-origin: 50% 0; font-size: 10px; color: #CFE6EE; white-space: nowrap">{{t.label}}</span></sc-for>
@@ -2063,20 +2719,20 @@ input[type=range]{accent-color:#FBB040}
             </div>
             <sc-for list="{{rt.signs}}" as="s" hint-placeholder-count="6">
               <button onClick="{{s.open}}" onDoubleClick="{{s.focus}}" aria-label="{{s.aria}}" style="position: absolute; left: {{s.x}}px; top: {{s.y}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; border: 0; padding: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; align-items: center">
-                <sc-if value="{{s.photo}}" hint-placeholder-val="{{ false }}"><span class="ph {{s.cls}}" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFFFFF; box-sizing: border-box; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 3px; background: {{s.bg}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></span></sc-if>
-                <sc-if value="{{s.sign}}" hint-placeholder-val="{{ true }}"><span class="{{s.cls}}" style="width: 30px; height: 30px; border-radius: 4px; background: {{s.bg}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></sc-if>
+                <sc-if value="{{s.photo}}" hint-placeholder-val="{{ false }}"><span class="ph {{s.cls}}" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFFFFF; box-sizing: border-box; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 3px; background: {{s.bg}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></span></sc-if>
+                <sc-if value="{{s.sign}}" hint-placeholder-val="{{ true }}"><span class="{{s.cls}}" style="width: 30px; height: 30px; border-radius: 4px; background: {{s.bg}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></sc-if>
                 <span style="font-size: 10px; white-space: nowrap; max-width: 96px; overflow: hidden; text-overflow: ellipsis">{{s.short}}</span>
                 <span style="font-size: 10px; font-weight: 700; white-space: nowrap; color: {{s.kmC}}">{{s.km}}</span>
-                <span style="width: 2px; height: 8px; background: #A9C7D4"></span>
+                <span style="width: 2px; height: {{s.lead}}px; background: #A9C7D4"></span>
               </button>
             </sc-for>
-            <div style="position: absolute; left: {{rt.bx}}px; top: 96px; transform: translateX(-4px) scale({{rt.inv}}); transform-origin: 0 100%; display: flex; align-items: center; gap: 4px">
+            <sc-if value="{{rt.bxOn}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: {{rt.bx}}px; top: 96px; transform: translateX(-4px) scale({{rt.inv}}); transform-origin: 0 100%; display: flex; align-items: center; gap: 4px">
               <svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true"><path d="M2 22V2" stroke="#FBB040" stroke-width="2"></path><path d="M3 2h11l-3 4 3 4H3z" fill="#D0202E"></path></svg>
               <span style="font-size: 11px; font-weight: 700; color: #FFD08A; white-space: nowrap">{{rt.borderL}}</span>
-            </div>
+            </div></sc-if>
             <div style="position: absolute; left: {{rt.vanX}}px; top: {{rt.vanY}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; display: flex; flex-direction: column; align-items: center">
               <span style="font-size: 12px; font-weight: 700; color: #2A1A00; background: #FBB040; border-radius: 6px; padding: 1px 6px; margin-bottom: 2px; white-space: nowrap">{{rt.vanL}}</span>
-              <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true"><path d="M2 18V4h24l8 5h8v9z" fill="#E8F1F5"></path><rect x="27" y="5" width="9" height="6" rx="1" fill="#5FD4F0"></rect><circle cx="11" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle><circle cx="33" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle></svg>
+              <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true" style="transform: scaleX({{rt.vanFlip}})"><path d="M2 18V4h24l8 5h8v9z" fill="#E8F1F5"></path><rect x="27" y="5" width="9" height="6" rx="1" fill="#5FD4F0"></rect><circle cx="11" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle><circle cx="33" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle></svg>
             </div>
           </sc-if>
           <sc-if value="{{rt.map}}" hint-placeholder-val="{{ false }}">
@@ -2114,7 +2770,15 @@ input[type=range]{accent-color:#FBB040}
           <div class="pnl" style="min-height: 92px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px"><span class="lbl">{{b.l}}</span><span style="font-size: 20px; font-weight: 700; color: {{b.c}}; white-space: normal; overflow-wrap: anywhere; line-height: 1.2">{{b.v}}</span></div>
         </sc-for>
       </div>
-      <div data-demo="1" style="position: absolute; left: 20px; top: 596px; width: 800px; font-size: 12px; color: #8FC3D3">Ch\u1EB7ng v\u1EC1 m\u1EB7c \u0111\u1ECBnh = ch\u1EB7ng \u0111i \u0111\u1EA3o ng\u01B0\u1EE3c + c\xE1c ch\u1EB7ng v\u1EC1 c\u1EE7a b\u1EA1n (g\u1ED9p ch\u1ED7 tr\xF9ng). S\u1ED1 km \u0111o l\u1EA1i theo \u0111\u01B0\u1EDDng th\u1EADt khi build.</div>
+      <sc-if value="{{od.on}}" hint-placeholder-val="{{ true }}">
+      <div style="position: absolute; left: 20px; top: 592px; width: 800px; height: 112px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr 0.8fr; gap: 10px">
+        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP A \xB7 H\xD4M NAY</span><button onClick="{{od.resetA}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip A" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">\u21BA</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.a}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div></div>
+        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP B \xB7 C\u1EA2 CHUY\u1EBEN</span><button onClick="{{od.resetB}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip B" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">\u21BA</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.b}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div><span style="font-size: 11px; color: #8FC3D3">{{od.legNow}}</span></div>
+        <div class="pnl" style="padding: 6px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: {{od.nxBg}}"><span class="lbl">CH\u1EB6NG K\u1EBE</span><span style="font-size: 26px; font-weight: 800; color: {{od.nxC}}">{{od.nxKm}}</span><span style="font-size: 13px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{od.nx}}</span><sc-if value="{{od.obdOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #7BD88F">{{od.obd}} {{od.range}}</span></sc-if></div>
+        <button onClick="{{od.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg width="62" height="62" viewBox="0 0 70 70" aria-hidden="true"><circle cx="35" cy="35" r="30" fill="none" stroke="#16324A" stroke-width="7"></circle><circle cx="35" cy="35" r="30" fill="none" stroke="#FBB040" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{od.dash}}" transform="rotate(-90 35 35)"></circle><text x="35" y="40" text-anchor="middle" font-size="15" font-weight="800" fill="#E8F1F5" font-family="Overpass, sans-serif">{{od.pct}}</text></svg><span style="font-size: 11px; color: #8FC3D3">Nh\u1EADt K\xFD \u203A</span></button>
+      </div>
+      </sc-if>
+      <div data-demo="1" style="position: absolute; left: 20px; top: 596px; width: 800px; font-size: 12px; color: #8FC3D3; display: none">Ch\u1EB7ng v\u1EC1 m\u1EB7c \u0111\u1ECBnh = ch\u1EB7ng \u0111i \u0111\u1EA3o ng\u01B0\u1EE3c + c\xE1c ch\u1EB7ng v\u1EC1 c\u1EE7a b\u1EA1n (g\u1ED9p ch\u1ED7 tr\xF9ng). S\u1ED1 km \u0111o l\u1EA1i theo \u0111\u01B0\u1EDDng th\u1EADt khi build.</div>
 
       <!-- c\xE1c ch\u1EB7ng gh\xE9 -->
       <section aria-label="C\xE1c ch\u1EB7ng gh\xE9" class="pnl" style="position: absolute; right: 20px; top: 64px; width: 420px; height: 600px; display: flex; flex-direction: column">
@@ -2124,10 +2788,10 @@ input[type=range]{accent-color:#FBB040}
             <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
               <span aria-hidden="true" style="color: #5E8496; font-size: 16px; cursor: grab">\u22EE\u22EE</span>
               <sc-if value="{{s.photo}}" hint-placeholder-val="{{ true }}">
-                <div class="ph" aria-hidden="true" style="position: relative; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -3px; bottom: -3px; width: 18px; height: 18px; border-radius: 3px; background: {{s.sign}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.icon}}"></path></svg></span></div>
+                <div class="ph" aria-hidden="true" style="position: relative; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -3px; bottom: -3px; width: 18px; height: 18px; border-radius: 3px; background: {{s.sign}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.icon}}"></path></svg></span></div>
               </sc-if>
               <sc-if value="{{s.noPhoto}}" hint-placeholder-val="{{ false }}">
-                <div style="width: 34px; height: 34px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
+                <div style="width: 34px; height: 34px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
               </sc-if>
               <div style="flex: 1; min-width: 0">
                 <button onClick="{{s.open}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 14px; font-weight: 700; text-decoration: {{s.strike}}">{{s.name}}</button>
@@ -2150,6 +2814,44 @@ input[type=range]{accent-color:#FBB040}
           <button onClick="{{openPick}}" class="btn btn-o" style="flex: 1">+ Th\xEAm T\u1EEB Danh S\xE1ch</button>
         </div>
       </section>
+      <sc-if value="{{tp.open}}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-label="C\xE1c chuy\u1EBFn" class="pnl fadein" style="position: absolute; left: 50%; top: 60px; transform: translateX(-50%); width: 760px; max-height: 600px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: #06192A; box-shadow: 0 20px 60px rgba(0,0,0,0.7)">
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 700; color: #FBB040; flex: 1">C\xE1c Chuy\u1EBFn</span><button onClick="{{tp.close}}" class="btn" style="height: 40px">\u0110\xF3ng</button></div>
+          <div class="scrl" style="max-height: 270px; display: flex; flex-direction: column; gap: 6px">
+            <sc-for list="{{tp.rows}}" as="t" hint-placeholder-count="2">
+              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: {{t.bg}}">
+                <div style="flex: 1; min-width: 0"><div style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.name}}</div><div style="font-size: 12px; color: #8FC3D3">{{t.sub}}</div></div>
+                <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="background: {{t.curBg}}; color: {{t.curFg}}">{{t.curL}}</button>
+                <sc-if value="{{t.edit}}" hint-placeholder-val="{{ false }}"><button onClick="{{t.pin}}" class="btn" aria-label="Ghim" style="height: 36px; width: 40px; padding: 0">\u{1F4CC}</button><button onClick="{{t.rename}}" class="btn" style="height: 36px">S\u1EEDa T\xEAn</button><button onClick="{{t.copy}}" class="btn" style="height: 36px">Ch\xE9p</button><button onClick="{{t.del}}" class="btn" style="height: 36px; color: #FF9A9E">{{t.delL}}</button></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{tp.editing}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; align-items: center"><label style="flex: 1; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #8FC3D3">T\xEAn m\u1EDBi<input type="text" value="{{tp.editName}}" onInput="{{tp.setEditName}}" style="flex: 1; height: 40px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label><button onClick="{{tp.saveName}}" class="btn btn-o" style="height: 40px">L\u01B0u</button></div></sc-if>
+          <div style="border-top: 1px solid rgba(95,212,240,0.2); padding-top: 10px; display: flex; flex-direction: column; gap: 8px">
+            <span class="lbl">+ CHUY\u1EBEN M\u1EDAI</span>
+            <span style="font-size: 12px; color: #8FC3D3">{{tp.lockL}}</span>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">T\u1EEB<input type="text" value="{{tp.from}}" placeholder="{{tp.fromPh}}" disabled="{{tp.lock}}" onInput="{{tp.setFrom}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
+              <span style="font-size: 22px; color: #FBB040; padding-top: 16px">\u2192</span>
+              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">T\u1EDBi<input type="text" value="{{tp.to}}" placeholder="Sydney" disabled="{{tp.lock}}" onInput="{{tp.setTo}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
+              <button onClick="{{tp.create}}" disabled="{{tp.lock}}" class="btn btn-o" style="height: 44px; margin-top: 16px; padding: 0 20px">T\u1EA1o Chuy\u1EBFn</button>
+            </div>
+            <span style="font-size: 13px; color: #FFD08A; min-height: 18px">{{tp.msg}}</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{od.logOpen}}" hint-placeholder-val="{{ false }}">
+        <div role="dialog" aria-label="Nh\u1EADt k\xFD Road Trip" class="pnl fadein" style="position: absolute; left: 50%; top: 70px; transform: translateX(-50%); width: 820px; height: 560px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; background: #06192A; box-shadow: 0 20px 60px rgba(0,0,0,0.7)">
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 700; color: #FBB040; flex: 1">Nh\u1EADt K\xFD Road Trip</span><button onClick="{{od.closeLog}}" class="btn" style="height: 40px">\u0110\xF3ng</button></div>
+          <div style="display: flex; gap: 16px; font-size: 14px; color: #7BD88F"><span>{{od.totGo}}</span><span>{{od.totBack}}</span></div>
+          <span style="font-size: 12px; color: #8FC3D3">M\u1ED7i l\u1EA7n ch\u1EA1y r\u1ED3i \u0111\u1EADu xe h\u01A1n 10 ph\xFAt l\xE0 m\u1ED9t ch\u1EB7ng \u2014 km \u0111o b\u1EB1ng GPS, so v\u1EDBi km \u01B0\u1EDBc t\xEDnh tr\xEAn tuy\u1EBFn.</span>
+          <sc-if value="{{od.logEmpty}}" hint-placeholder-val="{{ false }}"><span style="font-size: 15px; color: #CFE6EE; padding: 20px 0">Ch\u01B0a c\xF3 ch\u1EB7ng n\xE0o \u2014 ch\u1EA1y xe l\xE0 app t\u1EF1 ghi.</span></sc-if>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{od.logRows}}" as="l" hint-placeholder-count="3"><div style="flex-shrink: 0; display: grid; grid-template-columns: 110px 90px 80px 120px 70px 70px 80px 1fr; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 6px; background: rgba(13,44,64,0.55); font-size: 13px"><span>{{l.t}}</span><span style="color: #8FC3D3">{{l.dir}}</span><b style="color: #FFD08A">{{l.km}}</b><span style="color: #8FC3D3">{{l.est}}</span><span>{{l.diff}}</span><span>{{l.time}}</span><span>{{l.avg}}</span><span style="color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{l.place}}</span></div></sc-for>
+          </div>
+        </div>
+      </sc-if>
     </sc-if>
 
     <!-- ========== 4. ROAD TRIP + B\u1EA2N \u0110\u1ED2 (CHIA M\xC0N H\xCCNH) ========== -->
@@ -2212,27 +2914,28 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; left: 20px; right: 20px; top: 14px; display: flex; align-items: center; gap: 10px">
         <button onClick="{{goRt}}" aria-label="Quay l\u1EA1i" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
         <span style="font-size: 24px; font-weight: 700; color: #FBB040">T\xECm Ch\u1ED7 G\u1EA7n \u0110\xE2y</span>
-        <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">T\xECm ch\u1ED7</span><input type="text" placeholder="{{searchPh}}" disabled="{{drive}}" style="flex: 1; height: 46px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: {{searchBg}}; color: #E8F1F5; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55)"></label>
-        <span style="font-size: 12px; color: #7BD88F">Ngu\u1ED3n: OpenStreetMap \xB7 logo h\xE3ng t\u1EF1 l\u1EA5y khi build</span>
+        <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">T\xECm ch\u1ED7</span><input type="text" value="{{searchQ}}" onInput="{{setSearchQ}}" placeholder="{{searchPh}}" disabled="{{drive}}" style="flex: 1; height: 46px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: {{searchBg}}; color: #E8F1F5; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55)"></label>
+        <button onClick="{{doSearchQ}}" disabled="{{drive}}" class="btn btn-o" style="height: 46px">T\xECm</button>
+        <span style="font-size: 12px; color: #7BD88F">Ngu\u1ED3n: OpenStreetMap \xB7 logo: Wikimedia</span>
       </div>
       <div style="position: absolute; left: 20px; right: 20px; top: 76px; display: flex; gap: 10px; flex-wrap: wrap">
         <sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
           <button onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="border: 0; cursor: pointer; font-family: inherit; width: 126px; height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; background: {{c.bg}}; color: #FFFFFF; box-shadow: {{c.ring}}">
-            <sc-if value="{{c.logo}}" hint-placeholder-val="{{ false }}"><span style="width: 52px; height: 44px; border: 1.5px dashed #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 9px; line-height: 1.1; text-align: center; padding: 2px; background: rgba(255,255,255,0.12)">[logo]</span></sc-if>
-            <sc-if value="{{c.sign}}" hint-placeholder-val="{{ true }}"><span style="width: 40px; height: 40px; border: 2px solid #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{c.icon}}"></path></svg></span></sc-if>
+            <sc-if value="{{c.logoImg}}" hint-placeholder-val="{{ false }}"><span style="width: 52px; height: 44px; border-radius: 6px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><img src="{{c.logoUrl}}" alt="" style="max-width: 46px; max-height: 38px; object-fit: contain"></span></sc-if>
+            <sc-if value="{{c.sign}}" hint-placeholder-val="{{ true }}"><span style="width: 44px; height: 44px; border: 2px solid #FFFFFF; border-radius: 6px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #1F5FAE"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="{{c.icon}}" fill="#FFFFFF" fill-rule="evenodd"></path></svg></span></sc-if>
             <span style="font-size: 13px; font-weight: 700; font-family: Overpass, sans-serif">{{c.label}}</span>
           </button>
         </sc-for>
         <button class="btn" style="width: 126px; height: 96px; font-size: 13px">+ Th\xEAm N\xFAt</button>
       </div>
       <div style="position: absolute; left: 20px; right: 20px; top: 194px; display: flex; align-items: center; gap: 10px">
-        <span class="lbl">{{catTitle}} \xB7 {{searchNote}}</span>
+        <span class="lbl">{{catTitle}} \xB7 {{searchNote}}</span><sc-if value="{{searchRetry}}" hint-placeholder-val="{{ false }}"><button onClick="{{doRetry}}" class="btn btn-o" style="height: 40px; padding: 0 22px; font-size: 16px">\u21BB Th\u1EED L\u1EA1i</button></sc-if>
         <span data-demo="1" style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px; font-weight: 700">S\u1ED0 LI\u1EC6U M\u1EAAU</span>
       </div>
       <div class="scrl" style="position: absolute; left: 20px; right: 20px; top: 222px; height: 370px; display: flex; flex-direction: column; gap: 8px">
         <sc-for list="{{results}}" as="r" hint-placeholder-count="4">
           <div class="pnl" style="flex-shrink: 0; min-height: 80px; padding: 10px 16px; box-sizing: border-box; display: flex; align-items: center; gap: 16px">
-            <span aria-hidden="true" style="width: 52px; height: 52px; flex-shrink: 0; border: 1.5px dashed #8FC3D3; border-radius: 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9px; line-height: 1.15; color: #CFE6EE; padding: 3px; overflow: hidden; background: {{r.logoBg}}"><sc-if value="{{r.logoImg}}" hint-placeholder-val="{{ false }}"><img src="{{r.logoUrl}}" alt="" style="max-width: 46px; max-height: 46px; object-fit: contain"></sc-if><sc-if value="{{r.logoTxt}}" hint-placeholder-val="{{ true }}">{{r.logo}}</sc-if></span>
+            <span aria-hidden="true" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 8px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow: hidden; background: {{r.logoBg}}; border: {{r.logoBd}}"><sc-if value="{{r.logoImg}}" hint-placeholder-val="{{ false }}"><img src="{{r.logoUrl}}" alt="" style="max-width: 46px; max-height: 46px; object-fit: contain"></sc-if><sc-if value="{{r.logoTxt}}" hint-placeholder-val="{{ true }}"><svg width="34" height="34" viewBox="0 0 24 24"><path d="{{r.sign}}" fill="#FFFFFF" fill-rule="evenodd"></path></svg></sc-if></span>
             <div style="flex: 1; min-width: 0"><div style="font-size: 17px; font-weight: 700">{{r.name}}</div><div style="font-size: 13px; color: #8FC3D3">{{r.addr}}</div></div>
             <div style="width: 90px; text-align: center"><div style="font-size: 20px; font-weight: 700; color: #FFD08A">{{r.km}}</div><div style="font-size: 11px; color: #8FC3D3">t\u1EDBi {{r.eta}}</div></div>
             <div style="width: 110px; text-align: center; font-size: 13px; font-weight: 700; color: {{r.openC}}">{{r.open}}</div>
@@ -2343,13 +3046,32 @@ input[type=range]{accent-color:#FBB040}
     </sc-if>
 
 
-    <!-- ===== \u0111\u1ED3ng h\u1ED3 l\u1EADt l\u1EDBn (ch\u1EA1m \u0111\u1ED3ng h\u1ED3 / \u0111\u1EADu xe l\xE2u) ===== -->
-    <sc-if value="{{clk.big}}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{clk.closeBig}}" aria-label="\u0110\xF3ng \u0111\u1ED3ng h\u1ED3 l\u1EDBn" class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; background: rgba(1,6,10,0.88); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px">
-        <span style="display: flex; align-items: center; gap: 10px"><sc-for list="{{clk.bigCards}}" as="cd" hint-placeholder-count="4"><span class="fcard fbig {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span>
-        <span style="font-size: 26px; font-weight: 700">{{clk.bigDate}}</span>
-        <span style="font-size: 18px; color: #CFE6EE">{{clk.bigSub}}</span>
-        <span style="font-size: 13px; color: #8FC3D3">Ch\u1EA1m \u0111\u1EC3 \u0111\xF3ng</span>
+    <!-- ===== m\xE0n h\xECnh ch\u1EDD ki\u1EC3u Th\u1EDDi Ti\u1EBFt Samsung (\u0111\u1EADu xe l\xE2u kh\xF4ng \u0111\u1EE5ng m\xE0n h\xECnh / ch\u1EA1m \xF4 th\u1EDDi ti\u1EBFt / ch\u1EA1m \u0111\u1ED3ng h\u1ED3) ===== -->
+    <sc-if value="{{idl.on}}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{idl.close}}" aria-label="\u0110\xF3ng m\xE0n h\xECnh ch\u1EDD" class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; background: {{idl.sky}}; overflow: hidden">
+        <canvas id="idlesky" width="1280" height="720" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; opacity: {{idl.bgOp}}"></canvas>
+        <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0,0,0,{{idl.dark}})"></div>
+        <div style="position: absolute; left: {{idl.x}}px; top: {{idl.y}}px; width: 1200px; height: 660px">
+          <div style="position: absolute; left: 30px; top: 30px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
+            <sc-if value="{{idl.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 10px"><sc-for list="{{idl.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard fbig {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
+            <sc-if value="{{idl.analog}}" hint-placeholder-val="{{ false }}"><svg width="200" height="200" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"></circle><path d="{{idl.ticks}}" stroke="#FFFFFF" stroke-width="1.6"></path><line x1="50" y1="50" x2="{{idl.hx}}" y2="{{idl.hy}}" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"></line><line x1="50" y1="50" x2="{{idl.mx}}" y2="{{idl.my}}" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"></line><circle cx="50" cy="50" r="3" fill="#FBB040"></circle></svg></sc-if>
+            <sc-if value="{{idl.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 150px; line-height: 0.95; font-weight: {{idl.fw}}; font-family: {{idl.font}}; color: {{idl.c}}; letter-spacing: {{idl.ls}}; text-shadow: {{idl.glow}}; padding: {{idl.pad}}; background: {{idl.plate}}; border-radius: 14px; border: {{idl.border}}">{{idl.h}}<span style="opacity: {{idl.colon}}">:</span>{{idl.m}}</span></sc-if>
+            <span style="font-size: 26px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,0.35)">{{idl.date}}</span>
+            <sc-if value="{{idl.sub}}" hint-placeholder-val="{{ true }}"><span style="font-size: 18px; opacity: 0.9">{{idl.sub}}</span></sc-if>
+            <sc-if value="{{idl.appt}}" hint-placeholder-val="{{ false }}"><span style="margin-top: 6px; padding: 6px 14px; border-radius: 18px; background: rgba(255,255,255,0.18); font-size: 16px">{{idl.appt}}</span></sc-if>
+          </div>
+          <div style="position: absolute; right: 30px; top: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-shadow: 0 1px 8px rgba(0,0,0,0.3)">
+            <span style="font-size: 18px; opacity: 0.9">{{idl.place}}</span>
+            <span style="display: flex; align-items: center; gap: 10px"><svg width="70" height="70" viewBox="0 0 48 48" aria-hidden="true" class="{{wxc.cls}}"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg><span style="font-size: 120px; font-weight: 200; line-height: 1">{{wxT}}</span></span>
+            <span style="font-size: 20px">{{idl.desc}}</span>
+            <span style="font-size: 18px; opacity: 0.9">{{wxc.hl}}</span>
+          </div>
+          <div style="position: absolute; left: 30px; right: 30px; bottom: 20px; display: flex; gap: 14px; align-items: stretch">
+            <sc-if value="{{idl.hourly}}" hint-placeholder-val="{{ true }}"><div style="flex: 2; display: flex; padding: 10px 6px; border-radius: 18px; background: rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)"><sc-for list="{{idl.hours}}" as="hh" hint-placeholder-count="6"><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 15px"><span style="opacity: 0.85">{{hh.t}}</span><span style="font-size: 22px">{{hh.i}}</span><span>{{hh.v}}</span></div></sc-for></div></sc-if>
+            <sc-if value="{{idl.days3}}" hint-placeholder-val="{{ true }}"><div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 18px; background: rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); font-size: 16px"><sc-for list="{{idl.days}}" as="dd" hint-placeholder-count="3"><div style="display: flex; justify-content: space-between; gap: 10px"><span>{{dd.n}}</span><span>{{dd.i}}</span><span class="tnum">{{dd.v}}</span></div></sc-for></div></sc-if>
+          </div>
+        </div>
+        <span style="position: absolute; left: 0; right: 0; bottom: 4px; font-size: 12px; opacity: 0.6">Ch\u1EA1m \u0111\u1EC3 \u0111\xF3ng</span>
       </button>
     </sc-if>
 
@@ -2457,7 +3179,7 @@ input[type=range]{accent-color:#FBB040}
           <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px">
             <sc-for list="{{saved}}" as="p" hint-placeholder-count="8">
               <button onClick="{{p.add}}" disabled="{{p.has}}" style="flex-shrink: 0; border: 0; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #0D2C40; color: #E8F1F5; text-align: left; opacity: {{p.op}}">
-                <span style="width: 30px; height: 30px; border-radius: 4px; background: {{p.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{p.icon}}"></path></svg></span>
+                <span style="width: 30px; height: 30px; border-radius: 4px; background: {{p.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="16" height="16" viewBox="0 0 24 24" fill="{{p.icF}}" stroke="{{p.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{p.icon}}"></path></svg></span>
                 <span style="flex: 1; min-width: 0"><span style="display: block; font-size: 14px; font-weight: 700">{{p.name}}</span><span style="display: block; font-size: 11px; color: #8FC3D3">{{p.town}} \xB7 km {{p.km}}</span></span>
                 <span style="font-size: 13px; font-weight: 700; color: {{p.stC}}">{{p.st}}</span>
               </button>
@@ -2489,7 +3211,7 @@ input[type=range]{accent-color:#FBB040}
           </div>
           </sc-if>
           <div style="padding: 0 22px; display: flex; flex-direction: column; gap: 6px">
-            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 4px; background: {{sd.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{sd.icon}}"></path></svg></span><span style="font-size: 22px; font-weight: 700">{{sd.name}}</span></div>
+            <div style="display: flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border-radius: 4px; background: {{sd.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="{{sd.icF}}" stroke="{{sd.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{sd.icon}}"></path></svg></span><span style="font-size: 22px; font-weight: 700">{{sd.name}}</span></div>
             <div style="font-size: 14px; color: #CFE6EE">{{sd.town}} \xB7 {{sd.info}}</div>
           </div>
           <div style="padding: 0 22px; display: flex; gap: 8px; flex-wrap: wrap">
@@ -2515,21 +3237,21 @@ input[type=range]{accent-color:#FBB040}
     </sc-if>
 
 
-    <!-- ===== M\xE0n h\xECnh ch\xE0o + Gi\u1EDBi Thi\u1EC7u t\u1EF1 chuy\u1EC3n ===== -->
+    <!-- ===== M\xE0n h\xECnh ch\xE0o (m\u1ED9t m\xE0n h\xECnh duy nh\u1EA5t, t\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh, ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm) ===== -->
     <sc-if value="{{bootSplash}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+      <button onClick="{{skipBoot}}" aria-label="V\xE0o M\xE0n H\xECnh Ch\xEDnh" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
         <div style="font-size: 72px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 20px rgba(95,212,240,0.7)"><span style="color: #48B0C8">TOM'S</span> <span style="color: #FBB040">CAR</span></div>
         <div style="font-size: 16px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040"></div></div>
-      </div>
+        <div style="font-size: 13px; color: #8FC3D3">{{verL}} \xB7 Tom's Technology Solutions</div>
+      </button>
     </sc-if>
     <sc-if value="{{bootAbout}}" hint-placeholder-val="{{ false }}">
       <div class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; background: #03111C; display: flex; align-items: center; justify-content: center">
         <div class="pnl" style="width: 640px; padding: 30px; display: flex; flex-direction: column; gap: 12px; background: #06192A">
           <div style="font-size: 30px; font-weight: 700; color: #FBB040">Tom's Car <span style="font-size: 16px; color: #CFE6EE">{{verL}}</span></div>
-          <div style="font-size: 14px; color: #CFE6EE; line-height: 1.6">M\xE0n h\xECnh xe cho Samsung DeX, \u0111i\u1EC7n tho\u1EA1i v\xE0 m\xE1y t\xEDnh b\u1EA3ng \xB7 Tom's Technology Solutions</div>
-          <div style="height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="aboutbar" style="height: 100%; background: #5FD4F0"></div></div>
-          <div style="display: flex; align-items: center; gap: 12px"><span style="flex: 1; font-size: 13px; color: #8FC3D3">{{aboutNote}}</span><button onClick="{{skipBoot}}" class="btn btn-o">V\xE0o Ngay</button></div>
+          <div style="font-size: 14px; color: #CFE6EE; line-height: 1.6">M\xE0n h\xECnh xe cho Samsung DeX, \u0111i\u1EC7n tho\u1EA1i v\xE0 m\xE1y t\xEDnh b\u1EA3ng \xB7 Tom's Technology Solutions \xB7 Focus On One Thing And Do It Well</div>
+          <div style="display: flex; justify-content: flex-end"><button onClick="{{skipBoot}}" class="btn btn-o">\u0110\xF3ng</button></div>
         </div>
       </div>
     </sc-if>

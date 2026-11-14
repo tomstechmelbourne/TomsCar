@@ -488,7 +488,7 @@ window.__SceneComp = function() {
             sw,
             on: sel === k ? "true" : "false",
             ring: sel === k ? "inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)" : "inset 0 0 0 1px rgba(255,255,255,0.25)",
-            tag: board || k === "neon" ? vi ? "Xem \u0110\u01B0\u1EE3c" : "Live" : vi ? "Khi Build" : "At Build",
+            tag: "",
             tagBg: board || k === "neon" ? "#7BD88F" : "#CFE6EE",
             tagOp: 1,
             pick: () => self.setState({ theme: k })
@@ -572,7 +572,7 @@ window.__SceneComp = function() {
                 lanes: [0, 1, 2, 3].map((i) => ({ dur: laneS.toFixed(2) + "s", delay: lanes["laneDelay" + i], ps, c: P.laneC, glow: P.laneGlow }))
               });
             })(),
-            themeNote: vi ? (cp === "real" ? "Bu\u1ED3ng L\xE1i Th\u1EADt: trong b\u1EA3n m\u1EABu xem \u1EDF b\u1EA3ng 2, khi build s\u1EBD \u0111\u1ED5i \u0111\u01B0\u1EE3c t\u1EA1i \u0111\xE2y. " : "") + 'Ki\u1EC3u c\xF3 nh\xE3n "Xem \u0110\u01B0\u1EE3c" \u0111\u1ED5i c\u1EA3nh ngay b\xEAn ngo\xE0i k\xEDnh; ki\u1EC3u "Khi Build" s\u1EBD c\xF3 khi build app.' : 'Preview: picking here only marks the choice. Styles tagged "Demo board 5/7" can be viewed on that board; Realistic cockpit is board 2. In the real app it switches instantly.'
+            themeNote: vi ? "" : 'Preview: picking here only marks the choice. Styles tagged "Demo board 5/7" can be viewed on that board; Realistic cockpit is board 2. In the real app it switches instantly.'
           };
         })(),
         t,

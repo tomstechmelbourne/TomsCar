@@ -53,6 +53,8 @@
         <package android:name="com.spotify.music" />
         <package android:name="com.tomstechsolutions.jukebox" />
         <package android:name="com.tomstechsolutions.shield" />
+        <package android:name="com.google.android.tts" />
+        <intent><action android:name="android.media.browse.MediaBrowserService" /></intent>
     </queries>
 
     <application

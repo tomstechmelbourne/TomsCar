@@ -115,6 +115,8 @@ class MainActivity : Activity() {
         radio = Radio(this)
         voice = Voice(this) { o -> main.post { web.evaluateJavascript("window.tcVoice && tcVoice(" + JSONObject.quote(o.toString()) + ")", null) } }
         voice.init()
+        jukebox = Jukebox(this) { j -> main.post { js("tcJukebox", j) } }
+        jukebox.start()
     }
 
     @Deprecated("file chooser result")
@@ -143,6 +145,7 @@ class MainActivity : Activity() {
         if (hasBtPermission()) obd?.start()
         main.removeCallbacks(tick); main.post(tick)
         if (::phone.isInitialized) phone.start()
+        if (::voice.isInitialized) voice.recheck()
     }
 
     override fun onDestroy() {
@@ -151,6 +154,7 @@ class MainActivity : Activity() {
         if (::phone.isInitialized) phone.stop()
         if (::radio.isInitialized) radio.stop()
         if (::voice.isInitialized) voice.release()
+        if (::jukebox.isInitialized) jukebox.stop()
         try { (getSystemService(Context.LOCATION_SERVICE) as LocationManager).removeUpdates(locListener) } catch (_: Exception) {}
         super.onDestroy()
     }
@@ -380,20 +384,50 @@ class MainActivity : Activity() {
 
     private fun mediaAction(a: String) {
         val c = controller()
-        when (a) {
-            "prev" -> c?.transportControls?.skipToPrevious() ?: mediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
-            "next" -> c?.transportControls?.skipToNext() ?: mediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
-            "toggle" -> {
-                if (c == null) mediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
-                else if (c.playbackState?.state == PlaybackState.STATE_PLAYING) c.transportControls.pause() else c.transportControls.play()
-            }
-            else -> if (a.startsWith("queue:")) c?.transportControls?.skipToQueueItem(a.removePrefix("queue:").toLongOrNull() ?: 0)
+        val playing = c?.playbackState?.state == PlaybackState.STATE_PLAYING
+        val useJb = musicApp == "jukebox" && jukebox.installed()
+        when {
+            a == "prev" -> c?.transportControls?.skipToPrevious() ?: if (useJb) jukebox.prev() else mediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
+            a == "next" -> c?.transportControls?.skipToNext() ?: if (useJb) jukebox.next() else mediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
+            a == "pause" -> c?.transportControls?.pause() ?: if (useJb) jukebox.pause() else mediaKey(KeyEvent.KEYCODE_MEDIA_PAUSE)
+            a == "play" || a == "autoplay" -> if (c != null && a == "play") c.transportControls.play() else startMusic()
+            a == "toggle" -> if (c == null) startMusic() else if (playing) c.transportControls.pause() else c.transportControls.play()
+            a.startsWith("app:") -> musicApp = a.removePrefix("app:").ifBlank { "jukebox" }
+            a.startsWith("queue:") -> c?.transportControls?.skipToQueueItem(a.removePrefix("queue:").toLongOrNull() ?: 0)
+            a.startsWith("jb:") -> { val o = JSONObject(a.removePrefix("jb:")); jukebox.play(o.optString("kind"), o.optString("name")) }
+            a == "jbquery" -> jukebox.query()
+            a == "volup" -> (getSystemService(Context.AUDIO_SERVICE) as AudioManager).adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0)
+            a == "voldown" -> (getSystemService(Context.AUDIO_SERVICE) as AudioManager).adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0)
         }
-        when (a) {
-            "volume" -> (getSystemService(Context.AUDIO_SERVICE) as AudioManager)
-                .adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_SAME, AudioManager.FLAG_SHOW_UI)
+        main.postDelayed({ if (ready) push() }, 600)
+        main.postDelayed({ if (ready) push() }, 2000)
+    }
+
+    /** Nothing is playing yet: start the default music app without leaving Tom's Car. */
+    private fun startMusic() {
+        if (::radio.isInitialized) radio.stop()
+        if (musicApp == "jukebox" && jukebox.installed()) {
+            jukebox.resume()
+            // if Jukebox still has not started after a few seconds, open it briefly and come back
+            main.postDelayed({
+                if (controller()?.playbackState?.state != PlaybackState.STATE_PLAYING)
+                    jukebox.openAndPlay { startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)) }
+            }, 3500)
+            return
         }
-        main.postDelayed({ if (ready) push() }, 400)
+        val pkg = if (musicApp == "jukebox") null else musicApp
+        if (pkg != null) {
+            // ask that app to play with a media key aimed at it; open it if it does not react
+            val down = Intent(Intent.ACTION_MEDIA_BUTTON).setPackage(pkg).putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PLAY))
+            val up = Intent(Intent.ACTION_MEDIA_BUTTON).setPackage(pkg).putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY))
+            try { sendBroadcast(down); sendBroadcast(up) } catch (_: Exception) { }
+            main.postDelayed({
+                if (controller()?.playbackState?.state != PlaybackState.STATE_PLAYING) {
+                    packageManager.getLaunchIntentForPackage(pkg)?.let { startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                    main.postDelayed({ mediaKey(KeyEvent.KEYCODE_MEDIA_PLAY); startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)) }, 1800)
+                }
+            }, 2500)
+        } else mediaKey(KeyEvent.KEYCODE_MEDIA_PLAY)
     }
 
     // ---------------------------------------------------------------- settings
@@ -441,6 +475,10 @@ class MainActivity : Activity() {
             .setNegativeButton("Đóng", null)
             .show()
     }
+
+    private lateinit var jukebox: Jukebox
+    /** Default music app chosen in Settings → Music ("jukebox" or a package name). */
+    private var musicApp = "jukebox"
 
     private fun js(fn: String, json: String) = web.evaluateJavascript("window.$fn && $fn(" + JSONObject.quote(json) + ")", null)
 
@@ -569,7 +607,13 @@ class MainActivity : Activity() {
                         if (key.startsWith("sms:")) phone.sms(key.removePrefix("sms:"), t) else if (!MediaListener.reply(this@MainActivity, key, t)) Launcher.toast(this@MainActivity, "App này không cho trả lời từ Tom's Car") }
                     "apps" -> bg.execute { val j = appsJson(); main.post { js("tcApps", j.toString()) } }
                     "radio" -> when (arg) { "stop" -> radio.stop(); "prev", "next" -> {}; "" -> radio.toggle(); else -> { val o = JSONObject(arg); radio.play(o.optString("url"), o.optString("name")); mediaPause() } }
-                    "voice" -> when (arg) { "start" -> voice.listen(); "stop" -> voice.cancel() }
+                    "voice" -> when {
+                        arg == "start" -> voice.listen(); arg == "stop" -> voice.cancel()
+                        arg == "installvi" -> voice.installVi(); arg == "report" -> voice.report()
+                        arg == "test" -> voice.say("Dạ, em là trợ lý Tom's Car. Anh cần gì cứ nói nha.")
+                        arg.startsWith("cfg:") -> try { voice.config(JSONObject(arg.removePrefix("cfg:"))) } catch (_: Exception) {}
+                        else -> {}
+                    }
                     "say" -> voice.say(arg)
                     "geocode" -> bg.execute { val r = geocodeText(arg); main.post { js("tcGeo", r.toString()) } }
                     "openApp" -> openApp(arg)

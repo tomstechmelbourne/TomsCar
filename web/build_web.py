@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Turn the approved Main.dc.html board into the app's offline web UI (assets/web)."""
-import json, re, sys, pathlib, shutil
+import os, json, re, sys, pathlib, shutil
 
 src_path, out_dir = sys.argv[1], pathlib.Path(sys.argv[2])
 here = pathlib.Path(__file__).parent
@@ -127,6 +127,11 @@ for f in (here.parent / 'fonts').glob('*'):
     shutil.copy(f, out_dir / 'fonts' / f.name)
 shutil.copy(here / 'dcmini.js', out_dir / 'dcmini.js')
 shutil.copy(here / 'glue.js', out_dir / 'glue.js')
+shutil.copy(here / 'sky.js', out_dir / 'sky.js')
+shutil.copy(here / 'lowpoly.js', out_dir / 'lowpoly.js')
+LF = pathlib.Path(os.environ.get('LEAFLET', '/tmp/node_modules/leaflet/dist'))
+shutil.copy(LF / 'leaflet.js', out_dir / 'leaflet.js')
+shutil.copy(LF / 'leaflet.css', out_dir / 'leaflet.css')
 (out_dir / 'scene.js').write_text(
     'window.__SceneComp = (function () {\n' + code + '\nreturn Component;\n})();\nwindow.__SCENE_TPL = ' + json.dumps(tpl, ensure_ascii=False) + ';\nwindow.__SCENE_PROPS = ' + json.dumps(props) + ';\n',
     encoding='utf-8')
@@ -147,24 +152,31 @@ FONTS = """
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Tom's Car</title>
+<link rel="stylesheet" href="leaflet.css">
 <style>{FONTS}
 html,body{{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}}
 body.app [data-demo]{{display:none!important}}
 body.app [data-ui]{{display:none!important}}
 #stage{{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden}}
-#scene,#ui{{position:absolute;left:0;top:0;width:100%;height:100%}}
+#scene,#ui,#lp{{position:absolute;left:0;top:0;width:100%;height:100%}}
+#lp{{display:none}}
+body.lp-on #lp{{display:block}}
+body.lp-on #scene{{display:none}}
 #ui{{pointer-events:none}}
 #ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{{pointer-events:auto}}
 #ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{{pointer-events:auto}}
 body.theme-open #ui{{display:none}}
 body.narrow #scene{{display:none}}
 </style></head>
-<body><div id="stage"><div id="scene"></div><div id="ui"></div></div>
+<body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="ui"></div></div>
 <script>window.TC_VERSION = '{version}';</script>
 <script src="dcmini.js"></script>
 <script src="scene.js"></script>
 <script src="app.js"></script>
+<script src="leaflet.js"></script>
 <script src="glue.js"></script>
+<script src="sky.js"></script>
+<script src="lowpoly.js"></script>
 <script>
 window.__tc = dcMount(document.getElementById('scene'), window.__SCENE_TPL, window.__SceneComp, window.__SCENE_PROPS, {{ post: function (v, c) {{ v = (window.tcPost ? window.tcPost(v, c) : v) || v; return window.tcScenePost ? window.tcScenePost(v, c) : v; }} }});
 if (window.tcSceneInit) window.tcSceneInit(window.__tc);
@@ -176,6 +188,6 @@ if (window.TCNative) {{ try {{ window.TCNative.call('ready', ''); }} catch (e) {
 """, encoding='utf-8')
 import subprocess, os
 esb = os.environ.get('ESBUILD', '/tmp/node_modules/.bin/esbuild')
-for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js'):
+for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js', 'sky.js', 'lowpoly.js'):
     subprocess.run([esb, str(out_dir / f), '--target=chrome61', '--allow-overwrite', '--log-level=warning', '--outfile=' + str(out_dir / f)], check=True)
 print('web UI written to', out_dir)

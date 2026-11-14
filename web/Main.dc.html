@@ -811,7 +811,7 @@ class Component extends DCLogic {
         const groups = G.map((g) => ({ label: g.label, items: g.items.map(([k, lab, sw, board]) => ({
           label: lab, sw: sw, on: sel === k ? 'true' : 'false',
           ring: sel === k ? 'inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)' : 'inset 0 0 0 1px rgba(255,255,255,0.25)',
-          tag: board || k === 'neon' ? (vi ? 'Xem Được' : 'Live') : (vi ? 'Khi Build' : 'At Build'), tagBg: board || k === 'neon' ? '#7BD88F' : '#CFE6EE', tagOp: 1,
+          tag: '', tagBg: board || k === 'neon' ? '#7BD88F' : '#CFE6EE', tagOp: 1,
           pick: () => self.setState({ theme: k })
         })) }));
         return {
@@ -860,7 +860,7 @@ class Component extends DCLogic {
               lanes: [0, 1, 2, 3].map((i) => ({ dur: laneS.toFixed(2) + 's', delay: lanes['laneDelay' + i], ps: ps, c: P.laneC, glow: P.laneGlow }))
             });
           })(),
-          themeNote: vi ? (cp === 'real' ? 'Buồng Lái Thật: trong bản mẫu xem ở bảng 2, khi build sẽ đổi được tại đây. ' : '') + 'Kiểu có nhãn "Xem Được" đổi cảnh ngay bên ngoài kính; kiểu "Khi Build" sẽ có khi build app.' : 'Preview: picking here only marks the choice. Styles tagged "Demo board 5/7" can be viewed on that board; Realistic cockpit is board 2. In the real app it switches instantly.'
+          themeNote: vi ? '' : 'Preview: picking here only marks the choice. Styles tagged "Demo board 5/7" can be viewed on that board; Realistic cockpit is board 2. In the real app it switches instantly.'
         };
       })(),
       t: t,
