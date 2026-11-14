@@ -1,0 +1,36 @@
+Shell              <- google shell.com.au
+Reddy Express      <- https://www.reddyexpress.com.au/apple-touch-icon.png
+BP                 <- google www.bp.com
+Ampol              <- duckduckgo ampol.com.au
+EG                 <- google www.eg.group
+Caltex             <- google caltex.com
+United Petroleum   <- google unitedpetroleum.com.au
+7-Eleven           <- google 7eleven.com.au
+Puma Energy        <- google pumaenergy.com
+Liberty            <- google libertyoil.com.au
+Mobil              <- google mobil.com.au
+Metro Petroleum    <- google metropetroleum.com.au
+OTR                <- google otr.com.au
+Speedway           <- google speedwaypetroleum.com.au
+McDonald's         <- duckduckgo mcdonalds.com.au
+Hungry Jack's      <- google hungryjacks.com.au
+KFC                <- google kfc.com.au
+Subway             NO LOGO
+Domino's           <- google dominos.com
+Pizza Hut          <- google pizzahut.com.au
+Red Rooster        <- duckduckgo redrooster.com.au
+Oporto             <- duckduckgo oporto.com.au
+Guzman y Gomez     <- google small 32 guzmanygomez.com.au
+Nando's            <- duckduckgo nandos.com.au
+Hog's Breath       <- google hogsbreath.com.au
+Starbucks          <- google starbucks.com.au
+Gloria Jean's      <- duckduckgo gloriajeanscoffees.com.au
+The Coffee Club    NO LOGO
+Muffin Break       <- google muffinbreak.com.au
+Bakers Delight     <- https://bakersdelight.co.nz/apple-touch-icon.png
+Coles              <- google coles.com.au
+Woolworths         <- google woolworthsgroup.com.au
+Aldi               <- google aldi.com.au
+IGA                <- google iga.com.au
+Foodworks          <- google foodworks.com.au
+logos: 33/35
