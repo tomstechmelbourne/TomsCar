@@ -1,0 +1,10 @@
+11-14 20:39:31.911  4061  4061 D nativeloader: Load /system/lib64/libwebviewchromium_plat_support.so using ns clns-9 from class loader (caller=/data/app/~~K54_hGomR1OVRRW969Y5Cg==/com.google.android.webview-dKcD_2jBh8jjsOqgAN_H3Q==/WebViewGoogle.apk): ok
+11-14 20:39:31.913  4061  4082 I chromium: [1114/203931.913299:INFO:variations_seed_loader.cc(66)] Failed to open file for reading.: No such file or directory (2)
+11-14 20:39:31.913  4061  4082 I chromium: [1114/203931.913641:INFO:variations_seed_loader.cc(66)] Failed to open file for reading.: No such file or directory (2)
+11-14 20:39:31.939   577   611 I ActivityManager: Start proc 4088:com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0/u0i1 for  {com.tomstechsolutions.car/org.chromium.content.app.SandboxedProcessService0:0}
+11-14 20:39:31.954  4088  4088 I cr_WebViewApkApp: Launched version=124.0.6367.219 minSdkVersion=29 isBundle=false processName=com.google.android.webview:sandboxed_process0:org.chromium.content.app.SandboxedProcessService0:0
+11-14 20:39:32.042  4088  4107 W chromium: [WARNING:runtime_features.cc(694)] SharedStorage for M118+ cannot be enabled in this configuration. Use --enable-features=SharedStorageAPI,SharedStorageAPIM118 in addition.
+11-14 20:39:32.042  4088  4107 W chromium: [WARNING:runtime_features.cc(730)] AttributionReportingCrossAppWeb cannot be enabled in this configuration. Use --enable-features=ConversionMeasurement,AttributionReportingCrossAppWeb in addition.
+11-14 20:39:32.466  4088  4107 I chromium: [INFO:viewport_data.cc(133)] E2E_Used ViewportFitCover
+11-14 20:39:39.434  1287  2153 I cr_CronetUrlRequestContext: destroyNativeStreamLocked org.chromium.net.impl.CronetBidirectionalStream@9d62432
+11-14 20:39:42.666  1287  2153 I cr_CronetUrlRequestContext: destroyNativeStreamLocked org.chromium.net.impl.CronetBidirectionalStream@4a8290
