@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -5,6 +6,8 @@ plugins {
 
 // CI passes the highest platform it can install (-Ptc.sdk=37), falls back to 36.
 val tcSdk = (project.findProperty("tc.sdk") as String?)?.toIntOrNull() ?: 36
+
+val signProps = Properties().apply { val f = file("signing.properties"); if (f.exists()) f.inputStream().use { load(it) } }
 
 android {
     namespace = "com.tomstechsolutions.car"
@@ -19,7 +22,6 @@ android {
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
 
-    val signProps = java.util.Properties().apply { val f = file("signing.properties"); if (f.exists()) f.inputStream().use { load(it) } }
     signingConfigs {
         create("release") {
             storeFile = file("tomscar.keystore")
