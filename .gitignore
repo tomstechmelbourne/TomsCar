@@ -5,3 +5,5 @@ local.properties
 .idea/
 app/build/
 app/src/main/assets/model-en/
+app/*.keystore
+app/signing.properties

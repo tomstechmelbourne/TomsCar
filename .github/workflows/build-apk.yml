@@ -38,6 +38,12 @@ jobs:
           mv /tmp/vosk-model-small-en-us-0.15 $GITHUB_WORKSPACE/app/src/main/assets/model-en
           echo "small-en-us-0.15" > $GITHUB_WORKSPACE/app/src/main/assets/model-en/uuid
           du -sh $GITHUB_WORKSPACE/app/src/main/assets/model-en
+      - name: Unpack signing key
+        env:
+          SIGN_SECRET: ${{ secrets.SIGN_SECRET }}
+        run: |
+          if [ -z "$SIGN_SECRET" ]; then echo "::error::Missing repository secret SIGN_SECRET"; exit 1; fi
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 -in app/signing.enc -pass env:SIGN_SECRET | tar -x -C app
       - uses: gradle/actions/setup-gradle@v4
       - name: Build release APK (API 37, falls back to 36)
         run: |

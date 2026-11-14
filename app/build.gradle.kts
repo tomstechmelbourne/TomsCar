@@ -19,21 +19,24 @@ android {
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
 
+    val signProps = java.util.Properties().apply { val f = file("signing.properties"); if (f.exists()) f.inputStream().use { load(it) } }
     signingConfigs {
         create("release") {
             storeFile = file("tomscar.keystore")
-            storePassword = "TomsCar2026"
-            keyAlias = "tomscar"
-            keyPassword = "TomsCar2026"
+            storePassword = signProps.getProperty("storePassword")
+            keyAlias = signProps.getProperty("keyAlias")
+            keyPassword = signProps.getProperty("keyPassword")
         }
     }
+    // the signing key is unpacked by the workflow from app/signing.enc (secret SIGN_SECRET); without it local builds use the debug key
+    val relSign = if (signProps.isEmpty) signingConfigs.getByName("debug") else signingConfigs.getByName("release")
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = relSign
         }
-        debug { signingConfig = signingConfigs.getByName("release") }
+        debug { signingConfig = relSign }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
