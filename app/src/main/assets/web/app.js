@@ -2197,7 +2197,7 @@ window.__AppComp = function() {
         spdDisp: dk.glass || dk.pill || dk.wheel ? "none" : "flex",
         mpL: mpPos ? mpPos.L : "auto",
         mpR: mpPos ? mpPos.R : "20px",
-        mpW: mpPos ? mpPos.W : musicW,
+        mpW: mpPos ? mpPos.W : drive ? 600 : 660,
         mpH: mpPos ? 72 : 80,
         mpB: mpPos ? 16 : 10,
         mpCls: mpPos ? "gl" : "",
