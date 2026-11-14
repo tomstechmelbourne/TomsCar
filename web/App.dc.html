@@ -688,7 +688,7 @@ input[type=range]{accent-color:#FBB040}
         <span style="font-size: 24px; font-weight: 700; color: #FBB040">Tìm Chỗ Gần Đây</span>
         <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">Tìm chỗ</span><input type="text" value="{{searchQ}}" onInput="{{setSearchQ}}" placeholder="{{searchPh}}" disabled="{{drive}}" style="flex: 1; height: 46px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: {{searchBg}}; color: #E8F1F5; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55)"></label>
         <button onClick="{{doSearchQ}}" disabled="{{drive}}" class="btn btn-o" style="height: 46px">Tìm</button>
-        <span style="font-size: 12px; color: #7BD88F">Nguồn: OpenStreetMap · logo: Wikimedia</span>
+        <span style="font-size: 12px; color: #7BD88F">Nguồn: OpenStreetMap · logo: trang web các hãng</span>
       </div>
       <div style="position: absolute; left: 20px; right: 20px; top: 76px; display: flex; gap: 10px; flex-wrap: wrap">
         <sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
@@ -1466,7 +1466,7 @@ class Component extends DCLogic {
         info('Phiên bản', 'Tom’s Technology Solutions', (window.TC_VERSION || '0.9.5-beta')),
         info('Khẩu hiệu', '', 'Focus On One Thing And Do It Well'),
         info('Biểu tượng dịch vụ', 'Theo AS 1742.6 (nền xanh, hình trắng)', 'Dựa theo bộ biển của QLD TMR — CC BY 4.0'),
-        info('Hình địa điểm / logo hãng', '', 'Wikimedia Commons · Wikidata'),
+        info('Hình địa điểm', '', 'Wikimedia Commons · Wikidata'), info('Logo hãng', 'Đóng sẵn trong app lúc build', 'Trang web chính thức của từng hãng'),
         info('Thời tiết', '', 'Open-Meteo'),
         info('Bản đồ', 'Tối/Sáng © CARTO · Địa Hình © OpenTopoMap · Vệ Tinh © Esri', '© OpenStreetMap contributors'),
         info('Tìm đường chuyến mới', '', 'OSRM · Nominatim (OpenStreetMap)')] }

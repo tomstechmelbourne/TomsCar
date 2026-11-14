@@ -755,7 +755,8 @@ window.__AppComp = function() {
           info("Phi\xEAn b\u1EA3n", "Tom\u2019s Technology Solutions", window.TC_VERSION || "0.9.5-beta"),
           info("Kh\u1EA9u hi\u1EC7u", "", "Focus On One Thing And Do It Well"),
           info("Bi\u1EC3u t\u01B0\u1EE3ng d\u1ECBch v\u1EE5", "Theo AS 1742.6 (n\u1EC1n xanh, h\xECnh tr\u1EAFng)", "D\u1EF1a theo b\u1ED9 bi\u1EC3n c\u1EE7a QLD TMR \u2014 CC BY 4.0"),
-          info("H\xECnh \u0111\u1ECBa \u0111i\u1EC3m / logo h\xE3ng", "", "Wikimedia Commons \xB7 Wikidata"),
+          info("H\xECnh \u0111\u1ECBa \u0111i\u1EC3m", "", "Wikimedia Commons \xB7 Wikidata"),
+          info("Logo h\xE3ng", "\u0110\xF3ng s\u1EB5n trong app l\xFAc build", "Trang web ch\xEDnh th\u1EE9c c\u1EE7a t\u1EEBng h\xE3ng"),
           info("Th\u1EDDi ti\u1EBFt", "", "Open-Meteo"),
           info("B\u1EA3n \u0111\u1ED3", "T\u1ED1i/S\xE1ng \xA9 CARTO \xB7 \u0110\u1ECBa H\xECnh \xA9 OpenTopoMap \xB7 V\u1EC7 Tinh \xA9 Esri", "\xA9 OpenStreetMap contributors"),
           info("T\xECm \u0111\u01B0\u1EDDng chuy\u1EBFn m\u1EDBi", "", "OSRM \xB7 Nominatim (OpenStreetMap)")
@@ -3228,7 +3229,7 @@ input[type=range]{accent-color:#FBB040}
         <span style="font-size: 24px; font-weight: 700; color: #FBB040">T\xECm Ch\u1ED7 G\u1EA7n \u0110\xE2y</span>
         <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">T\xECm ch\u1ED7</span><input type="text" value="{{searchQ}}" onInput="{{setSearchQ}}" placeholder="{{searchPh}}" disabled="{{drive}}" style="flex: 1; height: 46px; box-sizing: border-box; padding: 0 14px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: {{searchBg}}; color: #E8F1F5; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.55)"></label>
         <button onClick="{{doSearchQ}}" disabled="{{drive}}" class="btn btn-o" style="height: 46px">T\xECm</button>
-        <span style="font-size: 12px; color: #7BD88F">Ngu\u1ED3n: OpenStreetMap \xB7 logo: Wikimedia</span>
+        <span style="font-size: 12px; color: #7BD88F">Ngu\u1ED3n: OpenStreetMap \xB7 logo: trang web c\xE1c h\xE3ng</span>
       </div>
       <div style="position: absolute; left: 20px; right: 20px; top: 76px; display: flex; gap: 10px; flex-wrap: wrap">
         <sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
