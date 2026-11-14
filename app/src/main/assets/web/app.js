@@ -250,6 +250,8 @@ window.__AppComp = function() {
     cockpitAuto: false,
     mapStyle: "auto",
     mapBright: 100,
+    dashLayout: "wheel",
+    idleLayout: "htc",
     odoOn: true,
     stateRules: true
   };
@@ -527,6 +529,7 @@ window.__AppComp = function() {
       const go = (scr) => () => self.setState({ scr, dlg: null, listOpen: false, exitOpen: false, createOpen: false });
       const priv = C.privacy;
       const nar = APP && !!S.narrow;
+      let dk = { glass: false, pill: false, wheel: false }, mpPos = null;
       const SCR = [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"], ["contacts", "Li\xEAn L\u1EA1c"]];
       const scrBtns = SCR.map(([k, label]) => {
         const on = S.scr === k;
@@ -602,7 +605,7 @@ window.__AppComp = function() {
         } };
       });
       const VS = window.__voiceState || {};
-      const tg = (k, label, hint) => ({ isToggle: true, label, hint, on: C[k] ? "true" : "false", trackBg: C[k] ? "#FBB040" : "#2A3C48", knobX: C[k] ? 34 : 4, stateL: C[k] ? "M\u1EDF" : "T\u1EAFt", stateC: C[k] ? "#FFD08A" : "#8FC3D3", toggle: () => self.setS(k, !C[k]) });
+      const tg = (k, label, hint) => ({ isToggle: true, label, hint, on: C[k] ? "true" : "false", trackBg: C[k] ? "#FBB040" : "#2B4252", knobX: C[k] ? 32 : 4, tick: C[k] ? "\u2713" : "", stateL: C[k] ? "M\u1EDF" : "T\u1EAFt", stateC: C[k] ? "#FFD08A" : "#8FC3D3", toggle: () => self.setS(k, !C[k]), rowTap: () => self.setS(k, !C[k]), rowCur: "pointer" });
       const ch = (k, label, hint, opts) => ({ isChoice: true, label, hint, opts: opts.map(([v, l]) => {
         const on = C[k] === v;
         return { label: l, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS(k, v) };
@@ -626,6 +629,14 @@ window.__AppComp = function() {
         ] },
         gd: { label: "Giao Di\u1EC7n", icon: "M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01", desc: "Ki\u1EC3u m\xE0n h\xECnh, s\u1ED1 t\u1ED1c \u0111\u1ED9, m\u01B0a, l\xE0m m\u1EDD, d\u1ECBu m\u1EAFt", rows: [
           stt("Ki\u1EC3u giao di\u1EC7n", "23 ki\u1EC3u + ki\u1EC3u \u0111\u1ED3ng h\u1ED3 bu\u1ED3ng l\xE1i", false, "", "B\u1EA5m \u0111\u1EC3 ch\u1ECDn", "M\u1EDF Giao Di\u1EC7n", () => openTheme()),
+          ch("dashLayout", "Ki\u1EC3u \u0111\u1ED3ng h\u1ED3 t\u1ED1c \u0111\u1ED9 + thanh nh\u1EA1c", "C\u1EA3nh Low-Poly", [["wheel", "Sau v\xF4 l\u0103ng"], ["glass", "K\xEDnh n\u1ED5i"], ["pill", "C\u1EA1nh thanh nh\u1EA1c"]]),
+          tg("idleOn", "M\xE0n h\xECnh ch\u1EDD", "Khi \u0111\u1EADu xe v\xE0 l\xE2u kh\xF4ng \u0111\u1EE5ng m\xE0n h\xECnh"),
+          ch("idleLayout", "Ki\u1EC3u m\xE0n h\xECnh ch\u1EDD", "", [["htc", "HTC l\u1EADt s\u1ED1"], ["glass", "Th\u1EBB k\xEDnh"], ["analog", "\u0110\u1ED3ng h\u1ED3 kim"]]),
+          ch("idleMin", "Hi\u1EC7n m\xE0n h\xECnh ch\u1EDD sau", "", [[1, "1 ph\xFAt"], [3, "3 ph\xFAt"], [5, "5 ph\xFAt"], [10, "10 ph\xFAt"]]),
+          tg("idleWxBg", "N\u1EC1n tr\u1EDDi \u0111\u1ED9ng", "M\xE2y tr\xF4i m\u01B0\u1EE3t khi \u0111\u1EADu xe, \u0111\u1EE9ng y\xEAn khi xe ch\u1EA1y"),
+          tg("idleHourly", "D\u1EF1 b\xE1o theo gi\u1EDD", "Ki\u1EC3u Th\u1EBB k\xEDnh"),
+          tg("idleVN", "Gi\u1EDD Vi\u1EC7t Nam", "Hi\u1EC7n gi\u1EDD S\xE0i G\xF2n d\u01B0\u1EDBi ng\xE0y th\xE1ng"),
+          tg("idleAppt", "L\u1ECBch h\u1EB9n", "T\u1EEB Google Calendar"),
           ch("spStyle", "Ki\u1EC3u s\u1ED1 t\u1ED1c \u0111\u1ED9", "Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay tr\xEAn M\xE0n H\xECnh Ch\xEDnh", Object.keys(STY).map((k) => [k, STY[k].label])),
           ch("spSize", "C\u1EE1 s\u1ED1 t\u1ED1c \u0111\u1ED9", "", [["S", "Nh\u1ECF"], ["M", "V\u1EEBa"], ["L", "To"]]),
           tg("spRing", "V\xF2ng cung gi\u1EDBi h\u1EA1n quanh s\u1ED1", "G\u1EA7n ch\u1EA1m gi\u1EDBi h\u1EA1n th\xEC v\xF2ng g\u1EA7n k\xEDn"),
@@ -983,7 +994,7 @@ window.__AppComp = function() {
           return { label, on: on ? "true" : "false", bg: on ? ON.bg : "rgba(3,17,28,0.85)", fg: on ? ON.fg : "#CFE6EE", pick: () => self.setS("rtView", k) };
         }),
         road: view === "road",
-        map: view === "map",
+        map: view === "map" && !APP,
         r0x: regs[0].x,
         r0w: regs[0].w,
         r1x: regs[1].x,
@@ -1231,9 +1242,11 @@ window.__AppComp = function() {
           isGo,
           total: TOTAL,
           pts: TRIP ? TRIP.pts : window.__routePts,
-          follow: drive && S.zMode !== "free",
+          follow: false,
+          drive,
+          brg: LV.bearing || 0,
           van: LV.lat != null ? [LV.lat, LV.lon] : null,
-          stops: [{ id: "", start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 3, bg: "#00653A" }].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0], lat: x.lat, lon: x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === "end" ? 3 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? "#3E7A4E" : x.id === "end" ? "#00653A" : SIGN[x.k] || "#1F5FAE" })))
+          stops: [{ id: "", start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 5, bg: "#00653A" }].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0], lat: x.lat, lon: x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === "end" ? 5 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? "#3E7A4E" : x.id === "end" ? "#00653A" : SIGN[x.k] || "#1F5FAE" })))
         });
       }
       const curIds = isGo ? S.goList : S.backList;
@@ -1476,6 +1489,7 @@ window.__AppComp = function() {
         if (S.src === "radio") rowsRaw = tabOk === "fav" ? toRows([].concat(RL.near || [], RL.au || [], RL.vn || []).filter((r) => S.favs[r.id])) : toRows(RL[tabOk]);
         if (S.src === "podcast") rowsRaw = window.__jbLib && (window.__jbLib.podcasts || []).length ? window.__jbLib.podcasts.map((x) => ({ t: x.name, s: "Ph\xE1t t\u1EADp m\u1EDBi nh\u1EA5t \xB7 Tom\u2019s Jukebox", letter: "P", tile: "#7A4BB5", rad: "8px", jb: { kind: "podcast", name: x.name } })) : [{ t: "M\u1EDF app podcast", s: "K\xEAnh theo d\xF5i b\xEAn Tom\u2019s Jukebox s\u1EBD hi\u1EC7n \u1EDF \u0111\xE2y", letter: "P", tile: "#7A4BB5", rad: "8px", open: true }];
         if (S.src === "radio" && !rowsRaw.length) rowsRaw = [{ t: S.radioLists ? "Kh\xF4ng t\xECm th\u1EA5y \u0111\xE0i" : "\u0110ang t\u1EA3i danh s\xE1ch \u0111\xE0i\u2026", s: "C\u1EA7n c\xF3 m\u1EA1ng", letter: "\u2026", tile: "#2B2B2B", rad: "50%" }];
+        if (APP && S.src !== "radio" && !rowsRaw.length) rowsRaw = [{ t: !window.__jbLib ? C.musicApp === "jukebox" ? "Ch\u01B0a \u0111\u1ECDc \u0111\u01B0\u1EE3c th\u01B0 vi\u1EC7n Tom's Jukebox" : "App nh\u1EA1c n\xE0y kh\xF4ng cho xem danh s\xE1ch" : S.src === "podcast" ? "Ch\u01B0a theo d\xF5i podcast n\xE0o trong Tom's Jukebox" : "Th\u01B0 vi\u1EC7n tr\u1ED1ng", s: !window.__jbLib ? "C\u1EA7n Tom's Jukebox 0.9.5 tr\u1EDF l\xEAn \u2014 m\u1EDF Jukebox m\u1ED9t l\u1EA7n r\u1ED3i b\u1EA5m l\u1EA1i" : "Th\xEAm nh\u1EA1c trong Tom's Jukebox", letter: "!", tile: "#2B2B2B", rad: "50%", open: true }];
       } else if (S.src === "music") {
         if (tabOk === "queue") rowsRaw = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => ({ t: "B\xE0i h\xE1t m\u1EABu " + i, s: "Ngh\u1EC7 s\u0129 m\u1EABu \xB7 3:" + p2(10 + i * 4), letter: "\u266A", tile: "#3A2A10", rad: "6px" }));
         if (tabOk === "lists") rowsRaw = [["\u0110i Adelaide", "24 b\xE0i"], ["Nh\u1EA1c X\u01B0a", "58 b\xE0i"], ["L\xE1i \u0110\xEAm", "31 b\xE0i"], ["Y\xEAu Th\xEDch", "120 b\xE0i"]].map(([t, sub]) => ({ t, s: sub, letter: "\u2261", tile: "#1B3A52", rad: "6px" }));
@@ -1723,7 +1737,7 @@ window.__AppComp = function() {
       const wxL1 = WX ? (WXVI[wk] || "") + (WX.rain != null ? " " + Math.round(WX.rain) + "%" : "") + (WX.hi != null ? " \xB7 \u2191" + Math.round(WX.hi) + "\xB0 \u2193" + Math.round(WX.lo) + "\xB0" : "") : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026";
       const wxL2 = WX && WX.wind != null ? "Gi\xF3 " + Math.round(WX.wind) + " km/g" : "";
       const hrNow = d.getHours();
-      const tod = hrNow < 6 || hrNow >= 20 ? "night" : hrNow < 8 ? "dawn" : hrNow >= 17 ? "dusk" : "day";
+      const tod = window.tcTod ? window.tcTod(d) : hrNow < 6 || hrNow >= 20 ? "night" : hrNow < 7 ? "dawn" : hrNow >= 19 ? "dusk" : "day";
       const CLOUD = "M14 34h20a8 8 0 0 0 0-16 11 11 0 0 0-21 3 7 7 0 0 0 1 13z";
       const WP = {
         clear: [{ d: "M24 6v5M24 37v5M6 24h5M37 24h5M11.3 11.3l3.5 3.5M33.2 33.2l3.5 3.5M11.3 36.7l3.5-3.5M33.2 14.8l3.5-3.5", fill: "none", stroke: "#FFD24D", sw: 2.6, cls: "sr" }, { d: "M24 16a8 8 0 1 0 0.01 0z", fill: "#FFD24D", stroke: "none", sw: 0, cls: "" }],
@@ -1744,7 +1758,7 @@ window.__AppComp = function() {
         aria: WX ? wxT + " " + (WXVI[wk] || "") : "\u0111ang l\u1EA5y",
         open: () => self.setState({ idleOn: true, idleAt: Date.now() })
       };
-      window.__wxState = { kind: wk, tod, calm: drive };
+      window.__wxState = { kind: wk, tod, calm: drive && !!C.calm, drive };
       const THEMEMAP = { outback: "au", coast: "au", melb: "au", neonau: "neon", dandenong: "au", yarra: "au", snow: "au", sgold: "retro", synth: "neon", cyber: "neon", minimal: "minimal", rally: "led" };
       const ck = C.clkAuto ? THEMEMAP[LV.theme] || "neon" : C.clkStyle;
       const cs = CLK[ck] || CLK.neon;
@@ -1820,15 +1834,36 @@ window.__AppComp = function() {
       const curGauge = C.gaugeAuto ? GMAP[curTheme] || "minimal" : C.gaugeManual || "classic";
       window.__curGauge = curGauge;
       const engineOn = curTheme.indexOf("lp_") === 0 || BUILT.indexOf(curTheme) < 0 || C.drawStyle === "poly" || curCockpit !== "neon";
-      const sunNow = (() => {
-        const sn = window.__sun;
-        if (!sn) return tod;
-        const t = d.getTime(), r = new Date(sn.rise).getTime(), st2 = new Date(sn.set).getTime();
-        return t < r - 18e5 || t > st2 + 18e5 ? "night" : t < r + 36e5 ? "dawn" : t > st2 - 36e5 ? "dusk" : "day";
-      })();
+      const sunNow = tod;
       const LIMV = LV.limit || null;
-      const sceneCfg = { on: engineOn && !nar, theme: curTheme, style: curTheme.indexOf("lp_") === 0 ? "poly" : C.drawStyle === "poly" ? "poly" : "flat", cockpit: curCockpit, gauge: curGauge, tod: sunNow, wx: wk === "night" ? "clear" : wk === "cloudy" ? "cloud" : wk, drive, moveMode: C.sceneMove || "still", dim: drive && C.calm ? 0.25 : 0, unit: C.unit === "kmg" ? "km/g" : "km/h" };
+      const dashL = C.dashLayout || "wheel";
+      const sceneCfg = { on: engineOn && !nar, noGauge: dashL !== "wheel", theme: curTheme, style: curTheme.indexOf("lp_") === 0 ? "poly" : C.drawStyle === "poly" ? "poly" : "flat", cockpit: dashL === "wheel" ? curCockpit : "none", gauge: curGauge, tod: sunNow, wx: wk === "night" ? "clear" : wk === "cloudy" ? "cloud" : wk, drive, moveMode: C.sceneMove || "still", dim: drive && C.calm ? 0.25 : 0, unit: C.unit === "kmg" ? "km/g" : "km/h" };
       const sk = JSON.stringify(sceneCfg);
+      const lpOn = engineOn && !nar;
+      const spF = Math.min(1, (APP ? LV.speed || 0 : drive ? S.speed : 0) / 160);
+      const overC = sb.c === "#FF7A7A" || sb.c === "#FFC46B" ? sb.c : null;
+      const nxtStop = (() => {
+        try {
+          return rt && rt.stops ? rt.stops.find((x) => x.cls === "nxt") : null;
+        } catch (e) {
+          return null;
+        }
+      })();
+      dk = {
+        glass: lpOn && dashL === "glass",
+        pill: lpOn && dashL === "pill",
+        wheel: lpOn && dashL === "wheel",
+        arc: (348 * spF).toFixed(1) + " 465",
+        arcC: overC || "#5FD4F0",
+        arc2: (292 * spF).toFixed(1) + " 390",
+        arcC2: overC || "#FBB040",
+        numC: overC || "#FFFFFF",
+        unit: C.unit === "mph" ? "MPH" : "KM/G",
+        note: nxtStop ? nxtStop.dist + " \xB7 " + nxtStop.name.split(" (")[0].slice(0, 14) : sb.limNote || "",
+        gx: 846,
+        sx: 950
+      };
+      mpPos = lpOn ? dashL === "wheel" ? { L: "200px", R: "auto", W: 530 } : dashL === "glass" ? { L: "375px", R: "auto", W: 530 } : { L: "310px", R: "auto", W: 530 } : null;
       if (window.TCScene && sk !== window.__sceneKey) {
         window.__sceneKey = sk;
         window.TCScene.set(sceneCfg);
@@ -1866,7 +1901,7 @@ window.__AppComp = function() {
           ["calm", "D\u1ECBu M\u1EAFt khi xe ch\u1EA1y", "N\u1EC1n t\u1ED1i v\xE0 m\u1EDD h\u01A1n"]
         ].map(([k, l, sub]) => {
           const on = k === "sceneSlow" ? C.sceneMove === "slow" : !!C[k];
-          return Object.assign({ label: l, sub, on: on ? "true" : "false", state: on ? "M\u1EDF" : "T\u1EAFt", pick: () => k === "sceneSlow" ? self.setS("sceneMove", on ? "still" : "slow") : self.setS(k, !on) }, chip(on));
+          return Object.assign({ label: l, sub, on: on ? "true" : "false", state: on ? "M\u1EDF" : "T\u1EAFt", swBg: on ? "#FBB040" : "#2B4252", knobX: on ? 32 : 4, tick: on ? "\u2713" : "", pick: () => k === "sceneSlow" ? self.setS("sceneMove", on ? "still" : "slow") : self.setS(k, !on) }, chip(on));
         }),
         note: regionTheme ? "\u0110ang t\u1EF1 \u0111\u1ED5i c\u1EA3nh theo v\xF9ng: " + (window.TCScene ? window.TCScene.names(regionTheme) : regionTheme) + ' \xB7 kho\xE1 c\u1EA3nh: t\u1EAFt "T\u1EF1 \u0111\u1ED5i c\u1EA3nh theo v\xF9ng"' : "Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay. Ki\u1EC3u v\u1EBD G\u1ED1c / Low-Poly \xE1p d\u1EE5ng cho m\u1ECDi giao di\u1EC7n; nh\xF3m Low-Poly lu\xF4n v\u1EBD Low-Poly."
       };
@@ -1970,43 +2005,107 @@ window.__AppComp = function() {
       const WXD = LV.wx && LV.wx.daily || [];
       const EMO = { clear: "\u2600", night: "\u263E", cloudy: "\u2601", rain: "\u{1F327}", storm: "\u26C8", fog: "\u{1F32B}" };
       const shift = Math.floor(S.now / 12e4) % 6;
+      const IC = {
+        clear: [{ d: "M32 20a12 12 0 1 0 0.01 0z", f: "#FFC94A", s: "none", w: 0 }, { d: "M32 6v7M32 51v7M6 32h7M51 32h7M13 13l5 5M46 46l5 5M13 51l5-5M46 18l5-5", f: "none", s: "#FFC94A", w: 4 }],
+        night: [{ d: "M40 10a22 22 0 1 0 14 34 18 18 0 0 1-14-34z", f: "#F3EFDC", s: "none", w: 0 }],
+        cloudy: [{ d: "M24 13a11 11 0 1 0 0.01 0z", f: "#FFC94A", s: "none", w: 0 }, { d: "M22 46h26a9 9 0 0 0 0-18 13 13 0 0 0-25-2A10 10 0 0 0 22 46z", f: "#FFFFFF", s: "none", w: 0 }],
+        rain: [{ d: "M16 34h30a10 10 0 0 0 0-20 14 14 0 0 0-27-3A11 11 0 0 0 16 34z", f: "#FFFFFF", s: "none", w: 0 }, { d: "M22 42l-3 8M33 42l-3 8M44 42l-3 8", f: "none", s: "#7FD0FF", w: 3.5 }],
+        storm: [{ d: "M16 32h30a10 10 0 0 0 0-20 14 14 0 0 0-27-3A11 11 0 0 0 16 32z", f: "#D5DCE2", s: "none", w: 0 }, { d: "M34 34l-8 12h8l-5 10", f: "none", s: "#FFE066", w: 3.5 }],
+        fog: [{ d: "M10 24h44M6 34h52M12 44h40", f: "none", s: "#E8EEF2", w: 4 }]
+      };
+      const icOf = (c, h) => {
+        const k = c === "cloud" ? "cloudy" : c;
+        if (k === "clear" && h != null && (h < 6 || h >= 20)) return IC.night;
+        return IC[k] || IC.cloudy;
+      };
+      const ilay = C.idleLayout || "htc";
+      const sunT = window.__sun || null;
+      const hm = (t) => {
+        if (!t) return "--:--";
+        const x = new Date(t);
+        return p2(x.getHours()) + ":" + p2(x.getMinutes());
+      };
+      const nowCode = wk === "night" ? "clear" : wk;
+      const futH = WXH.filter((h) => new Date(h.t).getTime() > d.getTime()).slice(0, 5);
+      const hrs = [{ t: "B\xE2y gi\u1EDD", code: nowCode, temp: WX ? WX.temp : null, hr: d.getHours() }].concat(futH.map((h) => ({ t: p2(new Date(h.t).getHours()) + "h", code: h.code === "night" ? "clear" : h.code, temp: h.temp, hr: new Date(h.t).getHours(), p: h.rain })));
+      const tv = hrs.map((h) => h.temp).filter((v) => v != null);
+      const tmin = Math.min.apply(null, tv.length ? tv : [0]), tmax = Math.max.apply(null, tv.length ? tv : [1]);
+      const hx = (i) => 40 + i * (570 / Math.max(1, hrs.length - 1)), hyv = (v) => 130 - (v - tmin) / Math.max(1, tmax - tmin) * 50;
+      const curve = hrs.map((h, i) => (i ? "L" : "M") + hx(i).toFixed(1) + " " + hyv(h.temp == null ? tmin : h.temp).toFixed(1)).join(" ");
+      const days = WXD.slice(0, 5);
+      const dlo = Math.min.apply(null, days.map((x) => x.lo).concat([99])), dhi = Math.max.apply(null, days.map((x) => x.hi).concat([-99]));
+      const rng = Math.max(1, dhi - dlo);
+      const dayName = (x, i) => i === 0 ? "H\xF4m nay" : i === 1 ? "Ng\xE0y mai" : THU[(/* @__PURE__ */ new Date(x.d + "T12:00")).getDay()];
+      const minA = (d.getMinutes() + d.getSeconds() / 60) * 6 * Math.PI / 180, hrA = (d.getHours() % 12 + d.getMinutes() / 60) * 30 * Math.PI / 180, secA = d.getSeconds() * 6 * Math.PI / 180;
+      const pol = (a, r) => [(100 + Math.sin(a) * r).toFixed(1), (100 - Math.cos(a) * r).toFixed(1)];
+      let tk2 = "";
+      for (let i = 0; i < 12; i++) {
+        const a = i * 30 * Math.PI / 180, r1 = i % 3 ? 82 : 76;
+        const p1 = pol(a, r1), p2b = pol(a, 88);
+        tk2 += "M" + p1[0] + " " + p1[1] + "L" + p2b[0] + " " + p2b[1];
+      }
+      const sunArc = (() => {
+        if (!sunT) return "M0 0";
+        const ang = (t) => {
+          const x = new Date(t);
+          return (x.getHours() % 12 + x.getMinutes() / 60) * 30 * Math.PI / 180;
+        };
+        let a1 = ang(sunT.rise), a2 = ang(sunT.set);
+        if (a2 <= a1) a2 += Math.PI * 2;
+        if (a2 - a1 > Math.PI * 1.95) a2 = a1 + Math.PI * 1.95;
+        const s1 = pol(a1, 93), s2 = pol(a2, 93);
+        return "M" + s1[0] + " " + s1[1] + " A93 93 0 " + (a2 - a1 > Math.PI ? 1 : 0) + " 1 " + s2[0] + " " + s2[1];
+      })();
+      const hStr = (C.clock === "12" ? d.getHours() % 12 || 12 : p2(d.getHours())) + "", mStr = p2(d.getMinutes());
+      const flipM = self._lastM !== mStr;
+      if (flipM) {
+        self._lastM = mStr;
+        self._flipAt = S.now;
+      }
+      const flipNow = S.now - (self._flipAt || 0) < 700;
       const idl = {
         on: idlOn,
         close: () => self.setState({ clkBig: false, idleOn: false, last: Date.now(), parkedAt: S.now }),
-        sky: wxc.sky,
         bgOp: C.idleWxBg === false ? 0 : 1,
-        dark: tod === "night" ? 0.25 : 0.05,
-        x: 40 + [0, 6, 12, 6, -6, -12][shift],
-        y: 30 + [0, 4, 8, 4, -4, -8][shift],
-        flip: ist === "flip",
-        analog: ist === "analog",
-        text: ist !== "flip" && ist !== "analog",
-        cards: mkCards(true),
-        h: (C.clock === "12" ? d.getHours() % 12 || 12 : p2(d.getHours())) + "",
-        m: p2(d.getMinutes()),
-        colon: C.clkBlink && !drive && d.getSeconds() % 2 ? 0.3 : 1,
-        fw: isS.fw,
-        font: isS.font,
-        c: isS.c,
-        ls: isS.ls,
-        glow: isS.glow,
-        plate: isS.plate,
-        border: isS.border,
-        pad: isS.pad,
-        ticks: tk,
-        hx: (50 + Math.sin(hA) * 24).toFixed(1),
-        hy: (50 - Math.cos(hA) * 24).toFixed(1),
-        mx: (50 + Math.sin(mA) * 36).toFixed(1),
-        my: (50 - Math.cos(mA) * 36).toFixed(1),
+        dark: tod === "night" ? 0.2 : 0.02,
+        x: [0, 4, 8, 4, -4, -8][shift],
+        y: [0, 3, 6, 3, -3, -6][shift],
+        htc: ilay === "htc",
+        glass: ilay === "glass",
+        days3On: WXD.length > 0,
+        analog: ilay === "analog",
+        days5On: ilay !== "glass" && WXD.length > 0,
+        h: hStr,
+        m: mStr,
+        flipH: flipNow && mStr === "00" ? "flp" : "",
+        flipM: flipNow ? "flp" : "",
+        icon: icOf(nowCode, d.getHours()),
+        temp: WX ? Math.round(WX.temp) + "\xB0" : "--\xB0",
+        desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 m\u01B0a " + Math.round(WX.rain) + "%" : "") : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026",
+        desc2: WX ? "\u2191" + Math.round(WX.hi) + "\xB0 \u2193" + Math.round(WX.lo) + "\xB0" + (WX.wind != null ? " \xB7 gi\xF3 " + Math.round(WX.wind) + " km/g" : "") + (PL && PL.suburb ? " \xB7 " + PL.suburb : "") : "",
+        hilo: WX ? "\u2191" + Math.round(WX.hi) + "\xB0 \u2193" + Math.round(WX.lo) + "\xB0" : "",
+        wind: WX && WX.wind != null ? "Gi\xF3 " + Math.round(WX.wind) + " km/g" : "Gi\xF3 --",
+        rain: WX ? "M\u01B0a " + Math.round(WX.rain || 0) + "%" : "M\u01B0a --",
+        rise: hm(sunT && sunT.rise),
+        set: hm(sunT && sunT.set),
         date: THU[d.getDay()] + ", " + p2(d.getDate()) + "/" + p2(d.getMonth() + 1) + "/" + d.getFullYear(),
-        sub: [C.clkLunar ? lunTxt : "", C.idleVN ? "Gi\u1EDD Vi\u1EC7t Nam " + tzTime(d, "Asia/Ho_Chi_Minh") : ""].filter(Boolean).join("   \xB7   "),
+        sub: [C.clkLunar !== false ? lunTxt : "", sunT ? "L\u1EB7n " + hm(sunT.set) : "", C.idleVN ? "VN " + tzTime(d, "Asia/Ho_Chi_Minh") : ""].filter(Boolean).join(" \xB7 "),
         appt: C.idleAppt !== false && AP && apMin > -15 && apMin < 600 ? "H\u1EB9n " + p2(new Date(AP.start).getHours()) + ":" + p2(new Date(AP.start).getMinutes()) + " \xB7 " + (AP.title || "") : "",
-        place: PL && (PL.suburb || PL.street) ? (PL.suburb || PL.street) + (drive ? "" : " \xB7 \u0111ang \u0111\u1EADu xe") : "",
-        desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 m\u01B0a " + Math.round(WX.rain) + "%" : "") + (WX.wind != null ? " \xB7 gi\xF3 " + Math.round(WX.wind) + " km/g" : "") : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026",
-        hourly: C.idleHourly !== false && WXH.length > 0,
-        days3: C.idle3d !== false && WXD.length > 0,
-        hours: WXH.slice(0, 6).map((h, i) => ({ t: i ? p2(new Date(h.t).getHours()) + "h" : "B\xE2y gi\u1EDD", i: EMO[h.code] || "\u2601", v: Math.round(h.temp) + "\xB0" })),
-        days: WXD.slice(0, 3).map((x, i) => ({ n: i === 0 ? "H\xF4m nay" : i === 1 ? "Ng\xE0y mai" : THU[new Date(x.d).getDay()], i: EMO[x.code] || "\u2601", v: Math.round(x.hi) + "\xB0 / " + Math.round(x.lo) + "\xB0" }))
+        place: PL && (PL.suburb || PL.street) ? PL.suburb || PL.street : "",
+        hourly: C.idleHourly !== false && hrs.length > 1,
+        curve: curve || "M0 0",
+        curveA: curve ? curve + " L" + hx(hrs.length - 1).toFixed(1) + " 160 L40 160 Z" : "M0 0",
+        hours: hrs.map((h, i) => ({ t: h.t, icon: icOf(h.code, h.hr), p: h.p != null ? Math.round(h.p) + "%" : "", x: (20 + hx(i)).toFixed(0), ty: (14 + hyv(h.temp == null ? tmin : h.temp) - 26).toFixed(0), v: h.temp == null ? "--" : Math.round(h.temp) + "\xB0" })),
+        days3: days.slice(0, 3).map((x, i) => ({ n: dayName(x, i), icon: icOf(x.code), hi: Math.round(x.hi) + "\xB0", lo: Math.round(x.lo) + "\xB0" })),
+        days5: days.map((x, i) => ({ n: dayName(x, i), icon: icOf(x.code), hi: Math.round(x.hi) + "\xB0", lo: Math.round(x.lo) + "\xB0", l: ((x.lo - dlo) / rng * 100).toFixed(0), w: Math.max(6, (x.hi - x.lo) / rng * 100).toFixed(0) })),
+        sunArc,
+        ticks: tk2,
+        hx: pol(hrA, 46)[0],
+        hy: pol(hrA, 46)[1],
+        mx: pol(minA, 70)[0],
+        my: pol(minA, 70)[1],
+        sx: pol(secA, 78)[0],
+        sy: pol(secA, 78)[1]
       };
       window.__idleOn = idlOn;
       const delP = S.delId ? ALLP[S.delId] : null;
@@ -2094,6 +2193,21 @@ window.__AppComp = function() {
         isRt: !nar && S.scr === "rt",
         tp,
         od,
+        dk,
+        spdDisp: dk.glass || dk.pill || dk.wheel ? "none" : "flex",
+        mpL: mpPos ? mpPos.L : "auto",
+        mpR: mpPos ? mpPos.R : "20px",
+        mpW: mpPos ? mpPos.W : musicW,
+        mpH: mpPos ? 72 : 80,
+        mpB: mpPos ? 16 : 10,
+        mpCls: mpPos ? "gl" : "",
+        srcMenuOn: !!S.srcMenu,
+        srcMenuX: mpPos ? parseInt(mpPos.L) + 200 : 640,
+        srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }),
+        srcMenu: [["music", "Nh\u1EA1c"], ["radio", "Radio"], ["podcast", "Podcast"]].map(([k, l]) => {
+          const on = S.src === k;
+          return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "#0D2C40", fg: on ? "#2A1A00" : "#E8F1F5", pick: () => self.setState({ src: k, srcMenu: false, mpOpen: true, mpTab: k === "radio" ? "near" : k === "music" ? "lists" : self.state.mpTab, panelAt: Date.now() }) };
+        }),
         townOn: !!(S.townSign && S.now - S.townSign.at < 6e3 && S.scr === "home"),
         townL: S.townSign ? S.townSign.name : "",
         isSplit: !nar && S.scr === "split",
@@ -2278,6 +2392,19 @@ window.__APP_TPL = `
 .jbpill.calm .jbwave path{animation-duration:40s}
 @keyframes tf-breathe{0%,100%{opacity:.35}50%{opacity:1}}
 @keyframes tf-jump{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.25)}}
+.gl{background:rgba(8,22,34,.5)!important;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22)!important;border-radius:999px!important;clip-path:none!important}
+.glc{background:rgba(8,22,34,.5);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22);border-radius:26px}
+.glr{background:rgba(8,22,34,.5)!important;backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 8px 28px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.22)!important;border-radius:50%!important;clip-path:none!important}
+.glt{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#ui .lbl{text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.flipc{position:relative;width:250px;height:230px;border-radius:22px;background:linear-gradient(#1d2a36 0 50%,#16212b 50%);box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:Overpass,sans-serif;font-size:190px;font-weight:300;line-height:1;letter-spacing:-6px;color:#fff}
+.flipc:after{content:'';position:absolute;left:0;right:0;top:50%;height:3px;background:rgba(0,0,0,.55)}
+.flipc.flp{animation:tf-flip .6s ease-in-out}
+@keyframes tf-flip{0%{transform:perspective(600px) rotateX(0)}50%{transform:perspective(600px) rotateX(-12deg)}100%{transform:perspective(600px) rotateX(0)}}
+@keyframes tf-tapf{0%,70%{opacity:.9}100%{opacity:0}}
+.tapfade{animation:tf-tapf 7s forwards}
+.sw2{width:64px;height:36px;border-radius:18px;position:relative;flex-shrink:0;transition:background .2s}
+.sw2 .kn{position:absolute;top:4px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;color:#E08A00;font-size:15px;font-weight:800;transition:left .2s}
 .odo-d{display:inline-block;height:1.15em;overflow:hidden;vertical-align:top}.odo-c{display:flex;flex-direction:column;transition:transform .6s cubic-bezier(.3,1.3,.5,1)}.odo-c span{height:1.15em;line-height:1.15em;text-align:center}
 .mic-idle .mw{animation:tf-breathe 2.4s ease-in-out infinite}
 .mic-listen .mw{animation:tf-jump .45s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
@@ -2374,11 +2501,11 @@ input[type=range]{accent-color:#FBB040}
           <div style="font-size: 28px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 12px rgba(95,212,240,0.6)"><span style="color: #48B0C8">TOM'S</span> <span style="position: relative; display: inline-block; color: #FBB040">CAR<svg aria-hidden="true" viewBox="0 10 300 90" style="position: absolute; left: -0.5em; top: -0.56em; width: 2.7em; height: 1.1em; overflow: visible; pointer-events: none"><path d="M12 74 C60 46 104 22 160 20 C204 18 232 30 262 54 C236 36 206 28 162 30 C110 32 66 52 12 74 Z" fill="#FBB040"></path><path d="M96 58 C120 40 150 34 178 34 C204 34 222 42 236 54 C214 48 190 46 166 46 C140 46 118 50 96 58 Z" fill="#FBB040"></path><path d="M176 58 C214 54 256 56 290 64 C296 66 296 71 290 71 C254 63 216 60 176 58 Z" fill="#FBB040"></path><path d="M296 76 C292 82 286 86 276 88 C282 84 288 80 296 76 Z M200 86 C176 90 150 90 128 87 C150 87 176 87 200 86 Z M54 86 C40 86 26 82 16 76 C28 80 40 83 54 86 Z" fill="#FBB040"></path><path d="M58 86 C62 70 76 62 92 62 C108 62 120 72 124 86 C116 76 106 70 92 70 C78 70 66 76 58 86 Z" fill="#FBB040"></path><path d="M206 86 C210 70 224 62 240 62 C256 62 268 72 272 86 C264 76 254 70 240 70 C226 70 214 76 206 86 Z" fill="#FBB040"></path><path d="M281 63 L291 66 L282 67 Z" fill="#FFE9A8"></path></svg></span></div>
           <div style="font-size: 11px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         </div>
-        <div class="pnl" style="height: 54px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 250px">
+        <div class="pnl gl" style="height: 58px; padding: 0 22px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 260px">
           <span class="lbl">\u0110ANG CH\u1EA0Y TR\xCAN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
           <span role="group" aria-label="Pin thi\u1EBFt b\u1ECB" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
-        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl" style="position: absolute; left: 640px; top: 0; transform: translateX(-50%); border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 54px; padding: 0 10px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
+        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl gl" style="position: absolute; left: 640px; top: 0; transform: translateX(-50%); border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
           <sc-if value="{{clk.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 2px"><sc-for list="{{clk.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
           <sc-if value="{{clk.analog}}" hint-placeholder-val="{{ false }}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0B141B" stroke="#A9C7D4" stroke-width="1.5"></circle><line x1="20" y1="20" x2="{{clk.hx}}" y2="{{clk.hy}}" stroke="#E8F1F5" stroke-width="2.6" stroke-linecap="round"></line><line x1="20" y1="20" x2="{{clk.mx}}" y2="{{clk.my}}" stroke="#FBB040" stroke-width="1.8" stroke-linecap="round"></line><circle cx="20" cy="20" r="2" fill="#FBB040"></circle></svg></sc-if>
           <sc-if value="{{clk.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 24px; font-weight: {{clk.fw}}; font-family: {{clk.font}}; font-style: {{clk.fst}}; color: {{clk.c}}; text-shadow: {{clk.glow}}; letter-spacing: {{clk.ls}}">{{clk.h}}<span style="opacity: {{clk.colonOp}}">:</span>{{clk.m}}<span style="font-size: 12px; margin-left: 3px">{{clk.ap}}</span></span></sc-if>
@@ -2387,8 +2514,8 @@ input[type=range]{accent-color:#FBB040}
             <sc-if value="{{clk.line2On}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: {{clk.line2C}}; white-space: nowrap">{{clk.line2}}</span></sc-if>
           </span>
         </button>
-        <button onClick="{{wxc.open}}" aria-label="Th\u1EDDi ti\u1EBFt: {{wxc.aria}}" class="pnl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 210px; padding: 0 12px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
-          <canvas id="wxmini" width="210" height="58" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas>
+        <button onClick="{{wxc.open}}" aria-label="Th\u1EDDi ti\u1EBFt: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
+          <canvas id="wxmini" width="230" height="58" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas><span aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(10,30,50,0.3); pointer-events: none"></span>
           <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true" style="position: relative; flex-shrink: 0"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg>
           <span style="position: relative; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; min-width: 0">
             <span style="font-size: 26px; font-weight: 300">{{wxT}}</span>
@@ -2397,18 +2524,18 @@ input[type=range]{accent-color:#FBB040}
           <span style="position: relative; margin-left: auto; font-size: 11px; text-align: right; line-height: 1.2; max-width: 70px">{{wxc.desc}}</span>
         </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
-        <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
-        <button onClick="{{openTheme}}" aria-label="Giao Di\u1EC7n" title="Giao Di\u1EC7n" class="btn" style="width: 54px; height: 54px; padding: 0; color: #CFF6FF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01"></path></svg></button>
-        <button onClick="{{goSettings}}" aria-label="C\xE0i \u0110\u1EB7t" title="C\xE0i \u0110\u1EB7t" class="btn" style="width: 54px; height: 54px; padding: 0; color: #FBB040"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
-        <button onClick="{{openExit}}" aria-label="Tho\xE1t ch\u01B0\u01A1ng tr\xECnh" title="Tho\xE1t" class="btn" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
+        <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
+        <button onClick="{{openTheme}}" aria-label="Giao Di\u1EC7n" title="Giao Di\u1EC7n" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #CFF6FF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01"></path></svg></button>
+        <button onClick="{{goSettings}}" aria-label="C\xE0i \u0110\u1EB7t" title="C\xE0i \u0110\u1EB7t" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FBB040"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
+        <button onClick="{{openExit}}" aria-label="Tho\xE1t ch\u01B0\u01A1ng tr\xECnh" title="Tho\xE1t" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
       </header>
 
       <!-- tab + g\u01B0\u01A1ng camera sau (d\u1EDDi xu\u1ED1ng d\u01B0\u1EDBi thanh tr\xEAn) -->
-      <div style="position: absolute; left: 20px; top: 86px; display: flex; gap: 6px">
+      <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px">
         <button class="pill" style="background: #FBB040; color: #2A1A00">M\xE0n H\xECnh Ch\xEDnh</button>
-        <button onClick="{{goRt}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5)">Road Trip</button>
-        <button onClick="{{goContacts}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5); display: flex; align-items: center; gap: 6px">Li\xEAn L\u1EA1c<span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{unreadN}}</span></button>
-        <button onClick="{{goSearch}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5)">T\xECm Ch\u1ED7</button>
+        <button onClick="{{goRt}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">Road Trip</button>
+        <button onClick="{{goContacts}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5); display: flex; align-items: center; gap: 6px">Li\xEAn L\u1EA1c<span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{unreadN}}</span></button>
+        <button onClick="{{goSearch}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">T\xECm Ch\u1ED7</button>
       </div>
       <div data-demo="1" class="pnl" style="position: absolute; right: 20px; top: 86px; width: 300px; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg,#0E2A3C,#06141F)">
         <span class="lbl" style="position: absolute; left: 12px; top: 8px">CAM SAU</span>
@@ -2442,7 +2569,7 @@ input[type=range]{accent-color:#FBB040}
       </section>
 
       <!-- s\u1ED1 t\u1ED1c \u0111\u1ED9 (canh gi\u1EEFa, \u0111\u1ED5i ki\u1EC3u \u0111\u01B0\u1EE3c) + bi\u1EC3n gi\u1EDBi h\u1EA1n theo v\xF9ng -->
-      <div style="position: absolute; left: 440px; top: 130px; width: 400px; height: 310px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,6,10,0.72), rgba(1,6,10,0.45) 60%, rgba(1,6,10,0))">
+      <div style="display: {{spdDisp}}; position: absolute; left: 440px; top: 130px; width: 400px; height: 310px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,6,10,0.72), rgba(1,6,10,0.45) 60%, rgba(1,6,10,0))">
         <button onClick="{{sb.tap}}" aria-label="{{sb.aria}}" style="position: relative; width: {{sb.ring}}px; height: {{sb.ring}}px; border: 0; padding: 0; background: transparent; cursor: pointer; color: inherit; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0">
           <sc-if value="{{sb.showRing}}" hint-placeholder-val="{{ true }}">
             <svg aria-hidden="true" viewBox="0 0 200 200" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%"><path d="{{sb.arcBg}}" fill="none" stroke="rgba(95,212,240,0.18)" stroke-width="6" stroke-linecap="round"></path><path d="{{sb.arc}}" fill="none" stroke="{{sb.c}}" stroke-width="6" stroke-linecap="round"></path></svg>
@@ -2468,7 +2595,7 @@ input[type=range]{accent-color:#FBB040}
       </div>
       <sc-if value="{{townOn}}" hint-placeholder-val="{{ false }}"><div class="fadein" aria-live="polite" style="position: absolute; left: 50%; top: 92px; transform: translateX(-50%); background: #1F5FAE; border: 3px solid #FFFFFF; border-radius: 8px; padding: 6px 22px; font-family: Overpass, sans-serif; font-weight: 800; font-size: 22px; color: #FFFFFF; box-shadow: 0 6px 20px rgba(0,0,0,0.5); white-space: nowrap">{{townL}}</div></sc-if>
       <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}">
-      <div style="position: absolute; left: 826px; top: 196px; display: flex; flex-direction: column; align-items: center; gap: 4px">
+      <div style="display: {{spdDisp}}; position: absolute; left: 826px; top: 196px; flex-direction: column; align-items: center; gap: 4px">
         <div aria-label="{{sb.limAria}}" style="width: 66px; height: 86px; background: #FFFFFF; border-radius: 6px; box-sizing: border-box; border: {{sb.limBorder}}; display: flex; align-items: center; justify-content: center"><div style="width: 54px; height: 54px; border-radius: 50%; border: 6px solid #D0202E; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: Overpass, sans-serif; font-weight: 800; font-size: 21px; color: #111111; text-align: center">{{sb.lim}}</div></div>
         <span style="font-size: 11px; color: {{sb.limNoteC}}; text-align: center; white-space: nowrap">{{sb.limNote}}</span>
       </div>
@@ -2504,8 +2631,27 @@ input[type=range]{accent-color:#FBB040}
         </sc-if>
       </div>
 
+
+      <!-- \u0111\u1ED3ng h\u1ED3 t\u1ED1c \u0111\u1ED9 theo ki\u1EC3u \u0111\xE3 ch\u1ECDn (#32): k\xEDnh n\u1ED5i / \xF4m thanh nh\u1EA1c / sau v\xF4 l\u0103ng -->
+      <sc-if value="{{dk.glass}}" hint-placeholder-val="{{ false }}">
+        <div class="glc" aria-label="T\u1ED1c \u0111\u1ED9 {{sb.num}} {{sb.unit}}" style="position: absolute; right: 24px; bottom: 104px; width: 220px; height: 140px">
+          <svg width="120" height="120" viewBox="0 0 170 170" aria-hidden="true" style="position: absolute; left: 14px; top: 10px"><circle cx="85" cy="85" r="74" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="7" stroke-dasharray="348 465" transform="rotate(135 85 85)" stroke-linecap="round"></circle><circle cx="85" cy="85" r="74" fill="none" stroke="{{dk.arcC}}" stroke-width="7" stroke-dasharray="{{dk.arc}}" transform="rotate(135 85 85)" stroke-linecap="round"></circle></svg>
+          <div style="position: absolute; left: 14px; width: 120px; top: 40px; text-align: center"><div class="tnum" style="font-size: 44px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</div><div style="font-size: 10px; letter-spacing: 2px; opacity: 0.8">{{dk.unit}}</div></div>
+          <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; right: 16px; top: 18px; display: flex; flex-direction: column; align-items: center; gap: 4px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 10px; color: #CFE6EE; text-align: center; max-width: 70px">{{dk.note}}</span></div></sc-if>
+        </div>
+      </sc-if>
+      <sc-if value="{{dk.pill}}" hint-placeholder-val="{{ false }}">
+        <div class="glr" aria-label="T\u1ED1c \u0111\u1ED9 {{sb.num}} {{sb.unit}}" style="position: absolute; left: {{dk.gx}}px; bottom: 6px; width: 94px; height: 94px; display: flex; align-items: center; justify-content: center">
+          <svg width="94" height="94" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
+          <div style="text-align: center; position: relative"><div class="tnum" style="font-size: 32px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</div><div style="font-size: 8px; letter-spacing: 2px; opacity: 0.8">{{dk.unit}}</div></div>
+        </div>
+        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: {{dk.sx}}px; bottom: 24px; width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div></sc-if>
+      </sc-if>
+      <sc-if value="{{dk.wheel}}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: 1080px; top: 568px; width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div></sc-if>
+      </sc-if>
       <!-- thanh nh\u1EA1c: vi\xEAn thu\u1ED1c ki\u1EC3u Tom's Jukebox (\u0111\u0129a than tr\xE1i, t\xEAn gi\u1EEFa, \u23EE \u25B6 \u23ED b\xEAn ph\u1EA3i, thanh th\u1EDDi gian trong vi\xEAn thu\u1ED1c, s\xF3ng l\u1EE5a \u1EDF m\xE9p d\u01B0\u1EDBi) -->
-      <div class="pnl dimbox jbpill" style="position: absolute; right: 20px; bottom: 10px; width: {{musicW}}px; height: 80px; padding: 0 16px 0 10px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
+      <div class="pnl dimbox jbpill {{mpCls}}" style="position: absolute; left: {{mpL}}; right: {{mpR}}; bottom: {{mpB}}px; width: {{mpW}}px; height: {{mpH}}px; padding: 0 12px 0 8px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
         <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 26px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.55"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.45"></path></svg>
         <button onClick="{{togglePanel}}" aria-label="Danh s\xE1ch b\xE0i v\xE0 \u0111\xE0i" style="position: relative; width: 60px; height: 60px; border: 0; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer; background: transparent">
           <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true" class="{{jb.discCls}}"><circle cx="30" cy="30" r="29" fill="#1A1A1A"></circle><circle cx="30" cy="30" r="22" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="17" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="11" fill="#FBB040"></circle><circle cx="30" cy="30" r="3" fill="#2A1A00"></circle></svg>
@@ -2519,7 +2665,7 @@ input[type=range]{accent-color:#FBB040}
             <span>{{jb.durL}}</span>
           </div>
         </div>
-        <button onClick="{{cycleSrc}}" aria-label="\u0110\u1ED5i ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}}</button>
+        <button onClick="{{srcMenuTap}}" aria-label="Ch\u1ECDn ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" aria-expanded="{{srcMenuOn}}" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}} \u25BE</button>
         <sc-if value="{{needPerm}}" hint-placeholder-val="{{ false }}">
           <button onClick="{{grantPerm}}" class="btn" style="position: relative; height: 34px; font-size: 11px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040; flex-shrink: 0">\u26A0 C\u1EA5p quy\u1EC1n</button>
         </sc-if>
@@ -2527,12 +2673,19 @@ input[type=range]{accent-color:#FBB040}
           <button onClick="{{jb.recTap}}" aria-label="Th\xE2u \u0111\xE0i \u0111ang nghe" class="jbbtn" style="width: 40px; height: 40px; border-color: #E5484D"><span style="width: 14px; height: 14px; border-radius: 50%; background: #E5484D; display: block"></span></button>
         </sc-if>
         <div style="position: relative; display: flex; align-items: center; gap: 8px; flex-shrink: 0">
+          <button onClick="{{togglePanel}}" aria-label="Danh s\xE1ch ph\xE1t" aria-expanded="{{panelExp}}" class="jbbtn" style="width: 44px; height: 44px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h10v2H4z" fill="#FBB040"></path></svg></button>
           <button onClick="{{prevF}}" aria-label="B\xE0i tr\u01B0\u1EDBc" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect><path d="M19 5v14L9 12z" fill="#FBB040"></path></svg></button>
           <button onClick="{{togglePlay}}" aria-label="{{playLabel}}" class="jbbtn" style="width: 60px; height: 60px"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="{{playIcon}}" fill="#FBB040"></path></svg></button>
           <button onClick="{{nextF}}" aria-label="B\xE0i k\u1EBF" class="jbbtn" style="width: 46px; height: 46px"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z" fill="#FBB040"></path><rect x="16" y="5" width="3" height="14" rx="1" fill="#FBB040"></rect></svg></button>
         </div>
       </div>
 
+
+      <sc-if value="{{srcMenuOn}}" hint-placeholder-val="{{ false }}">
+        <div class="glc fadein" role="menu" aria-label="Ch\u1ECDn ngu\u1ED3n nghe" style="position: absolute; left: {{srcMenuX}}px; bottom: 96px; z-index: 9; padding: 8px; display: flex; gap: 8px">
+          <sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" role="menuitem" aria-pressed="{{o.on}}" class="pill" style="height: 48px; padding: 0 18px; font-size: 15px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+        </div>
+      </sc-if>
       <!-- b\u1EA3ng ch\u1ECDn b\xE0i / \u0111\xE0i (tr\u01B0\u1EE3t l\xEAn t\u1EEB thanh nh\u1EA1c) -->
       <sc-if value="{{mp.open}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Ch\u1ECDn b\xE0i v\xE0 \u0111\xE0i" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: 640px; height: 400px; z-index: 8; display: flex; flex-direction: column; background: #06192A">
@@ -2607,11 +2760,10 @@ input[type=range]{accent-color:#FBB040}
           <div style="font-size: 13px; color: #8FC3D3; margin-bottom: 16px">{{grpDesc}}</div>
           <div style="display: flex; flex-direction: column; gap: 8px">
             <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
-              <div class="pnl" style="min-height: 62px; padding: 10px 16px; box-sizing: border-box; display: flex; align-items: center; gap: 14px">
+              <div class="pnl" onClick="{{r.rowTap}}" style="min-height: 62px; padding: 10px 16px; box-sizing: border-box; display: flex; align-items: center; gap: 14px; cursor: {{r.rowCur}}">
                 <div style="flex: 1; min-width: 0"><div style="font-size: 15px; font-weight: 700">{{r.label}}</div><div style="font-size: 12px; color: #8FC3D3">{{r.hint}}</div></div>
                 <sc-if value="{{r.isToggle}}" hint-placeholder-val="{{ true }}">
-                  <button onClick="{{r.toggle}}" role="switch" aria-checked="{{r.on}}" aria-label="{{r.label}}" style="width: 64px; height: 34px; border: 0; border-radius: 17px; cursor: pointer; position: relative; background: {{r.trackBg}}; flex-shrink: 0"><span style="position: absolute; top: 4px; left: {{r.knobX}}px; width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; transition: left .2s"></span></button>
-                  <span style="width: 44px; font-size: 13px; font-weight: 700; color: {{r.stateC}}">{{r.stateL}}</span>
+                  <button onClick="{{r.toggle}}" role="switch" aria-checked="{{r.on}}" aria-label="{{r.label}}" class="sw2" style="border: 0; padding: 0; cursor: pointer; background: {{r.trackBg}}"><span class="kn" style="left: {{r.knobX}}px">{{r.tick}}</span></button>
                 </sc-if>
                 <sc-if value="{{r.isChoice}}" hint-placeholder-val="{{ false }}">
                   <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 560px">
@@ -2662,7 +2814,7 @@ input[type=range]{accent-color:#FBB040}
           <sc-for list="{{th.gauges}}" as="o" hint-placeholder-count="8"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
         <div style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px">
-          <sc-for list="{{th.toggles}}" as="o" hint-placeholder-count="4"><button onClick="{{o.pick}}" role="switch" aria-checked="{{o.on}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; height: 56px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700">{{o.label}}</span><span style="font-size: 11px; color: #8FC3D3">{{o.sub}}</span></span><span style="margin-left: 8px; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; background: {{o.bg}}; color: {{o.fg}}">{{o.state}}</span></button></sc-for>
+          <sc-for list="{{th.toggles}}" as="o" hint-placeholder-count="4"><button onClick="{{o.pick}}" role="switch" aria-checked="{{o.on}}" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; height: 56px; padding: 0 14px; display: flex; align-items: center; gap: 12px; text-align: left"><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700">{{o.label}}</span><span style="font-size: 11px; color: #8FC3D3">{{o.sub}}</span></span><span class="sw2" style="margin-left: 8px; background: {{o.swBg}}"><span class="kn" style="left: {{o.knobX}}px">{{o.tick}}</span></span></button></sc-for>
         </div>
         <div style="margin-top: 12px; font-size: 12px; color: #8FC3D3">{{th.note}}</div>
       </div>
@@ -3048,30 +3200,66 @@ input[type=range]{accent-color:#FBB040}
 
     <!-- ===== m\xE0n h\xECnh ch\u1EDD ki\u1EC3u Th\u1EDDi Ti\u1EBFt Samsung (\u0111\u1EADu xe l\xE2u kh\xF4ng \u0111\u1EE5ng m\xE0n h\xECnh / ch\u1EA1m \xF4 th\u1EDDi ti\u1EBFt / ch\u1EA1m \u0111\u1ED3ng h\u1ED3) ===== -->
     <sc-if value="{{idl.on}}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{idl.close}}" aria-label="\u0110\xF3ng m\xE0n h\xECnh ch\u1EDD" class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; background: {{idl.sky}}; overflow: hidden">
+      <button onClick="{{idl.close}}" aria-label="\u0110\xF3ng m\xE0n h\xECnh ch\u1EDD" class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; background: #0B1A2A; overflow: hidden; text-align: left">
         <canvas id="idlesky" width="1280" height="720" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; opacity: {{idl.bgOp}}"></canvas>
-        <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(0,0,0,{{idl.dark}})"></div>
-        <div style="position: absolute; left: {{idl.x}}px; top: {{idl.y}}px; width: 1200px; height: 660px">
-          <div style="position: absolute; left: 30px; top: 30px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start">
-            <sc-if value="{{idl.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 10px"><sc-for list="{{idl.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard fbig {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
-            <sc-if value="{{idl.analog}}" hint-placeholder-val="{{ false }}"><svg width="200" height="200" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"></circle><path d="{{idl.ticks}}" stroke="#FFFFFF" stroke-width="1.6"></path><line x1="50" y1="50" x2="{{idl.hx}}" y2="{{idl.hy}}" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"></line><line x1="50" y1="50" x2="{{idl.mx}}" y2="{{idl.my}}" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"></line><circle cx="50" cy="50" r="3" fill="#FBB040"></circle></svg></sc-if>
-            <sc-if value="{{idl.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 150px; line-height: 0.95; font-weight: {{idl.fw}}; font-family: {{idl.font}}; color: {{idl.c}}; letter-spacing: {{idl.ls}}; text-shadow: {{idl.glow}}; padding: {{idl.pad}}; background: {{idl.plate}}; border-radius: 14px; border: {{idl.border}}">{{idl.h}}<span style="opacity: {{idl.colon}}">:</span>{{idl.m}}</span></sc-if>
-            <span style="font-size: 26px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,0.35)">{{idl.date}}</span>
-            <sc-if value="{{idl.sub}}" hint-placeholder-val="{{ true }}"><span style="font-size: 18px; opacity: 0.9">{{idl.sub}}</span></sc-if>
-            <sc-if value="{{idl.appt}}" hint-placeholder-val="{{ false }}"><span style="margin-top: 6px; padding: 6px 14px; border-radius: 18px; background: rgba(255,255,255,0.18); font-size: 16px">{{idl.appt}}</span></sc-if>
-          </div>
-          <div style="position: absolute; right: 30px; top: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; text-shadow: 0 1px 8px rgba(0,0,0,0.3)">
-            <span style="font-size: 18px; opacity: 0.9">{{idl.place}}</span>
-            <span style="display: flex; align-items: center; gap: 10px"><svg width="70" height="70" viewBox="0 0 48 48" aria-hidden="true" class="{{wxc.cls}}"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg><span style="font-size: 120px; font-weight: 200; line-height: 1">{{wxT}}</span></span>
-            <span style="font-size: 20px">{{idl.desc}}</span>
-            <span style="font-size: 18px; opacity: 0.9">{{wxc.hl}}</span>
-          </div>
-          <div style="position: absolute; left: 30px; right: 30px; bottom: 20px; display: flex; gap: 14px; align-items: stretch">
-            <sc-if value="{{idl.hourly}}" hint-placeholder-val="{{ true }}"><div style="flex: 2; display: flex; padding: 10px 6px; border-radius: 18px; background: rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)"><sc-for list="{{idl.hours}}" as="hh" hint-placeholder-count="6"><div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 15px"><span style="opacity: 0.85">{{hh.t}}</span><span style="font-size: 22px">{{hh.i}}</span><span>{{hh.v}}</span></div></sc-for></div></sc-if>
-            <sc-if value="{{idl.days3}}" hint-placeholder-val="{{ true }}"><div style="flex: 1.2; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 18px; background: rgba(255,255,255,0.14); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); font-size: 16px"><sc-for list="{{idl.days}}" as="dd" hint-placeholder-count="3"><div style="display: flex; justify-content: space-between; gap: 10px"><span>{{dd.n}}</span><span>{{dd.i}}</span><span class="tnum">{{dd.v}}</span></div></sc-for></div></sc-if>
-          </div>
+        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,{{idl.dark}})"></div>
+        <div style="position: absolute; left: {{idl.x}}px; top: {{idl.y}}px; width: 1280px; height: 720px">
+          <sc-if value="{{idl.htc}}" hint-placeholder-val="{{ true }}">
+            <div style="position: absolute; left: 0; right: 0; top: 56px; display: flex; justify-content: center; gap: 22px"><span class="flipc tnum {{idl.flipH}}">{{idl.h}}</span><span class="flipc tnum {{idl.flipM}}">{{idl.m}}</span></div>
+            <div class="glc" style="position: absolute; left: 50%; transform: translateX(-50%); top: 312px; border-radius: 999px; display: flex; align-items: center; gap: 20px; padding: 12px 32px; white-space: nowrap">
+              <svg width="52" height="52" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{idl.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg>
+              <span class="tnum" style="font-family: Overpass, sans-serif; font-size: 52px; font-weight: 200; line-height: 1">{{idl.temp}}</span>
+              <span style="display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 700">{{idl.desc}}</span><span style="font-size: 13px; opacity: 0.85">{{idl.desc2}}</span></span>
+              <span style="width: 1px; height: 44px; background: rgba(255,255,255,0.25)"></span>
+              <span style="display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 700">{{idl.date}}</span><span style="font-size: 13px; opacity: 0.85">{{idl.sub}}</span></span>
+            </div>
+          </sc-if>
+          <sc-if value="{{idl.glass}}" hint-placeholder-val="{{ false }}">
+            <div style="position: absolute; left: 70px; top: 80px; display: flex; flex-direction: column; gap: 6px; text-shadow: 0 2px 12px rgba(0,0,0,0.35)">
+              <span class="tnum" style="font-family: Overpass, sans-serif; font-size: 160px; font-weight: 200; line-height: 0.95; letter-spacing: -4px">{{idl.h}}:{{idl.m}}</span>
+              <span style="font-size: 26px; font-weight: 600">{{idl.date}}</span><span style="font-size: 18px; opacity: 0.9">{{idl.sub}}</span>
+            </div>
+            <div class="glc" style="position: absolute; right: 70px; top: 80px; width: 430px; padding: 22px 26px; display: flex; flex-direction: column; gap: 10px">
+              <div style="display: flex; align-items: center; gap: 16px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{idl.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 64px; font-weight: 200; line-height: 1">{{idl.temp}}</span><span style="display: flex; flex-direction: column; margin-left: auto; text-align: right"><span style="font-size: 16px; font-weight: 700">{{idl.place}}</span><span style="font-size: 14px; opacity: 0.85">{{idl.hilo}}</span></span></div>
+              <div style="font-size: 17px; font-weight: 700">{{idl.desc}}</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; font-size: 14px; opacity: 0.9"><span>\u{1F4A8} {{idl.wind}}</span><span>\u2602 {{idl.rain}}</span><span>\u{1F305} M\u1ECDc {{idl.rise}}</span><span>\u{1F307} L\u1EB7n {{idl.set}}</span></div>
+            </div>
+            <sc-if value="{{idl.hourly}}" hint-placeholder-val="{{ true }}">
+              <div class="glc" style="position: absolute; left: 70px; bottom: 50px; width: 690px; height: 190px; padding: 14px 20px; box-sizing: border-box">
+                <svg width="650" height="160" viewBox="0 0 650 160" aria-hidden="true" style="position: absolute; left: 20px; top: 14px"><path d="{{idl.curveA}}" fill="rgba(255,201,74,0.18)"></path><path d="{{idl.curve}}" fill="none" stroke="#FFC94A" stroke-width="3" stroke-linecap="round"></path></svg>
+                <sc-for list="{{idl.hours}}" as="hh" hint-placeholder-count="6"><span style="position: absolute; left: {{hh.x}}px; top: 14px; width: 80px; margin-left: -40px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span style="font-size: 13px; font-weight: 700">{{hh.t}}</span><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{hh.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span style="font-size: 11px; color: #9FD8FF">{{hh.p}}</span></span><span class="tnum" style="position: absolute; left: {{hh.x}}px; top: {{hh.ty}}px; width: 60px; margin-left: -30px; text-align: center; font-size: 15px; font-weight: 700">{{hh.v}}</span></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{idl.days3On}}" hint-placeholder-val="{{ true }}">
+            <div class="glc" style="position: absolute; right: 70px; bottom: 50px; width: 430px; padding: 12px 22px; display: flex; flex-direction: column">
+              <sc-for list="{{idl.days3}}" as="dd" hint-placeholder-count="3"><div style="display: flex; align-items: center; gap: 12px; padding: 6px 0"><span style="width: 90px; font-size: 15px; font-weight: 700">{{dd.n}}</span><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{dd.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span style="margin-left: auto; font-size: 15px" class="tnum">{{dd.hi}} / {{dd.lo}}</span></div></sc-for>
+            </div>
+            </sc-if>
+          </sc-if>
+          <sc-if value="{{idl.analog}}" hint-placeholder-val="{{ false }}">
+            <svg width="380" height="380" viewBox="0 0 200 200" aria-hidden="true" style="position: absolute; left: 110px; top: 50px; filter: drop-shadow(0 14px 30px rgba(0,0,0,0.35))">
+              <circle cx="100" cy="100" r="96" fill="rgba(8,22,34,0.55)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"></circle>
+              <path d="{{idl.sunArc}}" fill="none" stroke="#FFC94A" stroke-width="3" stroke-linecap="round" opacity="0.85"></path>
+              <path d="{{idl.ticks}}" stroke="#E8F1F5" stroke-width="2" stroke-linecap="round"></path>
+              <line x1="100" y1="100" x2="{{idl.hx}}" y2="{{idl.hy}}" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"></line>
+              <line x1="100" y1="100" x2="{{idl.mx}}" y2="{{idl.my}}" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"></line>
+              <line x1="100" y1="100" x2="{{idl.sx}}" y2="{{idl.sy}}" stroke="#FBB040" stroke-width="1.5" stroke-linecap="round"></line>
+              <circle cx="100" cy="100" r="4" fill="#FBB040"></circle>
+            </svg>
+            <div style="position: absolute; left: 640px; top: 90px; width: 540px; display: flex; flex-direction: column; gap: 14px">
+              <span style="font-size: 30px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.35)">{{idl.date}}</span><span style="font-size: 18px; opacity: 0.9">{{idl.sub}}</span>
+              <div class="glc" style="display: flex; align-items: center; gap: 16px; padding: 16px 22px"><svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{idl.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 54px; font-weight: 200; line-height: 1">{{idl.temp}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 700">{{idl.desc}}</span><span style="font-size: 13px; opacity: 0.85">{{idl.desc2}}</span></span></div>
+              <div style="font-size: 13px; opacity: 0.85">V\xF2ng v\xE0ng tr\xEAn m\u1EB7t \u0111\u1ED3ng h\u1ED3: t\u1EEB l\xFAc m\u1EB7t tr\u1EDDi m\u1ECDc {{idl.rise}} t\u1EDBi l\xFAc l\u1EB7n {{idl.set}}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{idl.days5On}}" hint-placeholder-val="{{ true }}">
+            <div class="glc" style="position: absolute; left: 150px; right: 150px; bottom: 50px; padding: 14px 26px; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+              <sc-for list="{{idl.days5}}" as="dd" hint-placeholder-count="5"><div style="display: flex; flex-direction: column; align-items: center; gap: 5px"><span style="font-size: 14px; font-weight: 700">{{dd.n}}</span><svg width="40" height="40" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{dd.icon}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 15px">{{dd.hi}}</span><span style="position: relative; width: 90%; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.18)"><span style="position: absolute; left: {{dd.l}}%; width: {{dd.w}}%; top: 0; bottom: 0; border-radius: 3px; background: linear-gradient(90deg,#7FD0FF,#FFC94A)"></span></span><span class="tnum" style="font-size: 13px; opacity: 0.75">{{dd.lo}}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{idl.appt}}" hint-placeholder-val="{{ false }}"><span class="glc" style="position: absolute; left: 50%; transform: translateX(-50%); top: 16px; padding: 8px 18px; border-radius: 999px; font-size: 15px; white-space: nowrap">{{idl.appt}}</span></sc-if>
         </div>
-        <span style="position: absolute; left: 0; right: 0; bottom: 4px; font-size: 12px; opacity: 0.6">Ch\u1EA1m \u0111\u1EC3 \u0111\xF3ng</span>
+        <span class="tapfade" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; font-size: 14px; color: #FFFFFF; text-shadow: 0 1px 4px rgba(0,0,0,0.5)">Ch\u1EA1m \u0111\u1EC3 \u0111\xF3ng</span>
       </button>
     </sc-if>
 

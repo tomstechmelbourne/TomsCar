@@ -17,8 +17,8 @@ android {
         applicationId = "com.tomstechsolutions.car"
         minSdk = 26
         targetSdk = tcSdk
-        versionCode = 960
-        versionName = "0.9.6-beta"
+        versionCode = 970
+        versionName = "0.9.7-beta"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
 

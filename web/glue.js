@@ -55,15 +55,15 @@
     if (wxBusy || Date.now() - wxAt < 15 * 60 * 1000) return;
     wxBusy = true;
     const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat.toFixed(3) + '&longitude=' + lon.toFixed(3) +
-      '&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=4';
+      '&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=6';
     fetch(u).then((r) => r.json()).then((j) => {
       wxAt = Date.now();
       const nowH = new Date(); nowH.setMinutes(0, 0, 0);
       const hourly = []; const ht = (j.hourly && j.hourly.time) || [];
-      for (let i = 0; i < ht.length && hourly.length < 8; i++) { const t = new Date(ht[i]); if (t >= nowH) { const hr = t.getHours(); let c = wxCode(j.hourly.weather_code[i]); if (c === 'clear' && (hr < 6 || hr >= 20)) c = 'night'; hourly.push({ t: ht[i], temp: j.hourly.temperature_2m[i], code: c }); } }
+      for (let i = 0; i < ht.length && hourly.length < 12; i++) { const t = new Date(ht[i]); if (t >= nowH) { const hr = t.getHours(); let c = wxCode(j.hourly.weather_code[i]); if (c === 'clear' && (hr < 6 || hr >= 20)) c = 'night'; hourly.push({ t: ht[i], temp: j.hourly.temperature_2m[i], code: c, rain: j.hourly.precipitation_probability ? j.hourly.precipitation_probability[i] : null }); } }
       const daily = ((j.daily && j.daily.time) || []).map((d, i) => ({ d: d, hi: j.daily.temperature_2m_max[i], lo: j.daily.temperature_2m_min[i], code: wxCode(j.daily.weather_code[i]) }));
       const sun = j.daily && j.daily.sunrise ? { rise: j.daily.sunrise[0], set: j.daily.sunset[0] } : null;
-      window.__sun = sun;
+      window.__sun = sun; window.__sunDays = j.daily ? { rise: j.daily.sunrise, set: j.daily.sunset } : null;
       push({ wx: { temp: j.current.temperature_2m, feels: j.current.apparent_temperature, code: wxCode(j.current.weather_code), rain: j.current.precipitation_probability || 0, wind: j.current.wind_speed_10m, hi: j.daily.temperature_2m_max[0], lo: j.daily.temperature_2m_min[0], hourly: hourly, daily: daily, sun: sun } });
     }).catch(() => {}).then(() => { wxBusy = false; });
   };
@@ -316,6 +316,19 @@
     });
   };
 
+
+  // time of day from the real sunrise/sunset (falls back to the clock): ±30 min around rise = dawn, around set = dusk
+  window.tcTod = function (now) {
+    const t = (now || new Date()).getTime(), sd = window.__sunDays;
+    let r = null, st = null;
+    if (sd && sd.rise) { const day = new Date(t).toISOString ? new Date(t) : null; for (let i = 0; i < sd.rise.length; i++) { const rr = new Date(sd.rise[i]).getTime(), ss = new Date(sd.set[i]).getTime(); if (t < ss + 12 * 3600000) { r = rr; st = ss; break; } } }
+    if (r == null) { const h = new Date(t).getHours() + new Date(t).getMinutes() / 60; return h < 5.5 || h >= 20.5 ? 'night' : h < 6.5 ? 'dawn' : h >= 19.5 ? 'dusk' : 'day'; }
+    const M = 1800000;
+    if (t < r - M || t > st + M) return 'night';
+    if (t <= r + M) return 'dawn';
+    if (t >= st - M) return 'dusk';
+    return 'day';
+  };
   // ---- trip: direction, start time, today's distance, parked time ----
   let trip = null, lastKm = null, dirVotes = 0, today = (() => { try { const t = JSON.parse(localStorage.getItem('tc-today') || 'null'); return t && t.day === new Date().toDateString() ? t : null; } catch (e) { return null; } })();
   let lastT = Date.now(), parkedSince = Date.now();
@@ -416,20 +429,22 @@
     topo: ['https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', '© OpenStreetMap · SRTM · © OpenTopoMap (CC-BY-SA)', 17],
     sat: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Ảnh vệ tinh © Esri, Maxar, Earthstar Geographics', 18]
   };
+  let follow = false, userAt = 0, lastVan = null, loc = null, curDrive = false;
+  const paintLoc = () => { if (!loc) return; loc.style.color = !lastVan ? '#7A8A94' : follow ? '#FBB040' : '#FFFFFF'; loc.style.boxShadow = follow ? 'inset 0 0 0 2px #FBB040' : 'none'; loc.title = !lastVan ? 'Đang tìm vị trí…' : ''; };
   let map = null, layer = null, layerKey = '', routeL = null, doneL = null, van = null, marks = [], lastSig = '', box = null, ctl = null, fitted = '';
   const circ = (n) => n <= 20 ? String.fromCharCode(0x245F + n) : n + '.';
   const pointAtKm = (pts, km, tot) => { if (!pts || pts.length < 2) return null; const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], (pts[i][1] - pts[i - 1][1]) * 0.8)); const t = Math.max(0, Math.min(1, km / tot)) * L[L.length - 1]; let i = 1; while (i < L.length - 1 && L[i] < t) i++; const f = Math.min(1, (t - L[i - 1]) / ((L[i] - L[i - 1]) || 1)); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f]; };
   const place = () => {
     if (!box) return; const st = document.getElementById('stage'); if (!st) return;
     const r = st.getBoundingClientRect(), s = r.width / 1280;
-    box.style.left = (r.left + 20 * s) + 'px'; box.style.top = (r.top + 200 * s) + 'px'; box.style.width = (800 * s) + 'px'; box.style.height = (242 * s) + 'px';
+    box.style.left = (r.left + 20 * s) + 'px'; box.style.top = (r.top + 152 * s) + 'px'; box.style.width = (800 * s) + 'px'; box.style.height = (290 * s) + 'px';
     if (map) map.invalidateSize(false);
   };
   window.addEventListener('resize', () => setTimeout(place, 50));
   const ensure = () => {
     if (map || !window.L) return !!map;
     box = document.createElement('div'); box.id = 'rtmap';
-    box.style.cssText = 'position:fixed;z-index:50;display:none;border-radius:0 0 10px 10px;overflow:hidden;background:#0A1B28';
+    box.style.cssText = 'position:fixed;z-index:50;display:none;border-radius:12px;overflow:hidden;background:#0A1B28';
     document.body.appendChild(box);
     map = window.L.map(box, { zoomControl: false, attributionControl: true, preferCanvas: true }).setView([-36.5, 142], 6);
     map.attributionControl.setPrefix('');
@@ -438,6 +453,19 @@
     box.appendChild(ctl);
     window.L.DomEvent.disableClickPropagation(ctl);
     map.on('zoomend moveend', relayout);
+    // view switch (top-left) + locate button (bottom-right)
+    const vs = document.createElement('div'); vs.style.cssText = 'position:absolute;left:8px;top:8px;z-index:1000;display:flex;gap:4px;font:700 13px Overpass,sans-serif';
+    vs.appendChild(btn('Con Đường', false, () => window.__ui && window.__ui.setS('rtView', 'road'))); vs.appendChild(btn('Bản Đồ', true, () => {}));
+    box.appendChild(vs); window.L.DomEvent.disableClickPropagation(vs);
+    loc = document.createElement('button'); loc.setAttribute('aria-label', 'Về vị trí xe');
+    loc.style.cssText = 'position:absolute;right:10px;bottom:24px;z-index:1000;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.3);cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(8,22,34,.6);backdrop-filter:blur(10px)';
+    loc.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+    loc.onclick = () => { if (!lastVan) return; follow = true; userAt = 0; map.setView(lastVan, Math.max(map.getZoom(), 13), { animate: true }); paintLoc(); };
+    box.appendChild(loc); window.L.DomEvent.disableClickPropagation(loc);
+    map.on('dragstart', () => { follow = false; userAt = Date.now(); paintLoc(); });
+    map.getContainer().addEventListener('wheel', () => { follow = false; userAt = Date.now(); paintLoc(); }, { passive: true });
+    map.getContainer().addEventListener('touchstart', (e) => { if (e.touches && e.touches.length > 1) { follow = false; userAt = Date.now(); paintLoc(); } }, { passive: true });
+    paintLoc();
     return true;
   };
   const btn = (label, on, fn) => { const b = document.createElement('button'); b.textContent = label; b.style.cssText = 'height:30px;padding:0 9px;border:0;border-radius:15px;cursor:pointer;font:inherit;background:' + (on ? '#FBB040' : 'rgba(3,17,28,0.88)') + ';color:' + (on ? '#2A1A00' : '#CFE6EE'); b.onclick = fn; return b; };
@@ -464,8 +492,9 @@
       const m = q.m, g = q.group; const wantName = m.pri >= 3 || z >= 9;
       let label = g.length > 1 ? Math.min.apply(null, g.map((x) => x.n || 99)) + '+' + (g.length - 1) : (m.end ? '🏁' : m.start ? '●' : String(m.n));
       let name = wantName ? m.short : '';
+      const keep = m.start || m.end;
       const w = (label.length + name.length) * 7 + 30, bx = { x0: q.p.x - 12, x1: q.p.x - 12 + w, y0: q.p.y - 12, y1: q.p.y + 12 };
-      if (name && boxes.some((b) => !(bx.x1 < b.x0 || bx.x0 > b.x1 || bx.y1 < b.y0 || bx.y0 > b.y1))) { bx.y0 -= 26; bx.y1 -= 26; if (boxes.some((b) => !(bx.x1 < b.x0 || bx.x0 > b.x1 || bx.y1 < b.y0 || bx.y0 > b.y1))) name = ''; else m.lift = 1; } else m.lift = 0;
+      if (name && boxes.some((b) => !(bx.x1 < b.x0 || bx.x0 > b.x1 || bx.y1 < b.y0 || bx.y0 > b.y1))) { bx.y0 -= 26; bx.y1 -= 26; if (!keep && boxes.some((b) => !(bx.x1 < b.x0 || bx.x0 > b.x1 || bx.y1 < b.y0 || bx.y0 > b.y1))) name = ''; else m.lift = 1; } else m.lift = 0;
       boxes.push(bx);
       const html = '<div style="display:flex;flex-direction:column;align-items:flex-start;transform:translate(-12px,' + (m.lift ? -38 : -12) + 'px)"><div style="display:flex;align-items:center;gap:4px;white-space:nowrap"><span style="min-width:24px;height:24px;border-radius:12px;padding:0 4px;box-sizing:border-box;background:' + m.bg + ';border:2px solid #fff;color:#fff;font:800 13px Overpass,sans-serif;display:flex;align-items:center;justify-content:center">' + label + '</span>' + (name ? '<span style="font:700 12px Overpass,sans-serif;color:#fff;background:rgba(3,17,28,0.85);padding:1px 6px;border-radius:4px">' + name + '</span>' : '') + '</div>' + (m.lift ? '<span style="width:2px;height:14px;background:#fff;margin-left:11px;opacity:.8"></span>' : '') + '</div>';
       m.mk.setIcon(window.L.divIcon({ className: '', html, iconSize: [0, 0] }));
@@ -473,13 +502,14 @@
     });
   }
   window.tcMapSync = (o) => {
-    if (!o.show) { if (box) box.style.display = 'none'; return; }
+    if (!o.show) { if (box) { box.style.display = 'none'; box.__shown = false; } return; }
     if (!ensure()) return;
     if (box.style.display === 'none' || !box.style.display) { box.style.display = 'block'; place(); }
     const key = o.styleKey; const T = TILES[key] || TILES.dark;
     if (layerKey !== key) { if (layer) map.removeLayer(layer); layer = window.L.tileLayer(T[0], { attribution: T[1], maxZoom: T[2], subdomains: 'abc', detectRetina: false }).addTo(map); layerKey = key; }
     const tp = box.querySelector('.leaflet-tile-pane'); if (tp) tp.style.filter = 'brightness(' + (o.bright / 100) + ')' + (o.tint ? ' sepia(0.15) saturate(1.1)' : '');
     const cs = o.style + o.night + o.bright; if (cs !== window.__mapCtlSig) { window.__mapCtlSig = cs; drawCtl(o); }
+    if (box.__shown !== true) { box.__shown = true; setTimeout(() => { place(); }, 30); }
     const sig = o.tripId + '|' + o.isGo + '|' + o.stops.map((s) => s.id + s.next + s.done).join(',');
     if (sig !== lastSig) {
       lastSig = sig;
@@ -492,6 +522,12 @@
       if (fitted !== o.tripId && pts.length) { fitted = o.tripId; map.fitBounds(routeL.getBounds(), { padding: [20, 20] }); }
       relayout();
     }
-    if (o.van) { if (!van) van = window.L.circleMarker(o.van, { radius: 9, color: '#2A1A00', weight: 3, fillColor: '#FBB040', fillOpacity: 1 }).addTo(map); else van.setLatLng(o.van); if (o.follow) map.panTo(o.van, { animate: true }); }
+    lastVan = o.van || null; curDrive = !!o.drive; paintLoc();
+    if (o.van) {
+      const ico = window.L.divIcon({ className: '', iconSize: [0, 0], html: '<div style="transform:translate(-18px,-18px) rotate(' + Math.round(o.brg || 0) + 'deg);width:36px;height:36px"><svg width="36" height="36" viewBox="0 0 36 36"><circle cx="18" cy="18" r="16" fill="rgba(251,176,64,0.22)"/><path d="M18 5l9 23-9-5-9 5z" fill="#FBB040" stroke="#2A1A00" stroke-width="2" stroke-linejoin="round"/></svg></div>' });
+      if (!van) van = window.L.marker(o.van, { icon: ico, keyboard: false, zIndexOffset: 1000 }).addTo(map); else { van.setLatLng(o.van); van.setIcon(ico); }
+      if (!follow && curDrive && userAt && Date.now() - userAt > 10000) { follow = true; paintLoc(); }
+      if (follow) map.panTo(o.van, { animate: true });
+    }
   };
 })();

@@ -159,7 +159,7 @@
     if (S.tod === 'night' && S.wx !== 'rain' && S.wx !== 'storm') {
       if (!stars) { const r = rnd(7); stars = []; for (let i = 0; i < 80; i++) stars.push([r() * 1280, r() * 300, r() * 1.3 + 0.4, r() * 6]); }
       for (const st of stars) { g.fillStyle = 'rgba(255,255,255,' + (0.35 + 0.55 * Math.abs(Math.sin(t * 0.0006 + st[3]))).toFixed(2) + ')'; g.fillRect(st[0] / 1280 * W, st[1] / 720 * H, st[2] * DPR, st[2] * DPR); }
-      circ(W * 0.78, H * 0.12, H * 0.035, '#f3efdc'); circ(W * 0.78 + H * 0.015, H * 0.115, H * 0.031, c0);
+      circ(W * 0.3, H * 0.2, H * 0.026, '#f3efdc'); circ(W * 0.3 + H * 0.011, H * 0.195, H * 0.023, c0);
     } else if (S.wx === 'clear' || S.tod === 'dawn' || S.tod === 'dusk') {
       const sx = W * T.sun[0], sy = H * T.sun[1];
       const sg = g.createRadialGradient(sx, sy, 0, sx, sy, W * 0.11); sg.addColorStop(0, 'rgba(255,248,215,0.95)'); sg.addColorStop(0.3, 'rgba(255,230,150,0.45)'); sg.addColorStop(1, 'rgba(255,230,150,0)');
@@ -266,7 +266,7 @@
   // ---------- cockpit + gauge behind the wheel (right-hand drive) ----------
   function cockpit(t) {
     const c = CP[S.cockpit] || CP.lowpoly; const night = S.tod === 'night';
-    if (c.hud || !c.dash) { gaugeHud(); mirror(c); return; }
+    if (c.hud || !c.dash) { if (!S.noGauge) gaugeHud(); return; }
     const dh = H * c.top, dash = night ? c.dashN : c.dash;
     // A-pillars
     poly([[0, 0], [W * 0.05, 0], [W * 0.13, H - dh], [0, H - dh]], night ? shade(c.pillar, -0.6) : c.pillar);
@@ -283,15 +283,16 @@
     if (c.grab) { g.strokeStyle = c.trim; g.lineWidth = 6 * DPR; g.beginPath(); g.arc(W * 0.32, H - dh * 0.75, W * 0.04, Math.PI, 0); g.stroke(); }
     if (c.chrome) rect(W * 0.3, H - dh * 0.66, W * 0.4, 2 * DPR, '#e6e6e6');
     // gauge behind the wheel (driver sits on the right)
-    const gx = W * 0.75, gy = H - dh * 0.55;
-    gauge(gx, gy, Math.min(H * 0.078, dh * 0.34), c);
-    wheel(W * 0.75, H + H * 0.06, c, night);
-    mirror(c);
+    if (!S.noGauge) {
+      const gx = W * 0.75, gy = H - dh * 0.5;
+      gauge(gx, gy, Math.min(H * 0.072, dh * 0.32), c);
+      wheel(W * 0.75, H + H * 0.1, c, night);
+    }
     if (c.pixel) pixelate();
   }
 
   function wheel(x, y, c, night) {
-    const R = H * 0.34, col = night ? '#0c0f13' : '#2f3439';
+    const R = H * 0.3, col = night ? '#2a3038' : '#59636d';
     g.strokeStyle = col; g.lineCap = 'round';
     switch (c.wheel) {
       case 'four': case 'three': case 'big': case 'thin': {
@@ -307,6 +308,8 @@
       case 'yoke': g.lineWidth = H * 0.03; g.beginPath(); g.moveTo(x - R * 0.85, y - R * 0.25); g.lineTo(x - R * 0.85, y - R * 0.55); g.quadraticCurveTo(x, y - R * 0.75, x + R * 0.85, y - R * 0.55); g.lineTo(x + R * 0.85, y - R * 0.25); g.stroke(); break;
       default: g.lineWidth = H * 0.035; g.beginPath(); g.arc(x, y, R, Math.PI * 1.12, Math.PI * 1.88); g.stroke();
     }
+    // bright rim highlight
+    if (c.wheel !== 'yoke') { g.strokeStyle = night ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.42)'; g.lineWidth = H * 0.004; g.beginPath(); g.arc(x, y, (c.wheel === 'big' ? R * 1.15 : R) - H * 0.012, Math.PI * 1.12, Math.PI * 1.88); g.stroke(); }
     g.lineCap = 'butt';
   }
 
