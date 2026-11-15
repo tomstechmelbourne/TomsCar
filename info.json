@@ -1,0 +1,112 @@
+{
+ "voices": [
+  {
+   "name": "⭐ Adam bựa — Nam · Bắc · Phong cách tự nhiên",
+   "slug": "Adam_ba_Nam_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "⭐ Trúc Ly — Nữ · Bắc · Phong cách tự nhiên",
+   "slug": "Trc_Ly_N_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "⭐ Thiện Minh — Nam · Bắc · Phong cách kể chuyện",
+   "slug": "Thin_Minh_Nam_Bc_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "⭐ Mai Anh — Nữ · Bắc · Phong cách tin tức",
+   "slug": "Mai_Anh_N_Bc_Phong_cch_tin_tc"
+  },
+  {
+   "name": "⭐ Hải Đăng — Nam · Bắc · Phong cách tự nhiên",
+   "slug": "Hi_ng_Nam_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "⭐ Thùy Dung — Nữ · Nam · Phong cách tin tức",
+   "slug": "Thy_Dung_N_Nam_Phong_cch_tin_tc"
+  },
+  {
+   "name": "⭐ Thiền Tâm Đức — Nam · Bắc · Phong cách kể chuyện",
+   "slug": "Thin_Tm_c_Nam_Bc_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "⭐ Ngọc Huyền — Nữ · Bắc · Giọng đọc tự nhiên",
+   "slug": "Ngc_Huyn_N_Bc_Ging_c_t_nhin"
+  },
+  {
+   "name": "⭐ Quang Sơn — Nam · Trung · Phong cách tự nhiên",
+   "slug": "Quang_Sn_Nam_Trung_Phong_cch_t_nhin"
+  },
+  {
+   "name": "⭐ Ngọc Trân — Nữ · Trung · Phong cách tự nhiên",
+   "slug": "Ngc_Trn_N_Trung_Phong_cch_t_nhin"
+  },
+  {
+   "name": "Minh Đức — Nam · Bắc · Phong cách tin tức",
+   "slug": "Minh_c_Nam_Bc_Phong_cch_tin_tc"
+  },
+  {
+   "name": "Phạm Tuyên — Nam · Bắc · Phong cách tự nhiên",
+   "slug": "Phm_Tuyn_Nam_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "Thái Sơn — Nam · Nam · Phong cách kể chuyện",
+   "slug": "Thi_Sn_Nam_Nam_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "Xuân Vĩnh — Nam · Bắc · Phong cách tự nhiên",
+   "slug": "Xun_Vnh_Nam_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "Thanh Bình — Nam · Bắc · Phong cách kể chuyện",
+   "slug": "Thanh_Bnh_Nam_Bc_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "Ngọc Linh — Nữ · Bắc · Phong cách kể chuyện",
+   "slug": "Ngc_Linh_N_Bc_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "Đoan Trang — Nữ · Bắc · Phong cách tự nhiên",
+   "slug": "oan_Trang_N_Bc_Phong_cch_t_nhin"
+  },
+  {
+   "name": "Thục Đoan — Nữ · Nam · Phong cách kể chuyện",
+   "slug": "Thc_oan_N_Nam_Phong_cch_k_chuyn"
+  },
+  {
+   "name": "Minh Triết — Nam · Nam · Phong cách tin tức",
+   "slug": "Minh_Trit_Nam_Nam_Phong_cch_tin_tc"
+  },
+  {
+   "name": "Mỹ Duyên — Nữ · Nam · Phong cách đọc truyện",
+   "slug": "M_Duyn_N_Nam_Phong_cch_c_truyn"
+  },
+  {
+   "name": "Quỳnh Anh — Nữ · Bắc · Phong cách đọc truyện",
+   "slug": "Qunh_Anh_N_Bc_Phong_cch_c_truyn"
+  },
+  {
+   "name": "Đức Trí — Nam · Nam · Phong cách đọc truyện",
+   "slug": "c_Tr_Nam_Nam_Phong_cch_c_truyn"
+  },
+  {
+   "name": "Kim Thanh — Nữ · Nam · Phong cách đọc truyện",
+   "slug": "Kim_Thanh_N_Nam_Phong_cch_c_truyn"
+  },
+  {
+   "name": "Adam — Nam · Nam · Giọng đọc tự nhiên",
+   "slug": "Adam_Nam_Nam_Ging_c_t_nhin"
+  },
+  {
+   "name": "Quốc Tuấn — Nam · Bắc · Phong cách tự nhiên",
+   "slug": "Quc_Tun_Nam_Bc_Phong_cch_t_nhin"
+  }
+ ],
+ "lines": [
+  "Ba trăm mét nữa, rẽ phải vô Taylors Road.",
+  "Rẽ trái.",
+  "Vô vòng xoay, ra lối thứ hai.",
+  "Phía trước có camera tốc độ.",
+  "Dạ, đang tìm Bunnings Sunshine cho Tom.",
+  "Đã tới nơi, nhà của Tom."
+ ]
+}
