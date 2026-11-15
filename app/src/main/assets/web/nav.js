@@ -110,11 +110,12 @@
     if (t === "fork" || t === "off ramp" || t === "on ramp" || t === "merge") return /right/.test(mod) ? "slight right" : /left/.test(mod) ? "slight left" : "straight";
     return mod;
   };
+  const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
   const TILES = {
-    dark: ["https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", "\xA9 OpenStreetMap \xA9 CARTO", 19],
-    light: ["https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", "\xA9 OpenStreetMap \xA9 CARTO", 19],
-    topo: ["https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", "\xA9 OpenStreetMap \xB7 SRTM \xB7 \xA9 OpenTopoMap (CC-BY-SA)", 17],
-    sat: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", "\u1EA2nh v\u1EC7 tinh \xA9 Esri, Maxar, Earthstar Geographics", 18]
+    dark: { L: [[ESRI + "Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}", 16], [ESRI + "Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}", 16]], a: "B\u1EA3n \u0111\u1ED3 \xA9 Esri, HERE, Garmin, \xA9 OpenStreetMap" },
+    light: { L: [[ESRI + "World_Street_Map/MapServer/tile/{z}/{y}/{x}", 19]], a: "B\u1EA3n \u0111\u1ED3 \xA9 Esri, HERE, Garmin, \xA9 OpenStreetMap" },
+    topo: { L: [["https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", 17]], a: "\xA9 OpenStreetMap \xB7 SRTM \xB7 \xA9 OpenTopoMap (CC-BY-SA)" },
+    sat: { L: [[ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}", 18], [ESRI + "Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", 18]], a: "\u1EA2nh v\u1EC7 tinh \xA9 Esri, Maxar, Earthstar Geographics" }
   };
   let dbp = null;
   const db = () => dbp || (dbp = new Promise((res) => {
@@ -165,7 +166,7 @@
       img.src = url;
       return img;
     } });
-    return new CTL(T[0], { attribution: T[1], maxZoom: T[2], subdomains: "abc", detectRetina: false });
+    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : "", maxNativeZoom: l[1], maxZoom: 19, subdomains: "abc", detectRetina: false, zIndex: i + 1 })));
   };
   const ensure = () => {
     if (map) return true;
@@ -845,7 +846,9 @@
     const keys = NAV.tileList(pts), urls = [];
     keys.forEach((k) => {
       const [z, x, y] = k.split("/").map(Number);
-      urls.push(tileUrl(TILES.light[0], z, x, y), tileUrl(TILES.dark[0], z, x, y));
+      TILES.light.L.concat(TILES.dark.L).forEach((l) => {
+        if (z <= l[1]) urls.push(tileUrl(l[0], z, x, y));
+      });
     });
     let done = 0, i = 0, bad = 0;
     const total = urls.length;

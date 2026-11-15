@@ -52,11 +52,13 @@
   const iconKey = (s) => { const t = s.maneuver.type, mod = s.maneuver.modifier || 'straight'; if (t === 'arrive') return 'arrive'; if (/roundabout|rotary/.test(t)) return 'round'; if (t === 'fork' || t === 'off ramp' || t === 'on ramp' || t === 'merge') return /right/.test(mod) ? 'slight right' : /left/.test(mod) ? 'slight left' : 'straight'; return mod; };
 
   // ---------------- map ----------------
+  // CARTO raster tiles now need an API key (watermark without one) → Esri basemaps, no key needed
+  const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
   const TILES = {
-    dark: ['https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', '© OpenStreetMap © CARTO', 19],
-    light: ['https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', '© OpenStreetMap © CARTO', 19],
-    topo: ['https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', '© OpenStreetMap · SRTM · © OpenTopoMap (CC-BY-SA)', 17],
-    sat: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', 'Ảnh vệ tinh © Esri, Maxar, Earthstar Geographics', 18]
+    dark: { L: [[ESRI + 'Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', 16], [ESRI + 'Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', 16]], a: 'Bản đồ © Esri, HERE, Garmin, © OpenStreetMap' },
+    light: { L: [[ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}', 19]], a: 'Bản đồ © Esri, HERE, Garmin, © OpenStreetMap' },
+    topo: { L: [['https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', 17]], a: '© OpenStreetMap · SRTM · © OpenTopoMap (CC-BY-SA)' },
+    sat: { L: [[ESRI + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', 18], [ESRI + 'Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', 18]], a: 'Ảnh vệ tinh © Esri, Maxar, Earthstar Geographics' }
   };
   // offline tiles (prefetched before a long trip) live in IndexedDB; a tile that fails to load is looked up there
   let dbp = null;
@@ -68,7 +70,7 @@
   let routeL = null, routeC = null, altL = [], trailL = null, van = null, marks = [], follow = true, userAt = 0, lastVan = null, lastSig = '', fittedSig = '';
   const mkLayer = (T) => {
     const CTL = window.L.TileLayer.extend({ createTile(c, done) { const img = document.createElement('img'); img.alt = ''; const url = this.getTileUrl(c); img.onload = () => done(null, img); img.onerror = () => { if (img.__f) { done(new Error('tile'), img); return; } img.__f = 1; idbGet(url).then((b) => { if (b) img.src = URL.createObjectURL(b); else done(new Error('tile'), img); }); }; img.src = url; return img; } });
-    return new CTL(T[0], { attribution: T[1], maxZoom: T[2], subdomains: 'abc', detectRetina: false });
+    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : '', maxNativeZoom: l[1], maxZoom: 19, subdomains: 'abc', detectRetina: false, zIndex: i + 1 })));
   };
   const ensure = () => {
     if (map) return true; if (!window.L) return false;
@@ -354,7 +356,7 @@
   };
   NAV.prefetch = (pts, onProg) => {
     const keys = NAV.tileList(pts), urls = [];
-    keys.forEach((k) => { const [z, x, y] = k.split('/').map(Number); urls.push(tileUrl(TILES.light[0], z, x, y), tileUrl(TILES.dark[0], z, x, y)); });
+    keys.forEach((k) => { const [z, x, y] = k.split('/').map(Number); TILES.light.L.concat(TILES.dark.L).forEach((l) => { if (z <= l[1]) urls.push(tileUrl(l[0], z, x, y)); }); });
     let done = 0, i = 0, bad = 0; const total = urls.length;
     return new Promise((res) => {
       const next = () => { if (i >= total) { if (done >= total) res({ total, bad }); return; } const u = urls[i++];
