@@ -126,7 +126,18 @@ object Launcher {
     }
 
     /** Navigate with Waze (main), else Google Maps, else any map app. */
-    fun navigate(a: Activity, address: String) {
+    fun navigate(a: Activity, address0: String) {
+        // 0.9.9: "gmaps:lat,lon|name" / "waze:lat,lon|name" = open that app on the route Tom's Car planned
+        val m = Regex("^(gmaps|waze):(-?\\d+\\.?\\d*),(-?\\d+\\.?\\d*)(\\|.*)?$").find(address0.trim())
+        if (m != null) {
+            val ll = m.groupValues[2] + "," + m.groupValues[3]
+            val i = if (m.groupValues[1] == "waze") Intent(Intent.ACTION_VIEW, Uri.parse("https://waze.com/ul?ll=$ll&navigate=yes")).setPackage("com.waze")
+                    else Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$ll")).setPackage("com.google.android.apps.maps")
+            try { a.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return } catch (_: ActivityNotFoundException) {}
+            try { a.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$ll?q=$ll")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return } catch (_: ActivityNotFoundException) {}
+            toast(a, if (m.groupValues[1] == "waze") "Chưa cài Waze" else "Chưa cài Google Maps"); return
+        }
+        val address = address0
         val q = Uri.encode(address)
         val ll = Regex("^-?\\d+\\.\\d+,-?\\d+\\.\\d+$").matches(address.trim())
         val tries = listOf(

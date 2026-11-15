@@ -154,24 +154,18 @@ input[type=range]{accent-color:#FBB040}
         </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
         <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Chế Độ Riêng Tư" title="Chế Độ Riêng Tư" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
-        <button onClick="{{openTheme}}" aria-label="Giao Diện" title="Giao Diện" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #CFF6FF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01"></path></svg></button>
+        <button onClick="{{openTheme}}" aria-label="Giao Diện" title="Giao Diện" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19c1.2 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-.9.8-1.7 1.7-1.7h2.1a5.4 5.4 0 0 0 5.4-5.4C22 6.3 17.6 2.5 12 2.5z" fill="#F3EBD2" stroke="#8a6b3a" stroke-width="0.8"></path><circle cx="6.8" cy="11.6" r="1.9" fill="#E5484D"></circle><circle cx="9.6" cy="6.9" r="1.9" fill="#FBB040"></circle><circle cx="14.8" cy="6.6" r="1.9" fill="#7BD88F"></circle><circle cx="18.2" cy="10.4" r="1.9" fill="#2FD0F5"></circle><circle cx="8.6" cy="16.2" r="1.7" fill="#B07CF0"></circle></svg></button>
         <button onClick="{{goSettings}}" aria-label="Cài Đặt" title="Cài Đặt" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FBB040"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
         <button onClick="{{openExit}}" aria-label="Thoát chương trình" title="Thoát" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
       </header>
 
-      <!-- tab + gương camera sau (dời xuống dưới thanh trên) -->
-      <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px">
-        <button class="pill" style="background: #FBB040; color: #2A1A00">Màn Hình Chính</button>
-        <button onClick="{{goRt}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">Road Trip</button>
-        <button onClick="{{goContacts}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5); display: flex; align-items: center; gap: 6px">Liên Lạc<span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{unreadN}}</span></button>
-        <button onClick="{{goSearch}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">Tìm Chỗ</button>
-      </div>
-      <div data-demo="1" class="pnl" style="position: absolute; right: 20px; top: 86px; width: 300px; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg,#0E2A3C,#06141F)">
-        <span class="lbl" style="position: absolute; left: 12px; top: 8px">CAM SAU</span>
-        <svg width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><path d="M0 44 L46 8 L74 8 L120 44" fill="none" stroke="#FBB040" stroke-width="2" opacity="0.6"></path><rect x="50" y="18" width="20" height="12" rx="2" fill="#5FD4F0" opacity="0.5"></rect></svg>
+      <!-- tab: Màn Hình Chính · Hành Trình · Road Trip · Liên Lạc · Tìm Chỗ -->
+      <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- cột Workspace: trống lần đầu -->
+      <sc-if value="{{wsShow}}" hint-placeholder-val="{{ true }}">
       <section aria-label="Workspace" style="position: absolute; left: 20px; top: 138px; width: 330px; bottom: 100px; display: flex; flex-direction: column; gap: 8px">
         <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">WORKSPACE</span><sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}"><button onClick="{{openCreate}}" class="btn" style="height: 34px; font-size: 12px">+ Tạo</button></sc-if></div>
         <sc-if value="{{wsEmpty}}" hint-placeholder-val="{{ true }}">
@@ -190,12 +184,209 @@ input[type=range]{accent-color:#FBB040}
             <div class="pnl glb" style="flex-shrink: 0; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
               <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><sc-if value="{{w.rt}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px">Road Trip</span></sc-if><button onClick="{{w.edit}}" aria-label="Sửa Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #CFF6FF">✎</button><button onClick="{{w.del}}" aria-label="Xoá Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">✕</button></div>
               <div aria-hidden="true" style="display: flex; gap: 4px; height: 30px"><sc-for list="{{w.boxes}}" as="b" hint-placeholder-count="2"><span style="flex: {{b.flex}}; min-width: 0; border-radius: 4px; background: {{b.bg}}; font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; padding: 0 4px">{{b.name}}</span></sc-for></div>
-              <button onClick="{{w.open}}" class="btn btn-o" style="height: 44px">Mở Workspace</button>
+              <button onClick="{{w.open}}" class="btn glb" style="height: 44px; color: #FFD08A; font-weight: 800; background: rgba(251,176,64,0.16); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.7)">Mở Workspace</button>
             </div>
           </sc-for>
         </div>
         </sc-if>
       </section>
+      </sc-if>
+      <!-- ===== 0.9.9: lớp trên bản đồ ===== -->
+      <!-- ô "Đi đâu?" (Màn Hình Chính) -->
+      <sc-if value="{{nv.boxOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 54px; box-sizing: border-box; padding: 0 6px 0 14px; display: flex; align-items: center; gap: 8px; z-index: 7">
+          <span aria-hidden="true" style="font-size: 20px; color: #FBB040">➤</span>
+          <input type="text" aria-label="Đi đâu?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
+          <sc-if value="{{nv.qOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.clearQ}}" aria-label="Xoá chữ" class="btn" style="width: 40px; height: 40px; padding: 0; background: transparent">✕</button></sc-if>
+          <button onClick="{{nv.goFirst}}" class="btn btn-o" style="height: 42px; padding: 0 20px; font-size: 17px">Đi</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.resOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl fadein" role="listbox" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: 380px; box-sizing: border-box; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
+          <div class="scrl" style="display: flex; flex-direction: column; gap: 2px; max-height: 368px">
+            <sc-for list="{{nv.res}}" as="r" hint-placeholder-count="4"><button onClick="{{r.pick}}" style="flex-shrink: 0; width: 100%; border: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-align: left"><span style="width: 38px; height: 38px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 32px; height: 32px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 12px; color: #FFD08A; white-space: nowrap">{{r.km}}</span></button></sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.chipsOn}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: 20px; top: 150px; width: 470px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; z-index: 6">
+          <sc-for list="{{nv.chips}}" as="c" hint-placeholder-count="3"><button onClick="{{c.go}}" class="pill glt" style="height: 38px; background: rgba(8,22,34,0.72); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); font-size: 14px; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis">{{c.l}}</button></sc-for>
+        </div>
+      </sc-if>
+
+      <!-- biển chỉ đường (đang chạy theo chỉ đường) -->
+      <sc-if value="{{nv.bannerOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl fadein" role="status" aria-live="polite" style="position: absolute; right: 20px; top: 88px; width: 470px; box-sizing: border-box; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; background: rgba(12,92,66,0.94); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 7">
+          <div style="display: flex; align-items: center; gap: 14px">
+            <svg width="66" height="66" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink: 0"><path d="{{nv.icoD}}" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div style="flex: 1; min-width: 0"><div class="tnum" style="font-size: 36px; font-weight: 800; line-height: 1; color: #FFFFFF">{{nv.dist}}</div><div style="font-size: 19px; font-weight: 700; line-height: 1.25; color: #FFFFFF; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical">{{nv.text}}</div></div>
+          </div>
+          <sc-if value="{{nv.thenOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: #D8FFF0; border-top: 1px solid rgba(255,255,255,0.22); padding-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sau đó {{nv.thenDist}}: {{nv.then}}</div></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- thẻ tóm tắt chuyến (xem trước, chưa chạy) -->
+      <sc-if value="{{nv.prevOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb fadein" role="dialog" aria-label="Tóm tắt đường đi" style="position: absolute; right: 84px; top: 150px; width: 406px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="width: 40px; height: 40px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; font-size: 20px"><sc-if value="{{nv.destLogoOn}}" hint-placeholder-val="{{ false }}"><img src="{{nv.destLogo}}" alt="" style="width: 34px; height: 34px; object-fit: contain"></sc-if><sc-if value="{{nv.destIcOn}}" hint-placeholder-val="{{ true }}"><span style="color: #D0202E">⚑</span></sc-if></span>
+            <div style="flex: 1; min-width: 0"><div style="font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.dest}}</div><div style="font-size: 13px; color: #CFE6EE">{{nv.sum}}</div></div>
+            <button onClick="{{nv.cancel}}" aria-label="Huỷ đường đi" class="btn" style="width: 40px; height: 40px; padding: 0">✕</button>
+          </div>
+          <sc-for list="{{nv.alts}}" as="a" hint-placeholder-count="2"><button onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; background: {{a.bg}}; box-shadow: {{a.ring}}"><span style="font-size: 14px; font-weight: 700; flex: 1; text-align: left">{{a.label}}</span><span style="font-size: 12px; color: #FFD08A">{{a.toll}}</span><span class="tnum" style="font-size: 14px">{{a.info}}</span></button></sc-for>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nv.avoid}}" as="v" hint-placeholder-count="3"><button onClick="{{v.tap}}" aria-pressed="{{v.on}}" class="pill" style="height: 32px; padding: 0 10px; font-size: 12px; background: {{v.bg}}; color: {{v.fg}}">{{v.l}}</button></sc-for></div>
+          <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
+          <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
+          <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">Bắt Đầu</button>
+          <div style="display: flex; gap: 6px"><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Mở bằng Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Mở bằng Waze</button></div>
+          <div style="font-size: 11px; color: #8FC3D3">Thời gian ước tính theo đường, chưa tính kẹt xe.</div>
+        </div>
+      </sc-if>
+
+      <!-- thẻ giờ tới (đang chạy) -->
+      <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb" style="position: absolute; right: 20px; bottom: 100px; width: 470px; height: 66px; box-sizing: border-box; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6">
+          <div style="flex: 1; min-width: 0"><div class="tnum" style="font-size: 24px; font-weight: 800; color: #7BD88F; line-height: 1.1">{{nv.eta}} <span style="font-size: 13px; font-weight: 600; color: #CFE6EE">tới nơi</span></div><div style="font-size: 13px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.left}} · {{nv.km}} · {{nv.dest}}</div></div>
+          <button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">{{nv.voiceIc}}</button>
+          <button onClick="{{nv.share}}" aria-label="Gửi giờ tới bằng tin nhắn" class="btn" style="height: 48px; font-size: 13px">Gửi ETA</button>
+          <button onClick="{{nv.stop}}" class="btn" style="height: 48px; font-size: 15px; color: #FFFFFF; background: #C8343A">Dừng</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.arrivedOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb fadein" role="status" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 70px; box-sizing: border-box; padding: 0 10px 0 18px; display: flex; align-items: center; gap: 10px; z-index: 7; background: rgba(12,92,66,0.94)">
+          <span style="flex: 1; font-size: 20px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.arrivedL}}</span>
+          <button onClick="{{nv.done}}" class="btn btn-o" style="height: 48px">Xong</button>
+        </div>
+      </sc-if>
+
+      <!-- nút bản đồ: + − vị trí, cả chuyến, hướng -->
+      <sc-if value="{{nv.ctlOn}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; gap: 8px; z-index: 5">
+          <button onClick="{{nv.zin}}" aria-label="Phóng to" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">+</button>
+          <button onClick="{{nv.zout}}" aria-label="Thu nhỏ" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">−</button>
+          <button onClick="{{nv.loc}}" aria-label="Về vị trí xe" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
+          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem cả chuyến" title="Xem cả chuyến" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
+          <sc-if value="{{nv.rotOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.rot}}" aria-label="{{nv.rotA}}" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 20px; font-weight: 800; color: #FFD08A">{{nv.rotL}}</button></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===== HÀNH TRÌNH (#63, #66) ===== -->
+      <sc-if value="{{hj.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">➤ Hành Trình ▸</button></sc-if>
+      <sc-if value="{{hj.on}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="Hành Trình" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">HÀNH TRÌNH</span><button onClick="{{hj.toggle}}" aria-label="Thu gọn bảng" class="btn" style="width: 38px; height: 34px; padding: 0">◀</button></div>
+          <sc-if value="{{hj.habitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.habitGo}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; padding: 8px 12px; border-radius: 10px; background: rgba(251,176,64,0.14); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 14px">{{hj.habitL}}</span><span style="font-weight: 800; color: #FBB040">Đi ➤</span></button></sc-if>
+          <sc-if value="{{hj.parkOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
+              <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">🅿 {{hj.parkL}}</button>
+              <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nhắc hết giờ:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <div style="display: flex; align-items: center; gap: 10px; height: 32px"><span style="width: 22px; height: 22px; border-radius: 11px; background: #14A05A; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0"></span><span style="font-size: 14px; color: #CFE6EE">Từ: Vị trí hiện tại</span></div>
+            <sc-for list="{{hj.wps}}" as="w" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column">
+                <span aria-hidden="true" style="width: 0; height: 10px; margin-left: 10px; border-left: 2px dotted #A9C7D4"></span>
+                <div style="display: flex; align-items: center; gap: 8px; min-height: 34px">
+                  <span style="width: 22px; height: 22px; border-radius: 11px; background: {{w.bg}}; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0; color: #FFFFFF; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{w.n}}</span>
+                  <sc-if value="{{w.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{w.logo}}" alt="" style="width: 20px; height: 20px; border-radius: 4px; background: #FFFFFF"></sc-if>
+                  <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span>
+                  <button onClick="{{w.up}}" aria-label="Lên" class="btn" style="width: 30px; height: 28px; padding: 0; font-size: 11px; opacity: {{w.upOp}}">▲</button>
+                  <button onClick="{{w.down}}" aria-label="Xuống" class="btn" style="width: 30px; height: 28px; padding: 0; font-size: 11px; opacity: {{w.downOp}}">▼</button>
+                  <button onClick="{{w.del}}" aria-label="Bỏ điểm này" class="btn" style="width: 30px; height: 28px; padding: 0; color: #FF9A9E">✕</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: relative">
+            <input type="text" aria-label="Đi đâu?" value="{{hj.q}}" placeholder="{{hj.ph}}" disabled="{{hj.lock}}" onInput="{{hj.type}}" style="width: 100%; box-sizing: border-box; height: 46px; border: 0; border-radius: 10px; padding: 0 14px; font-family: inherit; font-size: 16px; background: rgba(13,44,64,0.92); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.55); outline: none">
+          </div>
+          <sc-if value="{{hj.resOn}}" hint-placeholder-val="{{ false }}">
+            <div class="scrl" style="max-height: 220px; display: flex; flex-direction: column; gap: 2px; background: rgba(4,18,30,0.9); border-radius: 10px; padding: 4px">
+              <sc-for list="{{hj.res}}" as="r" hint-placeholder-count="3"><button onClick="{{r.pick}}" style="flex-shrink: 0; width: 100%; border: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 34px; height: 34px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 28px; height: 28px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 11px; color: #FFD08A; white-space: nowrap">{{r.km}}</span></button></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{hj.wpOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px"><sc-if value="{{hj.tidyOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.tidy}}" class="btn" style="flex: 1; height: 40px; font-size: 13px">Sắp Xếp Gọn</button></sc-if><button onClick="{{nv.start}}" class="btn btn-o" style="flex: 1; height: 40px; font-size: 15px">Bắt Đầu</button></div></sc-if>
+          <div role="tablist" style="display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 34px; padding: 0 4px; font-size: 13px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-if value="{{hj.emptyOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #8FC3D3; padding: 10px 4px; line-height: 1.45">{{hj.empty}}</span></sc-if>
+            <sc-if value="{{hj.workOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.workSet}}" class="btn" style="flex-shrink: 0; height: 36px; font-size: 13px">💼 Lưu chỗ đang đậu là Chỗ Làm</button></sc-if>
+            <sc-if value="{{hj.rowsOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.rows}}" as="r" hint-placeholder-count="4">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.04)">
+                  <span style="width: 36px; height: 36px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 30px; height: 30px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span>
+                  <button onClick="{{r.pick}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3">{{r.sub}}</span></button>
+                  <button onClick="{{r.addStop}}" aria-label="Thêm làm điểm dừng" class="btn" style="width: 34px; height: 34px; padding: 0; font-size: 16px">＋</button>
+                  <sc-if value="{{r.actOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.act}}" aria-label="{{r.actA}}" class="btn" style="width: 34px; height: 34px; padding: 0">{{r.actL}}</button></sc-if>
+                  <button onClick="{{r.go}}" aria-label="Đi tới đây" class="btn btn-o" style="width: 40px; height: 34px; padding: 0">➤</button>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.logRows}}" as="l" hint-placeholder-count="3">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: {{l.bg}}">
+                  <button onClick="{{l.show}}" aria-pressed="{{l.on}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 11px; color: #8FC3D3">{{l.when}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{l.name}}</span><span style="font-size: 11px; color: #FFD08A">{{l.km}}</span></button>
+                  <button onClick="{{l.del}}" aria-label="Xoá chuyến này" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">✕</button>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+          <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px; align-items: center"><span style="flex: 1; font-size: 11px; color: #8FC3D3">Chỉ lưu trong máy này</span><button onClick="{{hj.logToggle}}" class="btn" style="height: 34px; font-size: 12px">{{hj.logOnL}}</button><button onClick="{{hj.clear}}" class="btn" style="height: 34px; font-size: 12px; color: #FF9A9E">{{hj.clearL}}</button></div></sc-if>
+        </section>
+      </sc-if>
+
+      <!-- ===== ROAD TRIP trên bản đồ (#59) ===== -->
+      <sc-if value="{{rtp.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{rtp.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">🗺 Road Trip ▸</button></sc-if>
+      <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><button onClick="{{rtp.toggle}}" aria-label="Thu gọn bảng" class="btn" style="width: 38px; height: 34px; padding: 0">◀</button></div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 34px; padding: 0 12px; font-size: 13px; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 34px; font-size: 13px">Các Chuyến ▾</button>
+            <button onClick="{{rtp.newTrip}}" class="btn" style="height: 34px; font-size: 13px; color: #FFD08A">{{rtp.newL}}</button>
+          </div>
+          <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">Từ<input type="text" value="{{rtp.from}}" placeholder="{{rtp.fromPh}}" disabled="{{rtp.lock}}" onClick="{{rtp.focusFrom}}" onInput="{{rtp.typeFrom}}" style="height: 42px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <sc-if value="{{rtp.resFromOn}}" hint-placeholder-val="{{ false }}"><div class="scrl" style="max-height: 170px; display: flex; flex-direction: column; gap: 2px"><sc-for list="{{rtp.resFrom}}" as="r" hint-placeholder-count="2"><button onClick="{{r.pick}}" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.04); cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 28px; height: 28px; border-radius: 6px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 24px; height: 24px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span></button></sc-for></div></sc-if>
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">Tới<input type="text" value="{{rtp.to}}" placeholder="Vd: Adelaide, Bunnings Sunshine…" disabled="{{rtp.lock}}" onInput="{{rtp.typeTo}}" style="height: 42px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <sc-if value="{{rtp.resToOn}}" hint-placeholder-val="{{ false }}"><div class="scrl" style="max-height: 170px; display: flex; flex-direction: column; gap: 2px"><sc-for list="{{rtp.resTo}}" as="r" hint-placeholder-count="2"><button onClick="{{r.pick}}" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.04); cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 28px; height: 28px; border-radius: 6px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 24px; height: 24px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 11px; color: #FFD08A">{{r.km}}</span></button></sc-for></div></sc-if>
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">Tên chuyến<input type="text" value="{{rtp.name}}" placeholder="{{rtp.namePh}}" onInput="{{rtp.setName}}" style="height: 40px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <button onClick="{{rtp.create}}" disabled="{{rtp.lock}}" class="btn btn-o" style="height: 44px; font-size: 16px">{{rtp.createL}}</button>
+              <span style="font-size: 12px; color: #FFD08A">{{rtp.lockL}}{{rtp.msg}}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+            <sc-for list="{{rtp.boxes}}" as="b" hint-placeholder-count="3"><div style="border-radius: 8px; background: rgba(255,255,255,0.05); padding: 5px 4px; display: flex; flex-direction: column; align-items: center; text-align: center"><span class="lbl" style="font-size: 9px">{{b.l}}</span><span style="font-size: 16px; font-weight: 800; white-space: nowrap">{{b.v}}</span><span style="font-size: 10px; color: #8FC3D3; white-space: nowrap">{{b.s}}</span></div></sc-for>
+          </div>
+          <button onClick="{{rtp.openLog}}" aria-label="Tiến độ chuyến — bấm xem nhật ký" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
+            <span style="display: block; width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span>
+            <span style="display: flex; gap: 8px; font-size: 12px; width: 100%"><span style="color: #CFE6EE; flex: 1">{{rtp.pctL}}</span><span style="color: #FFD08A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px">Chặng kế: {{rtp.nx}} · {{rtp.nxKm}}</span></span>
+          </button>
+          <div class="lbl" style="display: flex; align-items: center"><span style="flex: 1">CÁC CHẶNG GHÉ · {{rtp.count}}</span></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="5">
+              <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
+                <div style="width: 28px; height: 28px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
+                <button onClick="{{s.open}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-decoration: {{s.strike}}">{{s.name}}</span><span style="font-size: 11px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #8FC3D3">{{s.eta}}</span></span></button>
+                <button onClick="{{s.up}}" aria-label="Lên" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">▲</button>
+                <button onClick="{{s.down}}" aria-label="Xuống" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">▼</button>
+                <button onClick="{{s.skip}}" aria-label="Bỏ qua chuyến này" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 11px">{{s.skipL}}</button>
+                <button onClick="{{s.del}}" aria-label="Xoá chặng" class="btn" style="width: 28px; height: 26px; padding: 0; color: #FF9A9E; font-size: 11px">✕</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 6px"><button onClick="{{rtp.addStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Thêm Chặng</button><button onClick="{{rtp.pickStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Từ Danh Sách</button></div>
+          <div style="flex-shrink: 0; display: flex; gap: 4px; align-items: center; font-size: 12px; color: #CFE6EE">
+            <span class="tnum" style="white-space: nowrap">A <b style="color: #FFFFFF">{{rtp.a}}</b></span><button onClick="{{rtp.resetA}}" aria-label="Đặt lại Trip A" class="btn" style="width: 28px; height: 28px; padding: 0">↺</button>
+            <span class="tnum" style="white-space: nowrap; margin-left: 4px">B <b style="color: #FFFFFF">{{rtp.b}}</b></span><button onClick="{{rtp.resetB}}" aria-label="Đặt lại Trip B" class="btn" style="width: 28px; height: 28px; padding: 0">↺</button>
+            <button onClick="{{rtp.off}}" class="btn" style="flex: 1; min-width: 0; height: 28px; font-size: 11px; color: #A9E3F2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.offL}}</button>
+          </div>
+          </sc-if>
+          <button onClick="{{rtp.start}}" class="btn" style="height: 50px; font-size: 16px; font-weight: 800; background: {{rtp.startBg}}; color: {{rtp.startFg}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.startL}}</button>
+        </section>
+      </sc-if>
 
       <!-- số tốc độ (canh giữa, đổi kiểu được) + biển giới hạn theo vùng -->
       <div style="display: {{spdDisp}}; position: absolute; left: 440px; top: 130px; width: 400px; height: 310px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,6,10,0.72), rgba(1,6,10,0.45) 60%, rgba(1,6,10,0))">
@@ -267,7 +458,7 @@ input[type=range]{accent-color:#FBB040}
           <svg width="110" height="110" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
           <span style="text-align: center; position: relative"><span class="tnum" style="display: block; font-size: 38px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.85; margin-top: 2px">{{dk.unit}}</span></span>
         </button>
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 9px; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></div></sc-if>
+        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></div></sc-if>
         <div style="position: absolute; left: 640px; bottom: 128px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none">
           <sc-if value="{{sb.ahead}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 6px 14px; font-size: 14px; color: #FFD08A; text-align: center; white-space: nowrap">Phía trước 300 m: {{sb.aheadL}}</div></sc-if>
           <sc-if value="{{sb.statsOpen}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center; white-space: nowrap">{{sb.stats}}</div></sc-if>
@@ -417,6 +608,7 @@ input[type=range]{accent-color:#FBB040}
           <span class="lbl">KIỂU VẼ</span>
           <sc-for list="{{th.styles}}" as="o" hint-placeholder-count="2"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 38px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0 6px"><span class="lbl">NỀN MÀN HÌNH CHÍNH</span><sc-for list="{{th.homeBg}}" as="o" hint-placeholder-count="2"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 16px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for><span style="font-size: 12px; color: #8FC3D3">Chọn một cảnh bên dưới là nền đổi sang low-poly · khi chỉ đường luôn hiện bản đồ</span></div>
         <sc-for list="{{th.groups}}" as="gp" hint-placeholder-count="4">
           <div style="margin: 10px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">{{gp.label}}</div>
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px">
@@ -441,175 +633,21 @@ input[type=range]{accent-color:#FBB040}
     </sc-if>
 
     <!-- ========== 3. ROAD TRIP ========== -->
-    <sc-if value="{{isRt}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; left: 20px; right: 20px; top: 12px; display: flex; align-items: center; gap: 8px">
-        <button onClick="{{goHome}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5)">Màn Hình Chính</button>
-        <button class="pill" style="background: #FBB040; color: #2A1A00">Road Trip</button>
-        <span style="font-size: 20px; font-weight: 700; margin-left: 8px; white-space: nowrap">{{rt.title}}</span>
-        <sc-for list="{{rt.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-        <button onClick="{{rt.toggleAutoDir}}" aria-pressed="{{rt.autoDir}}" class="pill" style="white-space: nowrap; background: {{rt.autoDirBg}}; color: {{rt.autoDirC}}; box-shadow: inset 0 0 0 1px {{rt.autoDirC}}">📍 Tự Nhận Chiều</button>
-        <span style="margin-left: auto"></span>
-        <button onClick="{{rt.openTrips}}" class="btn" style="height: 40px; font-size: 13px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis">{{rt.tripL}}</button>
-        <button onClick="{{goSearch}}" class="btn" style="height: 40px; font-size: 13px">Tìm Chỗ</button>
-        <button onClick="{{goSplit}}" class="btn btn-o" style="height: 40px; font-size: 13px">Mở Bản Đồ</button>
-      </div>
-
-      <!-- 3 ô trên: canh giữa -->
-      <div style="position: absolute; left: 20px; top: 64px; width: 800px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
-        <sc-for list="{{rt.boxes}}" as="b" hint-placeholder-count="3">
-          <div class="pnl" style="height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px"><span class="lbl">{{b.l}}</span><span style="font-size: 22px; font-weight: 700">{{b.v}}</span><span style="font-size: 12px; color: #8FC3D3">{{b.s}}</span></div>
-        </sc-for>
-      </div>
-
-      <!-- hiển thị quãng đường: phóng to / thu nhỏ, km, hình chặng -->
-      <div class="pnl" onWheel="{{rt.wheel}}" onPointerDown="{{rt.panStart}}" onPointerMove="{{rt.panMove}}" onPointerUp="{{rt.panEnd}}" onPointerLeave="{{rt.panEnd}}" style="position: absolute; left: 20px; top: 152px; width: 800px; height: 290px; overflow: hidden; touch-action: none; cursor: {{rt.cursor}}">
-        <div style="position: absolute; left: 0; top: 0; width: 800px; height: 290px; transform-origin: 0 0; transform: translate({{rt.tx}}px, {{rt.ty}}px) scale({{rt.z}})">
-          <sc-if value="{{rt.road}}" hint-placeholder-val="{{ true }}">
-            <svg aria-hidden="true" viewBox="0 0 800 290" width="800" height="290" style="position: absolute; left: 0; top: 0; display: block">
-              <rect x="{{rt.r0x}}" y="0" width="{{rt.r0w}}" height="290" fill="#0B1E33"></rect>
-              <rect x="{{rt.r1x}}" y="0" width="{{rt.r1w}}" height="290" fill="#0E2A22"></rect>
-              <rect x="{{rt.r2x}}" y="0" width="{{rt.r2w}}" height="290" fill="#2A2612"></rect>
-              <rect x="{{rt.r3x}}" y="0" width="{{rt.r3w}}" height="290" fill="#2A1C12"></rect>
-              <rect x="{{rt.r4x}}" y="0" width="{{rt.r4w}}" height="290" fill="#1B2618"></rect>
-              <path d="{{rt.cityD}}" fill="#163650" stroke="#5FD4F0" stroke-width="1" opacity="0.8"></path>
-              <path d="{{rt.hillD}}" fill="#1F4A33" opacity="0.9"></path>
-              <path d="{{rt.wheatD}}" stroke="#C9A64A" stroke-width="2" opacity="0.7"></path>
-              <path d="{{rt.scrubD}}" fill="#6B5A34" opacity="0.9"></path>
-              <path d="{{rt.ahillD}}" fill="#2D4A28" opacity="0.9"></path>
-              <path d="{{rt.roadD}}" fill="none" stroke="#2B3A46" stroke-width="22" stroke-linecap="round"></path>
-              <path d="{{rt.roadD}}" fill="none" stroke="#E8F1F5" stroke-width="1.6" stroke-dasharray="10 10" opacity="0.6"></path>
-              <path d="{{rt.doneD}}" fill="none" stroke="#7BD88F" stroke-width="6" stroke-linecap="round" opacity="0.85"></path>
-              <path d="{{rt.tickD}}" stroke="#E8F1F5" stroke-width="1.5" opacity="0.7"></path>
-              <line x1="{{rt.bx}}" y1="120" x2="{{rt.bx}}" y2="245" stroke="#FBB040" stroke-width="2" stroke-dasharray="5 4" opacity="{{rt.bxOp}}"></line>
-            </svg>
-            <sc-for list="{{rt.regions}}" as="g" hint-placeholder-count="5"><span style="position: absolute; left: {{g.x}}px; top: 262px; width: {{g.w}}px; text-align: center; font-size: 11px; color: #A9C7D4; letter-spacing: 0.5px">{{g.label}}</span></sc-for>
-            <sc-for list="{{rt.ticks}}" as="t" hint-placeholder-count="7"><span style="position: absolute; left: {{t.x}}px; top: {{t.y}}px; transform: translateX(-50%) scale({{rt.inv}}); transform-origin: 50% 0; font-size: 10px; color: #CFE6EE; white-space: nowrap">{{t.label}}</span></sc-for>
-            <sc-for list="{{rt.segs}}" as="g" hint-placeholder-count="6"><span style="position: absolute; left: {{g.x}}px; top: {{g.y}}px; transform: translateX(-50%) scale({{rt.inv}}); transform-origin: 50% 0; font-size: 11px; font-weight: 700; color: #FFD08A; background: rgba(3,17,28,0.75); border-radius: 4px; padding: 0 4px; white-space: nowrap">{{g.label}}</span></sc-for>
-            <div aria-hidden="true" style="position: absolute; left: {{rt.sunX}}px; top: 14px; transform: scale({{rt.inv}}); transform-origin: 50% 0; display: flex; flex-direction: column; align-items: center; gap: 2px">
-              <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="{{rt.sunIcon}}" fill="{{rt.sunC}}"></path></svg>
-              <span style="font-size: 11px; color: #CFE6EE">tới {{rt.eta}}</span>
-            </div>
-            <sc-for list="{{rt.signs}}" as="s" hint-placeholder-count="6">
-              <button onClick="{{s.open}}" onDoubleClick="{{s.focus}}" aria-label="{{s.aria}}" style="position: absolute; left: {{s.x}}px; top: {{s.y}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; border: 0; padding: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; align-items: center">
-                <sc-if value="{{s.photo}}" hint-placeholder-val="{{ false }}"><span class="ph {{s.cls}}" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFFFFF; box-sizing: border-box; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 3px; background: {{s.bg}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></span></sc-if>
-                <sc-if value="{{s.sign}}" hint-placeholder-val="{{ true }}"><span class="{{s.cls}}" style="width: 30px; height: 30px; border-radius: 4px; background: {{s.bg}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></sc-if>
-                <span style="font-size: 10px; white-space: nowrap; max-width: 96px; overflow: hidden; text-overflow: ellipsis">{{s.short}}</span>
-                <span style="font-size: 10px; font-weight: 700; white-space: nowrap; color: {{s.kmC}}">{{s.km}}</span>
-                <span style="width: 2px; height: {{s.lead}}px; background: #A9C7D4"></span>
-              </button>
-            </sc-for>
-            <sc-if value="{{rt.bxOn}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: {{rt.bx}}px; top: 96px; transform: translateX(-4px) scale({{rt.inv}}); transform-origin: 0 100%; display: flex; align-items: center; gap: 4px">
-              <svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true"><path d="M2 22V2" stroke="#FBB040" stroke-width="2"></path><path d="M3 2h11l-3 4 3 4H3z" fill="#D0202E"></path></svg>
-              <span style="font-size: 11px; font-weight: 700; color: #FFD08A; white-space: nowrap">{{rt.borderL}}</span>
-            </div></sc-if>
-            <div style="position: absolute; left: {{rt.vanX}}px; top: {{rt.vanY}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; display: flex; flex-direction: column; align-items: center">
-              <span style="font-size: 12px; font-weight: 700; color: #2A1A00; background: #FBB040; border-radius: 6px; padding: 1px 6px; margin-bottom: 2px; white-space: nowrap">{{rt.vanL}}</span>
-              <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true" style="transform: scaleX({{rt.vanFlip}})"><path d="M2 18V4h24l8 5h8v9z" fill="#E8F1F5"></path><rect x="27" y="5" width="9" height="6" rx="1" fill="#5FD4F0"></rect><circle cx="11" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle><circle cx="33" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle></svg>
-            </div>
-          </sc-if>
-          <sc-if value="{{rt.map}}" hint-placeholder-val="{{ false }}">
-            <svg aria-hidden="true" viewBox="0 0 780 300" width="800" height="290" style="position: absolute; left: 0; top: 0; display: block; background: #0A1B28">
-              <path d="M0 60 L780 40 M0 160 L780 190 M0 250 L780 230 M120 0 L160 300 M420 0 L390 300 M640 0 L700 300" stroke="#16324A" stroke-width="1"></path>
-              <path d="M335 0 L335 300" stroke="#FBB040" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.8"></path>
-              <polyline points="{{rt.mapLine}}" fill="none" stroke="#3A5A70" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></polyline>
-              <polyline points="{{rt.mapLine}}" fill="none" stroke="#5FD4F0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
-            </svg>
-            <sc-for list="{{rt.mapDots}}" as="m" hint-placeholder-count="8">
-              <div style="position: absolute; left: {{m.x}}px; top: {{m.y}}px; transform: translate(-6px, -6px) scale({{rt.inv}}); transform-origin: 6px 6px; display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 50%; background: {{m.c}}; border: 2px solid #03111C; box-sizing: border-box; flex-shrink: 0"></span><span style="font-size: 11px; font-weight: 600; color: #E8F1F5; white-space: nowrap; text-shadow: 0 0 4px #03111C">{{m.name}}</span></div>
-            </sc-for>
-            <div aria-hidden="true" style="position: absolute; left: {{rt.mapVanX}}px; top: {{rt.mapVanY}}px; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #FBB040; border: 2px solid #2A1A00; box-sizing: border-box; transform: scale({{rt.inv}})"></div>
-          </sc-if>
-        </div>
-        <div style="position: absolute; left: 14px; top: 10px; display: flex; gap: 6px; z-index: 3">
-          <sc-for list="{{rt.views}}" as="v" hint-placeholder-count="2"><button onClick="{{v.pick}}" aria-pressed="{{v.on}}" class="pill" style="height: 30px; background: {{v.bg}}; color: {{v.fg}}">{{v.label}}</button></sc-for>
-        </div>
-        <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px; align-items: center; z-index: 3">
-          <span style="font-size: 11px; color: #CFE6EE; background: rgba(3,17,28,0.8); padding: 3px 6px; border-radius: 4px">{{rt.zL}}</span>
-          <button onClick="{{rt.follow}}" aria-pressed="{{rt.followOn}}" class="pill" style="height: 30px; background: {{rt.followBg}}; color: {{rt.followFg}}">Theo Xe</button>
-          <button onClick="{{rt.all}}" class="pill" style="height: 30px; background: rgba(3,17,28,0.85); color: #CFE6EE">Cả Chuyến</button>
-          <button onClick="{{rt.zoomOut}}" aria-label="Thu nhỏ" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 22px">−</button>
-          <button onClick="{{rt.zoomIn}}" aria-label="Phóng to" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 22px">+</button>
-        </div>
-        <div style="position: absolute; left: 14px; bottom: 8px; font-size: 11px; color: #8FC3D3; background: rgba(3,17,28,0.7); padding: 2px 6px; border-radius: 4px; z-index: 3">{{rt.foot}}</div>
-      </div>
-
-      <!-- mô phỏng vị trí (chỉ trong bản mẫu) -->
-      <label data-demo="1" style="position: absolute; left: 20px; top: 452px; width: 800px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #8FC3D3">Mô phỏng vị trí xe (chỉ trong bản mẫu)<input type="range" min="0" max="727" step="1" value="{{pos}}" onChange="{{setPos}}" style="flex: 1"><span style="width: 60px; color: #E8F1F5">{{pos}} km</span></label>
-
-      <!-- 4 ô số liệu: canh giữa, chữ dài tự xuống dòng -->
-      <div style="position: absolute; left: 20px; top: 488px; width: 800px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
-        <sc-for list="{{rt.stats}}" as="b" hint-placeholder-count="4">
-          <div class="pnl" style="min-height: 92px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px"><span class="lbl">{{b.l}}</span><span style="font-size: 20px; font-weight: 700; color: {{b.c}}; white-space: normal; overflow-wrap: anywhere; line-height: 1.2">{{b.v}}</span></div>
-        </sc-for>
-      </div>
-      <sc-if value="{{od.on}}" hint-placeholder-val="{{ true }}">
-      <div style="position: absolute; left: 20px; top: 592px; width: 800px; height: 112px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr 0.8fr; gap: 10px">
-        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP A · HÔM NAY</span><button onClick="{{od.resetA}}" aria-label="Đặt lại Trip A" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">↺</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.a}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div></div>
-        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP B · CẢ CHUYẾN</span><button onClick="{{od.resetB}}" aria-label="Đặt lại Trip B" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">↺</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.b}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div><span style="font-size: 11px; color: #8FC3D3">{{od.legNow}}</span></div>
-        <div class="pnl" style="padding: 6px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: {{od.nxBg}}"><span class="lbl">CHẶNG KẾ</span><span style="font-size: 26px; font-weight: 800; color: {{od.nxC}}">{{od.nxKm}}</span><span style="font-size: 13px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{od.nx}}</span><sc-if value="{{od.obdOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #7BD88F">{{od.obd}} {{od.range}}</span></sc-if></div>
-        <button onClick="{{od.openLog}}" aria-label="Tiến độ chuyến — bấm xem nhật ký" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg width="62" height="62" viewBox="0 0 70 70" aria-hidden="true"><circle cx="35" cy="35" r="30" fill="none" stroke="#16324A" stroke-width="7"></circle><circle cx="35" cy="35" r="30" fill="none" stroke="#FBB040" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{od.dash}}" transform="rotate(-90 35 35)"></circle><text x="35" y="40" text-anchor="middle" font-size="15" font-weight="800" fill="#E8F1F5" font-family="Overpass, sans-serif">{{od.pct}}</text></svg><span style="font-size: 11px; color: #8FC3D3">Nhật Ký ›</span></button>
-      </div>
-      </sc-if>
-      <div data-demo="1" style="position: absolute; left: 20px; top: 596px; width: 800px; font-size: 12px; color: #8FC3D3; display: none">Chặng về mặc định = chặng đi đảo ngược + các chặng về của bạn (gộp chỗ trùng). Số km đo lại theo đường thật khi build.</div>
-
-      <!-- các chặng ghé -->
-      <section aria-label="Các chặng ghé" class="pnl" style="position: absolute; right: 20px; top: 64px; width: 420px; height: 600px; display: flex; flex-direction: column">
-        <div style="padding: 12px 14px 8px; display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">CÁC CHẶNG GHÉ · {{rt.count}}</span><span style="font-size: 11px; color: #8FC3D3">kéo ⋮⋮ hoặc ▲▼ để đổi thứ tự</span></div>
-        <div class="scrl" style="flex: 1; min-height: 0; padding: 0 10px 0 14px; display: flex; flex-direction: column; gap: 6px">
-          <sc-for list="{{rt.stops}}" as="s" hint-placeholder-count="7">
-            <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
-              <span aria-hidden="true" style="color: #5E8496; font-size: 16px; cursor: grab">⋮⋮</span>
-              <sc-if value="{{s.photo}}" hint-placeholder-val="{{ true }}">
-                <div class="ph" aria-hidden="true" style="position: relative; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -3px; bottom: -3px; width: 18px; height: 18px; border-radius: 3px; background: {{s.sign}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.icon}}"></path></svg></span></div>
-              </sc-if>
-              <sc-if value="{{s.noPhoto}}" hint-placeholder-val="{{ false }}">
-                <div style="width: 34px; height: 34px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
-              </sc-if>
-              <div style="flex: 1; min-width: 0">
-                <button onClick="{{s.open}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 14px; font-weight: 700; text-decoration: {{s.strike}}">{{s.name}}</button>
-                <div style="font-size: 11px; color: #8FC3D3">{{s.town}} · {{s.stay}} · <span style="color: {{s.tagC}}">{{s.tag}}</span></div>
-                <div style="font-size: 12px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #CFE6EE">{{s.eta}}</span></div>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 2px">
-                <button onClick="{{s.up}}" aria-label="Lên" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">▲</button>
-                <button onClick="{{s.down}}" aria-label="Xuống" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">▼</button>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 2px">
-                <button onClick="{{s.skip}}" aria-label="Bỏ qua chuyến này" title="Bỏ qua chuyến này" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">{{s.skipL}}</button>
-                <button onClick="{{s.del}}" aria-label="Xoá chặng" class="btn" style="width: 30px; height: 24px; padding: 0; color: #FF9A9E"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="padding: 10px 14px 14px; display: flex; gap: 8px">
-          <button onClick="{{openAdd}}" class="btn" style="flex: 1">+ Thêm Chặng</button>
-          <button onClick="{{openPick}}" class="btn btn-o" style="flex: 1">+ Thêm Từ Danh Sách</button>
-        </div>
-      </section>
+    <!-- các hộp thoại Road Trip (bảng Road Trip nằm trên bản đồ ở Màn Hình Chính) -->
+    <sc-if value="{{rtDlgOn}}" hint-placeholder-val="{{ false }}">
       <sc-if value="{{tp.open}}" hint-placeholder-val="{{ false }}">
-        <div role="dialog" aria-label="Các chuyến" class="pnl fadein" style="position: absolute; left: 50%; top: 60px; transform: translateX(-50%); width: 760px; max-height: 600px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: #06192A; box-shadow: 0 20px 60px rgba(0,0,0,0.7)">
-          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 700; color: #FBB040; flex: 1">Các Chuyến</span><button onClick="{{tp.close}}" class="btn" style="height: 40px">Đóng</button></div>
-          <div class="scrl" style="max-height: 270px; display: flex; flex-direction: column; gap: 6px">
+        <div role="dialog" aria-label="Các Chuyến" class="pnl glb fadein" style="position: absolute; left: 50%; top: 70px; transform: translateX(-50%); width: 720px; max-height: 560px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: rgba(4,18,30,0.94); box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1.5px rgba(251,176,64,0.75)">
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 800; color: #FBB040; flex: 1">Các Chuyến</span><button onClick="{{tp.newTrip}}" class="btn" style="height: 40px; color: #FFD08A">+ Chuyến Mới</button><button onClick="{{tp.close}}" class="btn" style="height: 40px">Đóng</button></div>
+          <div class="scrl" style="flex: 1; min-height: 0; max-height: 420px; display: flex; flex-direction: column; gap: 8px">
             <sc-for list="{{tp.rows}}" as="t" hint-placeholder-count="2">
-              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: {{t.bg}}">
-                <div style="flex: 1; min-width: 0"><div style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.name}}</div><div style="font-size: 12px; color: #8FC3D3">{{t.sub}}</div></div>
-                <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="background: {{t.curBg}}; color: {{t.curFg}}">{{t.curL}}</button>
-                <sc-if value="{{t.edit}}" hint-placeholder-val="{{ false }}"><button onClick="{{t.pin}}" class="btn" aria-label="Ghim" style="height: 36px; width: 40px; padding: 0">📌</button><button onClick="{{t.rename}}" class="btn" style="height: 36px">Sửa Tên</button><button onClick="{{t.copy}}" class="btn" style="height: 36px">Chép</button><button onClick="{{t.del}}" class="btn" style="height: 36px; color: #FF9A9E">{{t.delL}}</button></sc-if>
+              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(13,44,64,0.55); box-shadow: {{t.ring}}">
+                <div style="flex: 1; min-width: 0"><div style="font-size: 16px; font-weight: 700; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere">{{t.name}}</div><div style="font-size: 12px; color: #8FC3D3">{{t.sub}}</div></div>
+                <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="flex-shrink: 0; background: {{t.curBg}}; color: {{t.curFg}}">{{t.curL}}</button>
+                <sc-if value="{{t.edit}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 4px; flex-shrink: 0"><button onClick="{{t.pin}}" class="btn" aria-label="Ghim" style="height: 36px; width: 40px; padding: 0">📌</button><button onClick="{{t.rename}}" class="btn" style="height: 36px; font-size: 13px">Sửa Tên</button><button onClick="{{t.copy}}" class="btn" style="height: 36px; font-size: 13px">Chép</button><button onClick="{{t.del}}" class="btn" style="height: 36px; font-size: 13px; color: #FF9A9E">{{t.delL}}</button></div></sc-if>
               </div>
             </sc-for>
           </div>
           <sc-if value="{{tp.editing}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; align-items: center"><label style="flex: 1; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #8FC3D3">Tên mới<input type="text" value="{{tp.editName}}" onInput="{{tp.setEditName}}" style="flex: 1; height: 40px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label><button onClick="{{tp.saveName}}" class="btn btn-o" style="height: 40px">Lưu</button></div></sc-if>
-          <div style="border-top: 1px solid rgba(95,212,240,0.2); padding-top: 10px; display: flex; flex-direction: column; gap: 8px">
-            <span class="lbl">+ CHUYẾN MỚI</span>
-            <span style="font-size: 12px; color: #8FC3D3">{{tp.lockL}}</span>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">Từ<input type="text" value="{{tp.from}}" placeholder="{{tp.fromPh}}" disabled="{{tp.lock}}" onInput="{{tp.setFrom}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
-              <span style="font-size: 22px; color: #FBB040; padding-top: 16px">→</span>
-              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">Tới<input type="text" value="{{tp.to}}" placeholder="Sydney" disabled="{{tp.lock}}" onInput="{{tp.setTo}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
-              <button onClick="{{tp.create}}" disabled="{{tp.lock}}" class="btn btn-o" style="height: 44px; margin-top: 16px; padding: 0 20px">Tạo Chuyến</button>
-            </div>
-            <span style="font-size: 13px; color: #FFD08A; min-height: 18px">{{tp.msg}}</span>
-          </div>
         </div>
       </sc-if>
 
@@ -1179,7 +1217,7 @@ function rnd(i) { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.
 const DROPS = Array.from({ length: 46 }, (_, i) => ({ x: Math.round(rnd(i + 1) * 1270), dur: (5 + rnd(i + 50) * 4).toFixed(2), del: (-rnd(i + 99) * 9).toFixed(2), op: (0.3 + rnd(i + 7) * 0.5).toFixed(2) }));
 const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rnd(i + 200) * 9); return { x: Math.round(rnd(i + 300) * 1260), y: Math.round(60 + rnd(i + 400) * 420), s, dur: (9 + rnd(i + 500) * 8).toFixed(1), del: (-rnd(i + 600) * 16).toFixed(1) }; });
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
-const DEFAULTS = { lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
+const DEFAULTS = { bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
   musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chime: 'soft', chimeVol: 60 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
@@ -1259,6 +1297,8 @@ class Component extends DCLogic {
     if (APP) window.__uiComp = this;
     this.tick = setInterval(() => {
       const S = this.state, now = Date.now();
+      const lv0 = S.live || {};
+      if (APP && (lv0.speed || 0) > 10 && (S.set || {}).autoMap !== false && (S.scr === 'search' || S.scr === 'contacts') && now - S.last > 15000 && !S.dlg) { this.setState({ scr: 'home' }); return; }   // #65
       if (S.pendZone && now - S.pendAt >= 2000) this.setState({ now, zone: S.pendZone, pendZone: null, popAt: now });
       else this.setState({ now });
     }, 1000);
@@ -1270,6 +1310,7 @@ class Component extends DCLogic {
   syncNative(C) {
     if (!APP) return;
     tcn('media', 'app:' + (C.musicApp || 'jukebox'));
+    tcn('bubble', C.bubbleOn === false ? 'off' : 'on');
     tcn('voice', 'cfg:' + JSON.stringify({ rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || '', sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false }));
   }
   componentWillUnmount() { clearInterval(this.tick); clearTimeout(this.b1); clearTimeout(this.b2); }
@@ -1283,7 +1324,7 @@ class Component extends DCLogic {
     try { window.localStorage.setItem(STORE, JSON.stringify({ set: st.set, goList: st.goList, backList: st.backList, skip: st.skip, wsList: st.wsList, custom: st.custom, photos: st.photos, savedPl: st.savedPl, trips: st.trips, tripId: st.tripId, melStore: st.melStore })); } catch (e) {}
     this.setState(patch);
   }
-  setS(k, v) { const n = Object.assign({}, this.state.set, { [k]: v }); this.save({ set: n }); if (/^(musicApp|tts|hot)/.test(k)) this.syncNative(n); if (k === 'jbFollow' && v) tcn('media', 'jbquery'); }
+  setS(k, v) { const n = Object.assign({}, this.state.set, { [k]: v }); this.save({ set: n }); if (/^(musicApp|tts|hot|bubbleOn)/.test(k)) this.syncNative(n); if (k === 'jbFollow' && v) tcn('media', 'jbquery'); }
   toast(t) { this.setState({ toast: t, toastAt: Date.now() }); }
   say(t, sensitive) { this.toast(t); this.setState({ replyAt: Date.now() }); if (APP && !(sensitive && this.state.set.privacy)) tcn('say', t); }
   runVoice(text) {
@@ -1435,19 +1476,22 @@ class Component extends DCLogic {
         ch('mapApp', 'Bản đồ chính', 'Dùng khi chỉ đường và chia màn hình', [['waze', 'Waze'], ['gmaps', 'Google Maps'], ['here', 'HERE']]),
         (() => { const hm0 = APP && window.tcHome ? window.tcHome() : null; return { isStatus: true, label: 'Nhà (điểm xuất phát Road Trip)', hint: hm0 ? 'Đã lưu: ' + hm0.name + ' — chuyến đi bắt đầu và chuyến về kết thúc ở đây' : 'Chưa lưu — đang lấy vị trí GPS lúc mở app làm điểm xuất phát', stL: hm0 ? '✓ ' + hm0.name : '⚠ Chưa lưu', stC: hm0 ? '#7BD88F' : '#FFD08A', hasAct: true, actL: hm0 ? 'Lưu Lại Chỗ Này' : 'Lưu Chỗ Này Là Nhà', act: () => { if (!APP || !window.tcSetHome) { self.toast('Bản mẫu: cần app thật có GPS'); return; } const h = window.tcSetHome(); self.toast(h ? 'Đã lưu Nhà: ' + h.name : 'Chưa bắt được GPS — thử lại sau'); self.setState({ homeAt: Date.now() }); } }; })(),
         ch('mapSide', 'Bản đồ nằm bên', 'Road Trip + Bản Đồ', [['left', 'Trái'], ['right', 'Phải']]),
-        ch('rtView', 'Kiểu hiển thị quãng đường', 'Đổi nhanh ngay trên khung', [['road', 'Con Đường'], ['map', 'Bản Đồ']]),
-        tg('kmUnder', 'Km còn lại dưới mỗi chặng', ''),
-        tg('kmSeg', 'Km giữa hai chặng', 'Trên mặt đường'),
-        tg('kmPost', 'Cọc km dọc đường', 'Mỗi 100 km — phóng to thì mỗi 10 km'),
         tg('placePhotos', 'Hình đại diện địa điểm', 'Hình bạn chụp → Wikimedia Commons → biển báo'),
         tg('limitEst', 'Giới hạn ước tính khi thiếu dữ liệu', '50 khu dân cư / 100 ngoài thị trấn — có chữ "ước tính" dưới biển'),
         ch('rest', 'Nhắc nghỉ chân mỗi', 'Theo giờ lái liên tục', [[1.5, '1,5 giờ'], [2, '2 giờ'], [3, '3 giờ']]),
+        tg('homeMap', 'Màn Hình Chính là bản đồ', 'Tắt thì nền là cảnh low-poly như cũ (đổi trong Giao Diện)'),
+        tg('autoMap', 'Tự hiện bản đồ khi xe chạy', 'Trên 10 km/g: nền low-poly đổi sang bản đồ, Tìm Chỗ / Liên Lạc tự về bản đồ'),
+        tg('navVoice', 'Đọc chỉ đường', 'Rẽ trái, rẽ phải, vòng xoay… bằng giọng Việt'),
+        tg('navCams', 'Nhắc camera tốc độ + vùng trường học', 'Dữ liệu OpenStreetMap — có thể thiếu chỗ'),
+        ch('navRotate', 'Hướng bản đồ khi chỉ đường', 'Theo hướng xe tốn sức máy hơn — máy cũ nên để Hướng Bắc', [[false, 'Hướng Bắc'], [true, 'Theo hướng xe']]),
+        tg('tripLog', 'Nhật ký Hành Trình', 'Tự ghi chỗ đậu hơn 3 phút — chỉ lưu trong máy này, không gửi đi đâu'),
         ch('mapStyle', 'Kiểu bản đồ', 'Tự Động = Sáng ban ngày, Tối ban đêm (theo giờ mặt trời mọc/lặn)', [['auto', 'Tự Động'], ['dark', 'Tối'], ['light', 'Sáng'], ['topo', 'Địa Hình'], ['sat', 'Vệ Tinh']]),
         ch('mapBright', 'Độ sáng bản đồ', 'Bật Dịu Mắt thì tự giảm', [[70, '70%'], [85, '85%'], [100, '100%'], [115, '115%']]),
         tg('odoOn', 'Đồng hồ km kiểu cuộn', 'Trip A, Trip B, km tới chặng kế, vòng % chuyến'),
         tg('stateRules', 'Nhắc luật khi qua tiểu bang khác', 'Đọc to + hiện trên màn hình')] },
       ws: { label: 'Workspace', icon: 'M3 4h8v7H3zM13 4h8v4h-8zM13 10h8v10h-8zM3 13h8v7H3z', desc: 'Cách mở app trên DeX và điện thoại', rows: [
         tg('dexFull', 'Phóng to theo màn hình DeX', 'Trừ thanh tác vụ; 1 app thì phóng to hết'),
+        tg('bubbleOn', 'Nút nổi Tom’s Car', 'Mờ 50% trên app khác — bấm là về Tom’s Car, kéo để dời, bấm giữ để ẩn'),
         ch('strip', 'Dải Tom’s Car ở mép', 'Nút về Tom’s Car, trợ lý, đổi Workspace', [['left', 'Trái'], ['right', 'Phải'], ['off', 'Tắt']]),
         tg('hideTask', 'Ẩn thanh tác vụ DeX', 'Khi dùng Workspace (nếu máy cho phép)'),
         stt('DeX Labs: Buộc app thay đổi kích thước', 'Cần cho app không chịu phóng to', C.forceRes, 'Đã bật', 'Chưa bật', 'Hướng Dẫn', () => { self.setS('forceRes', true); self.toast('Trên DeX: mở Cài đặt → Samsung DeX → DeX Labs → bật "Buộc app thay đổi kích thước"'); }),
@@ -1653,7 +1697,7 @@ class Component extends DCLogic {
     };
     const tripRows = [{ id: 'mel-adl', name: 'Melbourne ⇄ Adelaide', km: 727, pinned: true, builtin: true }].concat((S.trips || []).slice().sort((a, b) => (b.pinned - a.pinned) || (b.at - a.at))).map((t) => {
       const on = t.id === S.tripId;
-      return { name: t.builtin ? t.name : t.name.replace(' → ', ' ⇄ '), sub: t.km + ' km' + (t.builtin ? ' · có sẵn' : ' · ' + Object.keys(t.places || {}).length + ' chỗ ghé gợi ý') + (t.pinned && !t.builtin ? ' · 📌' : ''), on: on ? 'true' : 'false', bg: on ? 'rgba(251,176,64,0.16)' : 'rgba(13,44,64,0.55)', curL: on ? 'Đang dùng' : 'Chọn', curBg: on ? '#FBB040' : '#0D2C40', curFg: on ? '#2A1A00' : '#CFE6EE', edit: !t.builtin,
+      return { ring: on ? 'inset 0 0 0 2px #FBB040' : 'inset 0 0 0 1px rgba(255,255,255,0.1)', name: t.name, sub: t.km + ' km' + (t.builtin ? ' · có sẵn' : ' · ' + Object.keys(t.places || {}).length + ' chỗ ghé gợi ý') + (t.pinned && !t.builtin ? ' · 📌' : ''), on: on ? 'true' : 'false', bg: on ? 'rgba(251,176,64,0.16)' : 'rgba(13,44,64,0.55)', curL: on ? 'Đang dùng' : 'Chọn', curBg: on ? '#FBB040' : '#0D2C40', curFg: on ? '#2A1A00' : '#CFE6EE', edit: !t.builtin,
         pick: () => { if (!on) { switchTrip(t.id); self.toast('Đã đổi sang chuyến ' + t.name); } },
         pin: () => self.save({ trips: S.trips.map((q) => q.id === t.id ? Object.assign({}, q, { pinned: !q.pinned }) : q) }),
         copy: () => { const c = JSON.parse(JSON.stringify(t)); c.id = 't' + Date.now().toString(36); c.name = t.name + ' (bản sao)'; c.at = Date.now(); c.pinned = false; self.save({ trips: S.trips.concat([c]) }); },
@@ -1662,7 +1706,7 @@ class Component extends DCLogic {
         delL: S.tripDel === t.id ? 'Xoá thật?' : 'Xoá' };
     });
     const tp = {
-      open: S.tripDlg, close: () => self.setState({ tripDlg: false, tripEdit: null, tripDel: null }), rows: tripRows,
+      open: S.tripDlg, close: () => self.setState({ tripDlg: false, tripEdit: null, tripDel: null }), rows: tripRows, newTrip: () => self.setState({ tripDlg: false, scr: 'rt', ntOpen: true, ntMsg: '', pnlMin: Object.assign({}, S.pnlMin || {}, { rt: false }) }),
       from: S.ntFrom, to: S.ntTo, msg: S.ntMsg, busy: S.ntBusy, lock: drive, lockL: drive ? 'Xe đang chạy — đậu xe rồi mới tạo chuyến mới' : 'Gõ nơi đi và nơi tới (vd "Melbourne" → "Sydney"). App tự tìm đường, gợi ý chỗ ghé; chặng về = chặng đi đảo ngược.',
       setFrom: (e) => self.setState({ ntFrom: e.target.value }), setTo: (e) => self.setState({ ntTo: e.target.value }),
       fromPh: '📍 Vị trí của Tom' + ((LV.place && LV.place.suburb) ? ' (' + LV.place.suburb + ')' : ''),
@@ -1677,18 +1721,6 @@ class Component extends DCLogic {
       saveName: () => { const n = (S.tripEditName || '').trim(); if (n) self.save({ trips: S.trips.map((q) => q.id === S.tripEdit ? Object.assign({}, q, { name: n }) : q), tripEdit: null }); else self.setState({ tripEdit: null }); }
     };
     self.switchTripExt = switchTrip;
-    // bản đồ thật trên Road Trip
-    if (APP && window.tcMapSync) {
-      const sun = window.__sun; const nowT = Date.now();
-      const night = sun && sun.rise ? !(nowT > new Date(sun.rise).getTime() && nowT < new Date(sun.set).getTime()) : (d.getHours() < 6 || d.getHours() >= 19);
-      const styleKey = C.mapStyle === 'auto' || !C.mapStyle ? (night ? 'dark' : 'light') : C.mapStyle;
-      const showMap = S.scr === 'rt' && C.rtView === 'map' && !nar && !S.tripDlg && !S.logOpen && !S.dlg;
-      window.tcMapSync({ show: showMap, style: C.mapStyle || 'auto', styleKey, night, bright: C.calm ? Math.min(C.mapBright || 100, 75) : (C.mapBright || 100), tint: styleKey === 'light', tripId: S.tripId + (SP ? '@' + SP.lat.toFixed(3) : ''), isGo, total: TOTAL,
-        pts: TRIP ? TRIP.pts : (SP && window.__routePts ? [[SP.lat, SP.lon]].concat(window.__routePts) : window.__routePts), follow: false, drive: drive, brg: LV.bearing || 0,
-        van: LV.lat != null ? [LV.lat, LV.lon] : null,
-        stops: [Object.assign({ id: '', start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 5, bg: '#00653A' }, SP && isGo ? { lat: SP.lat, lon: SP.lon } : {})].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === 'end', short: x.id === 'end' ? (SP && !isGo ? SP.name : x.name) : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, '').split(' (')[0], lat: x.id === 'end' && SP && !isGo ? SP.lat : x.lat, lon: x.id === 'end' && SP && !isGo ? SP.lon : x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === 'end' ? 5 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? '#3E7A4E' : x.id === 'end' ? '#00653A' : SIGN[x.k] || '#1F5FAE' })))
-      });
-    }
     const curIds = isGo ? S.goList : S.backList;
     const saved = Object.keys(ALLP).map((id) => { const has = curIds.indexOf(id) >= 0; const p = ALLP[id]; return { name: p.name, town: p.town, km: kmOf(id), icon: ICX[p.k], icF: icF(p.k), icS: icS(p.k), sign: SIGN[p.k], has, op: has ? 0.5 : 1, st: has ? '✓ đã có' : '+ Thêm', stC: has ? '#7BD88F' : '#FFD08A', add: () => { if (has) return; const arr = curIds.concat([id]).sort((a, b) => kmOf(a) - kmOf(b)); self.save(isGo ? { goList: arr } : { backList: arr }); } }; }).sort((a, b) => a.km - b.km);
     // thẻ chi tiết chặng
@@ -1892,7 +1924,14 @@ class Component extends DCLogic {
       { t: 'Nghe máy', re: /^(nghe|nghe máy|answer)$/, run: () => { tcn('call', 'answer'); self.setState({ va: false }); } },
       { t: 'Từ chối', re: /^(từ chối|decline|không nghe)/, run: () => { tcn('call', 'decline:' + (C.autoSms ? 1 : 0)); self.setState({ va: false }); } },
       { t: 'Gọi …', re: /^(gọi|call) (.+)$/, run: (m) => { const c = findContact(m[2]); if (c && c[5]) { self.setState({ va: false }); self.say('Dạ, đang gọi ' + (priv ? 'người đã chọn' : c[0]), true); tcn('call', 'dial:' + c[5]); } else { tcn('call', 'dialName:' + m[2]); sayV('Dạ, đang tìm ' + m[2] + ' trong danh bạ', true); } } },
-      { t: 'Chỉ đường tới …', re: /(chỉ đường|dẫn đường|đi tới|navigate)( tới| đến| to)? (.+)$/, run: (m) => { tcn('nav', m[3]); sayV('Dạ, đang chỉ đường tới ' + m[3]); } },
+      { t: 'Xe tôi ở đâu?', re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park))/, run: () => { const pk = window.NAV && window.NAV.hist.park; self.setState({ va: false, scr: 'trip' }); if (pk) { window.NAV.flyTo([pk.lat, pk.lon], 17); sayV('Dạ, xe đậu ở ' + (pk.name || 'chỗ đánh dấu trên bản đồ')); } else sayV('Dạ, mình chưa ghi chỗ đậu xe nào'); } },
+      { t: 'Chỉ đường tới …', re: /(chỉ đường|dẫn đường|đi tới|đi đến|navigate)( tới| đến| to)? (.+)$/, run: (m) => {
+        const q = m[3]; const NV2 = window.NAV, ll = LV.lat != null ? [LV.lat, LV.lon] : null;
+        if (!NV2 || !ll) { tcn('nav', q); sayV('Dạ, đang chỉ đường tới ' + q); return; }
+        if (/^(nhà|về nhà|home)$/.test(q.trim()) && window.tcHome && window.tcHome()) { const h = window.tcHome(); self.setState({ va: false, scr: 'home', wp: [{ name: 'Nhà', lat: h.lat, lon: h.lon }] }); NV2.startTo({ name: 'Nhà', lat: h.lat, lon: h.lon }); return; }
+        sayV('Dạ, đang tìm ' + q);
+        NV2.search(q, ll, (r) => { const p0 = r && r[0]; if (!p0) { sayV('Dạ, mình không tìm thấy ' + q); return; } const w = { name: p0.name, lat: p0.lat, lon: p0.lon, logo: p0.logo || '' }; self.setState({ va: false, scr: 'home', wp: [w] }); NV2.startTo(w); });
+      } },
       { t: 'Chặng kế tiếp', re: /(chặng kế|ghé chỗ kế|next stop)/, run: () => { const nx = list[nextIdx]; if (nx) { tcn('nav', nx.addr || ADDR[nx.name] || nx.name); sayV('Dạ, đang chỉ đường tới ' + nx.name); } else sayV('Dạ, hết chặng ghé rồi'); } }
     ];
     self._cmds = CMDS;
@@ -2057,10 +2096,11 @@ class Component extends DCLogic {
     if (!window.__thumbs) window.__thumbs = {};
     const thumbOf = (k) => { const key = k + '|' + (k.indexOf('lp_') === 0 ? 'poly' : C.drawStyle); if (!window.__thumbs[key] && window.TCScene && S.scr === 'theme') { try { window.__thumbs[key] = window.TCScene.thumb(k, k.indexOf('lp_') === 0 ? 'poly' : (C.drawStyle === 'poly' ? 'poly' : 'flat'), 'none', 256, 144); } catch (e) { window.__thumbs[key] = ''; } } return window.__thumbs[key] || ''; };
     const th = {
+      homeBg: [[true, '🗺 Bản Đồ'], [false, '🏔 Cảnh Low-Poly']].map(([k, l]) => Object.assign({ label: l, on: (C.homeMap !== false) === k ? 'true' : 'false', pick: () => self.setS('homeMap', k) }, chip((C.homeMap !== false) === k))),
       styles: [['flat', 'Gốc'], ['poly', 'Low-Poly']].map(([k, l]) => Object.assign({ label: l, on: (C.drawStyle || 'poly') === k ? 'true' : 'false', pick: () => self.setS('drawStyle', k) }, chip((C.drawStyle || 'poly') === k))),
       // #52: a few themes by default; the rest are added from "Thêm Giao Diện" (only what is shown gets drawn)
       groups: (S.thMore ? TGROUPS.map(([label, items]) => [label, items.filter(([k]) => TH_DEF.indexOf(k) < 0)]) : [['ĐANG DÙNG', TGROUPS.reduce((a, g) => a.concat(g[1]), []).filter(([k], i, arr) => (TH_DEF.indexOf(k) >= 0 || thExtra.indexOf(k) >= 0 || k === thTheme) && arr.findIndex((x) => x[0] === k) === i).sort((a, b) => (TH_DEF.indexOf(a[0]) < 0 ? 99 : TH_DEF.indexOf(a[0])) - (TH_DEF.indexOf(b[0]) < 0 ? 99 : TH_DEF.indexOf(b[0])))]]).map(([label, items]) => ({ label, items: items.map(([k, l]) => { const added = thExtra.indexOf(k) >= 0, isDef = TH_DEF.indexOf(k) >= 0; return { label: l, img: thumbOf(k), sw: '#0B2436', on: thTheme === k ? 'true' : 'false', badge: S.thMore ? (added ? '✓ Đã thêm' : '+ Thêm') : (isDef ? '' : 'Bỏ'), badgeOn: !!(S.thMore || !isDef), badgeBg: S.thMore ? (added ? '#FBB040' : 'rgba(3,17,28,0.85)') : 'rgba(120,20,30,0.85)', badgeFg: S.thMore && added ? '#2A1A00' : '#FFFFFF', ring: thTheme === k ? 'inset 0 0 0 3px #FBB040, 0 0 12px rgba(251,176,64,0.5)' : 'inset 0 0 0 1px rgba(255,255,255,0.15)',
-        pick: () => { if (S.thMore) { const nx = added ? thExtra.filter((x) => x !== k) : thExtra.concat([k]); self.setS('thExtra', nx); if (!added) self.toast('Đã thêm ' + l + ' vào Giao Diện'); } else self.setS('lpTheme', k); },
+        pick: () => { if (S.thMore) { const nx = added ? thExtra.filter((x) => x !== k) : thExtra.concat([k]); self.setS('thExtra', nx); if (!added) self.toast('Đã thêm ' + l + ' vào Giao Diện'); } else self.save({ set: Object.assign({}, C, { lpTheme: k, homeMap: false }) }); },
         drop: (e) => { if (e && e.stopPropagation) e.stopPropagation(); if (isDef) return; self.setS('thExtra', thExtra.filter((x) => x !== k)); if (thTheme === k) self.setS('lpTheme', 'lp_au'); } }; }) })),
       more: !!S.thMore, moreL: S.thMore ? '✓ Xong' : '+ Thêm Giao Diện (' + (TGROUPS.reduce((a, g) => a + g[1].length, 0) - TH_DEF.length) + ' kiểu)', toggleMore: () => self.setState({ thMore: !S.thMore }),
       cockpits: COCKPITS.map(([k, l]) => Object.assign({ label: l, on: (C.cockpit2 || 'lowpoly') === k ? 'true' : 'false', pick: () => self.setS('cockpit2', k) }, chip((C.cockpit2 || 'lowpoly') === k))),
@@ -2177,6 +2217,182 @@ class Component extends DCLogic {
     };
     window.__idleOn = idlOn;
 
+    // ---- 0.9.9: bản đồ toàn màn hình + chỉ đường + Hành Trình (nav.js) ----
+    const NV = window.NAV || null;
+    const shell = !nar && (S.scr === 'home' || S.scr === 'trip' || S.scr === 'rt');
+    if (NV) { NV.cfg.rotate = !!C.navRotate; NV.cfg.cams = C.navCams !== false; NV.cfg.histOff = C.tripLog === false; NV.cfg.mute = C.navVoice === false; }
+    const navV = NV && NV.st.route ? NV.navView() : null;
+    const navAct = !!(navV && navV.active);
+    const arrived = !!(NV && NV.st.arrivedAt && !navAct && Date.now() - NV.st.arrivedAt < 45000);
+    const hereLL = LV.lat != null ? [LV.lat, LV.lon] : (APP ? null : [-37.7466, 144.7326]);
+    const fastNow = (LV.speed || 0) > 10;
+    const mapShow = shell && (S.scr !== 'home' || C.homeMap !== false || !!navV || (fastNow && C.autoMap !== false));
+    const sun0 = window.__sun, nowT0 = Date.now();
+    const night0 = sun0 && sun0.rise ? !(nowT0 > new Date(sun0.rise).getTime() && nowT0 < new Date(sun0.set).getTime()) : (d.getHours() < 6 || d.getHours() >= 19);
+    const toWp = (p) => ({ name: p.name, lat: p.lat, lon: p.lon, logo: p.logo || (NV ? NV.logoOf(p.name) : ''), st: p.st || '' });
+    const wpList = S.wp || [];
+    const planWp = (wp, start) => {
+      self.setState({ wp, nq: '', nRes: null, nField: '' });
+      if (!NV) return;
+      if (!wp.length) { NV.cancel(); return; }
+      if (!hereLL) { self.toast('Chưa bắt được GPS — chờ chút rồi bấm lại'); return; }
+      NV.plan([{ name: 'Vị trí của Tom', lat: hereLL[0], lon: hereLL[1] }].concat(wp), { name: wp[wp.length - 1].name }).then(() => { if (start) NV.start(); }).catch(() => {});
+    };
+    const kmTo = (p) => (hereLL && NV && p && p.lat != null) ? NV.fmtDist(NV.dist(hereLL, [p.lat, p.lon])) : '';
+    const resRow = (p, pick) => { const lg = p.logo || (NV ? NV.logoOf(p.name) : ''); return { name: p.name, sub: p.sub || '', km: p.km != null ? (p.km < 10 ? String(Math.round(p.km * 10) / 10).replace('.', ',') : Math.round(p.km)) + ' km' : kmTo(p), logo: lg, logoOn: !!lg, icOn: !lg, icon: p.icon || '📍', icBg: lg ? '#FFFFFF' : 'rgba(13,44,64,0.9)', pick }; };
+    const typeIn = (field) => (e) => {
+      const q = e.target.value; const patch = { nq: q, nField: field }; if (q.trim().length < 3) patch.nRes = null;
+      if (field === 'from') patch.ntFrom = q, patch.ntFromP = null; if (field === 'to') patch.ntTo = q, patch.ntToP = null;
+      self.setState(patch);
+      if (NV) NV.search(q, hereLL, (r) => { if (self.state.nField === field) self.setState({ nRes: r }); });
+    };
+    const resFor = (field, onPick) => (S.nField === field && S.nRes) ? S.nRes.map((p) => resRow(p, () => onPick(p))) : [];
+    const homeP = APP && window.tcHome ? window.tcHome() : (APP ? null : { name: 'Nhà', lat: -37.7466, lon: 144.7326 });
+    const H0 = NV ? NV.hist : { saved: [], trips: [], places: {}, park: null };
+    const work = (H0.saved || []).find((s) => s.role === 'work');
+    const habit = NV && hereLL ? NV.habit(hereLL) : null;
+    const MAN = { straight: 'M24 42V8M13 19L24 8l11 11', right: 'M14 42V25q0-7 7-7h15M28 10l8 8-8 8', left: 'M34 42V25q0-7-7-7H12M20 10l-8 8 8 8', 'slight right': 'M18 42V27L33 12M21 11h13v13', 'slight left': 'M30 42V27L15 12M27 11H14v13', 'sharp right': 'M16 6v24l16 10M33 28v13H20', 'sharp left': 'M32 6v24L16 40M15 28v13h13', uturn: 'M32 42V18a8 8 0 0 0-16 0v14M9 25l7 8 7-8', round: 'M24 44V32M24 32a9 9 0 1 1 9-9M27 10l7 13-14 2', arrive: 'M13 44V6M13 8h22l-5 8 5 8H13' };
+    const AV = NV ? (NV.cfg.avoid || []) : [];
+    const avoidT = (k) => () => { const a = AV.indexOf(k) >= 0 ? AV.filter((x) => x !== k) : AV.concat([k]); NV.setCfg('avoid', a); if (wpList.length && !navAct) planWp(wpList, false); };
+    const destLL = navV && NV.st.dest ? NV.st.dest : null;
+    const extNav = (app) => () => { if (!destLL) return; tcn('nav', app + ':' + destLL.lat + ',' + destLL.lon + '|' + (destLL.name || '')); };
+    const chips = [];
+    if (homeP) chips.push({ l: '🏠 Nhà', go: () => planWp([toWp(Object.assign({}, homeP, { name: 'Nhà' }))], false) });
+    if (work) chips.push({ l: '💼 Chỗ làm', go: () => planWp([toWp(work)], false) });
+    if (habit) chips.push({ l: '⭐ ' + habit.name, go: () => planWp([toWp(habit)], false) });
+    chips.push({ l: '⛽ Cây xăng', go: () => { self.setState({ scr: 'search', cat: 'fuel' }); if (APP && window.tcFindPlaces) window.tcFindPlaces('fuel'); } });
+    if (H0.park) chips.push({ l: '🅿 Xe đậu', go: () => NV && NV.flyTo([H0.park.lat, H0.park.lon], 17) });
+    const pnlMin = !!(S.pnlMin || {})[S.scr];
+    const ctlTop = S.scr === 'home' ? (navAct ? 250 : 200) : (navAct ? 250 : 138);
+    const nv = {
+      mapOn: mapShow, boxOn: shell && S.scr === 'home' && !navAct && !arrived && mapShow, q: S.nField === 'go' ? (S.nq || '') : '', qOn: S.nField === 'go' && !!S.nq, lock: drive,
+      ph: drive ? 'Đậu xe rồi gõ — hoặc nói "Hey Tom, đi tới…"' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ', typeGo: typeIn('go'), clearQ: () => self.setState({ nq: '', nRes: null }),
+      goFirst: () => { const r = S.nField === 'go' && S.nRes && S.nRes[0]; if (r) planWp([toWp(r)], true); else if (navV) NV.start(); else self.toast('Gõ chỗ muốn tới trước nha'); },
+      res: resFor('go', (p) => planWp([toWp(p)], false)), resOn: S.nField === 'go' && !!(S.nRes && S.nRes.length) && S.scr === 'home',
+      chips, chipsOn: shell && S.scr === 'home' && !navAct && !navV && !arrived && mapShow && !(S.nField === 'go' && S.nRes && S.nRes.length),
+      bannerOn: shell && navAct && mapShow, icoD: navV ? (MAN[navV.ico] || MAN.straight) : '', dist: navV ? navV.dist : '', text: navV ? navV.text : '',
+      thenOn: !!(navV && navV.then), then: navV ? navV.then : '', thenDist: navV ? navV.thenDist : '',
+      prevOn: shell && !!navV && !navAct && !arrived && mapShow, dest: navV ? navV.dest : '', destLogo: navV ? navV.destLogo : '', destLogoOn: !!(navV && navV.destLogo), destIcOn: !(navV && navV.destLogo),
+      sum: navV ? navV.left + ' · ' + navV.km + ' · tới ' + navV.eta : '',
+      alts: navV ? navV.alts.map((a) => ({ label: a.label, info: a.min + ' · ' + a.km, toll: a.toll ? '💲 thu phí' : '', on: a.on ? 'true' : 'false', bg: a.on ? 'rgba(47,208,245,0.18)' : 'rgba(255,255,255,0.04)', ring: a.on ? 'inset 0 0 0 2px #2FD0F5' : 'inset 0 0 0 1px rgba(255,255,255,0.12)', pick: a.pick })) : [],
+      avoid: [['toll', 'Tránh thu phí'], ['motorway', 'Tránh cao tốc'], ['ferry', 'Tránh phà']].map(([k, l]) => { const on = AV.indexOf(k) >= 0; return { l: (on ? '✓ ' : '') + l, on: on ? 'true' : 'false', bg: on ? 'rgba(123,216,143,0.2)' : 'rgba(255,255,255,0.05)', fg: on ? '#7BD88F' : '#CFE6EE', tap: avoidT(k) }; }),
+      tollOn: !!(navV && navV.tolls.length), tollL: navV && navV.tolls.length ? '⚠ Có đoạn thu phí: ' + navV.tolls.slice(0, 2).join(', ') + (navV.noEx ? ' (không né được hết)' : '') : '',
+      msg: navV ? (navV.planning ? 'Đang tìm đường…' : navV.err || '') : '', msgOn: !!(navV && (navV.planning || navV.err)),
+      start: () => NV && NV.start(), cancel: () => { self.setState({ wp: [] }); NV && NV.cancel(); }, gmaps: extNav('gmaps'), waze: extNav('waze'),
+      etaOn: shell && navAct && mapShow, eta: navV ? navV.eta : '', left: navV ? navV.left : '', km: navV ? navV.km : '',
+      voiceIc: C.navVoice === false ? '🔇' : '🔊', voiceA: C.navVoice === false ? 'Bật đọc chỉ đường' : 'Tắt đọc chỉ đường', voice: () => self.setS('navVoice', C.navVoice === false),
+      share: () => { if (!navV) return; tcn('share', 'Tom đang trên đường tới ' + navV.dest + ', dự kiến tới lúc ' + navV.eta + ' (còn ' + navV.left + ').'); },
+      stop: () => { self.setState({ wp: [] }); NV && NV.stop(); },
+      arrivedOn: shell && arrived && mapShow, arrivedL: '🏁 Đã tới ' + (NV && NV.st.dest ? NV.st.dest.name : 'nơi'), done: () => { self.setState({ wp: [] }); NV && NV.cancel(); },
+      ctlOn: shell && mapShow, ctlTop, zin: () => NV && NV.zoomIn(), zout: () => NV && NV.zoomOut(), loc: () => NV && NV.locate(), locC: NV && NV.following() ? '#FBB040' : '#CFF6FF',
+      fit: () => NV && NV.fitAll(), fitOn: !!navV || S.scr === 'rt' || !!(NV && NV.st.preview),
+      rotOn: navAct, rotL: C.navRotate ? '🧭' : 'N', rotA: C.navRotate ? 'Bản đồ theo hướng xe — bấm để về Hướng Bắc' : 'Bản đồ Hướng Bắc — bấm để theo hướng xe', rot: () => self.setS('navRotate', !C.navRotate),
+      followOff: shell && mapShow && NV && !NV.following() && (navAct || drive), refollowL: 'Bản đồ sẽ tự theo xe sau 10 giây'
+    };
+    // tab row on the map screens: Màn Hình Chính · ➤ Hành Trình · 🗺 Road Trip · Liên Lạc · Tìm Chỗ
+    const unread0 = APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3;
+    const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: '', nRes: null, nField: '', ntOpen: scr === 'rt' ? S.ntOpen : false });
+    const tabs = [['home', 'Màn Hình Chính'], ['trip', '➤ Hành Trình'], ['rt', '🗺 Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ']].map(([k, l]) => { const on = S.scr === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(8,22,34,0.62)', fg: on ? '#2A1A00' : '#FFFFFF', ring: on ? 'none' : 'inset 0 0 0 1px rgba(255,255,255,0.22)', cls: on ? '' : 'glt', badge: unread0, badgeOn: k === 'contacts' && unread0 > 0, go: k === 'contacts' ? () => { tabGo('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } } : tabGo(k) }; });
+    const togglePnl = () => self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { [S.scr]: !pnlMin }) });
+    // ---- Hành Trình panel (#63, #66) ----
+    const dowS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+    const hjTab = S.hjTab || 'saved';
+    const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || '' }), () => planWp([toWp(p)], false)), { sub: kmTo(p), go: () => planWp([toWp(p)], true), act: act || (() => {}), actL: actL || '', actOn: !!act, actA: actA || '', addStop: () => planWp(wpList.concat([toWp(p)]), false) });
+    let hjRows = [];
+    if (hjTab === 'saved') {
+      if (homeP) hjRows.push(placeRow(Object.assign({}, homeP, { name: 'Nhà', icon: '🏠' })));
+      (H0.saved || []).forEach((s, i) => hjRows.push(placeRow(Object.assign({ icon: s.icon || '⭐' }, s), () => NV.unstar(i), '✕', 'Bỏ lưu ' + s.name)));
+    } else if (hjTab === 'freq') {
+      hjRows = (NV ? NV.frequent() : []).map((p) => placeRow(Object.assign({ icon: '📍' }, p), () => NV.star(p), '⭐', 'Lưu ' + p.name));
+    } else if (hjTab === 'recent') {
+      hjRows = (NV ? NV.recent() : []).map((p) => placeRow(Object.assign({ icon: '🕘' }, p), () => NV.star(p), '⭐', 'Lưu ' + p.name));
+    }
+    const logRows = hjTab === 'log' ? (H0.trips || []).slice(0, 60).map((t) => { const a = new Date(t.t0); return { when: dowS[a.getDay()] + ' ' + a.getDate() + '/' + (a.getMonth() + 1) + ' · ' + a.getHours() + ':' + p2(a.getMinutes()), name: (t.from.name || '?') + ' → ' + (t.to.name || '?'), km: String(t.km).replace('.', ',') + ' km · ' + Math.max(1, Math.round((t.t1 - t.t0) / 60000)) + ' ph', on: NV && NV.st.preview === t ? 'true' : 'false', bg: NV && NV.st.preview === t ? 'rgba(47,208,245,0.16)' : 'rgba(255,255,255,0.04)', show: () => NV && NV.showTrail(NV.st.preview === t ? null : t), del: () => NV && NV.delTrip(t.t0) }; }) : [];
+    const moveWp = (i, dir) => () => { const a = wpList.slice(), j = i + dir; if (j < 0 || j >= a.length) return; const t = a[i]; a[i] = a[j]; a[j] = t; planWp(a, false); };
+    const tidyWp = () => { if (wpList.length < 3 || !hereLL) return; const last = wpList[wpList.length - 1], rest = wpList.slice(0, -1), out = []; let cur = hereLL; while (rest.length) { let bi = 0, bd = 1e12; rest.forEach((w, i) => { const dd = NV.dist(cur, [w.lat, w.lon]); if (dd < bd) { bd = dd; bi = i; } }); const w = rest.splice(bi, 1)[0]; out.push(w); cur = [w.lat, w.lon]; } out.push(last); planWp(out, false); self.toast('Đã sắp xếp các điểm dừng cho gọn đường'); };
+    const parkAgo = H0.park ? Math.max(0, Math.round((Date.now() - H0.park.t) / 60000)) : 0;
+    const hj = {
+      on: shell && S.scr === 'trip' && !pnlMin, min: shell && S.scr === 'trip' && pnlMin, toggle: togglePnl,
+      habitOn: !!habit && !navV, habitL: habit ? 'Giờ này Tom hay đi ' + habit.name : '', habitGo: () => habit && planWp([toWp(habit)], true),
+      parkOn: !!H0.park && !drive, parkL: H0.park ? 'Xe đậu ở ' + (H0.park.name || 'đây') + ' · ' + (parkAgo < 60 ? parkAgo + ' phút trước' : Math.floor(parkAgo / 60) + ' giờ trước') : '', parkSee: () => H0.park && NV.flyTo([H0.park.lat, H0.park.lon], 17),
+      parkR: H0.park && H0.park.until ? '⏰ Nhắc lúc ' + NV.hhmm(H0.park.until - 600000) : '', parkRemind: [[60, '1P'], [120, '2P'], [240, '4P']].map(([m, l]) => ({ l, on: H0.park && H0.park.limit === m ? 'true' : 'false', bg: H0.park && H0.park.limit === m ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: H0.park && H0.park.limit === m ? '#2A1A00' : '#CFE6EE', tap: () => NV.parkRemind(m) })),
+      wps: wpList.map((w, i) => { const last = i === wpList.length - 1; return { n: last ? '⚑' : String(i + 1), bg: last ? '#D0202E' : '#F28A1A', name: w.name, logo: w.logo || '', logoOn: !!w.logo, up: moveWp(i, -1), down: moveWp(i, 1), del: () => planWp(wpList.filter((_, k) => k !== i), false), upOp: i === 0 ? 0.35 : 1, downOp: last ? 0.35 : 1 }; }),
+      wpOn: wpList.length > 0, tidyOn: wpList.length >= 3, tidy: tidyWp,
+      q: S.nField === 'hj' ? (S.nq || '') : '', ph: drive ? 'Đậu xe rồi gõ nha' : (wpList.length ? '+ Thêm điểm dừng' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ'), type: typeIn('hj'), lock: drive,
+      res: resFor('hj', (p) => planWp(wpList.concat([toWp(p)]), false)), resOn: S.nField === 'hj' && !!(S.nRes && S.nRes.length),
+      tabs: [['saved', 'Đã Lưu'], ['freq', 'Hay Đi'], ['recent', 'Gần Đây'], ['log', 'Nhật Ký']].map(([k, l]) => { const on = hjTab === k; return { l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: on ? '#2A1A00' : '#CFE6EE', tap: () => self.setState({ hjTab: k }) }; }),
+      rows: hjRows, rowsOn: hjTab !== 'log' && hjRows.length > 0, logOn: hjTab === 'log', logRows, logAny: logRows.length > 0,
+      empty: hjTab === 'log' ? (C.tripLog === false ? 'Nhật ký đang tắt.' : 'Chưa có chuyến nào — chạy xe rồi đậu hơn 3 phút là app tự ghi.') : hjTab === 'saved' ? 'Chưa lưu chỗ nào — bấm ⭐ ở Hay Đi / Gần Đây để lưu.' : hjTab === 'freq' ? 'Chạy vài bữa là app biết Tom hay đi đâu.' : 'Chưa có chỗ nào trong 8 ngày qua.',
+      emptyOn: hjTab === 'log' ? !logRows.length : !hjRows.length,
+      logToggle: () => self.setS('tripLog', C.tripLog === false), logOnL: C.tripLog === false ? 'Bật ghi nhật ký' : 'Tắt ghi nhật ký',
+      clear: () => { if (S.hjClear) { NV && NV.clearHist(); self.setState({ hjClear: false }); self.toast('Đã xoá hết nhật ký, chỗ hay đi và gần đây'); } else { self.setState({ hjClear: true }); self.toast('Bấm "Xoá Hết" lần nữa để xoá thật'); } }, clearL: S.hjClear ? 'Xoá thật?' : 'Xoá Hết',
+      workSet: () => { if (!hereLL) return; NV.setWork({ name: (LV.place && (LV.place.street || LV.place.suburb)) || 'Chỗ làm', lat: hereLL[0], lon: hereLL[1] }); }, workOn: !work && hjTab === 'saved'
+    };
+    // ---- Road Trip panel on the map (#59, #60, #61, #67, #69) ----
+    const rtStartP = SP ? SP : null;
+    const fromRows = (S.nField === 'from') ? [{ name: '📍 Vị trí hiện tại', sub: (LV.place && LV.place.suburb) || '', icon: '📍', cur: true }].concat(homeP ? [{ name: '🏠 Nhà', sub: homeP.name, icon: '🏠', home: true }] : []).map((r) => Object.assign(resRow({ name: r.name, sub: r.sub, icon: r.icon, km: null }, () => {
+      const P = r.home ? { name: 'Nhà', lat: homeP.lat, lon: homeP.lon, st: '' } : (hereLL ? { name: (LV.place && LV.place.suburb) || 'Vị trí của Tom', lat: hereLL[0], lon: hereLL[1], st: '' } : null);
+      if (!P) { self.toast('Chưa bắt được GPS'); return; }
+      const nm2 = S.ntNameTouched ? S.ntName : (P.name + (S.ntToP ? ' - ' + S.ntToP.name : ''));
+      self.setState({ ntFromP: P, ntFrom: r.home ? 'Nhà' : P.name, nRes: null, nField: '', ntName: nm2 });
+    }), { logoOn: false, icOn: true, logo: '', km: '' })) : [];
+    const shortN = (n) => (n || '').split(',')[0].trim();
+    const pickFrom = (p) => { const nm2 = S.ntNameTouched ? S.ntName : (shortN(p.name) + (S.ntToP ? ' - ' + shortN(S.ntToP.name) : '')); self.setState({ ntFromP: toWp(p), ntFrom: p.name, nRes: null, nField: '', nq: '', ntName: nm2 }); };
+    const pickTo = (p) => { const fromN = S.ntFromP ? shortN(S.ntFromP.name) : (S.ntFrom || '').trim() || (homeP ? 'Nhà' : (LV.place && LV.place.suburb) || 'Vị trí của Tom'); self.setState({ ntToP: toWp(p), ntTo: p.name, nRes: null, nField: '', nq: '', ntName: S.ntNameTouched ? S.ntName : fromN + ' - ' + shortN(p.name) }); };
+    const nxS2 = nextIdx >= 0 ? list[nextIdx] : null;
+    const nxLL = nxS2 ? (nxS2.id === 'end' ? (TRIP ? (isGo ? TRIP.to : TRIP.from) : (isGo ? { lat: -34.9285, lon: 138.6007 } : (SP || { lat: -37.8136, lon: 144.9631 }))) : nxS2) : null;
+    const OD0 = LV.odo || { a: S.demoA != null ? S.demoA : 128.4, b: pos };
+    const offKey = 'tc-off-' + S.tripId;
+    const offDone = (() => { try { return localStorage.getItem(offKey); } catch (e) { return null; } })();
+    const rtp = {
+      on: shell && S.scr === 'rt' && !pnlMin, min: shell && S.scr === 'rt' && pnlMin, toggle: togglePnl,
+      title: rt.title, legs: rt.legs, openTrips: rt.openTrips, newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: '', nField: '', nRes: null }), newL: S.ntOpen ? '✕ Đóng' : '+ Chuyến Mới', formOn: !!S.ntOpen,
+      from: S.ntFrom || '', fromPh: tp.fromPh, to: S.ntTo || '', typeFrom: typeIn('from'), typeTo: typeIn('to'), focusFrom: () => { if (S.nField !== 'from') self.setState({ nField: 'from', nRes: null }); },
+      resFrom: fromRows.concat(resFor('from', pickFrom)), resFromOn: S.nField === 'from', resTo: resFor('to', pickTo), resToOn: S.nField === 'to' && !!(S.nRes && S.nRes.length),
+      name: S.ntName || '', namePh: 'Tên chuyến (tự đặt theo nơi đi - nơi tới)', setName: (e) => self.setState({ ntName: e.target.value, ntNameTouched: true }),
+      create: () => {
+        if (drive || S.ntBusy) return;
+        const f = S.ntFromP || (S.ntFrom || '').trim() || (window.tcStartPt ? window.tcStartPt() : null) || 'Melbourne', t2 = S.ntToP || (S.ntTo || '').trim();
+        if (!t2) { self.setState({ ntMsg: 'Gõ nơi tới trước nha' }); return; }
+        if (!APP || !window.tcPlanTrip) { self.setState({ ntMsg: 'Bản mẫu: tạo chuyến cần app thật (có mạng)' }); return; }
+        self.setState({ ntBusy: true });
+        window.tcPlanTrip(f, t2, { name: (S.ntName || '').trim() }).then((trip) => { const trips = (self.state.trips || []).concat([trip]); self.save({ trips, ntBusy: false, ntFrom: '', ntTo: '', ntFromP: null, ntToP: null, ntName: '', ntNameTouched: false, ntOpen: false }); setTimeout(() => { self.switchTripExt && self.switchTripExt(trip.id); NV && setTimeout(NV.fitAll, 400); }, 60); self.toast('Đã tạo chuyến ' + trip.name + ' · ' + trip.km + ' km'); }).catch(() => self.setState({ ntBusy: false }));
+      },
+      mainOn: !S.ntOpen, busy: !!S.ntBusy, createL: S.ntBusy ? 'Đang tạo…' : 'Tạo Chuyến', msg: S.ntMsg || '', lockL: drive ? 'Xe đang chạy — đậu xe rồi mới tạo chuyến mới' : '', lock: drive,
+      boxes: rt.boxes, stops: rt.stops, count: list.length,
+      pct: Math.round(pos / TOTAL * 100), pctL: Math.round(pos / TOTAL * 100) + '% · ' + pos + '/' + TOTAL + ' km', nx: od.nx, nxKm: od.nxKm,
+      a: (Math.round((+OD0.a || 0) * 10) / 10).toString().replace('.', ','), b: (Math.round((+OD0.b || 0) * 10) / 10).toString().replace('.', ','), resetA: od.resetA, resetB: od.resetB, openLog: od.openLog,
+      startL: navAct ? 'Dừng Chỉ Đường' : (nxS2 ? 'Bắt Đầu · tới ' + od.nx : 'Bắt Đầu'), startBg: navAct ? '#E5484D' : '#FBB040', startFg: navAct ? '#FFFFFF' : '#2A1A00',
+      start: () => { if (navAct) { NV.stop(); return; } if (!nxLL || nxLL.lat == null) { self.toast('Chặng kế chưa có toạ độ'); return; } self.setState({ tripStarted: true }); planWp([toWp({ name: od.nx.replace(/^🏁 /, ''), lat: nxLL.lat, lon: nxLL.lon })], true); },
+      offL: offDone ? '✓ Bản đồ offline đã tải' : (S.offProg ? 'Đang tải ' + S.offProg : '⬇ Tải bản đồ offline'),
+      off: () => {
+        if (S.offProg || !NV) return; const pts = TRIP ? TRIP.pts : window.__rtRealPts || window.__routePts; if (!pts || pts.length < 2) { self.toast('Chưa có tuyến đường để tải'); return; }
+        const n = NV.tileList(pts).length * 2, mb = Math.max(1, Math.round(n * 18 / 1024));
+        if (S.offAsk !== S.tripId) { self.setState({ offAsk: S.tripId }); self.toast('Tải khoảng ' + mb + ' MB bản đồ dọc đường (nên dùng Wi-Fi) — bấm lần nữa để tải'); return; }
+        self.setState({ offAsk: null, offProg: '0%' });
+        NV.prefetch(pts, (dn, tot) => self.setState({ offProg: Math.round(dn / tot * 100) + '%' })).then((r) => { try { localStorage.setItem(offKey, String(Date.now())); } catch (e) {} self.setState({ offProg: null }); self.toast(r.bad ? 'Đã tải bản đồ offline (' + r.bad + ' mảnh lỗi)' : 'Đã tải xong bản đồ offline cho chuyến này'); });
+      },
+      addStop: () => self.setState({ dlg: 'add' }), pickStop: () => self.setState({ dlg: 'pick' }),
+      routeNote: !TRIP && !window.__rtRealPts ? 'Đang lấy đường thật từ ' + (SP ? SP.name : 'Melbourne') + ' tới Adelaide…' : ''
+    };
+    // #67: the built-in Melbourne ⇄ Adelaide trip follows real roads from home / the GPS start
+    if (APP && NV && !TRIP && S.scr === 'rt') {
+      const st0 = SP || { lat: -37.8136, lon: 144.9631 }; const rk = st0.lat.toFixed(3) + ',' + st0.lon.toFixed(3);
+      if (window.__rtRealKey !== rk) { window.__rtRealKey = rk; window.__rtRealPts = null; NV.realRoute([st0.lat, st0.lon], [-34.9285, 138.6007]).then((v) => { if (v && v.pts) { window.__rtRealPts = v.pts; self.setState({ navAt: Date.now() }); } }); }
+    }
+    if (NV) {
+      const rtPts = TRIP ? TRIP.pts : (window.__rtRealPts || window.__routePts || null);
+      const rtStops = [Object.assign({ id: '', start: true, short: isGo ? FROM : TO }, rtStartP && isGo ? { lat: rtStartP.lat, lon: rtStartP.lon } : (TRIP ? (isGo ? TRIP.from : TRIP.to) : {}))].concat(list.map((x, i) => {
+        const endLL = x.id === 'end' ? (TRIP ? (isGo ? TRIP.to : TRIP.from) : (isGo ? { lat: -34.9285, lon: 138.6007 } : (SP || { lat: -37.8136, lon: 144.9631 }))) : x;
+        return { id: x.id, n: i + 1, end: x.id === 'end', short: x.id === 'end' ? (SP && !isGo ? SP.name : x.name) : (x.name || '').split(' (')[0], logo: NV.logoOf(x.name), lat: endLL.lat, lon: endLL.lon };
+      }));
+      const vis = S.scr === 'rt' && rtPts;
+      NV.onPlaceClick = null;
+      NV.sync({ show: mapShow, night: night0, style: C.mapStyle || 'auto', bright: C.calm ? Math.min(C.mapBright || 100, 85) : (C.mapBright || 100), van: hereLL, brg: LV.bearing || 0, spd: LV.speed || 0, drive,
+        padL: (S.scr === 'trip' || S.scr === 'rt') && !pnlMin ? 430 : (S.scr === 'home' ? 380 : 40),
+        rt: vis ? { sig: S.tripId + ':' + leg + ':' + rtPts.length + ':' + list.map((x) => x.id).join(','), pts: rtPts, stops: rtStops } : null,
+        park: S.scr === 'trip' && H0.park ? H0.park : null });
+    }
     const delP = S.delId ? ALLP[S.delId] : null;
     // ---- điện thoại (#44) ----
     const phTrip = !!S.tripStarted || !!(LT && LT.km > 25 && LT.km < TOTAL - 25);
@@ -2194,14 +2410,14 @@ class Component extends DCLogic {
         { l: 'Mở Rộng', c: '#CFE6EE', ic: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', go: () => openFull('home') }
       ] };
     return {
-      rootW: nar ? '100%' : '1280px', rootH: nar ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || S.scr !== 'home'), clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
+      rootW: nar ? '100%' : '1280px', rootH: nar ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || !shell), nv, tabs, hj, rtp, wsShow: shell && S.scr === 'home', rtDlgOn: shell, clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
       unreadN: APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3,
       wsTitle: S.wsEdit != null ? 'Sửa Workspace' : 'Tạo Workspace', wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
       exitHard: () => { self.setState({ exitOpen: false }); tcn('exit', 'hard'); }, exitBg: () => { self.setState({ exitOpen: false }); tcn('exit', 'bg'); },
       addQ: S.addQ, setAddQ: (e) => self.setState({ addQ: e.target.value, addLink: '' }), addLink: S.addLink, setAddLink: (e) => self.setState({ addLink: e.target.value }), addHere, addFind, addMsg: S.addMsg,
       srcL: S.src === 'music' ? 'NHẠC' : S.src === 'radio' ? 'RADIO' : 'PODCAST', cycleSrc: () => { const n = { music: 'radio', radio: 'podcast', podcast: 'music' }[S.src]; self.setState({ src: n, mpTab: TABS[n][0][0], nowT: '', nowS: '' }); },
       togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }), panelExp: mpOpen ? 'true' : 'false', startListen: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); }, micOff: APP && PM.mic === false, micCls: (APP && PM.mic === false) ? '' : S.va ? 'mic-listen' : (S.now - (S.replyAt || 0) < 3000) ? 'mic-reply' : drive ? 'mic-idle mic-calm' : 'mic-idle', micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
-      isHome: !nar && S.scr === 'home', isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: !nar && S.scr === 'rt', tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => (APP && k === 'podcast' && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
+      isHome: shell, isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: false, tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => (APP && k === 'podcast' && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
       appTop: APP ? 0 : 40, appW: nar ? '100%' : '1280px', appH: nar ? '100%' : (APP ? '720px' : '680px'), appBg: APP ? 'transparent' : 'linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)',
       touch: () => { if (!S.dragging && !S.panning) self.setState({ last: Date.now() }); },
       drive: drive, drivePressed: drive ? 'true' : 'false', driveBg: drive ? '#7BD88F' : '#0D2C40', driveFg: drive ? '#03111C' : '#CFF6FF', driveLabel: drive ? 'Đang Chạy' : 'Đậu Xe',

@@ -163,6 +163,7 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        Bubble.hide()   // #73: Tom's Car is in front again
         immersive()
         startLocation()
         if (hasBtPermission()) obd?.start()
@@ -171,7 +172,13 @@ class MainActivity : Activity() {
         if (::voice.isInitialized) voice.recheck()
     }
 
+    override fun onStop() {
+        super.onStop()
+        if (!isFinishing && !isChangingConfigurations) Bubble.show(this)   // #73: covered by other apps → floating bubble
+    }
+
     override fun onDestroy() {
+        Bubble.hide()
         main.removeCallbacks(tick)
         obd?.stop()
         if (::phone.isInitialized) phone.stop()
@@ -323,6 +330,7 @@ class MainActivity : Activity() {
         }
         media()?.let { o.put("media", it) }
         if (l != null && fresh && l.hasBearing()) o.put("bearing", l.bearing)
+        if (l != null && fresh) { o.put("acc", l.accuracy.toDouble()); o.put("fix", l.time) }
         o.put("perms", perms())
         phone.json()?.let { o.put("call", it) }
         o.put("missed", phone.missed)
@@ -619,7 +627,11 @@ class MainActivity : Activity() {
                     "settings" -> settings()
                     "chime" -> chime(arg)
                     "media" -> mediaAction(arg)
-                    "launch" -> Launcher.workspace(this@MainActivity, arg)
+                    "launch" -> { Launcher.workspace(this@MainActivity, arg); Bubble.askOnce(this@MainActivity) }
+                    "bubble" -> { Bubble.enabled = arg != "off"; if (!Bubble.enabled) Bubble.hide() }
+                    "share" -> try { startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")).putExtra("sms_body", arg).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) { try { startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, arg), "Gửi giờ tới").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {} }
+                    "park" -> try { val o = JSONObject(arg); ParkAlarm.set(this@MainActivity, o.optLong("at"), o.optString("text"))
+                        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 9) } catch (_: Exception) {}
                     "nav" -> Launcher.navigate(this@MainActivity, arg)
                     "split" -> Launcher.split(this@MainActivity, arg)
                     "perm" -> askPerm(arg)

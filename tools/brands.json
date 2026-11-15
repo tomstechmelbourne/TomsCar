@@ -243,5 +243,271 @@
   "domains": [
    "foodworks.com.au"
   ]
+ },
+ {
+  "key": "Bunnings",
+  "re": "bunnings",
+  "domains": [
+   "bunnings.com.au"
+  ]
+ },
+ {
+  "key": "Kmart",
+  "re": "\\bkmart\\b",
+  "domains": [
+   "kmart.com.au"
+  ]
+ },
+ {
+  "key": "Target",
+  "re": "\\btarget\\b",
+  "domains": [
+   "target.com.au"
+  ]
+ },
+ {
+  "key": "Big W",
+  "re": "\\bbig ?w\\b",
+  "domains": [
+   "bigw.com.au"
+  ]
+ },
+ {
+  "key": "JB Hi-Fi",
+  "re": "jb ?hi-?fi",
+  "domains": [
+   "jbhifi.com.au"
+  ]
+ },
+ {
+  "key": "Officeworks",
+  "re": "officeworks",
+  "domains": [
+   "officeworks.com.au"
+  ]
+ },
+ {
+  "key": "Harvey Norman",
+  "re": "harvey norman",
+  "domains": [
+   "harveynorman.com.au"
+  ]
+ },
+ {
+  "key": "Costco",
+  "re": "costco",
+  "domains": [
+   "costco.com.au"
+  ]
+ },
+ {
+  "key": "Myer",
+  "re": "\\bmyer\\b",
+  "domains": [
+   "myer.com.au"
+  ]
+ },
+ {
+  "key": "David Jones",
+  "re": "david jones",
+  "domains": [
+   "davidjones.com"
+  ]
+ },
+ {
+  "key": "Spotlight",
+  "re": "\\bspotlight\\b",
+  "domains": [
+   "spotlightstores.com"
+  ]
+ },
+ {
+  "key": "Rebel",
+  "re": "\\brebel\\b",
+  "domains": [
+   "rebelsport.com.au"
+  ]
+ },
+ {
+  "key": "Chemist Warehouse",
+  "re": "chemist warehouse",
+  "domains": [
+   "chemistwarehouse.com.au"
+  ]
+ },
+ {
+  "key": "Priceline",
+  "re": "priceline",
+  "domains": [
+   "priceline.com.au"
+  ]
+ },
+ {
+  "key": "Dan Murphy's",
+  "re": "dan murphy",
+  "domains": [
+   "danmurphys.com.au"
+  ]
+ },
+ {
+  "key": "BWS",
+  "re": "\\bbws\\b",
+  "domains": [
+   "bws.com.au"
+  ]
+ },
+ {
+  "key": "Supercheap Auto",
+  "re": "supercheap",
+  "domains": [
+   "supercheapauto.com.au"
+  ]
+ },
+ {
+  "key": "Repco",
+  "re": "\\brepco\\b",
+  "domains": [
+   "repco.com.au"
+  ]
+ },
+ {
+  "key": "Autobarn",
+  "re": "autobarn",
+  "domains": [
+   "autobarn.com.au"
+  ]
+ },
+ {
+  "key": "Australia Post",
+  "re": "australia post|post office|\\bauspost\\b",
+  "domains": [
+   "auspost.com.au"
+  ]
+ },
+ {
+  "key": "CommBank",
+  "re": "commbank|commonwealth bank",
+  "domains": [
+   "commbank.com.au"
+  ]
+ },
+ {
+  "key": "ANZ",
+  "re": "\\banz\\b",
+  "domains": [
+   "anz.com.au"
+  ]
+ },
+ {
+  "key": "NAB",
+  "re": "\\bnab\\b|national australia bank",
+  "domains": [
+   "nab.com.au"
+  ]
+ },
+ {
+  "key": "Westpac",
+  "re": "westpac",
+  "domains": [
+   "westpac.com.au"
+  ]
+ },
+ {
+  "key": "IKEA",
+  "re": "\\bikea\\b",
+  "domains": [
+   "ikea.com"
+  ]
+ },
+ {
+  "key": "The Good Guys",
+  "re": "good guys",
+  "domains": [
+   "thegoodguys.com.au"
+  ]
+ },
+ {
+  "key": "Anaconda",
+  "re": "anaconda",
+  "domains": [
+   "anacondastores.com"
+  ]
+ },
+ {
+  "key": "BCF",
+  "re": "\\bbcf\\b",
+  "domains": [
+   "bcf.com.au"
+  ]
+ },
+ {
+  "key": "Mitre 10",
+  "re": "mitre ?10",
+  "domains": [
+   "mitre10.com.au"
+  ]
+ },
+ {
+  "key": "Total Tools",
+  "re": "total tools",
+  "domains": [
+   "totaltools.com.au"
+  ]
+ },
+ {
+  "key": "Petbarn",
+  "re": "petbarn",
+  "domains": [
+   "petbarn.com.au"
+  ]
+ },
+ {
+  "key": "Lowes",
+  "re": "\\blowes\\b",
+  "domains": [
+   "lowes.com.au"
+  ]
+ },
+ {
+  "key": "Telstra",
+  "re": "telstra",
+  "domains": [
+   "telstra.com.au"
+  ]
+ },
+ {
+  "key": "Optus",
+  "re": "\\boptus\\b",
+  "domains": [
+   "optus.com.au"
+  ]
+ },
+ {
+  "key": "Medicare",
+  "re": "medicare|services australia",
+  "domains": [
+   "servicesaustralia.gov.au"
+  ]
+ },
+ {
+  "key": "Bupa",
+  "re": "\\bbupa\\b",
+  "domains": [
+   "bupa.com.au"
+  ]
+ },
+ {
+  "key": "Grill'd",
+  "re": "grill'?d",
+  "domains": [
+   "grilld.com.au"
+  ]
+ },
+ {
+  "key": "Zambrero",
+  "re": "zambrero",
+  "domains": [
+   "zambrero.com.au"
+  ]
  }
 ]

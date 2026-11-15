@@ -396,10 +396,10 @@
     while (i < L.length - 1 && L[i] < t) i++;
     return pts[i];
   };
-  window.tcPlanTrip = (fromQ, toQ) => {
+  window.tcPlanTrip = (fromQ, toQ, opt) => {
     const u = window.__ui;
     const say = (m) => u && u.setState({ ntMsg: m });
-    say("\u0110ang t\xECm " + (typeof fromQ === "object" ? fromQ.name || "v\u1ECB tr\xED c\u1EE7a Tom" : fromQ) + " v\xE0 " + toQ + "\u2026");
+    say("\u0110ang t\xECm " + (typeof fromQ === "object" ? fromQ.name || "v\u1ECB tr\xED c\u1EE7a Tom" : fromQ) + " v\xE0 " + (typeof toQ === "object" ? toQ.name : toQ) + "\u2026");
     const geo = (q) => q && typeof q === "object" && q.lat != null ? Promise.resolve({ name: q.name || "V\u1ECB tr\xED c\u1EE7a Tom", st: q.st || "", lat: q.lat, lon: q.lon }) : geocode(q);
     return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say("\u0110ang t\xECm \u0111\u01B0\u1EDDng " + a.name + " \u2192 " + b.name + "\u2026");
@@ -455,7 +455,7 @@
       return one(1).then(() => {
         ids.sort((x, y) => places[x].km - places[y].km);
         say("");
-        return { id: "t" + Date.now().toString(36), name: T.a.name + " \u2192 " + T.b.name, from: T.a, to: T.b, km: T.km, mins: T.mins, pts: T.pts, border: T.border, places, lists: { goList: ids.slice(), backList: ids.slice().reverse(), skip: {}, custom: {} }, pinned: false, at: Date.now() };
+        return { id: "t" + Date.now().toString(36), name: opt && opt.name || T.a.name + " - " + T.b.name, from: T.a, to: T.b, km: T.km, mins: T.mins, pts: T.pts, border: T.border, places, lists: { goList: ids.slice(), backList: ids.slice().reverse(), skip: {}, custom: {} }, pinned: false, at: Date.now() };
       });
     }).catch((e) => {
       say(/nf:/.test(String(e && e.message)) ? 'Kh\xF4ng t\xECm th\u1EA5y "' + String(e.message).slice(3) + '" \u2014 g\xF5 r\xF5 h\u01A1n (vd "Sydney NSW")' : "Kh\xF4ng t\xECm \u0111\u01B0\u1EE3c \u0111\u01B0\u1EDDng (m\u1EA5t m\u1EA1ng?) \u2014 th\u1EED l\u1EA1i");
@@ -708,7 +708,18 @@
       checkRegion(d.lat, d.lon);
     }
     push(patch);
+    if (window.NAV && d.lat != null && d.fix !== lastFix) {
+      lastFix = d.fix;
+      try {
+        window.NAV.tick({ lat: d.lat, lon: d.lon, spd: d.speed || 0, acc: d.acc || 0, brg: d.bearing });
+      } catch (e) {
+        console.log("NAV " + e);
+      }
+    }
   };
+  let lastFix = -1;
+  window.__liveLL = () => live.lat != null ? [live.lat, live.lon] : null;
+  window.__liveSpd = () => live.speed || 0;
   window.tcApps = (a) => {
     if (window.__ui) window.__ui.setState({ apps: typeof a === "string" ? JSON.parse(a) : a });
   };

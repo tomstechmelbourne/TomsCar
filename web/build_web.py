@@ -134,6 +134,7 @@ shutil.copy(here / 'dcmini.js', out_dir / 'dcmini.js')
 shutil.copy(here / 'glue.js', out_dir / 'glue.js')
 shutil.copy(here / 'sky.js', out_dir / 'sky.js')
 shutil.copy(here / 'lowpoly.js', out_dir / 'lowpoly.js')
+shutil.copy(here / 'nav.js', out_dir / 'nav.js')
 shutil.copytree(here / 'sounds', out_dir / 'sounds', dirs_exist_ok=True)
 LF = pathlib.Path(os.environ.get('LEAFLET', '/tmp/node_modules/leaflet/dist'))
 shutil.copy(LF / 'leaflet.js', out_dir / 'leaflet.js')
@@ -164,23 +165,30 @@ html,body{{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-h
 body.app [data-demo]{{display:none!important}}
 body.app [data-ui]{{display:none!important}}
 #stage{{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden}}
-#scene,#ui,#lp{{position:absolute;left:0;top:0;width:100%;height:100%}}
+#scene,#ui,#lp,#tcmap{{position:absolute;left:0;top:0;width:100%;height:100%}}
 #lp{{display:none}}
 body.lp-on #lp{{display:block}}
 body.lp-on #scene{{display:none}}
+#tcmap{{display:none;overflow:hidden;background:#0b1620}}
+#tcmap .leaflet-container{{background:#0b1620}}
+body.map-on #tcmap{{display:block}}
+body.map-on #scene,body.map-on #lp{{display:none!important}}
+#tcmap .leaflet-control-attribution{{font-size:9px;background:rgba(0,0,0,.35);color:#aab}}
+#tcmap .leaflet-control-attribution a{{color:#ccd}}
 #ui{{pointer-events:none}}
 #ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{{pointer-events:auto}}
 #ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{{pointer-events:auto}}
 body.theme-open #ui{{display:none}}
 body.narrow #scene{{display:none}}
 </style></head>
-<body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="ui"></div></div>
+<body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="tcmap"></div><div id="ui"></div></div>
 <script>window.TC_VERSION = '{version}';</script>
 <script src="logos/logos.js"></script>
 <script src="dcmini.js"></script>
 <script src="scene.js"></script>
 <script src="app.js"></script>
 <script src="leaflet.js"></script>
+<script src="nav.js"></script>
 <script src="glue.js"></script>
 <script src="sky.js"></script>
 <script src="lowpoly.js"></script>
@@ -195,6 +203,6 @@ if (window.TCNative) {{ try {{ window.TCNative.call('ready', ''); }} catch (e) {
 """, encoding='utf-8')
 import subprocess, os
 esb = os.environ.get('ESBUILD', '/tmp/node_modules/.bin/esbuild')
-for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js', 'sky.js', 'lowpoly.js'):
+for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js', 'sky.js', 'lowpoly.js', 'nav.js'):
     subprocess.run([esb, str(out_dir / f), '--target=chrome61', '--allow-overwrite', '--log-level=warning', '--outfile=' + str(out_dir / f)], check=True)
 print('web UI written to', out_dir)

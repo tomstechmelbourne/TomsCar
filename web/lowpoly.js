@@ -135,12 +135,6 @@
 
   function signs(T, scn) {
     if (scn.side === 'city' || scn.side === 'shophouse' || scn.side === 'neoncity') return;
-    // Australian speed sign R4-1 on the left verge
-    const sg = proj(-3.3, 0.6), h = H * 0.05;
-    rect(sg.x - 1, sg.y - h * 0.6, 2, h * 0.6, '#777');
-    rect(sg.x - h * 0.36, sg.y - h * 1.5, h * 0.72, h * 0.9, '#fff');
-    g.strokeStyle = '#d22'; g.lineWidth = h * 0.08; g.beginPath(); g.arc(sg.x, sg.y - h * 1.05, h * 0.27, 0, 6.2832); g.stroke();
-    g.fillStyle = '#111'; g.font = '700 ' + (h * 0.22) + 'px "Overpass",sans-serif'; g.textAlign = 'center'; g.fillText(S.limit ? String(S.limit) : '100', sg.x, sg.y - h * 0.97);
     // guide posts: red reflector left, white right
     for (let i = 0; i < 6; i++) { const z = ((i / 6) + off) % 1; const a = proj(-2.85, 1 - z), b = proj(2.85, 1 - z); const hh = H * 0.012 * a.p * 2.2; rect(a.x - 1, a.y - hh, 2, hh, '#f2f2f2'); rect(a.x - 1, a.y - hh, 2, hh * 0.25, '#e33'); rect(b.x - 1, b.y - hh, 2, hh, '#f2f2f2'); rect(b.x - 1, b.y - hh, 2, hh * 0.25, '#fff'); }
   }
@@ -186,8 +180,17 @@
     }
     const nc = S.wx === 'clear' ? 3 : S.wx === 'cloud' ? 7 : (S.wx === 'rain' || S.wx === 'storm') ? 9 : 4;
     const cc = S.tod === 'night' ? 'rgba(70,85,120,0.35)' : (S.wx === 'rain' || S.wx === 'storm') ? 'rgba(80,95,110,0.55)' : 'rgba(255,255,255,0.6)';
+    const wet = S.wx === 'rain' || S.wx === 'storm';
     for (let i = 0; i < nc; i++) {
-      const cx = (((i * 0.29 + t * 0.000004 * (1 + i % 3)) % 1.25) - 0.12) * W, cy = H * (0.07 + (i % 4) * 0.045), r = H * (0.035 + (i % 3) * 0.012);
+      const cx = (((i * 0.29 + t * 0.000004 * (1 + i % 3)) % 1.25) - 0.12) * W, cy = H * (0.07 + (i % 4) * 0.045), r = H * (0.035 + (i % 3) * 0.012) * (wet ? 1.25 : 1);
+      if (S.style === 'poly' && (wet || S.wx === 'cloud')) {
+        // soft faceted cloud: a fan of triangles in two gentle shades
+        const n = 9, top = S.tod === 'night' ? ['rgba(78,92,122,0.32)', 'rgba(62,76,104,0.32)'] : wet ? ['rgba(132,146,160,0.42)', 'rgba(112,126,141,0.42)'] : ['rgba(236,240,244,0.55)', 'rgba(214,222,230,0.55)'];
+        const pts = []; for (let k = 0; k <= n; k++) { const a = Math.PI + (k / n) * Math.PI, rr = r * (1.25 + 0.35 * Math.sin(k * 2.3 + i)); pts.push([cx + Math.cos(a) * rr * 1.7, cy + Math.sin(a) * rr * 0.9]); }
+        for (let k = 0; k < n; k++) { g.fillStyle = top[k % 2]; g.beginPath(); g.moveTo(cx, cy + r * 0.25); g.lineTo(pts[k][0], pts[k][1]); g.lineTo(pts[k + 1][0], pts[k + 1][1]); g.closePath(); g.fill(); }
+        g.fillStyle = top[1]; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]); g.lineTo(pts[n][0], pts[n][1]); g.lineTo(cx, cy + r * 0.45); g.closePath(); g.fill();
+        continue;
+      }
       g.fillStyle = cc; [[0, 0, 1], [r * 0.9, r * 0.1, 0.8], [-r * 0.9, r * 0.15, 0.75], [r * 0.3, -r * 0.4, 0.7]].forEach((q) => { g.beginPath(); g.arc(cx + q[0], cy + q[1], r * q[2], 0, 6.2832); g.fill(); });
     }
     // hills
@@ -391,7 +394,7 @@
   // ---------- frame ----------
   function frame(ts) {
     requestAnimationFrame(frame);
-    if (!S.on) return;
+    if (!S.on || document.body.classList.contains('map-on')) return;   // 0.9.9: map covers the scene
     // moving the scene: only when parked, or "chạy rất chậm" if chosen
     const anim = !S.drive || S.moveMode === 'slow';
     const fps = S.drive ? 2 : 24;

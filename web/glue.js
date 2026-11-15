@@ -232,10 +232,10 @@
   const alongKm = (pts, km, la, lo) => { let tot = 0, best = { d: 1e9, k: 0 }; const L = []; for (let i = 1; i < pts.length; i++) L.push(dist(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1])); const sum = L.reduce((a, b) => a + b, 0) || 1;
     for (let i = 1; i < pts.length; i++) { const d0 = dist(la, lo, pts[i][0], pts[i][1]); if (d0 < best.d) best = { d: d0, k: tot + L[i - 1] }; tot += L[i - 1]; } return Math.round(best.k / sum * km); };
   const pointAt = (pts, frac) => { const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + dist(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1])); const t = frac * L[L.length - 1]; let i = 1; while (i < L.length - 1 && L[i] < t) i++; return pts[i]; };
-  window.tcPlanTrip = (fromQ, toQ) => {
+  window.tcPlanTrip = (fromQ, toQ, opt) => {
     const u = window.__ui;
     const say = (m) => u && u.setState({ ntMsg: m });
-    say('Đang tìm ' + (typeof fromQ === 'object' ? (fromQ.name || 'vị trí của Tom') : fromQ) + ' và ' + toQ + '…');
+    say('Đang tìm ' + (typeof fromQ === 'object' ? (fromQ.name || 'vị trí của Tom') : fromQ) + ' và ' + (typeof toQ === 'object' ? toQ.name : toQ) + '…');
     const geo = (q) => (q && typeof q === 'object' && q.lat != null) ? Promise.resolve({ name: q.name || 'Vị trí của Tom', st: q.st || '', lat: q.lat, lon: q.lon }) : geocode(q);
     return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say('Đang tìm đường ' + a.name + ' → ' + b.name + '…');
@@ -272,7 +272,7 @@
       return one(1).then(() => {
         ids.sort((x, y) => places[x].km - places[y].km);
         say('');
-        return { id: 't' + Date.now().toString(36), name: T.a.name + ' → ' + T.b.name, from: T.a, to: T.b, km: T.km, mins: T.mins, pts: T.pts, border: T.border, places, lists: { goList: ids.slice(), backList: ids.slice().reverse(), skip: {}, custom: {} }, pinned: false, at: Date.now() };
+        return { id: 't' + Date.now().toString(36), name: (opt && opt.name) || (T.a.name + ' - ' + T.b.name), from: T.a, to: T.b, km: T.km, mins: T.mins, pts: T.pts, border: T.border, places, lists: { goList: ids.slice(), backList: ids.slice().reverse(), skip: {}, custom: {} }, pinned: false, at: Date.now() };
       });
     }).catch((e) => { say(/nf:/.test(String(e && e.message)) ? 'Không tìm thấy "' + String(e.message).slice(3) + '" — gõ rõ hơn (vd "Sydney NSW")' : 'Không tìm được đường (mất mạng?) — thử lại'); throw e; });
   };
@@ -399,7 +399,12 @@
     if (gpsStart && !gpsStart.name && live.place && live.place.suburb) gpsStart.name = live.place.suburb;
     if (d.lat != null && d.lon != null) { fetchWx(d.lat, d.lon); fetchLimit(d.lat, d.lon, d.bearing, d.speed || 0); loadRadio(d.lat, d.lon); checkRegion(d.lat, d.lon); }
     push(patch);
+    // 0.9.9: live navigation + trip log (nav.js) — once per new GPS fix
+    if (window.NAV && d.lat != null && d.fix !== lastFix) { lastFix = d.fix; try { window.NAV.tick({ lat: d.lat, lon: d.lon, spd: d.speed || 0, acc: d.acc || 0, brg: d.bearing }); } catch (e) { console.log('NAV ' + e); } }
   };
+  let lastFix = -1;
+  window.__liveLL = () => live.lat != null ? [live.lat, live.lon] : null;
+  window.__liveSpd = () => live.speed || 0;
   // callbacks from native
   window.tcApps = (a) => { if (window.__ui) window.__ui.setState({ apps: typeof a === 'string' ? JSON.parse(a) : a }); };
   window.tcCallLog = (a) => { if (window.__ui) window.__ui.setState({ calls: typeof a === 'string' ? JSON.parse(a) : a }); };

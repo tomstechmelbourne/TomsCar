@@ -172,6 +172,13 @@ window.__AppComp = function() {
   });
   const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
   const DEFAULTS = {
+    bubbleOn: true,
+    homeMap: true,
+    autoMap: true,
+    navVoice: true,
+    navCams: true,
+    navRotate: false,
+    tripLog: true,
     lang: "vi",
     clock: "24",
     unit: "kmg",
@@ -443,6 +450,11 @@ window.__AppComp = function() {
       if (APP) window.__uiComp = this;
       this.tick = setInterval(() => {
         const S = this.state, now = Date.now();
+        const lv0 = S.live || {};
+        if (APP && (lv0.speed || 0) > 10 && (S.set || {}).autoMap !== false && (S.scr === "search" || S.scr === "contacts") && now - S.last > 15e3 && !S.dlg) {
+          this.setState({ scr: "home" });
+          return;
+        }
         if (S.pendZone && now - S.pendAt >= 2e3) this.setState({ now, zone: S.pendZone, pendZone: null, popAt: now });
         else this.setState({ now });
       }, 1e3);
@@ -463,6 +475,7 @@ window.__AppComp = function() {
     syncNative(C) {
       if (!APP) return;
       tcn("media", "app:" + (C.musicApp || "jukebox"));
+      tcn("bubble", C.bubbleOn === false ? "off" : "on");
       tcn("voice", "cfg:" + JSON.stringify({ rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || "", sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false }));
     }
     componentWillUnmount() {
@@ -487,7 +500,7 @@ window.__AppComp = function() {
     setS(k, v) {
       const n = Object.assign({}, this.state.set, { [k]: v });
       this.save({ set: n });
-      if (/^(musicApp|tts|hot)/.test(k)) this.syncNative(n);
+      if (/^(musicApp|tts|hot|bubbleOn)/.test(k)) this.syncNative(n);
       if (k === "jbFollow" && v) tcn("media", "jbquery");
     }
     toast(t) {
@@ -715,13 +728,15 @@ window.__AppComp = function() {
             } };
           })(),
           ch("mapSide", "B\u1EA3n \u0111\u1ED3 n\u1EB1m b\xEAn", "Road Trip + B\u1EA3n \u0110\u1ED3", [["left", "Tr\xE1i"], ["right", "Ph\u1EA3i"]]),
-          ch("rtView", "Ki\u1EC3u hi\u1EC3n th\u1ECB qu\xE3ng \u0111\u01B0\u1EDDng", "\u0110\u1ED5i nhanh ngay tr\xEAn khung", [["road", "Con \u0110\u01B0\u1EDDng"], ["map", "B\u1EA3n \u0110\u1ED3"]]),
-          tg("kmUnder", "Km c\xF2n l\u1EA1i d\u01B0\u1EDBi m\u1ED7i ch\u1EB7ng", ""),
-          tg("kmSeg", "Km gi\u1EEFa hai ch\u1EB7ng", "Tr\xEAn m\u1EB7t \u0111\u01B0\u1EDDng"),
-          tg("kmPost", "C\u1ECDc km d\u1ECDc \u0111\u01B0\u1EDDng", "M\u1ED7i 100 km \u2014 ph\xF3ng to th\xEC m\u1ED7i 10 km"),
           tg("placePhotos", "H\xECnh \u0111\u1EA1i di\u1EC7n \u0111\u1ECBa \u0111i\u1EC3m", "H\xECnh b\u1EA1n ch\u1EE5p \u2192 Wikimedia Commons \u2192 bi\u1EC3n b\xE1o"),
           tg("limitEst", "Gi\u1EDBi h\u1EA1n \u01B0\u1EDBc t\xEDnh khi thi\u1EBFu d\u1EEF li\u1EC7u", '50 khu d\xE2n c\u01B0 / 100 ngo\xE0i th\u1ECB tr\u1EA5n \u2014 c\xF3 ch\u1EEF "\u01B0\u1EDBc t\xEDnh" d\u01B0\u1EDBi bi\u1EC3n'),
           ch("rest", "Nh\u1EAFc ngh\u1EC9 ch\xE2n m\u1ED7i", "Theo gi\u1EDD l\xE1i li\xEAn t\u1EE5c", [[1.5, "1,5 gi\u1EDD"], [2, "2 gi\u1EDD"], [3, "3 gi\u1EDD"]]),
+          tg("homeMap", "M\xE0n H\xECnh Ch\xEDnh l\xE0 b\u1EA3n \u0111\u1ED3", "T\u1EAFt th\xEC n\u1EC1n l\xE0 c\u1EA3nh low-poly nh\u01B0 c\u0169 (\u0111\u1ED5i trong Giao Di\u1EC7n)"),
+          tg("autoMap", "T\u1EF1 hi\u1EC7n b\u1EA3n \u0111\u1ED3 khi xe ch\u1EA1y", "Tr\xEAn 10 km/g: n\u1EC1n low-poly \u0111\u1ED5i sang b\u1EA3n \u0111\u1ED3, T\xECm Ch\u1ED7 / Li\xEAn L\u1EA1c t\u1EF1 v\u1EC1 b\u1EA3n \u0111\u1ED3"),
+          tg("navVoice", "\u0110\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng", "R\u1EBD tr\xE1i, r\u1EBD ph\u1EA3i, v\xF2ng xoay\u2026 b\u1EB1ng gi\u1ECDng Vi\u1EC7t"),
+          tg("navCams", "Nh\u1EAFc camera t\u1ED1c \u0111\u1ED9 + v\xF9ng tr\u01B0\u1EDDng h\u1ECDc", "D\u1EEF li\u1EC7u OpenStreetMap \u2014 c\xF3 th\u1EC3 thi\u1EBFu ch\u1ED7"),
+          ch("navRotate", "H\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3 khi ch\u1EC9 \u0111\u01B0\u1EDDng", "Theo h\u01B0\u1EDBng xe t\u1ED1n s\u1EE9c m\xE1y h\u01A1n \u2014 m\xE1y c\u0169 n\xEAn \u0111\u1EC3 H\u01B0\u1EDBng B\u1EAFc", [[false, "H\u01B0\u1EDBng B\u1EAFc"], [true, "Theo h\u01B0\u1EDBng xe"]]),
+          tg("tripLog", "Nh\u1EADt k\xFD H\xE0nh Tr\xECnh", "T\u1EF1 ghi ch\u1ED7 \u0111\u1EADu h\u01A1n 3 ph\xFAt \u2014 ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y, kh\xF4ng g\u1EEDi \u0111i \u0111\xE2u"),
           ch("mapStyle", "Ki\u1EC3u b\u1EA3n \u0111\u1ED3", "T\u1EF1 \u0110\u1ED9ng = S\xE1ng ban ng\xE0y, T\u1ED1i ban \u0111\xEAm (theo gi\u1EDD m\u1EB7t tr\u1EDDi m\u1ECDc/l\u1EB7n)", [["auto", "T\u1EF1 \u0110\u1ED9ng"], ["dark", "T\u1ED1i"], ["light", "S\xE1ng"], ["topo", "\u0110\u1ECBa H\xECnh"], ["sat", "V\u1EC7 Tinh"]]),
           ch("mapBright", "\u0110\u1ED9 s\xE1ng b\u1EA3n \u0111\u1ED3", "B\u1EADt D\u1ECBu M\u1EAFt th\xEC t\u1EF1 gi\u1EA3m", [[70, "70%"], [85, "85%"], [100, "100%"], [115, "115%"]]),
           tg("odoOn", "\u0110\u1ED3ng h\u1ED3 km ki\u1EC3u cu\u1ED9n", "Trip A, Trip B, km t\u1EDBi ch\u1EB7ng k\u1EBF, v\xF2ng % chuy\u1EBFn"),
@@ -729,6 +744,7 @@ window.__AppComp = function() {
         ] },
         ws: { label: "Workspace", icon: "M3 4h8v7H3zM13 4h8v4h-8zM13 10h8v10h-8zM3 13h8v7H3z", desc: "C\xE1ch m\u1EDF app tr\xEAn DeX v\xE0 \u0111i\u1EC7n tho\u1EA1i", rows: [
           tg("dexFull", "Ph\xF3ng to theo m\xE0n h\xECnh DeX", "Tr\u1EEB thanh t\xE1c v\u1EE5; 1 app th\xEC ph\xF3ng to h\u1EBFt"),
+          tg("bubbleOn", "N\xFAt n\u1ED5i Tom\u2019s Car", "M\u1EDD 50% tr\xEAn app kh\xE1c \u2014 b\u1EA5m l\xE0 v\u1EC1 Tom\u2019s Car, k\xE9o \u0111\u1EC3 d\u1EDDi, b\u1EA5m gi\u1EEF \u0111\u1EC3 \u1EA9n"),
           ch("strip", "D\u1EA3i Tom\u2019s Car \u1EDF m\xE9p", "N\xFAt v\u1EC1 Tom\u2019s Car, tr\u1EE3 l\xFD, \u0111\u1ED5i Workspace", [["left", "Tr\xE1i"], ["right", "Ph\u1EA3i"], ["off", "T\u1EAFt"]]),
           tg("hideTask", "\u1EA8n thanh t\xE1c v\u1EE5 DeX", "Khi d\xF9ng Workspace (n\u1EBFu m\xE1y cho ph\xE9p)"),
           stt("DeX Labs: Bu\u1ED9c app thay \u0111\u1ED5i k\xEDch th\u01B0\u1EDBc", "C\u1EA7n cho app kh\xF4ng ch\u1ECBu ph\xF3ng to", C.forceRes, "\u0110\xE3 b\u1EADt", "Ch\u01B0a b\u1EADt", "H\u01B0\u1EDBng D\u1EABn", () => {
@@ -1173,7 +1189,8 @@ window.__AppComp = function() {
       const tripRows = [{ id: "mel-adl", name: "Melbourne \u21C4 Adelaide", km: 727, pinned: true, builtin: true }].concat((S.trips || []).slice().sort((a, b) => b.pinned - a.pinned || b.at - a.at)).map((t) => {
         const on = t.id === S.tripId;
         return {
-          name: t.builtin ? t.name : t.name.replace(" \u2192 ", " \u21C4 "),
+          ring: on ? "inset 0 0 0 2px #FBB040" : "inset 0 0 0 1px rgba(255,255,255,0.1)",
+          name: t.name,
           sub: t.km + " km" + (t.builtin ? " \xB7 c\xF3 s\u1EB5n" : " \xB7 " + Object.keys(t.places || {}).length + " ch\u1ED7 gh\xE9 g\u1EE3i \xFD") + (t.pinned && !t.builtin ? " \xB7 \u{1F4CC}" : ""),
           on: on ? "true" : "false",
           bg: on ? "rgba(251,176,64,0.16)" : "rgba(13,44,64,0.55)",
@@ -1214,6 +1231,7 @@ window.__AppComp = function() {
         open: S.tripDlg,
         close: () => self.setState({ tripDlg: false, tripEdit: null, tripDel: null }),
         rows: tripRows,
+        newTrip: () => self.setState({ tripDlg: false, scr: "rt", ntOpen: true, ntMsg: "", pnlMin: Object.assign({}, S.pnlMin || {}, { rt: false }) }),
         from: S.ntFrom,
         to: S.ntTo,
         msg: S.ntMsg,
@@ -1255,30 +1273,6 @@ window.__AppComp = function() {
         }
       };
       self.switchTripExt = switchTrip;
-      if (APP && window.tcMapSync) {
-        const sun = window.__sun;
-        const nowT = Date.now();
-        const night2 = sun && sun.rise ? !(nowT > new Date(sun.rise).getTime() && nowT < new Date(sun.set).getTime()) : d.getHours() < 6 || d.getHours() >= 19;
-        const styleKey = C.mapStyle === "auto" || !C.mapStyle ? night2 ? "dark" : "light" : C.mapStyle;
-        const showMap = S.scr === "rt" && C.rtView === "map" && !nar && !S.tripDlg && !S.logOpen && !S.dlg;
-        window.tcMapSync({
-          show: showMap,
-          style: C.mapStyle || "auto",
-          styleKey,
-          night: night2,
-          bright: C.calm ? Math.min(C.mapBright || 100, 75) : C.mapBright || 100,
-          tint: styleKey === "light",
-          tripId: S.tripId + (SP ? "@" + SP.lat.toFixed(3) : ""),
-          isGo,
-          total: TOTAL,
-          pts: TRIP ? TRIP.pts : SP && window.__routePts ? [[SP.lat, SP.lon]].concat(window.__routePts) : window.__routePts,
-          follow: false,
-          drive,
-          brg: LV.bearing || 0,
-          van: LV.lat != null ? [LV.lat, LV.lon] : null,
-          stops: [Object.assign({ id: "", start: true, short: isGo ? FROM : TO, routeKm: isGo ? 0 : TOTAL, pri: 5, bg: "#00653A" }, SP && isGo ? { lat: SP.lat, lon: SP.lon } : {})].concat(list.map((x, i) => ({ id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? SP && !isGo ? SP.name : x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0], lat: x.id === "end" && SP && !isGo ? SP.lat : x.lat, lon: x.id === "end" && SP && !isGo ? SP.lon : x.lon, routeKm: isGo ? x.km : TOTAL - x.km, pri: x.id === "end" ? 5 : i === nextIdx ? 4 : 1, next: i === nextIdx, done: x.km <= pos, bg: x.km <= pos ? "#3E7A4E" : x.id === "end" ? "#00653A" : SIGN[x.k] || "#1F5FAE" })))
-        });
-      }
       const curIds = isGo ? S.goList : S.backList;
       const saved = Object.keys(ALLP).map((id) => {
         const has = curIds.indexOf(id) >= 0;
@@ -1724,9 +1718,39 @@ window.__AppComp = function() {
             sayV("D\u1EA1, \u0111ang t\xECm " + m[2] + " trong danh b\u1EA1", true);
           }
         } },
-        { t: "Ch\u1EC9 \u0111\u01B0\u1EDDng t\u1EDBi \u2026", re: /(chỉ đường|dẫn đường|đi tới|navigate)( tới| đến| to)? (.+)$/, run: (m) => {
-          tcn("nav", m[3]);
-          sayV("D\u1EA1, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng t\u1EDBi " + m[3]);
+        { t: "Xe t\xF4i \u1EDF \u0111\xE2u?", re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park))/, run: () => {
+          const pk = window.NAV && window.NAV.hist.park;
+          self.setState({ va: false, scr: "trip" });
+          if (pk) {
+            window.NAV.flyTo([pk.lat, pk.lon], 17);
+            sayV("D\u1EA1, xe \u0111\u1EADu \u1EDF " + (pk.name || "ch\u1ED7 \u0111\xE1nh d\u1EA5u tr\xEAn b\u1EA3n \u0111\u1ED3"));
+          } else sayV("D\u1EA1, m\xECnh ch\u01B0a ghi ch\u1ED7 \u0111\u1EADu xe n\xE0o");
+        } },
+        { t: "Ch\u1EC9 \u0111\u01B0\u1EDDng t\u1EDBi \u2026", re: /(chỉ đường|dẫn đường|đi tới|đi đến|navigate)( tới| đến| to)? (.+)$/, run: (m) => {
+          const q2 = m[3];
+          const NV2 = window.NAV, ll = LV.lat != null ? [LV.lat, LV.lon] : null;
+          if (!NV2 || !ll) {
+            tcn("nav", q2);
+            sayV("D\u1EA1, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng t\u1EDBi " + q2);
+            return;
+          }
+          if (/^(nhà|về nhà|home)$/.test(q2.trim()) && window.tcHome && window.tcHome()) {
+            const h = window.tcHome();
+            self.setState({ va: false, scr: "home", wp: [{ name: "Nh\xE0", lat: h.lat, lon: h.lon }] });
+            NV2.startTo({ name: "Nh\xE0", lat: h.lat, lon: h.lon });
+            return;
+          }
+          sayV("D\u1EA1, \u0111ang t\xECm " + q2);
+          NV2.search(q2, ll, (r) => {
+            const p0 = r && r[0];
+            if (!p0) {
+              sayV("D\u1EA1, m\xECnh kh\xF4ng t\xECm th\u1EA5y " + q2);
+              return;
+            }
+            const w = { name: p0.name, lat: p0.lat, lon: p0.lon, logo: p0.logo || "" };
+            self.setState({ va: false, scr: "home", wp: [w] });
+            NV2.startTo(w);
+          });
         } },
         { t: "Ch\u1EB7ng k\u1EBF ti\u1EBFp", re: /(chặng kế|ghé chỗ kế|next stop)/, run: () => {
           const nx = list[nextIdx];
@@ -1974,6 +1998,7 @@ window.__AppComp = function() {
         return window.__thumbs[key] || "";
       };
       const th = {
+        homeBg: [[true, "\u{1F5FA} B\u1EA3n \u0110\u1ED3"], [false, "\u{1F3D4} C\u1EA3nh Low-Poly"]].map(([k, l]) => Object.assign({ label: l, on: C.homeMap !== false === k ? "true" : "false", pick: () => self.setS("homeMap", k) }, chip(C.homeMap !== false === k))),
         styles: [["flat", "G\u1ED1c"], ["poly", "Low-Poly"]].map(([k, l]) => Object.assign({ label: l, on: (C.drawStyle || "poly") === k ? "true" : "false", pick: () => self.setS("drawStyle", k) }, chip((C.drawStyle || "poly") === k))),
         // #52: a few themes by default; the rest are added from "Thêm Giao Diện" (only what is shown gets drawn)
         groups: (S.thMore ? TGROUPS.map(([label, items2]) => [label, items2.filter(([k]) => TH_DEF.indexOf(k) < 0)]) : [["\u0110ANG D\xD9NG", TGROUPS.reduce((a, g) => a.concat(g[1]), []).filter(([k], i, arr) => (TH_DEF.indexOf(k) >= 0 || thExtra.indexOf(k) >= 0 || k === thTheme) && arr.findIndex((x) => x[0] === k) === i).sort((a, b) => (TH_DEF.indexOf(a[0]) < 0 ? 99 : TH_DEF.indexOf(a[0])) - (TH_DEF.indexOf(b[0]) < 0 ? 99 : TH_DEF.indexOf(b[0])))]]).map(([label, items2]) => ({ label, items: items2.map(([k, l]) => {
@@ -1993,7 +2018,7 @@ window.__AppComp = function() {
                 const nx = added ? thExtra.filter((x) => x !== k) : thExtra.concat([k]);
                 self.setS("thExtra", nx);
                 if (!added) self.toast("\u0110\xE3 th\xEAm " + l + " v\xE0o Giao Di\u1EC7n");
-              } else self.setS("lpTheme", k);
+              } else self.save({ set: Object.assign({}, C, { lpTheme: k, homeMap: false }) });
             },
             drop: (e) => {
               if (e && e.stopPropagation) e.stopPropagation();
@@ -2227,6 +2252,457 @@ window.__AppComp = function() {
         sy: pol(secA, 78)[1]
       };
       window.__idleOn = idlOn;
+      const NV = window.NAV || null;
+      const shell = !nar && (S.scr === "home" || S.scr === "trip" || S.scr === "rt");
+      if (NV) {
+        NV.cfg.rotate = !!C.navRotate;
+        NV.cfg.cams = C.navCams !== false;
+        NV.cfg.histOff = C.tripLog === false;
+        NV.cfg.mute = C.navVoice === false;
+      }
+      const navV = NV && NV.st.route ? NV.navView() : null;
+      const navAct = !!(navV && navV.active);
+      const arrived = !!(NV && NV.st.arrivedAt && !navAct && Date.now() - NV.st.arrivedAt < 45e3);
+      const hereLL = LV.lat != null ? [LV.lat, LV.lon] : APP ? null : [-37.7466, 144.7326];
+      const fastNow = (LV.speed || 0) > 10;
+      const mapShow = shell && (S.scr !== "home" || C.homeMap !== false || !!navV || fastNow && C.autoMap !== false);
+      const sun0 = window.__sun, nowT0 = Date.now();
+      const night0 = sun0 && sun0.rise ? !(nowT0 > new Date(sun0.rise).getTime() && nowT0 < new Date(sun0.set).getTime()) : d.getHours() < 6 || d.getHours() >= 19;
+      const toWp = (p) => ({ name: p.name, lat: p.lat, lon: p.lon, logo: p.logo || (NV ? NV.logoOf(p.name) : ""), st: p.st || "" });
+      const wpList = S.wp || [];
+      const planWp = (wp, start) => {
+        self.setState({ wp, nq: "", nRes: null, nField: "" });
+        if (!NV) return;
+        if (!wp.length) {
+          NV.cancel();
+          return;
+        }
+        if (!hereLL) {
+          self.toast("Ch\u01B0a b\u1EAFt \u0111\u01B0\u1EE3c GPS \u2014 ch\u1EDD ch\xFAt r\u1ED3i b\u1EA5m l\u1EA1i");
+          return;
+        }
+        NV.plan([{ name: "V\u1ECB tr\xED c\u1EE7a Tom", lat: hereLL[0], lon: hereLL[1] }].concat(wp), { name: wp[wp.length - 1].name }).then(() => {
+          if (start) NV.start();
+        }).catch(() => {
+        });
+      };
+      const kmTo = (p) => hereLL && NV && p && p.lat != null ? NV.fmtDist(NV.dist(hereLL, [p.lat, p.lon])) : "";
+      const resRow = (p, pick) => {
+        const lg = p.logo || (NV ? NV.logoOf(p.name) : "");
+        return { name: p.name, sub: p.sub || "", km: p.km != null ? (p.km < 10 ? String(Math.round(p.km * 10) / 10).replace(".", ",") : Math.round(p.km)) + " km" : kmTo(p), logo: lg, logoOn: !!lg, icOn: !lg, icon: p.icon || "\u{1F4CD}", icBg: lg ? "#FFFFFF" : "rgba(13,44,64,0.9)", pick };
+      };
+      const typeIn = (field) => (e) => {
+        const q2 = e.target.value;
+        const patch = { nq: q2, nField: field };
+        if (q2.trim().length < 3) patch.nRes = null;
+        if (field === "from") patch.ntFrom = q2, patch.ntFromP = null;
+        if (field === "to") patch.ntTo = q2, patch.ntToP = null;
+        self.setState(patch);
+        if (NV) NV.search(q2, hereLL, (r) => {
+          if (self.state.nField === field) self.setState({ nRes: r });
+        });
+      };
+      const resFor = (field, onPick) => S.nField === field && S.nRes ? S.nRes.map((p) => resRow(p, () => onPick(p))) : [];
+      const homeP = APP && window.tcHome ? window.tcHome() : APP ? null : { name: "Nh\xE0", lat: -37.7466, lon: 144.7326 };
+      const H0 = NV ? NV.hist : { saved: [], trips: [], places: {}, park: null };
+      const work = (H0.saved || []).find((s) => s.role === "work");
+      const habit = NV && hereLL ? NV.habit(hereLL) : null;
+      const MAN = { straight: "M24 42V8M13 19L24 8l11 11", right: "M14 42V25q0-7 7-7h15M28 10l8 8-8 8", left: "M34 42V25q0-7-7-7H12M20 10l-8 8 8 8", "slight right": "M18 42V27L33 12M21 11h13v13", "slight left": "M30 42V27L15 12M27 11H14v13", "sharp right": "M16 6v24l16 10M33 28v13H20", "sharp left": "M32 6v24L16 40M15 28v13h13", uturn: "M32 42V18a8 8 0 0 0-16 0v14M9 25l7 8 7-8", round: "M24 44V32M24 32a9 9 0 1 1 9-9M27 10l7 13-14 2", arrive: "M13 44V6M13 8h22l-5 8 5 8H13" };
+      const AV = NV ? NV.cfg.avoid || [] : [];
+      const avoidT = (k) => () => {
+        const a = AV.indexOf(k) >= 0 ? AV.filter((x) => x !== k) : AV.concat([k]);
+        NV.setCfg("avoid", a);
+        if (wpList.length && !navAct) planWp(wpList, false);
+      };
+      const destLL = navV && NV.st.dest ? NV.st.dest : null;
+      const extNav = (app) => () => {
+        if (!destLL) return;
+        tcn("nav", app + ":" + destLL.lat + "," + destLL.lon + "|" + (destLL.name || ""));
+      };
+      const chips = [];
+      if (homeP) chips.push({ l: "\u{1F3E0} Nh\xE0", go: () => planWp([toWp(Object.assign({}, homeP, { name: "Nh\xE0" }))], false) });
+      if (work) chips.push({ l: "\u{1F4BC} Ch\u1ED7 l\xE0m", go: () => planWp([toWp(work)], false) });
+      if (habit) chips.push({ l: "\u2B50 " + habit.name, go: () => planWp([toWp(habit)], false) });
+      chips.push({ l: "\u26FD C\xE2y x\u0103ng", go: () => {
+        self.setState({ scr: "search", cat: "fuel" });
+        if (APP && window.tcFindPlaces) window.tcFindPlaces("fuel");
+      } });
+      if (H0.park) chips.push({ l: "\u{1F17F} Xe \u0111\u1EADu", go: () => NV && NV.flyTo([H0.park.lat, H0.park.lon], 17) });
+      const pnlMin = !!(S.pnlMin || {})[S.scr];
+      const ctlTop = S.scr === "home" ? navAct ? 250 : 200 : navAct ? 250 : 138;
+      const nv = {
+        mapOn: mapShow,
+        boxOn: shell && S.scr === "home" && !navAct && !arrived && mapShow,
+        q: S.nField === "go" ? S.nq || "" : "",
+        qOn: S.nField === "go" && !!S.nq,
+        lock: drive,
+        ph: drive ? '\u0110\u1EADu xe r\u1ED3i g\xF5 \u2014 ho\u1EB7c n\xF3i "Hey Tom, \u0111i t\u1EDBi\u2026"' : "\u0110i \u0111\xE2u? G\xF5 t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9",
+        typeGo: typeIn("go"),
+        clearQ: () => self.setState({ nq: "", nRes: null }),
+        goFirst: () => {
+          const r = S.nField === "go" && S.nRes && S.nRes[0];
+          if (r) planWp([toWp(r)], true);
+          else if (navV) NV.start();
+          else self.toast("G\xF5 ch\u1ED7 mu\u1ED1n t\u1EDBi tr\u01B0\u1EDBc nha");
+        },
+        res: resFor("go", (p) => planWp([toWp(p)], false)),
+        resOn: S.nField === "go" && !!(S.nRes && S.nRes.length) && S.scr === "home",
+        chips,
+        chipsOn: shell && S.scr === "home" && !navAct && !navV && !arrived && mapShow && !(S.nField === "go" && S.nRes && S.nRes.length),
+        bannerOn: shell && navAct && mapShow,
+        icoD: navV ? MAN[navV.ico] || MAN.straight : "",
+        dist: navV ? navV.dist : "",
+        text: navV ? navV.text : "",
+        thenOn: !!(navV && navV.then),
+        then: navV ? navV.then : "",
+        thenDist: navV ? navV.thenDist : "",
+        prevOn: shell && !!navV && !navAct && !arrived && mapShow,
+        dest: navV ? navV.dest : "",
+        destLogo: navV ? navV.destLogo : "",
+        destLogoOn: !!(navV && navV.destLogo),
+        destIcOn: !(navV && navV.destLogo),
+        sum: navV ? navV.left + " \xB7 " + navV.km + " \xB7 t\u1EDBi " + navV.eta : "",
+        alts: navV ? navV.alts.map((a) => ({ label: a.label, info: a.min + " \xB7 " + a.km, toll: a.toll ? "\u{1F4B2} thu ph\xED" : "", on: a.on ? "true" : "false", bg: a.on ? "rgba(47,208,245,0.18)" : "rgba(255,255,255,0.04)", ring: a.on ? "inset 0 0 0 2px #2FD0F5" : "inset 0 0 0 1px rgba(255,255,255,0.12)", pick: a.pick })) : [],
+        avoid: [["toll", "Tr\xE1nh thu ph\xED"], ["motorway", "Tr\xE1nh cao t\u1ED1c"], ["ferry", "Tr\xE1nh ph\xE0"]].map(([k, l]) => {
+          const on = AV.indexOf(k) >= 0;
+          return { l: (on ? "\u2713 " : "") + l, on: on ? "true" : "false", bg: on ? "rgba(123,216,143,0.2)" : "rgba(255,255,255,0.05)", fg: on ? "#7BD88F" : "#CFE6EE", tap: avoidT(k) };
+        }),
+        tollOn: !!(navV && navV.tolls.length),
+        tollL: navV && navV.tolls.length ? "\u26A0 C\xF3 \u0111o\u1EA1n thu ph\xED: " + navV.tolls.slice(0, 2).join(", ") + (navV.noEx ? " (kh\xF4ng n\xE9 \u0111\u01B0\u1EE3c h\u1EBFt)" : "") : "",
+        msg: navV ? navV.planning ? "\u0110ang t\xECm \u0111\u01B0\u1EDDng\u2026" : navV.err || "" : "",
+        msgOn: !!(navV && (navV.planning || navV.err)),
+        start: () => NV && NV.start(),
+        cancel: () => {
+          self.setState({ wp: [] });
+          NV && NV.cancel();
+        },
+        gmaps: extNav("gmaps"),
+        waze: extNav("waze"),
+        etaOn: shell && navAct && mapShow,
+        eta: navV ? navV.eta : "",
+        left: navV ? navV.left : "",
+        km: navV ? navV.km : "",
+        voiceIc: C.navVoice === false ? "\u{1F507}" : "\u{1F50A}",
+        voiceA: C.navVoice === false ? "B\u1EADt \u0111\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng" : "T\u1EAFt \u0111\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng",
+        voice: () => self.setS("navVoice", C.navVoice === false),
+        share: () => {
+          if (!navV) return;
+          tcn("share", "Tom \u0111ang tr\xEAn \u0111\u01B0\u1EDDng t\u1EDBi " + navV.dest + ", d\u1EF1 ki\u1EBFn t\u1EDBi l\xFAc " + navV.eta + " (c\xF2n " + navV.left + ").");
+        },
+        stop: () => {
+          self.setState({ wp: [] });
+          NV && NV.stop();
+        },
+        arrivedOn: shell && arrived && mapShow,
+        arrivedL: "\u{1F3C1} \u0110\xE3 t\u1EDBi " + (NV && NV.st.dest ? NV.st.dest.name : "n\u01A1i"),
+        done: () => {
+          self.setState({ wp: [] });
+          NV && NV.cancel();
+        },
+        ctlOn: shell && mapShow,
+        ctlTop,
+        zin: () => NV && NV.zoomIn(),
+        zout: () => NV && NV.zoomOut(),
+        loc: () => NV && NV.locate(),
+        locC: NV && NV.following() ? "#FBB040" : "#CFF6FF",
+        fit: () => NV && NV.fitAll(),
+        fitOn: !!navV || S.scr === "rt" || !!(NV && NV.st.preview),
+        rotOn: navAct,
+        rotL: C.navRotate ? "\u{1F9ED}" : "N",
+        rotA: C.navRotate ? "B\u1EA3n \u0111\u1ED3 theo h\u01B0\u1EDBng xe \u2014 b\u1EA5m \u0111\u1EC3 v\u1EC1 H\u01B0\u1EDBng B\u1EAFc" : "B\u1EA3n \u0111\u1ED3 H\u01B0\u1EDBng B\u1EAFc \u2014 b\u1EA5m \u0111\u1EC3 theo h\u01B0\u1EDBng xe",
+        rot: () => self.setS("navRotate", !C.navRotate),
+        followOff: shell && mapShow && NV && !NV.following() && (navAct || drive),
+        refollowL: "B\u1EA3n \u0111\u1ED3 s\u1EBD t\u1EF1 theo xe sau 10 gi\xE2y"
+      };
+      const unread0 = APP ? (S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0) : 3;
+      const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: "", nRes: null, nField: "", ntOpen: scr === "rt" ? S.ntOpen : false });
+      const tabs = [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["trip", "\u27A4 H\xE0nh Tr\xECnh"], ["rt", "\u{1F5FA} Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"]].map(([k, l]) => {
+        const on = S.scr === k;
+        return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "rgba(8,22,34,0.62)", fg: on ? "#2A1A00" : "#FFFFFF", ring: on ? "none" : "inset 0 0 0 1px rgba(255,255,255,0.22)", cls: on ? "" : "glt", badge: unread0, badgeOn: k === "contacts" && unread0 > 0, go: k === "contacts" ? () => {
+          tabGo("contacts")();
+          if (APP) {
+            tcn("calllog");
+            tcn("msgs");
+          }
+        } : tabGo(k) };
+      });
+      const togglePnl = () => self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { [S.scr]: !pnlMin }) });
+      const dowS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+      const hjTab = S.hjTab || "saved";
+      const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || "" }), () => planWp([toWp(p)], false)), { sub: kmTo(p), go: () => planWp([toWp(p)], true), act: act || (() => {
+      }), actL: actL || "", actOn: !!act, actA: actA || "", addStop: () => planWp(wpList.concat([toWp(p)]), false) });
+      let hjRows = [];
+      if (hjTab === "saved") {
+        if (homeP) hjRows.push(placeRow(Object.assign({}, homeP, { name: "Nh\xE0", icon: "\u{1F3E0}" })));
+        (H0.saved || []).forEach((s, i) => hjRows.push(placeRow(Object.assign({ icon: s.icon || "\u2B50" }, s), () => NV.unstar(i), "\u2715", "B\u1ECF l\u01B0u " + s.name)));
+      } else if (hjTab === "freq") {
+        hjRows = (NV ? NV.frequent() : []).map((p) => placeRow(Object.assign({ icon: "\u{1F4CD}" }, p), () => NV.star(p), "\u2B50", "L\u01B0u " + p.name));
+      } else if (hjTab === "recent") {
+        hjRows = (NV ? NV.recent() : []).map((p) => placeRow(Object.assign({ icon: "\u{1F558}" }, p), () => NV.star(p), "\u2B50", "L\u01B0u " + p.name));
+      }
+      const logRows = hjTab === "log" ? (H0.trips || []).slice(0, 60).map((t) => {
+        const a = new Date(t.t0);
+        return { when: dowS[a.getDay()] + " " + a.getDate() + "/" + (a.getMonth() + 1) + " \xB7 " + a.getHours() + ":" + p2(a.getMinutes()), name: (t.from.name || "?") + " \u2192 " + (t.to.name || "?"), km: String(t.km).replace(".", ",") + " km \xB7 " + Math.max(1, Math.round((t.t1 - t.t0) / 6e4)) + " ph", on: NV && NV.st.preview === t ? "true" : "false", bg: NV && NV.st.preview === t ? "rgba(47,208,245,0.16)" : "rgba(255,255,255,0.04)", show: () => NV && NV.showTrail(NV.st.preview === t ? null : t), del: () => NV && NV.delTrip(t.t0) };
+      }) : [];
+      const moveWp = (i, dir) => () => {
+        const a = wpList.slice(), j = i + dir;
+        if (j < 0 || j >= a.length) return;
+        const t = a[i];
+        a[i] = a[j];
+        a[j] = t;
+        planWp(a, false);
+      };
+      const tidyWp = () => {
+        if (wpList.length < 3 || !hereLL) return;
+        const last = wpList[wpList.length - 1], rest = wpList.slice(0, -1), out = [];
+        let cur = hereLL;
+        while (rest.length) {
+          let bi = 0, bd = 1e12;
+          rest.forEach((w2, i) => {
+            const dd = NV.dist(cur, [w2.lat, w2.lon]);
+            if (dd < bd) {
+              bd = dd;
+              bi = i;
+            }
+          });
+          const w = rest.splice(bi, 1)[0];
+          out.push(w);
+          cur = [w.lat, w.lon];
+        }
+        out.push(last);
+        planWp(out, false);
+        self.toast("\u0110\xE3 s\u1EAFp x\u1EBFp c\xE1c \u0111i\u1EC3m d\u1EEBng cho g\u1ECDn \u0111\u01B0\u1EDDng");
+      };
+      const parkAgo = H0.park ? Math.max(0, Math.round((Date.now() - H0.park.t) / 6e4)) : 0;
+      const hj = {
+        on: shell && S.scr === "trip" && !pnlMin,
+        min: shell && S.scr === "trip" && pnlMin,
+        toggle: togglePnl,
+        habitOn: !!habit && !navV,
+        habitL: habit ? "Gi\u1EDD n\xE0y Tom hay \u0111i " + habit.name : "",
+        habitGo: () => habit && planWp([toWp(habit)], true),
+        parkOn: !!H0.park && !drive,
+        parkL: H0.park ? "Xe \u0111\u1EADu \u1EDF " + (H0.park.name || "\u0111\xE2y") + " \xB7 " + (parkAgo < 60 ? parkAgo + " ph\xFAt tr\u01B0\u1EDBc" : Math.floor(parkAgo / 60) + " gi\u1EDD tr\u01B0\u1EDBc") : "",
+        parkSee: () => H0.park && NV.flyTo([H0.park.lat, H0.park.lon], 17),
+        parkR: H0.park && H0.park.until ? "\u23F0 Nh\u1EAFc l\xFAc " + NV.hhmm(H0.park.until - 6e5) : "",
+        parkRemind: [[60, "1P"], [120, "2P"], [240, "4P"]].map(([m, l]) => ({ l, on: H0.park && H0.park.limit === m ? "true" : "false", bg: H0.park && H0.park.limit === m ? "#FBB040" : "rgba(255,255,255,0.06)", fg: H0.park && H0.park.limit === m ? "#2A1A00" : "#CFE6EE", tap: () => NV.parkRemind(m) })),
+        wps: wpList.map((w, i) => {
+          const last = i === wpList.length - 1;
+          return { n: last ? "\u2691" : String(i + 1), bg: last ? "#D0202E" : "#F28A1A", name: w.name, logo: w.logo || "", logoOn: !!w.logo, up: moveWp(i, -1), down: moveWp(i, 1), del: () => planWp(wpList.filter((_, k) => k !== i), false), upOp: i === 0 ? 0.35 : 1, downOp: last ? 0.35 : 1 };
+        }),
+        wpOn: wpList.length > 0,
+        tidyOn: wpList.length >= 3,
+        tidy: tidyWp,
+        q: S.nField === "hj" ? S.nq || "" : "",
+        ph: drive ? "\u0110\u1EADu xe r\u1ED3i g\xF5 nha" : wpList.length ? "+ Th\xEAm \u0111i\u1EC3m d\u1EEBng" : "\u0110i \u0111\xE2u? G\xF5 t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9",
+        type: typeIn("hj"),
+        lock: drive,
+        res: resFor("hj", (p) => planWp(wpList.concat([toWp(p)]), false)),
+        resOn: S.nField === "hj" && !!(S.nRes && S.nRes.length),
+        tabs: [["saved", "\u0110\xE3 L\u01B0u"], ["freq", "Hay \u0110i"], ["recent", "G\u1EA7n \u0110\xE2y"], ["log", "Nh\u1EADt K\xFD"]].map(([k, l]) => {
+          const on = hjTab === k;
+          return { l, on: on ? "true" : "false", bg: on ? "#FBB040" : "rgba(255,255,255,0.06)", fg: on ? "#2A1A00" : "#CFE6EE", tap: () => self.setState({ hjTab: k }) };
+        }),
+        rows: hjRows,
+        rowsOn: hjTab !== "log" && hjRows.length > 0,
+        logOn: hjTab === "log",
+        logRows,
+        logAny: logRows.length > 0,
+        empty: hjTab === "log" ? C.tripLog === false ? "Nh\u1EADt k\xFD \u0111ang t\u1EAFt." : "Ch\u01B0a c\xF3 chuy\u1EBFn n\xE0o \u2014 ch\u1EA1y xe r\u1ED3i \u0111\u1EADu h\u01A1n 3 ph\xFAt l\xE0 app t\u1EF1 ghi." : hjTab === "saved" ? "Ch\u01B0a l\u01B0u ch\u1ED7 n\xE0o \u2014 b\u1EA5m \u2B50 \u1EDF Hay \u0110i / G\u1EA7n \u0110\xE2y \u0111\u1EC3 l\u01B0u." : hjTab === "freq" ? "Ch\u1EA1y v\xE0i b\u1EEFa l\xE0 app bi\u1EBFt Tom hay \u0111i \u0111\xE2u." : "Ch\u01B0a c\xF3 ch\u1ED7 n\xE0o trong 8 ng\xE0y qua.",
+        emptyOn: hjTab === "log" ? !logRows.length : !hjRows.length,
+        logToggle: () => self.setS("tripLog", C.tripLog === false),
+        logOnL: C.tripLog === false ? "B\u1EADt ghi nh\u1EADt k\xFD" : "T\u1EAFt ghi nh\u1EADt k\xFD",
+        clear: () => {
+          if (S.hjClear) {
+            NV && NV.clearHist();
+            self.setState({ hjClear: false });
+            self.toast("\u0110\xE3 xo\xE1 h\u1EBFt nh\u1EADt k\xFD, ch\u1ED7 hay \u0111i v\xE0 g\u1EA7n \u0111\xE2y");
+          } else {
+            self.setState({ hjClear: true });
+            self.toast('B\u1EA5m "Xo\xE1 H\u1EBFt" l\u1EA7n n\u1EEFa \u0111\u1EC3 xo\xE1 th\u1EADt');
+          }
+        },
+        clearL: S.hjClear ? "Xo\xE1 th\u1EADt?" : "Xo\xE1 H\u1EBFt",
+        workSet: () => {
+          if (!hereLL) return;
+          NV.setWork({ name: LV.place && (LV.place.street || LV.place.suburb) || "Ch\u1ED7 l\xE0m", lat: hereLL[0], lon: hereLL[1] });
+        },
+        workOn: !work && hjTab === "saved"
+      };
+      const rtStartP = SP ? SP : null;
+      const fromRows = S.nField === "from" ? [{ name: "\u{1F4CD} V\u1ECB tr\xED hi\u1EC7n t\u1EA1i", sub: LV.place && LV.place.suburb || "", icon: "\u{1F4CD}", cur: true }].concat(homeP ? [{ name: "\u{1F3E0} Nh\xE0", sub: homeP.name, icon: "\u{1F3E0}", home: true }] : []).map((r) => Object.assign(resRow({ name: r.name, sub: r.sub, icon: r.icon, km: null }, () => {
+        const P = r.home ? { name: "Nh\xE0", lat: homeP.lat, lon: homeP.lon, st: "" } : hereLL ? { name: LV.place && LV.place.suburb || "V\u1ECB tr\xED c\u1EE7a Tom", lat: hereLL[0], lon: hereLL[1], st: "" } : null;
+        if (!P) {
+          self.toast("Ch\u01B0a b\u1EAFt \u0111\u01B0\u1EE3c GPS");
+          return;
+        }
+        const nm2 = S.ntNameTouched ? S.ntName : P.name + (S.ntToP ? " - " + S.ntToP.name : "");
+        self.setState({ ntFromP: P, ntFrom: r.home ? "Nh\xE0" : P.name, nRes: null, nField: "", ntName: nm2 });
+      }), { logoOn: false, icOn: true, logo: "", km: "" })) : [];
+      const shortN = (n) => (n || "").split(",")[0].trim();
+      const pickFrom = (p) => {
+        const nm2 = S.ntNameTouched ? S.ntName : shortN(p.name) + (S.ntToP ? " - " + shortN(S.ntToP.name) : "");
+        self.setState({ ntFromP: toWp(p), ntFrom: p.name, nRes: null, nField: "", nq: "", ntName: nm2 });
+      };
+      const pickTo = (p) => {
+        const fromN = S.ntFromP ? shortN(S.ntFromP.name) : (S.ntFrom || "").trim() || (homeP ? "Nh\xE0" : LV.place && LV.place.suburb || "V\u1ECB tr\xED c\u1EE7a Tom");
+        self.setState({ ntToP: toWp(p), ntTo: p.name, nRes: null, nField: "", nq: "", ntName: S.ntNameTouched ? S.ntName : fromN + " - " + shortN(p.name) });
+      };
+      const nxS2 = nextIdx >= 0 ? list[nextIdx] : null;
+      const nxLL = nxS2 ? nxS2.id === "end" ? TRIP ? isGo ? TRIP.to : TRIP.from : isGo ? { lat: -34.9285, lon: 138.6007 } : SP || { lat: -37.8136, lon: 144.9631 } : nxS2 : null;
+      const OD0 = LV.odo || { a: S.demoA != null ? S.demoA : 128.4, b: pos };
+      const offKey = "tc-off-" + S.tripId;
+      const offDone = (() => {
+        try {
+          return localStorage.getItem(offKey);
+        } catch (e) {
+          return null;
+        }
+      })();
+      const rtp = {
+        on: shell && S.scr === "rt" && !pnlMin,
+        min: shell && S.scr === "rt" && pnlMin,
+        toggle: togglePnl,
+        title: rt.title,
+        legs: rt.legs,
+        openTrips: rt.openTrips,
+        newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: "", nField: "", nRes: null }),
+        newL: S.ntOpen ? "\u2715 \u0110\xF3ng" : "+ Chuy\u1EBFn M\u1EDBi",
+        formOn: !!S.ntOpen,
+        from: S.ntFrom || "",
+        fromPh: tp.fromPh,
+        to: S.ntTo || "",
+        typeFrom: typeIn("from"),
+        typeTo: typeIn("to"),
+        focusFrom: () => {
+          if (S.nField !== "from") self.setState({ nField: "from", nRes: null });
+        },
+        resFrom: fromRows.concat(resFor("from", pickFrom)),
+        resFromOn: S.nField === "from",
+        resTo: resFor("to", pickTo),
+        resToOn: S.nField === "to" && !!(S.nRes && S.nRes.length),
+        name: S.ntName || "",
+        namePh: "T\xEAn chuy\u1EBFn (t\u1EF1 \u0111\u1EB7t theo n\u01A1i \u0111i - n\u01A1i t\u1EDBi)",
+        setName: (e) => self.setState({ ntName: e.target.value, ntNameTouched: true }),
+        create: () => {
+          if (drive || S.ntBusy) return;
+          const f = S.ntFromP || (S.ntFrom || "").trim() || (window.tcStartPt ? window.tcStartPt() : null) || "Melbourne", t2 = S.ntToP || (S.ntTo || "").trim();
+          if (!t2) {
+            self.setState({ ntMsg: "G\xF5 n\u01A1i t\u1EDBi tr\u01B0\u1EDBc nha" });
+            return;
+          }
+          if (!APP || !window.tcPlanTrip) {
+            self.setState({ ntMsg: "B\u1EA3n m\u1EABu: t\u1EA1o chuy\u1EBFn c\u1EA7n app th\u1EADt (c\xF3 m\u1EA1ng)" });
+            return;
+          }
+          self.setState({ ntBusy: true });
+          window.tcPlanTrip(f, t2, { name: (S.ntName || "").trim() }).then((trip) => {
+            const trips = (self.state.trips || []).concat([trip]);
+            self.save({ trips, ntBusy: false, ntFrom: "", ntTo: "", ntFromP: null, ntToP: null, ntName: "", ntNameTouched: false, ntOpen: false });
+            setTimeout(() => {
+              self.switchTripExt && self.switchTripExt(trip.id);
+              NV && setTimeout(NV.fitAll, 400);
+            }, 60);
+            self.toast("\u0110\xE3 t\u1EA1o chuy\u1EBFn " + trip.name + " \xB7 " + trip.km + " km");
+          }).catch(() => self.setState({ ntBusy: false }));
+        },
+        mainOn: !S.ntOpen,
+        busy: !!S.ntBusy,
+        createL: S.ntBusy ? "\u0110ang t\u1EA1o\u2026" : "T\u1EA1o Chuy\u1EBFn",
+        msg: S.ntMsg || "",
+        lockL: drive ? "Xe \u0111ang ch\u1EA1y \u2014 \u0111\u1EADu xe r\u1ED3i m\u1EDBi t\u1EA1o chuy\u1EBFn m\u1EDBi" : "",
+        lock: drive,
+        boxes: rt.boxes,
+        stops: rt.stops,
+        count: list.length,
+        pct: Math.round(pos / TOTAL * 100),
+        pctL: Math.round(pos / TOTAL * 100) + "% \xB7 " + pos + "/" + TOTAL + " km",
+        nx: od.nx,
+        nxKm: od.nxKm,
+        a: (Math.round((+OD0.a || 0) * 10) / 10).toString().replace(".", ","),
+        b: (Math.round((+OD0.b || 0) * 10) / 10).toString().replace(".", ","),
+        resetA: od.resetA,
+        resetB: od.resetB,
+        openLog: od.openLog,
+        startL: navAct ? "D\u1EEBng Ch\u1EC9 \u0110\u01B0\u1EDDng" : nxS2 ? "B\u1EAFt \u0110\u1EA7u \xB7 t\u1EDBi " + od.nx : "B\u1EAFt \u0110\u1EA7u",
+        startBg: navAct ? "#E5484D" : "#FBB040",
+        startFg: navAct ? "#FFFFFF" : "#2A1A00",
+        start: () => {
+          if (navAct) {
+            NV.stop();
+            return;
+          }
+          if (!nxLL || nxLL.lat == null) {
+            self.toast("Ch\u1EB7ng k\u1EBF ch\u01B0a c\xF3 to\u1EA1 \u0111\u1ED9");
+            return;
+          }
+          self.setState({ tripStarted: true });
+          planWp([toWp({ name: od.nx.replace(/^🏁 /, ""), lat: nxLL.lat, lon: nxLL.lon })], true);
+        },
+        offL: offDone ? "\u2713 B\u1EA3n \u0111\u1ED3 offline \u0111\xE3 t\u1EA3i" : S.offProg ? "\u0110ang t\u1EA3i " + S.offProg : "\u2B07 T\u1EA3i b\u1EA3n \u0111\u1ED3 offline",
+        off: () => {
+          if (S.offProg || !NV) return;
+          const pts = TRIP ? TRIP.pts : window.__rtRealPts || window.__routePts;
+          if (!pts || pts.length < 2) {
+            self.toast("Ch\u01B0a c\xF3 tuy\u1EBFn \u0111\u01B0\u1EDDng \u0111\u1EC3 t\u1EA3i");
+            return;
+          }
+          const n = NV.tileList(pts).length * 2, mb = Math.max(1, Math.round(n * 18 / 1024));
+          if (S.offAsk !== S.tripId) {
+            self.setState({ offAsk: S.tripId });
+            self.toast("T\u1EA3i kho\u1EA3ng " + mb + " MB b\u1EA3n \u0111\u1ED3 d\u1ECDc \u0111\u01B0\u1EDDng (n\xEAn d\xF9ng Wi-Fi) \u2014 b\u1EA5m l\u1EA7n n\u1EEFa \u0111\u1EC3 t\u1EA3i");
+            return;
+          }
+          self.setState({ offAsk: null, offProg: "0%" });
+          NV.prefetch(pts, (dn, tot) => self.setState({ offProg: Math.round(dn / tot * 100) + "%" })).then((r) => {
+            try {
+              localStorage.setItem(offKey, String(Date.now()));
+            } catch (e) {
+            }
+            self.setState({ offProg: null });
+            self.toast(r.bad ? "\u0110\xE3 t\u1EA3i b\u1EA3n \u0111\u1ED3 offline (" + r.bad + " m\u1EA3nh l\u1ED7i)" : "\u0110\xE3 t\u1EA3i xong b\u1EA3n \u0111\u1ED3 offline cho chuy\u1EBFn n\xE0y");
+          });
+        },
+        addStop: () => self.setState({ dlg: "add" }),
+        pickStop: () => self.setState({ dlg: "pick" }),
+        routeNote: !TRIP && !window.__rtRealPts ? "\u0110ang l\u1EA5y \u0111\u01B0\u1EDDng th\u1EADt t\u1EEB " + (SP ? SP.name : "Melbourne") + " t\u1EDBi Adelaide\u2026" : ""
+      };
+      if (APP && NV && !TRIP && S.scr === "rt") {
+        const st0 = SP || { lat: -37.8136, lon: 144.9631 };
+        const rk = st0.lat.toFixed(3) + "," + st0.lon.toFixed(3);
+        if (window.__rtRealKey !== rk) {
+          window.__rtRealKey = rk;
+          window.__rtRealPts = null;
+          NV.realRoute([st0.lat, st0.lon], [-34.9285, 138.6007]).then((v) => {
+            if (v && v.pts) {
+              window.__rtRealPts = v.pts;
+              self.setState({ navAt: Date.now() });
+            }
+          });
+        }
+      }
+      if (NV) {
+        const rtPts = TRIP ? TRIP.pts : window.__rtRealPts || window.__routePts || null;
+        const rtStops = [Object.assign({ id: "", start: true, short: isGo ? FROM : TO }, rtStartP && isGo ? { lat: rtStartP.lat, lon: rtStartP.lon } : TRIP ? isGo ? TRIP.from : TRIP.to : {})].concat(list.map((x, i) => {
+          const endLL = x.id === "end" ? TRIP ? isGo ? TRIP.to : TRIP.from : isGo ? { lat: -34.9285, lon: 138.6007 } : SP || { lat: -37.8136, lon: 144.9631 } : x;
+          return { id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? SP && !isGo ? SP.name : x.name : (x.name || "").split(" (")[0], logo: NV.logoOf(x.name), lat: endLL.lat, lon: endLL.lon };
+        }));
+        const vis = S.scr === "rt" && rtPts;
+        NV.onPlaceClick = null;
+        NV.sync({
+          show: mapShow,
+          night: night0,
+          style: C.mapStyle || "auto",
+          bright: C.calm ? Math.min(C.mapBright || 100, 85) : C.mapBright || 100,
+          van: hereLL,
+          brg: LV.bearing || 0,
+          spd: LV.speed || 0,
+          drive,
+          padL: (S.scr === "trip" || S.scr === "rt") && !pnlMin ? 430 : S.scr === "home" ? 380 : 40,
+          rt: vis ? { sig: S.tripId + ":" + leg + ":" + rtPts.length + ":" + list.map((x) => x.id).join(","), pts: rtPts, stops: rtStops } : null,
+          park: S.scr === "trip" && H0.park ? H0.park : null
+        });
+      }
       const delP = S.delId ? ALLP[S.delId] : null;
       const phTrip = !!S.tripStarted || !!(LT && LT.km > 25 && LT.km < TOTAL - 25);
       const DOWV = ["CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"];
@@ -2261,7 +2737,13 @@ window.__AppComp = function() {
         verL: window.TC_VERSION || "0.9.x-beta",
         ph,
         rootBg: APP ? "transparent" : "#03111C",
-        opaqueBg: APP && (nar || S.scr !== "home"),
+        opaqueBg: APP && (nar || !shell),
+        nv,
+        tabs,
+        hj,
+        rtp,
+        wsShow: shell && S.scr === "home",
+        rtDlgOn: shell,
         clock,
         scrBtns,
         zones,
@@ -2334,11 +2816,11 @@ window.__AppComp = function() {
         micBg: APP && PM.mic === false ? "#5E6B73" : "#FBB040",
         micW: APP && PM.mic === false ? "#5E6B73" : S.va ? "#FBB040" : "#5FD4F0",
         micA: APP && PM.mic === false ? "ch\u01B0a c\u1EA5p quy\u1EC1n micro" : S.va ? "\u0111ang nghe" : "s\u1EB5n s\xE0ng",
-        isHome: !nar && S.scr === "home",
+        isHome: shell,
         isSettings: !nar && S.scr === "settings",
         isTheme: !nar && S.scr === "theme",
         th,
-        isRt: !nar && S.scr === "rt",
+        isRt: false,
         tp,
         od,
         dk,
@@ -2695,24 +3177,18 @@ input[type=range]{accent-color:#FBB040}
         </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
         <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
-        <button onClick="{{openTheme}}" aria-label="Giao Di\u1EC7n" title="Giao Di\u1EC7n" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #CFF6FF"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01"></path></svg></button>
+        <button onClick="{{openTheme}}" aria-label="Giao Di\u1EC7n" title="Giao Di\u1EC7n" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 1 0 0 19c1.2 0 1.8-.8 1.8-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-.9.8-1.7 1.7-1.7h2.1a5.4 5.4 0 0 0 5.4-5.4C22 6.3 17.6 2.5 12 2.5z" fill="#F3EBD2" stroke="#8a6b3a" stroke-width="0.8"></path><circle cx="6.8" cy="11.6" r="1.9" fill="#E5484D"></circle><circle cx="9.6" cy="6.9" r="1.9" fill="#FBB040"></circle><circle cx="14.8" cy="6.6" r="1.9" fill="#7BD88F"></circle><circle cx="18.2" cy="10.4" r="1.9" fill="#2FD0F5"></circle><circle cx="8.6" cy="16.2" r="1.7" fill="#B07CF0"></circle></svg></button>
         <button onClick="{{goSettings}}" aria-label="C\xE0i \u0110\u1EB7t" title="C\xE0i \u0110\u1EB7t" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FBB040"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></button>
         <button onClick="{{openExit}}" aria-label="Tho\xE1t ch\u01B0\u01A1ng tr\xECnh" title="Tho\xE1t" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
       </header>
 
-      <!-- tab + g\u01B0\u01A1ng camera sau (d\u1EDDi xu\u1ED1ng d\u01B0\u1EDBi thanh tr\xEAn) -->
-      <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px">
-        <button class="pill" style="background: #FBB040; color: #2A1A00">M\xE0n H\xECnh Ch\xEDnh</button>
-        <button onClick="{{goRt}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">Road Trip</button>
-        <button onClick="{{goContacts}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5); display: flex; align-items: center; gap: 6px">Li\xEAn L\u1EA1c<span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{unreadN}}</span></button>
-        <button onClick="{{goSearch}}" class="pill glt" style="background: rgba(8,22,34,0.5); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22)">T\xECm Ch\u1ED7</button>
-      </div>
-      <div data-demo="1" class="pnl" style="position: absolute; right: 20px; top: 86px; width: 300px; height: 80px; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg,#0E2A3C,#06141F)">
-        <span class="lbl" style="position: absolute; left: 12px; top: 8px">CAM SAU</span>
-        <svg width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><path d="M0 44 L46 8 L74 8 L120 44" fill="none" stroke="#FBB040" stroke-width="2" opacity="0.6"></path><rect x="50" y="18" width="20" height="12" rx="2" fill="#5FD4F0" opacity="0.5"></rect></svg>
+      <!-- tab: M\xE0n H\xECnh Ch\xEDnh \xB7 H\xE0nh Tr\xECnh \xB7 Road Trip \xB7 Li\xEAn L\u1EA1c \xB7 T\xECm Ch\u1ED7 -->
+      <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- c\u1ED9t Workspace: tr\u1ED1ng l\u1EA7n \u0111\u1EA7u -->
+      <sc-if value="{{wsShow}}" hint-placeholder-val="{{ true }}">
       <section aria-label="Workspace" style="position: absolute; left: 20px; top: 138px; width: 330px; bottom: 100px; display: flex; flex-direction: column; gap: 8px">
         <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">WORKSPACE</span><sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}"><button onClick="{{openCreate}}" class="btn" style="height: 34px; font-size: 12px">+ T\u1EA1o</button></sc-if></div>
         <sc-if value="{{wsEmpty}}" hint-placeholder-val="{{ true }}">
@@ -2731,12 +3207,209 @@ input[type=range]{accent-color:#FBB040}
             <div class="pnl glb" style="flex-shrink: 0; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
               <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><sc-if value="{{w.rt}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px">Road Trip</span></sc-if><button onClick="{{w.edit}}" aria-label="S\u1EEDa Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #CFF6FF">\u270E</button><button onClick="{{w.del}}" aria-label="Xo\xE1 Workspace" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">\u2715</button></div>
               <div aria-hidden="true" style="display: flex; gap: 4px; height: 30px"><sc-for list="{{w.boxes}}" as="b" hint-placeholder-count="2"><span style="flex: {{b.flex}}; min-width: 0; border-radius: 4px; background: {{b.bg}}; font-size: 11px; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; padding: 0 4px">{{b.name}}</span></sc-for></div>
-              <button onClick="{{w.open}}" class="btn btn-o" style="height: 44px">M\u1EDF Workspace</button>
+              <button onClick="{{w.open}}" class="btn glb" style="height: 44px; color: #FFD08A; font-weight: 800; background: rgba(251,176,64,0.16); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.7)">M\u1EDF Workspace</button>
             </div>
           </sc-for>
         </div>
         </sc-if>
       </section>
+      </sc-if>
+      <!-- ===== 0.9.9: l\u1EDBp tr\xEAn b\u1EA3n \u0111\u1ED3 ===== -->
+      <!-- \xF4 "\u0110i \u0111\xE2u?" (M\xE0n H\xECnh Ch\xEDnh) -->
+      <sc-if value="{{nv.boxOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 54px; box-sizing: border-box; padding: 0 6px 0 14px; display: flex; align-items: center; gap: 8px; z-index: 7">
+          <span aria-hidden="true" style="font-size: 20px; color: #FBB040">\u27A4</span>
+          <input type="text" aria-label="\u0110i \u0111\xE2u?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
+          <sc-if value="{{nv.qOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.clearQ}}" aria-label="Xo\xE1 ch\u1EEF" class="btn" style="width: 40px; height: 40px; padding: 0; background: transparent">\u2715</button></sc-if>
+          <button onClick="{{nv.goFirst}}" class="btn btn-o" style="height: 42px; padding: 0 20px; font-size: 17px">\u0110i</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.resOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl fadein" role="listbox" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: 380px; box-sizing: border-box; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
+          <div class="scrl" style="display: flex; flex-direction: column; gap: 2px; max-height: 368px">
+            <sc-for list="{{nv.res}}" as="r" hint-placeholder-count="4"><button onClick="{{r.pick}}" style="flex-shrink: 0; width: 100%; border: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; text-align: left"><span style="width: 38px; height: 38px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 32px; height: 32px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 12px; color: #FFD08A; white-space: nowrap">{{r.km}}</span></button></sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.chipsOn}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: 20px; top: 150px; width: 470px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; z-index: 6">
+          <sc-for list="{{nv.chips}}" as="c" hint-placeholder-count="3"><button onClick="{{c.go}}" class="pill glt" style="height: 38px; background: rgba(8,22,34,0.72); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22); font-size: 14px; white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis">{{c.l}}</button></sc-for>
+        </div>
+      </sc-if>
+
+      <!-- bi\u1EC3n ch\u1EC9 \u0111\u01B0\u1EDDng (\u0111ang ch\u1EA1y theo ch\u1EC9 \u0111\u01B0\u1EDDng) -->
+      <sc-if value="{{nv.bannerOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl fadein" role="status" aria-live="polite" style="position: absolute; right: 20px; top: 88px; width: 470px; box-sizing: border-box; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; background: rgba(12,92,66,0.94); box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 7">
+          <div style="display: flex; align-items: center; gap: 14px">
+            <svg width="66" height="66" viewBox="0 0 48 48" aria-hidden="true" style="flex-shrink: 0"><path d="{{nv.icoD}}" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            <div style="flex: 1; min-width: 0"><div class="tnum" style="font-size: 36px; font-weight: 800; line-height: 1; color: #FFFFFF">{{nv.dist}}</div><div style="font-size: 19px; font-weight: 700; line-height: 1.25; color: #FFFFFF; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical">{{nv.text}}</div></div>
+          </div>
+          <sc-if value="{{nv.thenOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: #D8FFF0; border-top: 1px solid rgba(255,255,255,0.22); padding-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Sau \u0111\xF3 {{nv.thenDist}}: {{nv.then}}</div></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- th\u1EBB t\xF3m t\u1EAFt chuy\u1EBFn (xem tr\u01B0\u1EDBc, ch\u01B0a ch\u1EA1y) -->
+      <sc-if value="{{nv.prevOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb fadein" role="dialog" aria-label="T\xF3m t\u1EAFt \u0111\u01B0\u1EDDng \u0111i" style="position: absolute; right: 84px; top: 150px; width: 406px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
+          <div style="display: flex; align-items: center; gap: 10px">
+            <span style="width: 40px; height: 40px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; font-size: 20px"><sc-if value="{{nv.destLogoOn}}" hint-placeholder-val="{{ false }}"><img src="{{nv.destLogo}}" alt="" style="width: 34px; height: 34px; object-fit: contain"></sc-if><sc-if value="{{nv.destIcOn}}" hint-placeholder-val="{{ true }}"><span style="color: #D0202E">\u2691</span></sc-if></span>
+            <div style="flex: 1; min-width: 0"><div style="font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.dest}}</div><div style="font-size: 13px; color: #CFE6EE">{{nv.sum}}</div></div>
+            <button onClick="{{nv.cancel}}" aria-label="Hu\u1EF7 \u0111\u01B0\u1EDDng \u0111i" class="btn" style="width: 40px; height: 40px; padding: 0">\u2715</button>
+          </div>
+          <sc-for list="{{nv.alts}}" as="a" hint-placeholder-count="2"><button onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; background: {{a.bg}}; box-shadow: {{a.ring}}"><span style="font-size: 14px; font-weight: 700; flex: 1; text-align: left">{{a.label}}</span><span style="font-size: 12px; color: #FFD08A">{{a.toll}}</span><span class="tnum" style="font-size: 14px">{{a.info}}</span></button></sc-for>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nv.avoid}}" as="v" hint-placeholder-count="3"><button onClick="{{v.tap}}" aria-pressed="{{v.on}}" class="pill" style="height: 32px; padding: 0 10px; font-size: 12px; background: {{v.bg}}; color: {{v.fg}}">{{v.l}}</button></sc-for></div>
+          <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
+          <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
+          <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">B\u1EAFt \u0110\u1EA7u</button>
+          <div style="display: flex; gap: 6px"><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">M\u1EDF b\u1EB1ng Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">M\u1EDF b\u1EB1ng Waze</button></div>
+          <div style="font-size: 11px; color: #8FC3D3">Th\u1EDDi gian \u01B0\u1EDBc t\xEDnh theo \u0111\u01B0\u1EDDng, ch\u01B0a t\xEDnh k\u1EB9t xe.</div>
+        </div>
+      </sc-if>
+
+      <!-- th\u1EBB gi\u1EDD t\u1EDBi (\u0111ang ch\u1EA1y) -->
+      <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb" style="position: absolute; right: 20px; bottom: 100px; width: 470px; height: 66px; box-sizing: border-box; padding: 0 8px 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6">
+          <div style="flex: 1; min-width: 0"><div class="tnum" style="font-size: 24px; font-weight: 800; color: #7BD88F; line-height: 1.1">{{nv.eta}} <span style="font-size: 13px; font-weight: 600; color: #CFE6EE">t\u1EDBi n\u01A1i</span></div><div style="font-size: 13px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.left}} \xB7 {{nv.km}} \xB7 {{nv.dest}}</div></div>
+          <button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">{{nv.voiceIc}}</button>
+          <button onClick="{{nv.share}}" aria-label="G\u1EEDi gi\u1EDD t\u1EDBi b\u1EB1ng tin nh\u1EAFn" class="btn" style="height: 48px; font-size: 13px">G\u1EEDi ETA</button>
+          <button onClick="{{nv.stop}}" class="btn" style="height: 48px; font-size: 15px; color: #FFFFFF; background: #C8343A">D\u1EEBng</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{nv.arrivedOn}}" hint-placeholder-val="{{ false }}">
+        <div class="pnl glb fadein" role="status" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 70px; box-sizing: border-box; padding: 0 10px 0 18px; display: flex; align-items: center; gap: 10px; z-index: 7; background: rgba(12,92,66,0.94)">
+          <span style="flex: 1; font-size: 20px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.arrivedL}}</span>
+          <button onClick="{{nv.done}}" class="btn btn-o" style="height: 48px">Xong</button>
+        </div>
+      </sc-if>
+
+      <!-- n\xFAt b\u1EA3n \u0111\u1ED3: + \u2212 v\u1ECB tr\xED, c\u1EA3 chuy\u1EBFn, h\u01B0\u1EDBng -->
+      <sc-if value="{{nv.ctlOn}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; gap: 8px; z-index: 5">
+          <button onClick="{{nv.zin}}" aria-label="Ph\xF3ng to" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">+</button>
+          <button onClick="{{nv.zout}}" aria-label="Thu nh\u1ECF" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">\u2212</button>
+          <button onClick="{{nv.loc}}" aria-label="V\u1EC1 v\u1ECB tr\xED xe" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
+          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem c\u1EA3 chuy\u1EBFn" title="Xem c\u1EA3 chuy\u1EBFn" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
+          <sc-if value="{{nv.rotOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.rot}}" aria-label="{{nv.rotA}}" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 20px; font-weight: 800; color: #FFD08A">{{nv.rotL}}</button></sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===== H\xC0NH TR\xCCNH (#63, #66) ===== -->
+      <sc-if value="{{hj.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">\u27A4 H\xE0nh Tr\xECnh \u25B8</button></sc-if>
+      <sc-if value="{{hj.on}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="H\xE0nh Tr\xECnh" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">H\xC0NH TR\xCCNH</span><button onClick="{{hj.toggle}}" aria-label="Thu g\u1ECDn b\u1EA3ng" class="btn" style="width: 38px; height: 34px; padding: 0">\u25C0</button></div>
+          <sc-if value="{{hj.habitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.habitGo}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; padding: 8px 12px; border-radius: 10px; background: rgba(251,176,64,0.14); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 14px">{{hj.habitL}}</span><span style="font-weight: 800; color: #FBB040">\u0110i \u27A4</span></button></sc-if>
+          <sc-if value="{{hj.parkOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
+              <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">\u{1F17F} {{hj.parkL}}</button>
+              <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nh\u1EAFc h\u1EBFt gi\u1EDD:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 0">
+            <div style="display: flex; align-items: center; gap: 10px; height: 32px"><span style="width: 22px; height: 22px; border-radius: 11px; background: #14A05A; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0"></span><span style="font-size: 14px; color: #CFE6EE">T\u1EEB: V\u1ECB tr\xED hi\u1EC7n t\u1EA1i</span></div>
+            <sc-for list="{{hj.wps}}" as="w" hint-placeholder-count="2">
+              <div style="display: flex; flex-direction: column">
+                <span aria-hidden="true" style="width: 0; height: 10px; margin-left: 10px; border-left: 2px dotted #A9C7D4"></span>
+                <div style="display: flex; align-items: center; gap: 8px; min-height: 34px">
+                  <span style="width: 22px; height: 22px; border-radius: 11px; background: {{w.bg}}; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0; color: #FFFFFF; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{w.n}}</span>
+                  <sc-if value="{{w.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{w.logo}}" alt="" style="width: 20px; height: 20px; border-radius: 4px; background: #FFFFFF"></sc-if>
+                  <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span>
+                  <button onClick="{{w.up}}" aria-label="L\xEAn" class="btn" style="width: 30px; height: 28px; padding: 0; font-size: 11px; opacity: {{w.upOp}}">\u25B2</button>
+                  <button onClick="{{w.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 30px; height: 28px; padding: 0; font-size: 11px; opacity: {{w.downOp}}">\u25BC</button>
+                  <button onClick="{{w.del}}" aria-label="B\u1ECF \u0111i\u1EC3m n\xE0y" class="btn" style="width: 30px; height: 28px; padding: 0; color: #FF9A9E">\u2715</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: relative">
+            <input type="text" aria-label="\u0110i \u0111\xE2u?" value="{{hj.q}}" placeholder="{{hj.ph}}" disabled="{{hj.lock}}" onInput="{{hj.type}}" style="width: 100%; box-sizing: border-box; height: 46px; border: 0; border-radius: 10px; padding: 0 14px; font-family: inherit; font-size: 16px; background: rgba(13,44,64,0.92); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.55); outline: none">
+          </div>
+          <sc-if value="{{hj.resOn}}" hint-placeholder-val="{{ false }}">
+            <div class="scrl" style="max-height: 220px; display: flex; flex-direction: column; gap: 2px; background: rgba(4,18,30,0.9); border-radius: 10px; padding: 4px">
+              <sc-for list="{{hj.res}}" as="r" hint-placeholder-count="3"><button onClick="{{r.pick}}" style="flex-shrink: 0; width: 100%; border: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 34px; height: 34px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 28px; height: 28px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 11px; color: #FFD08A; white-space: nowrap">{{r.km}}</span></button></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{hj.wpOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px"><sc-if value="{{hj.tidyOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.tidy}}" class="btn" style="flex: 1; height: 40px; font-size: 13px">S\u1EAFp X\u1EBFp G\u1ECDn</button></sc-if><button onClick="{{nv.start}}" class="btn btn-o" style="flex: 1; height: 40px; font-size: 15px">B\u1EAFt \u0110\u1EA7u</button></div></sc-if>
+          <div role="tablist" style="display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 34px; padding: 0 4px; font-size: 13px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-if value="{{hj.emptyOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #8FC3D3; padding: 10px 4px; line-height: 1.45">{{hj.empty}}</span></sc-if>
+            <sc-if value="{{hj.workOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.workSet}}" class="btn" style="flex-shrink: 0; height: 36px; font-size: 13px">\u{1F4BC} L\u01B0u ch\u1ED7 \u0111ang \u0111\u1EADu l\xE0 Ch\u1ED7 L\xE0m</button></sc-if>
+            <sc-if value="{{hj.rowsOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.rows}}" as="r" hint-placeholder-count="4">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.04)">
+                  <span style="width: 36px; height: 36px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 30px; height: 30px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span>
+                  <button onClick="{{r.pick}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3">{{r.sub}}</span></button>
+                  <button onClick="{{r.addStop}}" aria-label="Th\xEAm l\xE0m \u0111i\u1EC3m d\u1EEBng" class="btn" style="width: 34px; height: 34px; padding: 0; font-size: 16px">\uFF0B</button>
+                  <sc-if value="{{r.actOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.act}}" aria-label="{{r.actA}}" class="btn" style="width: 34px; height: 34px; padding: 0">{{r.actL}}</button></sc-if>
+                  <button onClick="{{r.go}}" aria-label="\u0110i t\u1EDBi \u0111\xE2y" class="btn btn-o" style="width: 40px; height: 34px; padding: 0">\u27A4</button>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.logRows}}" as="l" hint-placeholder-count="3">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: {{l.bg}}">
+                  <button onClick="{{l.show}}" aria-pressed="{{l.on}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 11px; color: #8FC3D3">{{l.when}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{l.name}}</span><span style="font-size: 11px; color: #FFD08A">{{l.km}}</span></button>
+                  <button onClick="{{l.del}}" aria-label="Xo\xE1 chuy\u1EBFn n\xE0y" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">\u2715</button>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+          <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px; align-items: center"><span style="flex: 1; font-size: 11px; color: #8FC3D3">Ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y</span><button onClick="{{hj.logToggle}}" class="btn" style="height: 34px; font-size: 12px">{{hj.logOnL}}</button><button onClick="{{hj.clear}}" class="btn" style="height: 34px; font-size: 12px; color: #FF9A9E">{{hj.clearL}}</button></div></sc-if>
+        </section>
+      </sc-if>
+
+      <!-- ===== ROAD TRIP tr\xEAn b\u1EA3n \u0111\u1ED3 (#59) ===== -->
+      <sc-if value="{{rtp.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{rtp.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">\u{1F5FA} Road Trip \u25B8</button></sc-if>
+      <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><button onClick="{{rtp.toggle}}" aria-label="Thu g\u1ECDn b\u1EA3ng" class="btn" style="width: 38px; height: 34px; padding: 0">\u25C0</button></div>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap">
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 34px; padding: 0 12px; font-size: 13px; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 34px; font-size: 13px">C\xE1c Chuy\u1EBFn \u25BE</button>
+            <button onClick="{{rtp.newTrip}}" class="btn" style="height: 34px; font-size: 13px; color: #FFD08A">{{rtp.newL}}</button>
+          </div>
+          <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">T\u1EEB<input type="text" value="{{rtp.from}}" placeholder="{{rtp.fromPh}}" disabled="{{rtp.lock}}" onClick="{{rtp.focusFrom}}" onInput="{{rtp.typeFrom}}" style="height: 42px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <sc-if value="{{rtp.resFromOn}}" hint-placeholder-val="{{ false }}"><div class="scrl" style="max-height: 170px; display: flex; flex-direction: column; gap: 2px"><sc-for list="{{rtp.resFrom}}" as="r" hint-placeholder-count="2"><button onClick="{{r.pick}}" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.04); cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 28px; height: 28px; border-radius: 6px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 24px; height: 24px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span></button></sc-for></div></sc-if>
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">T\u1EDBi<input type="text" value="{{rtp.to}}" placeholder="Vd: Adelaide, Bunnings Sunshine\u2026" disabled="{{rtp.lock}}" onInput="{{rtp.typeTo}}" style="height: 42px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <sc-if value="{{rtp.resToOn}}" hint-placeholder-val="{{ false }}"><div class="scrl" style="max-height: 170px; display: flex; flex-direction: column; gap: 2px"><sc-for list="{{rtp.resTo}}" as="r" hint-placeholder-count="2"><button onClick="{{r.pick}}" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.04); cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; text-align: left"><span style="width: 28px; height: 28px; border-radius: 6px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 24px; height: 24px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 11px; color: #FFD08A">{{r.km}}</span></button></sc-for></div></sc-if>
+              <label style="display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: #8FC3D3">T\xEAn chuy\u1EBFn<input type="text" value="{{rtp.name}}" placeholder="{{rtp.namePh}}" onInput="{{rtp.setName}}" style="height: 40px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+              <button onClick="{{rtp.create}}" disabled="{{rtp.lock}}" class="btn btn-o" style="height: 44px; font-size: 16px">{{rtp.createL}}</button>
+              <span style="font-size: 12px; color: #FFD08A">{{rtp.lockL}}{{rtp.msg}}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+            <sc-for list="{{rtp.boxes}}" as="b" hint-placeholder-count="3"><div style="border-radius: 8px; background: rgba(255,255,255,0.05); padding: 5px 4px; display: flex; flex-direction: column; align-items: center; text-align: center"><span class="lbl" style="font-size: 9px">{{b.l}}</span><span style="font-size: 16px; font-weight: 800; white-space: nowrap">{{b.v}}</span><span style="font-size: 10px; color: #8FC3D3; white-space: nowrap">{{b.s}}</span></div></sc-for>
+          </div>
+          <button onClick="{{rtp.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
+            <span style="display: block; width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span>
+            <span style="display: flex; gap: 8px; font-size: 12px; width: 100%"><span style="color: #CFE6EE; flex: 1">{{rtp.pctL}}</span><span style="color: #FFD08A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px">Ch\u1EB7ng k\u1EBF: {{rtp.nx}} \xB7 {{rtp.nxKm}}</span></span>
+          </button>
+          <div class="lbl" style="display: flex; align-items: center"><span style="flex: 1">C\xC1C CH\u1EB6NG GH\xC9 \xB7 {{rtp.count}}</span></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="5">
+              <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
+                <div style="width: 28px; height: 28px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
+                <button onClick="{{s.open}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-decoration: {{s.strike}}">{{s.name}}</span><span style="font-size: 11px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #8FC3D3">{{s.eta}}</span></span></button>
+                <button onClick="{{s.up}}" aria-label="L\xEAn" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">\u25B2</button>
+                <button onClick="{{s.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">\u25BC</button>
+                <button onClick="{{s.skip}}" aria-label="B\u1ECF qua chuy\u1EBFn n\xE0y" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 11px">{{s.skipL}}</button>
+                <button onClick="{{s.del}}" aria-label="Xo\xE1 ch\u1EB7ng" class="btn" style="width: 28px; height: 26px; padding: 0; color: #FF9A9E; font-size: 11px">\u2715</button>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 6px"><button onClick="{{rtp.addStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Th\xEAm Ch\u1EB7ng</button><button onClick="{{rtp.pickStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ T\u1EEB Danh S\xE1ch</button></div>
+          <div style="flex-shrink: 0; display: flex; gap: 4px; align-items: center; font-size: 12px; color: #CFE6EE">
+            <span class="tnum" style="white-space: nowrap">A <b style="color: #FFFFFF">{{rtp.a}}</b></span><button onClick="{{rtp.resetA}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip A" class="btn" style="width: 28px; height: 28px; padding: 0">\u21BA</button>
+            <span class="tnum" style="white-space: nowrap; margin-left: 4px">B <b style="color: #FFFFFF">{{rtp.b}}</b></span><button onClick="{{rtp.resetB}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip B" class="btn" style="width: 28px; height: 28px; padding: 0">\u21BA</button>
+            <button onClick="{{rtp.off}}" class="btn" style="flex: 1; min-width: 0; height: 28px; font-size: 11px; color: #A9E3F2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.offL}}</button>
+          </div>
+          </sc-if>
+          <button onClick="{{rtp.start}}" class="btn" style="height: 50px; font-size: 16px; font-weight: 800; background: {{rtp.startBg}}; color: {{rtp.startFg}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.startL}}</button>
+        </section>
+      </sc-if>
 
       <!-- s\u1ED1 t\u1ED1c \u0111\u1ED9 (canh gi\u1EEFa, \u0111\u1ED5i ki\u1EC3u \u0111\u01B0\u1EE3c) + bi\u1EC3n gi\u1EDBi h\u1EA1n theo v\xF9ng -->
       <div style="display: {{spdDisp}}; position: absolute; left: 440px; top: 130px; width: 400px; height: 310px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-radius: 50%; background: radial-gradient(closest-side, rgba(1,6,10,0.72), rgba(1,6,10,0.45) 60%, rgba(1,6,10,0))">
@@ -2808,7 +3481,7 @@ input[type=range]{accent-color:#FBB040}
           <svg width="110" height="110" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
           <span style="text-align: center; position: relative"><span class="tnum" style="display: block; font-size: 38px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.85; margin-top: 2px">{{dk.unit}}</span></span>
         </button>
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 9px; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></div></sc-if>
+        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><div aria-label="{{sb.limAria}}" style="position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></div></sc-if>
         <div style="position: absolute; left: 640px; bottom: 128px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none">
           <sc-if value="{{sb.ahead}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 6px 14px; font-size: 14px; color: #FFD08A; text-align: center; white-space: nowrap">Ph\xEDa tr\u01B0\u1EDBc 300 m: {{sb.aheadL}}</div></sc-if>
           <sc-if value="{{sb.statsOpen}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center; white-space: nowrap">{{sb.stats}}</div></sc-if>
@@ -2958,6 +3631,7 @@ input[type=range]{accent-color:#FBB040}
           <span class="lbl">KI\u1EC2U V\u1EBC</span>
           <sc-for list="{{th.styles}}" as="o" hint-placeholder-count="2"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 38px; padding: 0 14px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
+        <div style="display: flex; align-items: center; gap: 10px; margin: 4px 0 6px"><span class="lbl">N\u1EC0N M\xC0N H\xCCNH CH\xCDNH</span><sc-for list="{{th.homeBg}}" as="o" hint-placeholder-count="2"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 40px; padding: 0 16px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for><span style="font-size: 12px; color: #8FC3D3">Ch\u1ECDn m\u1ED9t c\u1EA3nh b\xEAn d\u01B0\u1EDBi l\xE0 n\u1EC1n \u0111\u1ED5i sang low-poly \xB7 khi ch\u1EC9 \u0111\u01B0\u1EDDng lu\xF4n hi\u1EC7n b\u1EA3n \u0111\u1ED3</span></div>
         <sc-for list="{{th.groups}}" as="gp" hint-placeholder-count="4">
           <div style="margin: 10px 0 8px; font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #FBB040">{{gp.label}}</div>
           <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px">
@@ -2982,175 +3656,21 @@ input[type=range]{accent-color:#FBB040}
     </sc-if>
 
     <!-- ========== 3. ROAD TRIP ========== -->
-    <sc-if value="{{isRt}}" hint-placeholder-val="{{ false }}">
-      <div style="position: absolute; left: 20px; right: 20px; top: 12px; display: flex; align-items: center; gap: 8px">
-        <button onClick="{{goHome}}" class="pill" style="background: rgba(3,17,28,0.85); color: #CFE6EE; box-shadow: inset 0 0 0 1px rgba(95,212,240,0.5)">M\xE0n H\xECnh Ch\xEDnh</button>
-        <button class="pill" style="background: #FBB040; color: #2A1A00">Road Trip</button>
-        <span style="font-size: 20px; font-weight: 700; margin-left: 8px; white-space: nowrap">{{rt.title}}</span>
-        <sc-for list="{{rt.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-        <button onClick="{{rt.toggleAutoDir}}" aria-pressed="{{rt.autoDir}}" class="pill" style="white-space: nowrap; background: {{rt.autoDirBg}}; color: {{rt.autoDirC}}; box-shadow: inset 0 0 0 1px {{rt.autoDirC}}">\u{1F4CD} T\u1EF1 Nh\u1EADn Chi\u1EC1u</button>
-        <span style="margin-left: auto"></span>
-        <button onClick="{{rt.openTrips}}" class="btn" style="height: 40px; font-size: 13px; white-space: nowrap; max-width: 260px; overflow: hidden; text-overflow: ellipsis">{{rt.tripL}}</button>
-        <button onClick="{{goSearch}}" class="btn" style="height: 40px; font-size: 13px">T\xECm Ch\u1ED7</button>
-        <button onClick="{{goSplit}}" class="btn btn-o" style="height: 40px; font-size: 13px">M\u1EDF B\u1EA3n \u0110\u1ED3</button>
-      </div>
-
-      <!-- 3 \xF4 tr\xEAn: canh gi\u1EEFa -->
-      <div style="position: absolute; left: 20px; top: 64px; width: 800px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
-        <sc-for list="{{rt.boxes}}" as="b" hint-placeholder-count="3">
-          <div class="pnl" style="height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px"><span class="lbl">{{b.l}}</span><span style="font-size: 22px; font-weight: 700">{{b.v}}</span><span style="font-size: 12px; color: #8FC3D3">{{b.s}}</span></div>
-        </sc-for>
-      </div>
-
-      <!-- hi\u1EC3n th\u1ECB qu\xE3ng \u0111\u01B0\u1EDDng: ph\xF3ng to / thu nh\u1ECF, km, h\xECnh ch\u1EB7ng -->
-      <div class="pnl" onWheel="{{rt.wheel}}" onPointerDown="{{rt.panStart}}" onPointerMove="{{rt.panMove}}" onPointerUp="{{rt.panEnd}}" onPointerLeave="{{rt.panEnd}}" style="position: absolute; left: 20px; top: 152px; width: 800px; height: 290px; overflow: hidden; touch-action: none; cursor: {{rt.cursor}}">
-        <div style="position: absolute; left: 0; top: 0; width: 800px; height: 290px; transform-origin: 0 0; transform: translate({{rt.tx}}px, {{rt.ty}}px) scale({{rt.z}})">
-          <sc-if value="{{rt.road}}" hint-placeholder-val="{{ true }}">
-            <svg aria-hidden="true" viewBox="0 0 800 290" width="800" height="290" style="position: absolute; left: 0; top: 0; display: block">
-              <rect x="{{rt.r0x}}" y="0" width="{{rt.r0w}}" height="290" fill="#0B1E33"></rect>
-              <rect x="{{rt.r1x}}" y="0" width="{{rt.r1w}}" height="290" fill="#0E2A22"></rect>
-              <rect x="{{rt.r2x}}" y="0" width="{{rt.r2w}}" height="290" fill="#2A2612"></rect>
-              <rect x="{{rt.r3x}}" y="0" width="{{rt.r3w}}" height="290" fill="#2A1C12"></rect>
-              <rect x="{{rt.r4x}}" y="0" width="{{rt.r4w}}" height="290" fill="#1B2618"></rect>
-              <path d="{{rt.cityD}}" fill="#163650" stroke="#5FD4F0" stroke-width="1" opacity="0.8"></path>
-              <path d="{{rt.hillD}}" fill="#1F4A33" opacity="0.9"></path>
-              <path d="{{rt.wheatD}}" stroke="#C9A64A" stroke-width="2" opacity="0.7"></path>
-              <path d="{{rt.scrubD}}" fill="#6B5A34" opacity="0.9"></path>
-              <path d="{{rt.ahillD}}" fill="#2D4A28" opacity="0.9"></path>
-              <path d="{{rt.roadD}}" fill="none" stroke="#2B3A46" stroke-width="22" stroke-linecap="round"></path>
-              <path d="{{rt.roadD}}" fill="none" stroke="#E8F1F5" stroke-width="1.6" stroke-dasharray="10 10" opacity="0.6"></path>
-              <path d="{{rt.doneD}}" fill="none" stroke="#7BD88F" stroke-width="6" stroke-linecap="round" opacity="0.85"></path>
-              <path d="{{rt.tickD}}" stroke="#E8F1F5" stroke-width="1.5" opacity="0.7"></path>
-              <line x1="{{rt.bx}}" y1="120" x2="{{rt.bx}}" y2="245" stroke="#FBB040" stroke-width="2" stroke-dasharray="5 4" opacity="{{rt.bxOp}}"></line>
-            </svg>
-            <sc-for list="{{rt.regions}}" as="g" hint-placeholder-count="5"><span style="position: absolute; left: {{g.x}}px; top: 262px; width: {{g.w}}px; text-align: center; font-size: 11px; color: #A9C7D4; letter-spacing: 0.5px">{{g.label}}</span></sc-for>
-            <sc-for list="{{rt.ticks}}" as="t" hint-placeholder-count="7"><span style="position: absolute; left: {{t.x}}px; top: {{t.y}}px; transform: translateX(-50%) scale({{rt.inv}}); transform-origin: 50% 0; font-size: 10px; color: #CFE6EE; white-space: nowrap">{{t.label}}</span></sc-for>
-            <sc-for list="{{rt.segs}}" as="g" hint-placeholder-count="6"><span style="position: absolute; left: {{g.x}}px; top: {{g.y}}px; transform: translateX(-50%) scale({{rt.inv}}); transform-origin: 50% 0; font-size: 11px; font-weight: 700; color: #FFD08A; background: rgba(3,17,28,0.75); border-radius: 4px; padding: 0 4px; white-space: nowrap">{{g.label}}</span></sc-for>
-            <div aria-hidden="true" style="position: absolute; left: {{rt.sunX}}px; top: 14px; transform: scale({{rt.inv}}); transform-origin: 50% 0; display: flex; flex-direction: column; align-items: center; gap: 2px">
-              <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path d="{{rt.sunIcon}}" fill="{{rt.sunC}}"></path></svg>
-              <span style="font-size: 11px; color: #CFE6EE">t\u1EDBi {{rt.eta}}</span>
-            </div>
-            <sc-for list="{{rt.signs}}" as="s" hint-placeholder-count="6">
-              <button onClick="{{s.open}}" onDoubleClick="{{s.focus}}" aria-label="{{s.aria}}" style="position: absolute; left: {{s.x}}px; top: {{s.y}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; border: 0; padding: 0; background: transparent; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; align-items: center">
-                <sc-if value="{{s.photo}}" hint-placeholder-val="{{ false }}"><span class="ph {{s.cls}}" style="position: relative; width: 44px; height: 44px; border-radius: 50%; border: 2px solid #FFFFFF; box-sizing: border-box; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -4px; bottom: -4px; width: 18px; height: 18px; border-radius: 3px; background: {{s.bg}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></span></sc-if>
-                <sc-if value="{{s.sign}}" hint-placeholder-val="{{ true }}"><span class="{{s.cls}}" style="width: 30px; height: 30px; border-radius: 4px; background: {{s.bg}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; opacity: {{s.op}}"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></span></sc-if>
-                <span style="font-size: 10px; white-space: nowrap; max-width: 96px; overflow: hidden; text-overflow: ellipsis">{{s.short}}</span>
-                <span style="font-size: 10px; font-weight: 700; white-space: nowrap; color: {{s.kmC}}">{{s.km}}</span>
-                <span style="width: 2px; height: {{s.lead}}px; background: #A9C7D4"></span>
-              </button>
-            </sc-for>
-            <sc-if value="{{rt.bxOn}}" hint-placeholder-val="{{ true }}"><div style="position: absolute; left: {{rt.bx}}px; top: 96px; transform: translateX(-4px) scale({{rt.inv}}); transform-origin: 0 100%; display: flex; align-items: center; gap: 4px">
-              <svg width="16" height="22" viewBox="0 0 16 22" aria-hidden="true"><path d="M2 22V2" stroke="#FBB040" stroke-width="2"></path><path d="M3 2h11l-3 4 3 4H3z" fill="#D0202E"></path></svg>
-              <span style="font-size: 11px; font-weight: 700; color: #FFD08A; white-space: nowrap">{{rt.borderL}}</span>
-            </div></sc-if>
-            <div style="position: absolute; left: {{rt.vanX}}px; top: {{rt.vanY}}px; transform: translate(-50%, -100%) scale({{rt.inv}}); transform-origin: 50% 100%; display: flex; flex-direction: column; align-items: center">
-              <span style="font-size: 12px; font-weight: 700; color: #2A1A00; background: #FBB040; border-radius: 6px; padding: 1px 6px; margin-bottom: 2px; white-space: nowrap">{{rt.vanL}}</span>
-              <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true" style="transform: scaleX({{rt.vanFlip}})"><path d="M2 18V4h24l8 5h8v9z" fill="#E8F1F5"></path><rect x="27" y="5" width="9" height="6" rx="1" fill="#5FD4F0"></rect><circle cx="11" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle><circle cx="33" cy="20" r="3.5" fill="#0B1620" stroke="#A9C7D4"></circle></svg>
-            </div>
-          </sc-if>
-          <sc-if value="{{rt.map}}" hint-placeholder-val="{{ false }}">
-            <svg aria-hidden="true" viewBox="0 0 780 300" width="800" height="290" style="position: absolute; left: 0; top: 0; display: block; background: #0A1B28">
-              <path d="M0 60 L780 40 M0 160 L780 190 M0 250 L780 230 M120 0 L160 300 M420 0 L390 300 M640 0 L700 300" stroke="#16324A" stroke-width="1"></path>
-              <path d="M335 0 L335 300" stroke="#FBB040" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.8"></path>
-              <polyline points="{{rt.mapLine}}" fill="none" stroke="#3A5A70" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></polyline>
-              <polyline points="{{rt.mapLine}}" fill="none" stroke="#5FD4F0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
-            </svg>
-            <sc-for list="{{rt.mapDots}}" as="m" hint-placeholder-count="8">
-              <div style="position: absolute; left: {{m.x}}px; top: {{m.y}}px; transform: translate(-6px, -6px) scale({{rt.inv}}); transform-origin: 6px 6px; display: flex; align-items: center; gap: 4px"><span style="width: 12px; height: 12px; border-radius: 50%; background: {{m.c}}; border: 2px solid #03111C; box-sizing: border-box; flex-shrink: 0"></span><span style="font-size: 11px; font-weight: 600; color: #E8F1F5; white-space: nowrap; text-shadow: 0 0 4px #03111C">{{m.name}}</span></div>
-            </sc-for>
-            <div aria-hidden="true" style="position: absolute; left: {{rt.mapVanX}}px; top: {{rt.mapVanY}}px; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #FBB040; border: 2px solid #2A1A00; box-sizing: border-box; transform: scale({{rt.inv}})"></div>
-          </sc-if>
-        </div>
-        <div style="position: absolute; left: 14px; top: 10px; display: flex; gap: 6px; z-index: 3">
-          <sc-for list="{{rt.views}}" as="v" hint-placeholder-count="2"><button onClick="{{v.pick}}" aria-pressed="{{v.on}}" class="pill" style="height: 30px; background: {{v.bg}}; color: {{v.fg}}">{{v.label}}</button></sc-for>
-        </div>
-        <div style="position: absolute; right: 12px; top: 10px; display: flex; gap: 6px; align-items: center; z-index: 3">
-          <span style="font-size: 11px; color: #CFE6EE; background: rgba(3,17,28,0.8); padding: 3px 6px; border-radius: 4px">{{rt.zL}}</span>
-          <button onClick="{{rt.follow}}" aria-pressed="{{rt.followOn}}" class="pill" style="height: 30px; background: {{rt.followBg}}; color: {{rt.followFg}}">Theo Xe</button>
-          <button onClick="{{rt.all}}" class="pill" style="height: 30px; background: rgba(3,17,28,0.85); color: #CFE6EE">C\u1EA3 Chuy\u1EBFn</button>
-          <button onClick="{{rt.zoomOut}}" aria-label="Thu nh\u1ECF" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 22px">\u2212</button>
-          <button onClick="{{rt.zoomIn}}" aria-label="Ph\xF3ng to" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 22px">+</button>
-        </div>
-        <div style="position: absolute; left: 14px; bottom: 8px; font-size: 11px; color: #8FC3D3; background: rgba(3,17,28,0.7); padding: 2px 6px; border-radius: 4px; z-index: 3">{{rt.foot}}</div>
-      </div>
-
-      <!-- m\xF4 ph\u1ECFng v\u1ECB tr\xED (ch\u1EC9 trong b\u1EA3n m\u1EABu) -->
-      <label data-demo="1" style="position: absolute; left: 20px; top: 452px; width: 800px; display: flex; align-items: center; gap: 10px; font-size: 12px; color: #8FC3D3">M\xF4 ph\u1ECFng v\u1ECB tr\xED xe (ch\u1EC9 trong b\u1EA3n m\u1EABu)<input type="range" min="0" max="727" step="1" value="{{pos}}" onChange="{{setPos}}" style="flex: 1"><span style="width: 60px; color: #E8F1F5">{{pos}} km</span></label>
-
-      <!-- 4 \xF4 s\u1ED1 li\u1EC7u: canh gi\u1EEFa, ch\u1EEF d\xE0i t\u1EF1 xu\u1ED1ng d\xF2ng -->
-      <div style="position: absolute; left: 20px; top: 488px; width: 800px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
-        <sc-for list="{{rt.stats}}" as="b" hint-placeholder-count="4">
-          <div class="pnl" style="min-height: 92px; padding: 8px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px"><span class="lbl">{{b.l}}</span><span style="font-size: 20px; font-weight: 700; color: {{b.c}}; white-space: normal; overflow-wrap: anywhere; line-height: 1.2">{{b.v}}</span></div>
-        </sc-for>
-      </div>
-      <sc-if value="{{od.on}}" hint-placeholder-val="{{ true }}">
-      <div style="position: absolute; left: 20px; top: 592px; width: 800px; height: 112px; display: grid; grid-template-columns: 1.15fr 1.15fr 1fr 0.8fr; gap: 10px">
-        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP A \xB7 H\xD4M NAY</span><button onClick="{{od.resetA}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip A" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">\u21BA</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.a}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div></div>
-        <div class="pnl" style="padding: 4px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; overflow: hidden"><div style="display: flex; align-items: center; gap: 8px; width: 100%"><span class="lbl" style="flex: 1">TRIP B \xB7 C\u1EA2 CHUY\u1EBEN</span><button onClick="{{od.resetB}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip B" class="btn" style="height: 26px; width: 30px; padding: 0; font-size: 13px">\u21BA</button></div><div style="font-family: {{od.f}}; font-size: 25px; font-weight: 800; color: {{od.c}}; background: {{od.bg}}; text-shadow: {{od.sh}}; border-radius: 6px; padding: 2px 8px; display: flex; gap: 2px"><sc-for list="{{od.b}}" as="g" hint-placeholder-count="5"><span class="odo-d" style="border-left: {{g.bl}}; padding-left: {{g.pl}}"><span class="odo-c" style="transform: translateY({{g.y}}em)"><sc-for list="{{g.digs}}" as="x" hint-placeholder-count="10"><span>{{x.d}}</span></sc-for></span></span></sc-for><span style="font-size: 14px; align-self: flex-end; padding-left: 4px">km</span></div><span style="font-size: 11px; color: #8FC3D3">{{od.legNow}}</span></div>
-        <div class="pnl" style="padding: 6px 10px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: {{od.nxBg}}"><span class="lbl">CH\u1EB6NG K\u1EBE</span><span style="font-size: 26px; font-weight: 800; color: {{od.nxC}}">{{od.nxKm}}</span><span style="font-size: 13px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{od.nx}}</span><sc-if value="{{od.obdOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: #7BD88F">{{od.obd}} {{od.range}}</span></sc-if></div>
-        <button onClick="{{od.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" class="pnl" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; padding: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px"><svg width="62" height="62" viewBox="0 0 70 70" aria-hidden="true"><circle cx="35" cy="35" r="30" fill="none" stroke="#16324A" stroke-width="7"></circle><circle cx="35" cy="35" r="30" fill="none" stroke="#FBB040" stroke-width="7" stroke-linecap="round" stroke-dasharray="{{od.dash}}" transform="rotate(-90 35 35)"></circle><text x="35" y="40" text-anchor="middle" font-size="15" font-weight="800" fill="#E8F1F5" font-family="Overpass, sans-serif">{{od.pct}}</text></svg><span style="font-size: 11px; color: #8FC3D3">Nh\u1EADt K\xFD \u203A</span></button>
-      </div>
-      </sc-if>
-      <div data-demo="1" style="position: absolute; left: 20px; top: 596px; width: 800px; font-size: 12px; color: #8FC3D3; display: none">Ch\u1EB7ng v\u1EC1 m\u1EB7c \u0111\u1ECBnh = ch\u1EB7ng \u0111i \u0111\u1EA3o ng\u01B0\u1EE3c + c\xE1c ch\u1EB7ng v\u1EC1 c\u1EE7a b\u1EA1n (g\u1ED9p ch\u1ED7 tr\xF9ng). S\u1ED1 km \u0111o l\u1EA1i theo \u0111\u01B0\u1EDDng th\u1EADt khi build.</div>
-
-      <!-- c\xE1c ch\u1EB7ng gh\xE9 -->
-      <section aria-label="C\xE1c ch\u1EB7ng gh\xE9" class="pnl" style="position: absolute; right: 20px; top: 64px; width: 420px; height: 600px; display: flex; flex-direction: column">
-        <div style="padding: 12px 14px 8px; display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">C\xC1C CH\u1EB6NG GH\xC9 \xB7 {{rt.count}}</span><span style="font-size: 11px; color: #8FC3D3">k\xE9o \u22EE\u22EE ho\u1EB7c \u25B2\u25BC \u0111\u1EC3 \u0111\u1ED5i th\u1EE9 t\u1EF1</span></div>
-        <div class="scrl" style="flex: 1; min-height: 0; padding: 0 10px 0 14px; display: flex; flex-direction: column; gap: 6px">
-          <sc-for list="{{rt.stops}}" as="s" hint-placeholder-count="7">
-            <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
-              <span aria-hidden="true" style="color: #5E8496; font-size: 16px; cursor: grab">\u22EE\u22EE</span>
-              <sc-if value="{{s.photo}}" hint-placeholder-val="{{ true }}">
-                <div class="ph" aria-hidden="true" style="position: relative; width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"></path></svg><span style="position: absolute; right: -3px; bottom: -3px; width: 18px; height: 18px; border-radius: 3px; background: {{s.sign}}; border: 1.5px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center"><svg width="11" height="11" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="{{s.icon}}"></path></svg></span></div>
-              </sc-if>
-              <sc-if value="{{s.noPhoto}}" hint-placeholder-val="{{ false }}">
-                <div style="width: 34px; height: 34px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
-              </sc-if>
-              <div style="flex: 1; min-width: 0">
-                <button onClick="{{s.open}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 14px; font-weight: 700; text-decoration: {{s.strike}}">{{s.name}}</button>
-                <div style="font-size: 11px; color: #8FC3D3">{{s.town}} \xB7 {{s.stay}} \xB7 <span style="color: {{s.tagC}}">{{s.tag}}</span></div>
-                <div style="font-size: 12px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #CFE6EE">{{s.eta}}</span></div>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 2px">
-                <button onClick="{{s.up}}" aria-label="L\xEAn" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">\u25B2</button>
-                <button onClick="{{s.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">\u25BC</button>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 2px">
-                <button onClick="{{s.skip}}" aria-label="B\u1ECF qua chuy\u1EBFn n\xE0y" title="B\u1ECF qua chuy\u1EBFn n\xE0y" class="btn" style="width: 30px; height: 24px; padding: 0; font-size: 11px">{{s.skipL}}</button>
-                <button onClick="{{s.del}}" aria-label="Xo\xE1 ch\u1EB7ng" class="btn" style="width: 30px; height: 24px; padding: 0; color: #FF9A9E"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg></button>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="padding: 10px 14px 14px; display: flex; gap: 8px">
-          <button onClick="{{openAdd}}" class="btn" style="flex: 1">+ Th\xEAm Ch\u1EB7ng</button>
-          <button onClick="{{openPick}}" class="btn btn-o" style="flex: 1">+ Th\xEAm T\u1EEB Danh S\xE1ch</button>
-        </div>
-      </section>
+    <!-- c\xE1c h\u1ED9p tho\u1EA1i Road Trip (b\u1EA3ng Road Trip n\u1EB1m tr\xEAn b\u1EA3n \u0111\u1ED3 \u1EDF M\xE0n H\xECnh Ch\xEDnh) -->
+    <sc-if value="{{rtDlgOn}}" hint-placeholder-val="{{ false }}">
       <sc-if value="{{tp.open}}" hint-placeholder-val="{{ false }}">
-        <div role="dialog" aria-label="C\xE1c chuy\u1EBFn" class="pnl fadein" style="position: absolute; left: 50%; top: 60px; transform: translateX(-50%); width: 760px; max-height: 600px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: #06192A; box-shadow: 0 20px 60px rgba(0,0,0,0.7)">
-          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 700; color: #FBB040; flex: 1">C\xE1c Chuy\u1EBFn</span><button onClick="{{tp.close}}" class="btn" style="height: 40px">\u0110\xF3ng</button></div>
-          <div class="scrl" style="max-height: 270px; display: flex; flex-direction: column; gap: 6px">
+        <div role="dialog" aria-label="C\xE1c Chuy\u1EBFn" class="pnl glb fadein" style="position: absolute; left: 50%; top: 70px; transform: translateX(-50%); width: 720px; max-height: 560px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: rgba(4,18,30,0.94); box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1.5px rgba(251,176,64,0.75)">
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px; font-weight: 800; color: #FBB040; flex: 1">C\xE1c Chuy\u1EBFn</span><button onClick="{{tp.newTrip}}" class="btn" style="height: 40px; color: #FFD08A">+ Chuy\u1EBFn M\u1EDBi</button><button onClick="{{tp.close}}" class="btn" style="height: 40px">\u0110\xF3ng</button></div>
+          <div class="scrl" style="flex: 1; min-height: 0; max-height: 420px; display: flex; flex-direction: column; gap: 8px">
             <sc-for list="{{tp.rows}}" as="t" hint-placeholder-count="2">
-              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; background: {{t.bg}}">
-                <div style="flex: 1; min-width: 0"><div style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.name}}</div><div style="font-size: 12px; color: #8FC3D3">{{t.sub}}</div></div>
-                <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="background: {{t.curBg}}; color: {{t.curFg}}">{{t.curL}}</button>
-                <sc-if value="{{t.edit}}" hint-placeholder-val="{{ false }}"><button onClick="{{t.pin}}" class="btn" aria-label="Ghim" style="height: 36px; width: 40px; padding: 0">\u{1F4CC}</button><button onClick="{{t.rename}}" class="btn" style="height: 36px">S\u1EEDa T\xEAn</button><button onClick="{{t.copy}}" class="btn" style="height: 36px">Ch\xE9p</button><button onClick="{{t.del}}" class="btn" style="height: 36px; color: #FF9A9E">{{t.delL}}</button></sc-if>
+              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; background: rgba(13,44,64,0.55); box-shadow: {{t.ring}}">
+                <div style="flex: 1; min-width: 0"><div style="font-size: 16px; font-weight: 700; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: anywhere">{{t.name}}</div><div style="font-size: 12px; color: #8FC3D3">{{t.sub}}</div></div>
+                <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="flex-shrink: 0; background: {{t.curBg}}; color: {{t.curFg}}">{{t.curL}}</button>
+                <sc-if value="{{t.edit}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 4px; flex-shrink: 0"><button onClick="{{t.pin}}" class="btn" aria-label="Ghim" style="height: 36px; width: 40px; padding: 0">\u{1F4CC}</button><button onClick="{{t.rename}}" class="btn" style="height: 36px; font-size: 13px">S\u1EEDa T\xEAn</button><button onClick="{{t.copy}}" class="btn" style="height: 36px; font-size: 13px">Ch\xE9p</button><button onClick="{{t.del}}" class="btn" style="height: 36px; font-size: 13px; color: #FF9A9E">{{t.delL}}</button></div></sc-if>
               </div>
             </sc-for>
           </div>
           <sc-if value="{{tp.editing}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 8px; align-items: center"><label style="flex: 1; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #8FC3D3">T\xEAn m\u1EDBi<input type="text" value="{{tp.editName}}" onInput="{{tp.setEditName}}" style="flex: 1; height: 40px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label><button onClick="{{tp.saveName}}" class="btn btn-o" style="height: 40px">L\u01B0u</button></div></sc-if>
-          <div style="border-top: 1px solid rgba(95,212,240,0.2); padding-top: 10px; display: flex; flex-direction: column; gap: 8px">
-            <span class="lbl">+ CHUY\u1EBEN M\u1EDAI</span>
-            <span style="font-size: 12px; color: #8FC3D3">{{tp.lockL}}</span>
-            <div style="display: flex; gap: 8px; align-items: center">
-              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">T\u1EEB<input type="text" value="{{tp.from}}" placeholder="{{tp.fromPh}}" disabled="{{tp.lock}}" onInput="{{tp.setFrom}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
-              <span style="font-size: 22px; color: #FBB040; padding-top: 16px">\u2192</span>
-              <label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #8FC3D3">T\u1EDBi<input type="text" value="{{tp.to}}" placeholder="Sydney" disabled="{{tp.lock}}" onInput="{{tp.setTo}}" style="height: 44px; border: 0; border-radius: 8px; padding: 0 12px; font-family: inherit; font-size: 16px; background: #0D2C40; color: #E8F1F5"></label>
-              <button onClick="{{tp.create}}" disabled="{{tp.lock}}" class="btn btn-o" style="height: 44px; margin-top: 16px; padding: 0 20px">T\u1EA1o Chuy\u1EBFn</button>
-            </div>
-            <span style="font-size: 13px; color: #FFD08A; min-height: 18px">{{tp.msg}}</span>
-          </div>
         </div>
       </sc-if>
 

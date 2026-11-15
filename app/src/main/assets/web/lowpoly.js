@@ -213,18 +213,6 @@
   }
   function signs(T, scn) {
     if (scn.side === "city" || scn.side === "shophouse" || scn.side === "neoncity") return;
-    const sg = proj(-3.3, 0.6), h = H * 0.05;
-    rect(sg.x - 1, sg.y - h * 0.6, 2, h * 0.6, "#777");
-    rect(sg.x - h * 0.36, sg.y - h * 1.5, h * 0.72, h * 0.9, "#fff");
-    g.strokeStyle = "#d22";
-    g.lineWidth = h * 0.08;
-    g.beginPath();
-    g.arc(sg.x, sg.y - h * 1.05, h * 0.27, 0, 6.2832);
-    g.stroke();
-    g.fillStyle = "#111";
-    g.font = "700 " + h * 0.22 + 'px "Overpass",sans-serif';
-    g.textAlign = "center";
-    g.fillText(S.limit ? String(S.limit) : "100", sg.x, sg.y - h * 0.97);
     for (let i = 0; i < 6; i++) {
       const z = (i / 6 + off) % 1;
       const a = proj(-2.85, 1 - z), b = proj(2.85, 1 - z);
@@ -311,8 +299,34 @@
     }
     const nc = S.wx === "clear" ? 3 : S.wx === "cloud" ? 7 : S.wx === "rain" || S.wx === "storm" ? 9 : 4;
     const cc = S.tod === "night" ? "rgba(70,85,120,0.35)" : S.wx === "rain" || S.wx === "storm" ? "rgba(80,95,110,0.55)" : "rgba(255,255,255,0.6)";
+    const wet = S.wx === "rain" || S.wx === "storm";
     for (let i = 0; i < nc; i++) {
-      const cx = ((i * 0.29 + t * 4e-6 * (1 + i % 3)) % 1.25 - 0.12) * W, cy = H * (0.07 + i % 4 * 0.045), r2 = H * (0.035 + i % 3 * 0.012);
+      const cx = ((i * 0.29 + t * 4e-6 * (1 + i % 3)) % 1.25 - 0.12) * W, cy = H * (0.07 + i % 4 * 0.045), r2 = H * (0.035 + i % 3 * 0.012) * (wet ? 1.25 : 1);
+      if (S.style === "poly" && (wet || S.wx === "cloud")) {
+        const n = 9, top = S.tod === "night" ? ["rgba(78,92,122,0.32)", "rgba(62,76,104,0.32)"] : wet ? ["rgba(132,146,160,0.42)", "rgba(112,126,141,0.42)"] : ["rgba(236,240,244,0.55)", "rgba(214,222,230,0.55)"];
+        const pts2 = [];
+        for (let k = 0; k <= n; k++) {
+          const a = Math.PI + k / n * Math.PI, rr = r2 * (1.25 + 0.35 * Math.sin(k * 2.3 + i));
+          pts2.push([cx + Math.cos(a) * rr * 1.7, cy + Math.sin(a) * rr * 0.9]);
+        }
+        for (let k = 0; k < n; k++) {
+          g.fillStyle = top[k % 2];
+          g.beginPath();
+          g.moveTo(cx, cy + r2 * 0.25);
+          g.lineTo(pts2[k][0], pts2[k][1]);
+          g.lineTo(pts2[k + 1][0], pts2[k + 1][1]);
+          g.closePath();
+          g.fill();
+        }
+        g.fillStyle = top[1];
+        g.beginPath();
+        g.moveTo(pts2[0][0], pts2[0][1]);
+        g.lineTo(pts2[n][0], pts2[n][1]);
+        g.lineTo(cx, cy + r2 * 0.45);
+        g.closePath();
+        g.fill();
+        continue;
+      }
       g.fillStyle = cc;
       [[0, 0, 1], [r2 * 0.9, r2 * 0.1, 0.8], [-r2 * 0.9, r2 * 0.15, 0.75], [r2 * 0.3, -r2 * 0.4, 0.7]].forEach((q) => {
         g.beginPath();
@@ -836,7 +850,7 @@
   }
   function frame(ts) {
     requestAnimationFrame(frame);
-    if (!S.on) return;
+    if (!S.on || document.body.classList.contains("map-on")) return;
     const anim = !S.drive || S.moveMode === "slow";
     const fps = S.drive ? 2 : 24;
     if (!dirty && ts - last < 1e3 / fps) return;
