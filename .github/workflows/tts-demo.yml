@@ -1,0 +1,23 @@
+name: tts-demo
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  tts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: VieNeu voices
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg espeak-ng >/dev/null
+          pip install -q vieneu || pip install -q vieneu --extra-index-url https://pnnbao97.github.io/llama-cpp-python-v0.3.16/cpu/
+          python tools/tts_demo.py tts_out
+          cd tts_out && for f in *.wav; do ffmpeg -v error -y -i "$f" -b:a 96k "${f%.wav}.mp3"; done; rm -f *.wav; ls -la
+      - name: Publish
+        run: |
+          cd tts_out && git init -q && git checkout -q -b tts-demo && git add -A
+          git -c user.name=ci -c user.email=ci@local commit -qm "tts demo"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" tts-demo
