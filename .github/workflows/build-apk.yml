@@ -38,6 +38,12 @@ jobs:
           mv /tmp/vosk-model-small-en-us-0.15 $GITHUB_WORKSPACE/app/src/main/assets/model-en
           echo "small-en-us-0.15" > $GITHUB_WORKSPACE/app/src/main/assets/model-en/uuid
           du -sh $GITHUB_WORKSPACE/app/src/main/assets/model-en
+      - name: Southern voice clips (#77, from the voice-clips branch if recorded)
+        run: |
+          if git ls-remote --exit-code --heads origin voice-clips >/dev/null 2>&1; then
+            git clone -q --depth 1 -b voice-clips "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" /tmp/vc
+            rm -rf /tmp/vc/.git; mkdir -p app/src/main/assets/voice; cp -r /tmp/vc/* app/src/main/assets/voice/; du -sh app/src/main/assets/voice
+          else echo "no voice clips yet"; fi
       - name: Brand logos (#53, packed into the app)
         run: pip install pillow > /dev/null 2>&1; python3 tools/fetch_logos.py app/src/main/assets/web/logos
       - name: Unpack signing key

@@ -17,6 +17,7 @@
     const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy; let t = l2 ? -(ax * dx + ay * dy) / l2 : 0; t = Math.max(0, Math.min(1, t));
     return { d: Math.hypot(ax + t * dx, ay + t * dy), t };
   };
+  const stepSay = (st) => (NAV.cfg && NAV.cfg.clip && !EN() && st.plain) ? st.plain : st.text;
   const say = (t) => { try { if (window.TCN && !(NAV.cfg && NAV.cfg.mute)) window.TCN.call('say', t); } catch (e) {} };
   const toast = (t) => { if (window.__ui && window.__ui.toast) window.__ui.toast(t); };
   const redraw = () => { if (window.__ui) window.__ui.setState({ navAt: Date.now() }); };
@@ -25,14 +26,34 @@
 
   // ---------------- formatting (Vietnamese, Southern wording) ----------------
   const fmtDist = (m) => m >= 1000 ? (m >= 10000 ? Math.round(m / 1000) : (Math.round(m / 100) / 10).toString().replace('.', ',')) + ' km' : (m >= 100 ? Math.round(m / 50) * 50 : Math.max(10, Math.round(m / 10) * 10)) + ' m';
-  const sayDist = (m) => m >= 1000 ? (Math.round(m / 100) / 10).toString().replace('.', ',') + ' cây số' : (Math.round(m / 50) * 50 || 50) + ' mét';
-  const fmtDur = (s) => { const m = Math.max(1, Math.round(s / 60)); return m >= 60 ? Math.floor(m / 60) + ' giờ ' + (m % 60 ? (m % 60) + ' ph' : '') : m + ' phút'; };
+  const EN = () => window.TC_LANG === 'en';
+  const kmClip = (k) => k < 3 ? Math.max(1, Math.round(k * 2) / 2) : k <= 20 ? Math.round(k) : k <= 100 ? Math.round(k / 5) * 5 : k < 135 ? 120 : k < 175 ? 150 : 200;
+  const sayDist = (m) => (NAV.cfg && NAV.cfg.clip && !EN() && m >= 1000) ? String(kmClip(m / 1000)).replace('.', ',') + ' cây số' : EN() ? (m >= 1000 ? (Math.round(m / 100) / 10) + ' kilometres' : (Math.round(m / 50) * 50 || 50) + ' metres') : m >= 1000 ? (Math.round(m / 100) / 10).toString().replace('.', ',') + ' cây số' : (Math.round(m / 50) * 50 || 50) + ' mét';
+  const fmtDur = (s) => { const m = Math.max(1, Math.round(s / 60)); if (EN()) return m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60 ? (m % 60) + ' min' : '') : m + ' min'; return m >= 60 ? Math.floor(m / 60) + ' giờ ' + (m % 60 ? (m % 60) + ' ph' : '') : m + ' phút'; };
   const hhmm = (t) => { const d = new Date(t); return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
   NAV.fmtDist = fmtDist; NAV.fmtDur = fmtDur; NAV.hhmm = hhmm;
   const DIRW = { uturn: 'Quay đầu', 'sharp right': 'Rẽ gắt phải', right: 'Rẽ phải', 'slight right': 'Chếch phải', straight: 'Đi thẳng', 'slight left': 'Chếch trái', left: 'Rẽ trái', 'sharp left': 'Rẽ gắt trái' };
   const side = (m) => /right/.test(m || '') ? 'phải' : /left/.test(m || '') ? 'trái' : '';
   const nm = (s) => { const n = (s.name || '').trim(), r = (s.ref || '').split(';')[0]; return n ? n + (r && n.indexOf(r) < 0 ? ' (' + r + ')' : '') : r; };
-  const viText = (s, wpName) => {
+  const DIRE = { uturn: 'Make a U-turn', 'sharp right': 'Turn sharp right', right: 'Turn right', 'slight right': 'Bear right', straight: 'Go straight', 'slight left': 'Bear left', left: 'Turn left', 'sharp left': 'Turn sharp left' };
+  const enText = (s, wpName) => {
+    const m = s.maneuver, t = m.type, mod = m.modifier || '', n = nm(s), onto = n ? ' onto ' + n : '', sd = /right/.test(mod) ? 'right' : /left/.test(mod) ? 'left' : '';
+    switch (t) {
+      case 'depart': return 'Head off' + (n ? ' on ' + n : '');
+      case 'arrive': return (wpName ? 'Arrive at ' + wpName : 'You have arrived') + (sd ? ', on the ' + sd : '');
+      case 'merge': return 'Merge' + (sd ? ' ' + sd : '') + onto;
+      case 'on ramp': return 'Take the ramp' + (sd ? ' on the ' + sd : '') + onto;
+      case 'off ramp': { const d = (s.destinations || '').split(',')[0].replace(/^[^:]*:\s*/, ''); return 'Take exit' + (s.exits ? ' ' + s.exits.split(';')[0] : '') + (sd ? ' on the ' + sd : '') + (d ? ' towards ' + d : onto); }
+      case 'fork': return 'Keep ' + (sd || 'straight') + (n ? ' on ' + n : '');
+      case 'end of road': return 'At the end of the road, ' + (DIRE[mod] || 'turn').toLowerCase() + onto;
+      case 'roundabout': case 'rotary': return 'At the roundabout, take exit ' + (m.exit || 1) + onto;
+      case 'roundabout turn': return (DIRE[mod] || 'Continue') + ' at the roundabout' + onto;
+      case 'exit roundabout': case 'exit rotary': return 'Exit the roundabout' + onto;
+      case 'continue': case 'new name': return mod && mod !== 'straight' ? (DIRE[mod] || 'Continue') + onto : 'Continue' + (n ? ' on ' + n : '');
+      default: return (DIRE[mod] || 'Continue') + onto;
+    }
+  };
+  const viText0 = (s, wpName) => {
     const m = s.maneuver, t = m.type, mod = m.modifier || '', n = nm(s), onto = n ? ' vô ' + n : '';
     switch (t) {
       case 'depart': return 'Xuất phát' + (n ? ' theo ' + n : '');
@@ -49,6 +70,7 @@
       default: return (DIRW[mod] || 'Đi tiếp') + onto;
     }
   };
+  const viText = (s, wpName) => EN() ? enText(s, wpName) : viText0(s, wpName);
   const iconKey = (s) => { const t = s.maneuver.type, mod = s.maneuver.modifier || 'straight'; if (t === 'arrive') return 'arrive'; if (/roundabout|rotary/.test(t)) return 'round'; if (t === 'fork' || t === 'off ramp' || t === 'on ramp' || t === 'merge') return /right/.test(mod) ? 'slight right' : /left/.test(mod) ? 'slight left' : 'straight'; return mod; };
 
   // ---------------- map ----------------
@@ -67,7 +89,7 @@
   const idbPut = (k, v) => db().then((d) => { if (d) try { d.transaction('t', 'readwrite').objectStore('t').put(v, k); } catch (e) {} });
   const tileUrl = (tpl, z, x, y) => tpl.replace('{s}', 'abc'[Math.abs(x + y) % 3]).replace('{z}', z).replace('{x}', x).replace('{y}', y).replace('{r}', '');
   let map = null, layer = null, layerKey = '', box = null, wrap = null;
-  let routeL = null, routeC = null, altL = [], trailL = null, van = null, marks = [], follow = true, userAt = 0, lastVan = null, lastSig = '', fittedSig = '';
+  let routeL = null, routeC = null, altL = [], trailL = null, van = null, /*car*/ marks = [], follow = true, userAt = 0, lastVan = null, lastSig = '', fittedSig = '';
   const mkLayer = (T) => {
     const CTL = window.L.TileLayer.extend({ createTile(c, done) { const img = document.createElement('img'); img.alt = ''; const url = this.getTileUrl(c); img.onload = () => done(null, img); img.onerror = () => { if (img.__f) { done(new Error('tile'), img); return; } img.__f = 1; idbGet(url).then((b) => { if (b) img.src = URL.createObjectURL(b); else done(new Error('tile'), img); }); }; img.src = url; return img; } });
     return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : '', maxNativeZoom: l[1], maxZoom: 19, subdomains: 'abc', detectRetina: false, zIndex: i + 1 })));
@@ -112,7 +134,7 @@
     const sig = (R ? 'n' + R.id + ':' + S.altPick + ':' + S.alts.length : '') + '|' + (o.rt ? o.rt.sig : '') + '|' + (S.preview ? S.preview.t0 : '') + '|' + (o.places || []).map((p) => p.name).join(',') + '|' + (o.park ? o.park.t : '') + '|' + (S.wps || []).length;
     if (sig !== lastSig) {
       lastSig = sig;
-      [routeL, routeC, trailL].concat(altL).forEach((l) => { if (l) map.removeLayer(l); }); routeL = routeC = trailL = null; altL = [];
+      [routeL, routeC, trailL, passedL].concat(altL).forEach((l) => { if (l) map.removeLayer(l); }); routeL = routeC = trailL = passedL = null; passedL0 = ''; altL = [];
       marks.forEach((m) => map.removeLayer(m)); marks = [];
       if (R) {
         S.alts.forEach((a, i) => { if (a === R) return; const l = window.L.polyline(a.pts, { color: '#7d8f9c', weight: 7, opacity: 0.75 }).addTo(map); l.on('click', () => NAV.pickAlt(i)); altL.push(l); });
@@ -135,31 +157,99 @@
       const fs = (R ? 'n' + R.id + ':' + S.altPick : o.rt ? o.rt.sig : '') + (S.preview ? S.preview.t0 : '');
       if (fs && fs !== fittedSig && !S.active) { fittedSig = fs; setTimeout(NAV.fitAll, 80); }
     }
-    // the car
-    lastVan = o.van || null;
+    // the car: targets only — the animation loop moves the arrow and the map smoothly (#91)
+    lastVan = o.van || null; Car.spd = o.spd || 0; Car.drive = !!o.drive;
     if (o.van) {
-      if (!van) van = window.L.marker(o.van, { icon: arrowIco(o.brg), keyboard: false, zIndexOffset: 1000 }).addTo(map); else { van.setLatLng(o.van); if (Math.abs((van.__b || 0) - (o.brg || 0)) > 2) { van.setIcon(arrowIco(rotOn ? 0 : o.brg)); van.__b = o.brg; } }
+      let tgt = o.van, brg = o.brg;
+      // snap onto the route while following it, so the arrow sits on the blue line (#89/#90)
+      if (S.active && S.snap && Date.now() - S.snap.t < 3000) { tgt = S.snap.p; if (S.snap.brg != null && (o.spd || 0) > 3) brg = S.snap.brg; }
+      if (!Car.to || dist(Car.to, tgt) > 0.5) { Car.from = Car.cur || tgt; Car.to = tgt; Car.t0 = performance.now(); }
+      if (brg != null && (o.spd || 0) > 2) Car.brgT = brg; else if (Car.brgT == null) Car.brgT = brg || 0;
+      if (!van) { Car.cur = tgt; Car.brg = Car.brgT || 0; van = window.L.marker(tgt, { icon: arrowIco(0), keyboard: false, zIndexOffset: 1000 }).addTo(map); }
       if (!follow && userAt && (o.drive || S.active) && Date.now() - userAt > 10000) follow = true;
-      if (follow) {
-        let z = map.getZoom();
-        if (S.active) { const s = o.spd || 0; z = s > 85 ? 14.5 : s > 60 ? 15.5 : s > 30 ? 16.5 : 17; }
-        else if (!box.__first) { box.__first = true; z = 15; }
-        if (S.active || o.drive) { const h = map.getSize().y; const p = map.project(o.van, z).add([0, -h * 0.18]); map.setView(map.unproject(p, z), z, { animate: true, duration: 0.8 }); }
-        else map.setView(o.van, z, { animate: true });
-      }
+      if (!box.__first && follow) { box.__first = true; map.setView(tgt, 15, { animate: false }); }
+      startLoop();
     }
-    applyRotate(S.active && NAV.cfg.rotate ? (o.brg || 0) : 0);
+    Car.rotate = !!(S.active && NAV.cfg.rotate);
+    // passed part of the route turns grey (#91)
+    if (R && S.active && routeL && passedL0 !== S.idx + ':' + R.id) {
+      passedL0 = S.idx + ':' + R.id;
+      const k = Math.min(R.pts.length - 1, (S.idx || 0) + 1), cut = S.snap ? S.snap.p : R.pts[k];
+      const done = R.pts.slice(0, k).concat([cut]), rest = [cut].concat(R.pts.slice(k));
+      if (!passedL) passedL = window.L.polyline(done, { color: '#8a97a3', weight: 7, opacity: 0.85, lineCap: 'round' }).addTo(map); else passedL.setLatLngs(done);
+      routeL.setLatLngs(rest); if (routeC) routeC.setLatLngs(rest);
+      if (passedL._map) passedL.bringToBack();
+    }
+    if (!S.active && passedL) { map.removeLayer(passedL); passedL = null; passedL0 = ''; }
   };
-  // heading-up: rotate a larger map box under the overlay (dragging off while rotated)
-  let rotOn = false;
-  const applyRotate = (deg) => {
-    if (!wrap) return; const on = !!deg || (deg === 0 && NAV.st.active && NAV.cfg.rotate);
-    if (on !== rotOn) { rotOn = on; wrap.style.width = wrap.style.height = on ? '160%' : '100%'; map.invalidateSize(false); if (on) map.dragging.disable(); else map.dragging.enable(); if (van) van.setIcon(arrowIco(on ? 0 : van.__b)); }
-    wrap.style.transform = 'translate(-50%,-50%)' + (on ? ' rotate(' + (-deg) + 'deg)' : '');
+  // ---------------- smooth car + camera (#91) ----------------
+  const Car = { cur: null, from: null, to: null, t0: 0, brg: 0, brgT: 0, spd: 0, rotate: false, drive: false };
+  let passedL = null, passedL0 = '', loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999;
+  const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
+  const startLoop = () => { if (loopOn) return; loopOn = true; requestAnimationFrame(frame); };
+  const frame = (ts) => {
+    if (!map || !Car.to || !document.body.classList.contains('map-on')) { loopOn = false; return; }
+    requestAnimationFrame(frame);
+    const fps = (NAV.st.active || Car.drive) ? 24 : 6;            // light on the Note 8 when parked
+    if (ts - lastFrame < 1000 / fps) return; lastFrame = ts;
+    // glide from the last position to the new one over ~1 s (fixes arrive about once a second)
+    const k = Math.min(1, (ts - Car.t0) / 1000);
+    Car.cur = [Car.from[0] + (Car.to[0] - Car.from[0]) * k, Car.from[1] + (Car.to[1] - Car.from[1]) * k];
+    Car.brg = (Car.brg + angDiff(Car.brg, Car.brgT || 0) * 0.18 + 360) % 360;
+    van.setLatLng(Car.cur);
+    // rotation: heading-up while navigating (map turns, arrow points up), otherwise north-up (arrow turns)
+    const rot = Car.rotate;
+    if (rot !== rotOn) { rotOn = rot; wrap.style.width = wrap.style.height = rot ? '160%' : '100%'; map.invalidateSize(false); if (rot) map.dragging.disable(); else map.dragging.enable(); lastIcoBrg = -999; }
+    wrap.style.transform = 'translate(-50%,-50%)' + (rot ? ' rotate(' + (-Car.brg).toFixed(1) + 'deg)' : '');
+    const icoB = rot ? 0 : Math.round(Car.brg / 3) * 3;
+    if (icoB !== lastIcoBrg) { lastIcoBrg = icoB; van.setIcon(arrowIco(icoB)); }
+    if (follow) {
+      let z = map.getZoom();
+      if (NAV.st.active) { const s = Car.spd; const zt = s > 85 ? 14.5 : s > 60 ? 15.5 : s > 30 ? 16.5 : 17; if (Math.abs(zt - z) >= 0.5) z = zt; }
+      let c = Car.cur;
+      if (NAV.st.active || Car.drive) {   // keep the car in the lower part of the screen, road ahead visible
+        const h = box.clientHeight || 720, off = h * 0.22, b = (rot ? Car.brg : 0) * RAD;
+        const p0 = map.project(Car.cur, z); c = map.unproject(p0.add([Math.sin(b) * off, -Math.cos(b) * off]), z);
+      }
+      map.setView(c, z, { animate: false });
+    }
+  };
+  NAV.carPos = () => Car.cur;
+  NAV.ahead = (km) => {   // #85: sample points on the remaining route (every ~1.5 km, up to km)
+    const S = NAV.st, R = S.route; if (!R || !S.active || !R.pts) return null;
+    const c = S.snap && S.snap.p ? S.snap.p : (lastVan || R.pts[0]); let best = 0, bd = 1e9;
+    for (let i = 0; i < R.pts.length; i += 2) { const d = dist(c, R.pts[i]); if (d < bd) { bd = d; best = i; } }
+    const out = [c]; let acc = 0, run = 0;
+    for (let i = best + 1; i < R.pts.length && acc < km * 1000; i++) { const d = dist(R.pts[i - 1], R.pts[i]); acc += d; run += d; if (run > 1500) { out.push(R.pts[i]); run = 0; } }
+    if (out.length < 2 && R.pts.length > best + 1) out.push(R.pts[Math.min(R.pts.length - 1, best + 20)]);
+    return out.slice(0, 25);
   };
 
   // ---------------- search (Photon) ----------------
   const ICON = { fuel: '⛽', supermarket: '🛒', convenience: '🛒', marketplace: '🛒', cafe: '☕', restaurant: '🍜', fast_food: '🍔', place_of_worship: '⛪', school: '🏫', hospital: '🏥', pharmacy: '💊', chemist: '💊', parking: '🅿', doityourself: '🔧', hardware: '🔧', mall: '🏬', department_store: '🏬', bank: '🏦', post_office: '✉', house: '🏠', residential: '🏠', car_repair: '🔧', hotel: '🏨', park: '🌳', station: '🚉', aerodrome: '✈' };
+
+  // 0.9.10 (#86): Here-style pictograms per place type — envelope for post office, cross for church…
+  const PG = {
+    post: ['#D9342B', 'M3 6h18v12H3z|M3 6l9 7 9-7'], church: ['#6B5BD2', 'M12 2v20|M6 8h12'], temple: ['#C9761E', 'M3 9 12 3l9 6|M5 9v11h14V9|M9 20v-6h6v6|M2 9h20'], mosque: ['#2E8B57', 'M12 3c-4 3-6 5-6 9h12c0-4-2-6-6-9z|M5 12v8h14v-8|M10 20v-4h4v4'],
+    school: ['#E0A100', 'M2 9l10-5 10 5-10 5z|M6 11v5c3 2 9 2 12 0v-5'], uni: ['#E0A100', 'M2 9l10-5 10 5-10 5z|M6 11v5c3 2 9 2 12 0v-5|M22 9v6'], hospital: ['#D9342B', 'M12 5v14|M5 12h14'], pharmacy: ['#2E9E4F', 'M12 5v14|M5 12h14|M4 4h16v16H4z'], clinic: ['#D9342B', 'M8 3v6a4 4 0 0 0 8 0V3|M12 13v3a4 4 0 0 0 8 0v-2|M20 12a1 1 0 1 0 0 .1'], dentist: ['#3A8DDE', 'M7 3c-3 0-4 3-3 6l2 11h3l1-6h4l1 6h3l2-11c1-3 0-6-3-6-2 0-3 1-5 1S9 3 7 3z'],
+    fuel: ['#1F6FB5', 'M4 20V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v15|M3 20h12|M6 7h6v4H6z|M14 9h2l2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3'], ev: ['#16A34A', 'M13 2 5 13h6l-1 9 8-11h-6z'], repair: ['#5B6B78', 'M14 7a4 4 0 0 0-5 5L3 18l3 3 6-6a4 4 0 0 0 5-5l-3 3-3-3z'], wash: ['#3A8DDE', 'M5 15l2-5h10l2 5|M4 15h16v4H4z|M8 3v3|M12 2v3|M16 3v3'], parking: ['#1F6FB5', 'M8 20V4h5a4 4 0 0 1 0 8H8'],
+    shop: ['#E3672A', 'M3 7h18l-2 11H5z|M8 7V5a4 4 0 0 1 8 0v2'], cart: ['#E3672A', 'M2 3h3l3 12h11l2-8H6|M9 20a1 1 0 1 0 .1 0|M18 20a1 1 0 1 0 .1 0'], hardware: ['#5B6B78', 'M3 21 14 10|M14 3l7 7-4 4-7-7z'],
+    food: ['#E3672A', 'M7 2v9|M4 2v6a3 3 0 0 0 6 0V2|M7 11v11|M17 2c-2 2-3 5-3 8h3v12|M17 2v20'], cafe: ['#8B5A2B', 'M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z|M17 10h2a2 2 0 0 1 0 4h-2|M8 2v3|M12 2v3'], fast: ['#E3672A', 'M4 11c0-4 4-6 8-6s8 2 8 6z|M3 14h18|M4 17h16a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3'], bar: ['#8E44AD', 'M4 4h16l-8 9z|M12 13v7|M8 20h8'],
+    bank: ['#2C5282', 'M3 9l9-5 9 5|M5 9v9|M10 9v9|M14 9v9|M19 9v9|M3 20h18'], atm: ['#2C5282', 'M3 6h18v12H3z|M12 9v6|M10 10.5c0-1 1-1.5 2-1.5s2 .5 2 1.5-4 1-4 2.5 1 1.5 2 1.5 2-.5 2-1.5'], hotel: ['#3A6FB0', 'M3 19V7|M3 15h18v4|M21 15v-3a3 3 0 0 0-3-3h-7v6|M7 12a1.5 1.5 0 1 0 .1 0'],
+    park: ['#2E8B57', 'M12 2 5 12h4l-3 5h12l-3-5h4z|M12 17v5'], beach: ['#E0A100', 'M3 20h18|M12 20 8 6|M3 9c3-4 9-5 13-2-4-1-8 0-13 2z|M17 4a3 3 0 1 0 .1 0'], library: ['#7A5C3A', 'M4 4h5v16H4z|M10 4h4v16h-4z|M15 5l4-1 3 15-4 1z'],
+    train: ['#1F6FB5', 'M6 3h12a2 2 0 0 1 2 2v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V5a2 2 0 0 1 2-2z|M4 10h16|M8 21l2-3|M16 21l-2-3'], bus: ['#1F6FB5', 'M5 4h14a1 1 0 0 1 1 1v12H4V5a1 1 0 0 1 1-1z|M4 11h16|M7 17v3|M17 17v3'], plane: ['#3A6FB0', 'M2 13l9-2V5a1 1 0 0 1 2 0v6l9 2v2l-9-1v4l2 2v1l-3-1-3 1v-1l2-2v-4l-9 1z'],
+    police: ['#1E3A8A', 'M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z|M9 12l2 2 4-4'], fire: ['#D9342B', 'M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3 0-5 1-8z'], gym: ['#5B6B78', 'M6 7v10|M18 7v10|M3 9v6|M21 9v6|M6 12h12'], toilets: ['#3A6FB0', 'M7 4a1.5 1.5 0 1 0 .1 0|M5 9h4v6H5z|M6 15v5|M8 15v5|M17 4a1.5 1.5 0 1 0 .1 0|M14 16l3-7 3 7z|M16 16v4|M18 16v4|M12 3v18'],
+    house: ['#4A6FA5', 'M3 11 12 3l9 8|M5 10v10h14V10|M10 20v-6h4v6'], road: ['#5B6B78', 'M8 3 5 21|M16 3l3 18|M12 4v3|M12 10v3|M12 16v3'], pin: ['#D9342B', 'M12 22s7-7 7-12a7 7 0 0 0-14 0c0 5 7 12 7 12z|M12 10a2 2 0 1 0 .1 0']
+  };
+  const PGK = { post_office: 'post', post_box: 'post', place_of_worship: 'church', church: 'church', cathedral: 'church', chapel: 'church', temple: 'temple', buddhist: 'temple', mosque: 'mosque', school: 'school', kindergarten: 'school', college: 'uni', university: 'uni', hospital: 'hospital', pharmacy: 'pharmacy', chemist: 'pharmacy', clinic: 'clinic', doctors: 'clinic', dentist: 'dentist',
+    fuel: 'fuel', charging_station: 'ev', car_repair: 'repair', tyres: 'repair', car_wash: 'wash', parking: 'parking', parking_entrance: 'parking', supermarket: 'cart', convenience: 'cart', marketplace: 'cart', mall: 'shop', department_store: 'shop', clothes: 'shop', shoes: 'shop', electronics: 'shop', doityourself: 'hardware', hardware: 'hardware', trade: 'hardware',
+    restaurant: 'food', food_court: 'food', cafe: 'cafe', bakery: 'cafe', fast_food: 'fast', bar: 'bar', pub: 'bar', biergarten: 'bar', bank: 'bank', atm: 'atm', bureau_de_change: 'bank', hotel: 'hotel', motel: 'hotel', hostel: 'hotel', guest_house: 'hotel', caravan_site: 'hotel', camp_site: 'park',
+    park: 'park', garden: 'park', nature_reserve: 'park', playground: 'park', beach: 'beach', library: 'library', station: 'train', train_station: 'train', halt: 'train', tram_stop: 'train', bus_station: 'bus', bus_stop: 'bus', aerodrome: 'plane', airport: 'plane', terminal: 'plane', police: 'police', fire_station: 'fire', fitness_centre: 'gym', sports_centre: 'gym', toilets: 'toilets',
+    house: 'house', residential: 'house', apartments: 'house', building: 'house', motorway: 'road', trunk: 'road', primary: 'road', secondary: 'road', tertiary: 'road', street: 'road', road: 'road' };
+  const pgCache = {};
+  NAV.pict = (kind, isHouse) => { const k = PGK[kind] || (isHouse ? 'house' : 'pin'); if (pgCache[k]) return pgCache[k]; const g = PG[k];
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6 -6 36 36"><circle cx="12" cy="12" r="18" fill="' + g[0] + '"/>' + g[1].split('|').map((d) => '<path d="' + d + '" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>').join('') + '</svg>';
+    return (pgCache[k] = { url: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), bg: g[0], key: k }); };
   NAV.iconOf = (kind) => ICON[kind] || '📍';
   const logoOf = (n) => (window.tcLogo && n) ? window.tcLogo(n) : '';
   NAV.logoOf = logoOf;
@@ -168,7 +258,7 @@
     const street = (p.housenumber ? p.housenumber + ' ' : '') + (p.street || '');
     const name = p.name || street || p.city || 'Không tên';
     const area = [p.name && street ? street : '', p.district || p.locality || p.city || '', p.state === 'Victoria' ? 'VIC' : p.state || ''].filter(Boolean).join(', ');
-    const pl = { name, sub: area, lat: c[1], lon: c[0], kind: p.osm_value || '', icon: ICON[p.osm_value] || (p.housenumber ? '🏠' : '📍') };
+    const pl = { name, sub: area, lat: c[1], lon: c[0], kind: p.osm_value || '', icon: ICON[p.osm_value] || (p.housenumber ? '🏠' : '📍'), house: !!p.housenumber };
     pl.st = { Victoria: 'VIC', 'South Australia': 'SA', 'New South Wales': 'NSW', Queensland: 'QLD', 'Australian Capital Territory': 'ACT', 'Western Australia': 'WA', Tasmania: 'TAS', 'Northern Territory': 'NT' }[p.state] || '';
     pl.logo = logoOf(p.name || ''); if (near) pl.km = dist(near, [pl.lat, pl.lon]) / 1000;
     return pl;
@@ -195,20 +285,26 @@
       const startIdx = Math.max(0, pts.length - 1);
       g.forEach((c, k) => { if (pts.length && k === 0) return; pts.push([c[1], c[0]]); if (pts.length > 1) cum.push(cum[cum.length - 1] + dist(pts[pts.length - 2], pts[pts.length - 1])); });
       const isWp = s.maneuver.type === 'arrive' && li < r.legs.length - 1;
-      steps.push({ at: cum[startIdx] || 0, text: viText(s, isWp ? (wps[li + 1] && wps[li + 1].name) : (s.maneuver.type === 'arrive' ? (wps[wps.length - 1] && wps[wps.length - 1].name) : '')), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === 'arrive' });
+      steps.push({ at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: '', ref: '', destinations: '', exits: '' }), ''), text: viText(s, isWp ? (wps[li + 1] && wps[li + 1].name) : (s.maneuver.type === 'arrive' ? (wps[wps.length - 1] && wps[wps.length - 1].name) : '')), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === 'arrive' });
       (s.intersections || []).forEach((x) => { if ((x.classes || []).indexOf('toll') >= 0 && s.name && tolls.indexOf(s.name) < 0) tolls.push(s.name); });
       legI = li;
     }));
     if (!pts.length) r.geometry.coordinates.forEach((c) => pts.push([c[1], c[0]]));
     while (cum.length < pts.length) cum.push(cum[cum.length - 1]);
-    return { id: Math.random().toString(36).slice(2, 8), pts, cum, steps, dist: r.distance, dur: r.duration, tolls, noEx: !!noEx, legs: r.legs.map((l) => ({ dist: l.distance, dur: l.duration })) };
+    // speed limits along the route: OSRM gives one value per segment of the overview line (#92)
+    const lim = []; try {
+      const og = r.geometry.coordinates; let gi = 0, acc = 0;
+      r.legs.forEach((l) => { const ms = (l.annotation && l.annotation.maxspeed) || []; ms.forEach((m) => { const a2 = og[gi], b2 = og[gi + 1]; if (!b2) return; const v = m && m.speed ? (m.unit === 'mph' ? Math.round(m.speed * 1.609) : m.speed) : null; if (!lim.length || lim[lim.length - 1].v !== v) lim.push({ at: acc, v }); acc += dist([a2[1], a2[0]], [b2[1], b2[0]]); gi++; }); });
+    } catch (e) {}
+    return { id: Math.random().toString(36).slice(2, 8), lim, pts, cum, steps, dist: r.distance, dur: r.duration, tolls, noEx: !!noEx, legs: r.legs.map((l) => ({ dist: l.distance, dur: l.duration })) };
   };
   NAV.route = (wps, avoid) => {
     const coords = wps.map((w) => (+w.lon).toFixed(6) + ',' + (+w.lat).toFixed(6)).join(';');
-    const base = OSRM + coords + '?overview=full&geometries=geojson&steps=true&alternatives=' + (wps.length === 2 ? '3' : 'false');
+    const base = OSRM + coords + '?overview=full&geometries=geojson&steps=true&annotations=maxspeed&alternatives=' + (wps.length === 2 ? '3' : 'false');
     const ex = (avoid || []).join(',');
     const go = (u) => fetch(u).then((r) => r.json());
-    return go(base + (ex ? '&exclude=' + ex : '')).then((j) => (j.code === 'Ok' || !ex) ? j : go(base).then((j2) => { j2.noEx = true; return j2; }))
+    const noAnn = (u) => u.replace('&annotations=maxspeed', '');
+    return go(base + (ex ? '&exclude=' + ex : '')).then((j) => j.code === 'Ok' ? j : go(noAnn(base) + (ex ? '&exclude=' + ex : ''))).then((j) => (j.code === 'Ok' || !ex) ? j : go(noAnn(base)).then((j2) => { j2.noEx = true; return j2; }))
       .then((j) => { if (j.code !== 'Ok' || !j.routes || !j.routes.length) throw new Error(j.message || 'route'); return j.routes.map((r) => build(r, wps, j.noEx)); });
   };
   // preview a route (Hành Trình / màn hình chính): alternatives shown grey, tap to pick
@@ -228,12 +324,12 @@
     S.active = true; S.idx = 0; S.said = {}; S.off = 0; S.startAt = Date.now(); S.alts = [S.route]; S.next = 1; S.toNext = S.route.steps[1] ? S.route.steps[1].at : S.route.dist;
     S.remain = S.route.dist; S.remainDur = S.route.dur; follow = true; userAt = 0;
     const first = S.route.steps[1];
-    say('Bắt đầu chỉ đường tới ' + (S.dest ? S.dest.name : 'nơi đến') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + first.text.toLowerCase() + '.' : ''));
+    if (EN()) say('Starting directions to ' + (S.dest ? S.dest.name : 'your destination') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' In ' + sayDist(first.at) + ', ' + first.text.toLowerCase() + '.' : '')); else if (NAV.cfg.clip) say('Bắt đầu chỉ đường.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + stepSay(first).toLowerCase() + '.' : '')); else say('Bắt đầu chỉ đường tới ' + (S.dest ? S.dest.name : 'nơi đến') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + first.text.toLowerCase() + '.' : ''));
     if (S.route.tolls.length && (NAV.cfg.avoid || []).indexOf('toll') < 0) toast('Đường này có đoạn thu phí: ' + S.route.tolls.slice(0, 2).join(', '));
     if (NAV.cfg.cams) loadCams(S.route.pts);
     redraw();
   };
-  NAV.stop = (quiet) => { const S = NAV.st; if (S.active && !quiet) say('Đã dừng chỉ đường'); NAV.cancel(); };
+  NAV.stop = (quiet) => { const S = NAV.st; if (S.active && !quiet) say(EN() ? 'Navigation stopped' : 'Đã dừng chỉ đường'); NAV.cancel(); };
   NAV.startTo = (place, opt) => {   // one tap "Đi": route from the car to a place and start
     const here = lastVan || (window.__liveLL && window.__liveLL());
     if (!here) { toast('Chưa bắt được GPS — chờ chút rồi bấm lại'); return Promise.resolve(); }
@@ -242,6 +338,7 @@
   // ---- live progress (called on every GPS fix) ----
   NAV.tick = (f) => {
     if (f.lat == null) return;
+    NAV.st.fixAt = Date.now();
     histTick(f); camTick(f);
     const S = NAV.st, R = S.route; if (!S.active || !R) return;
     const p = [f.lat, f.lon];
@@ -249,25 +346,29 @@
     for (let i = a; i < b; i++) { const q = segProj(p, R.pts[i], R.pts[i + 1]); if (q.d < best) { best = q.d; bi = i; bt = q.t; } }
     if (best > Math.max(55, (f.acc || 0) * 1.5)) { S.off = (S.off || 0) + 1; if (S.off >= 3 && Date.now() - (S.rerouteAt || 0) > 15000) reroute(p); return; }
     S.off = 0; S.idx = bi;
+    { const A = R.pts[bi], B = R.pts[bi + 1] || A; const sp = [A[0] + (B[0] - A[0]) * bt, A[1] + (B[1] - A[1]) * bt];
+      const y = Math.sin((B[1] - A[1]) * RAD) * Math.cos(B[0] * RAD), x = Math.cos(A[0] * RAD) * Math.sin(B[0] * RAD) - Math.sin(A[0] * RAD) * Math.cos(B[0] * RAD) * Math.cos((B[1] - A[1]) * RAD);
+      S.snap = { p: sp, brg: (Math.atan2(y, x) / RAD + 360) % 360, t: Date.now() }; }
     const along = R.cum[bi] + bt * ((R.cum[bi + 1] || R.cum[bi]) - R.cum[bi]);
     S.remain = Math.max(0, R.dist - along); S.remainDur = R.dur * (S.remain / (R.dist || 1));
     let n = 1; while (n < R.steps.length - 1 && R.steps[n].at <= along + 4) n++;
     S.next = n; S.toNext = Math.max(0, R.steps[n].at - along);
     const st = R.steps[n], spd = f.spd || 0, said = S.said[n] || (S.said[n] = {});
     const far = spd > 75 ? 1500 : spd > 45 ? 600 : 350, near = spd > 75 ? 350 : spd > 45 ? 160 : 70;
-    if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && (R.steps[n].at - R.steps[n - 1].at) > near * 2) { said.far = 1; say(sayDist(S.toNext) + ' nữa, ' + st.text.toLowerCase()); }
-    if (!said.near && S.toNext <= near) { said.near = 1; say(st.text); if (st.wp && n < R.steps.length - 1) toast(st.text); }
+    if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && (R.steps[n].at - R.steps[n - 1].at) > near * 2) { said.far = 1; say(EN() ? 'In ' + sayDist(S.toNext) + ', ' + st.text.toLowerCase() : sayDist(S.toNext) + ' nữa, ' + stepSay(st).toLowerCase()); }
+    if (!said.near && S.toNext <= near) { said.near = 1; say(stepSay(st)); if (st.wp && n < R.steps.length - 1) toast(st.text); }
     if (n === R.steps.length - 1 && S.toNext < 25) arrive();
     redraw();
   };
-  const arrive = () => { const S = NAV.st, d = S.dest; say('Đã tới nơi' + (d && d.name ? ', ' + d.name : '') + '.'); toast('🏁 Đã tới ' + (d ? d.name : 'nơi')); S.arrivedAt = Date.now(); S.active = false; setTimeout(() => { if (!NAV.st.active) NAV.cancel(); }, 45000); redraw(); };
+  const arrive = () => { const S = NAV.st, d = S.dest; say(EN() ? 'You have arrived' + (d && d.name ? ' at ' + d.name : '') + '.' : 'Đã tới nơi' + (d && d.name && !NAV.cfg.clip ? ', ' + d.name : '') + '.'); toast('🏁 Đã tới ' + (d ? d.name : 'nơi')); S.arrivedAt = Date.now(); S.active = false; setTimeout(() => { if (!NAV.st.active) NAV.cancel(); }, 45000); redraw(); };
   const reroute = (p) => {
-    const S = NAV.st; S.rerouteAt = Date.now(); say('Đang tính lại đường');
+    const S = NAV.st; S.rerouteAt = Date.now(); say(EN() ? 'Recalculating' : 'Đang tính lại đường');
     const R = S.route; const passedLegs = R.steps.slice(0, S.next).filter((s) => s.wp).length;
     const rest = S.wps.slice(1 + passedLegs);
     if (!rest.length) return;
     NAV.route([{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest), NAV.cfg.avoid).then((rs) => { S.route = rs[0]; S.alts = [rs[0]]; S.wps = [{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest); S.idx = 0; S.said = {}; S.off = 0; redraw(); }).catch(() => {});
   };
+  NAV.limitNow = () => { const S = NAV.st, R = S.route; if (!S.active || !R || !R.lim || !R.lim.length) return null; const along = R.dist - (S.remain || R.dist); let v = null, ahead = null; for (let i = 0; i < R.lim.length; i++) { if (R.lim[i].at <= along + 5) v = R.lim[i].v; else { if (R.lim[i].at - along < 300) ahead = R.lim[i].v; break; } } return v ? { v, ahead: ahead && ahead !== v ? ahead : null } : null; };
   NAV.navView = () => {
     const S = NAV.st, R = S.route; if (!R) return null;
     const st = R.steps[S.next || 1] || R.steps[R.steps.length - 1], st2 = R.steps[(S.next || 1) + 1];
@@ -292,7 +393,7 @@
   const schoolTime = () => { const d = new Date(), h = d.getHours() + d.getMinutes() / 60, wd = d.getDay(); return wd >= 1 && wd <= 5 && ((h >= 8 && h <= 9.5) || (h >= 14.5 && h <= 16)); };
   const camTick = (f) => {
     if (!NAV.cfg.cams || !cams.length || !(f.spd > 20)) return; const p = [f.lat, f.lon];
-    cams.forEach((c) => { if (camWarned[c.id]) return; const d = dist(p, [c.lat, c.lon]); if (c.school) { if (d < 180 && schoolTime() && f.spd > 45) { camWarned[c.id] = 1; say('Vùng trường học, chạy 40 cây số giờ'); toast('🏫 Vùng trường học · 40 km/g'); } } else if (d < 330) { camWarned[c.id] = 1; say('Phía trước ' + sayDist(d) + ' có camera tốc độ'); toast('📷 Camera tốc độ phía trước'); } });
+    cams.forEach((c) => { if (camWarned[c.id]) return; const d = dist(p, [c.lat, c.lon]); if (c.school) { if (d < 180 && schoolTime() && f.spd > 45) { camWarned[c.id] = 1; say(EN() ? 'School zone, 40 kilometres an hour' : 'Vùng trường học, chạy 40 cây số giờ'); toast('🏫 Vùng trường học · 40 km/g'); } } else if (d < 330) { camWarned[c.id] = 1; say(EN() ? 'Speed camera ahead in ' + sayDist(d) : 'Phía trước ' + sayDist(Math.max(50, Math.round(d / 50) * 50)) + ' có camera tốc độ'); toast('📷 Camera tốc độ phía trước'); } });
   };
 
   // ---------------- history: places, trips, parking (only in this phone) ----------------
@@ -329,6 +430,8 @@
   NAV.delPlace = (k) => { delete H.places[k]; saveH(); redraw(); };
   NAV.star = (p) => { if (!H.saved.some((s) => dist([s.lat, s.lon], [p.lat, p.lon]) < 60)) { H.saved.push({ name: p.name, lat: p.lat, lon: p.lon, icon: p.icon || '⭐', role: p.role || '' }); saveH(); toast('Đã lưu ⭐ ' + p.name); } redraw(); };
   NAV.unstar = (i) => { H.saved.splice(i, 1); saveH(); redraw(); };
+  NAV.getWork = () => H.saved.find((s) => s.role === 'work') || null;
+  NAV.clearWork = () => { H.saved = H.saved.filter((s) => s.role !== 'work'); saveH(); redraw(); };
   NAV.setWork = (p) => { H.saved = H.saved.filter((s) => s.role !== 'work'); H.saved.unshift({ name: p.name, lat: p.lat, lon: p.lon, icon: '💼', role: 'work' }); saveH(); toast('Đã lưu Chỗ làm'); redraw(); };
   // frequently visited — ranked by visits, but the count itself is never shown (privacy, #63)
   NAV.frequent = () => Object.keys(H.places).map((k) => Object.assign({ key: k }, H.places[k])).filter((p) => p.n >= 2 && p.name !== 'Nhà').sort((a, b) => b.n - a.n || b.last - a.last).slice(0, 12);

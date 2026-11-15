@@ -78,48 +78,89 @@
       .catch((e) => { if (i + 1 < OVP.length) return tryAt(i + 1); throw e; });
     return tryAt(0);
   };
-  // speed limit of the road we are on (+ one point ~300 m ahead)
-  let limAt = 0, limBusy = false, limLast = null;
-  const segDist = (lat, lon, g) => { let best = 1e9; for (let i = 1; i < g.length; i++) { const a = g[i - 1], b = g[i]; const ax = (a.lon - lon) * 89, ay = (a.lat - lat) * 111, bx = (b.lon - lon) * 89, by = (b.lat - lat) * 111; const vx = bx - ax, vy = by - ay; const t = Math.max(0, Math.min(1, -(ax * vx + ay * vy) / ((vx * vx + vy * vy) || 1e-9))); best = Math.min(best, Math.hypot(ax + vx * t, ay + vy * t)); } return best; };
-  const DEF_LIM = { motorway: 110, trunk: 100, primary: 100, secondary: 100, tertiary: 80, residential: 50, living_street: 10, service: 20, unclassified: 80 };
-  const parseLim = (tags, now) => {
+  // ---- speed limit (#92) ----
+  // 1) navigating: the limit along the planned route (OSRM / OpenStreetMap), exact and instant
+  // 2) otherwise: roads within ~1.2 km are downloaded once, then matched on the phone every second,
+  //    choosing the road that runs the same way as the car (not just the nearest one)
+  // 3) Victorian defaults when a road has no limit: 50 in built-up areas, 100 elsewhere (marked "ước tính")
+  // 4) Tom's own corrections ("Báo số sai") are remembered per road on this phone
+  let limArea = null, limBusy = false, limLast = null, limWay = null, limWarned = {};
+  const limFix = (() => { try { return JSON.parse(localStorage.getItem('tc-limfix') || '{}'); } catch (e) { return {}; } })();
+  const RADk = Math.PI / 180;
+  const kmDist = (a, b) => { const x = (b.lon - a.lon) * 111.32 * Math.cos(a.lat * RADk), y = (b.lat - a.lat) * 110.57; return Math.sqrt(x * x + y * y); };
+  const segInfo = (lat, lon, g) => { let best = 1e9, bb = 0; const kx = 111.32 * Math.cos(lat * RADk), ky = 110.57;
+    for (let i = 1; i < g.length; i++) { const ax = (g[i - 1].lon - lon) * kx, ay = (g[i - 1].lat - lat) * ky, bx = (g[i].lon - lon) * kx, by = (g[i].lat - lat) * ky, dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+      let t = l2 ? -(ax * dx + ay * dy) / l2 : 0; t = Math.max(0, Math.min(1, t)); const d = Math.hypot(ax + t * dx, ay + t * dy); if (d < best) { best = d; bb = (Math.atan2(dx, dy) / RADk + 360) % 360; } }
+    return { d: best, brg: bb }; };
+  const ROADS = 'motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|service|motorway_link|trunk_link|primary_link|secondary_link|tertiary_link';
+  const loadLimArea = (lat, lon) => {
+    if (limBusy) return; limBusy = true;
+    const q = '[out:json][timeout:20];way(around:1200,' + lat.toFixed(5) + ',' + lon.toFixed(5) + ')[highway~"' + ROADS + '"];out tags geom;';
+    overpass(q).then((j) => {
+      const ws = (j.elements || []).filter((e) => e.geometry && e.geometry.length > 1);
+      const res = ws.filter((w) => /residential|living_street/.test(w.tags.highway)).length;
+      limArea = { lat, lon, ws, built: res >= 6, at: Date.now() };
+    }).catch(() => {}).then(() => { limBusy = false; });
+  };
+  const DEF_RURAL = { motorway: 110, trunk: 100, primary: 100, secondary: 100, tertiary: 100, unclassified: 100, residential: 50, living_street: 10, service: 20 };
+  const parseLim = (tags, now, built) => {
     const m = parseInt(tags.maxspeed, 10);
-    let v = isNaN(m) ? null : m, school = false;
+    let v = isNaN(m) ? null : (/mph/.test(tags.maxspeed) ? Math.round(m * 1.609) : m), school = false;
     const cond = tags['maxspeed:conditional'] || '';
     const cm = cond.match(/(\d+)\s*@\s*\(([^)]*)\)/);
-    if (cm && /school/i.test(cond + (tags['maxspeed:type'] || ''))) {
+    if (cm && /school/i.test(cond + (tags['maxspeed:type'] || '') + (tags['maxspeed:variable'] || ''))) {
       const hm = now.getHours() * 60 + now.getMinutes(), wd = now.getDay();
       const inSchool = wd >= 1 && wd <= 5 && ((hm >= 480 && hm <= 570) || (hm >= 870 && hm <= 960));
       if (inSchool) { v = parseInt(cm[1], 10); school = true; }
     }
-    if (v == null) return { v: DEF_LIM[tags.highway] || (tags.highway ? 100 : null), est: true, school: false };
-    return { v, est: false, school };
+    if (v != null) return { v, est: false, school };
+    const h = (tags.highway || '').replace('_link', '');
+    if (/motorway/.test(h)) return { v: 100, est: true, school: false };
+    return { v: built ? (h === 'living_street' ? 10 : h === 'service' ? 20 : 50) : (DEF_RURAL[h] || 100), est: true, school: false };
   };
+  const matchLimit = (lat, lon, brg, spd) => {
+    const now = new Date();
+    // navigating → the route's own limits
+    const NV = window.NAV, nl = NV && NV.limitNow && NV.limitNow();
+    if (nl && nl.v) return { v: nl.v, est: false, school: false, label: '', ahead: nl.ahead, way: 'route' };
+    if (!limArea || kmDist(limArea, { lat, lon }) > 0.8 || Date.now() - limArea.at > 30 * 60000) { loadLimArea(lat, lon); if (!limArea) return null; }
+    let best = null;
+    limArea.ws.forEach((w) => {
+      const si = segInfo(lat, lon, w.geometry); if (si.d > 0.03) return;          // within 30 m
+      let score = si.d * 1000;                                                     // metres off the road
+      if (brg != null && spd > 8) { const dd = Math.abs(((si.brg - brg + 540) % 360) - 180); const a = Math.min(dd, 180 - dd); score += a * 0.6; if (a > 50) score += 40; }
+      if (limWay && w.id === limWay) score -= 6;                                   // stay on the same road
+      if (/service/.test(w.tags.highway) && spd > 40) score += 25;
+      if (!best || score < best.score) best = { w, score };
+    });
+    if (!best) return null;
+    limWay = best.w.id;
+    const L = parseLim(best.w.tags || {}, now, limArea.built);
+    if (limFix[best.w.id]) { L.v = limFix[best.w.id]; L.est = false; L.mine = true; }
+    return Object.assign(L, { label: best.w.tags.name || best.w.tags.ref || '', way: best.w.id, ahead: null });
+  };
+  window.tcLimitFix = (v) => { if (!limWay || limWay === 'route') return false; limFix[limWay] = v; try { localStorage.setItem('tc-limfix', JSON.stringify(limFix)); } catch (e) {} if (limLast) { limLast.v = v; limLast.est = false; push({ limit: Object.assign({}, limLast) }); } return true; };
   const fetchLimit = (lat, lon, brg, spd) => {
-    if (limBusy || Date.now() - limAt < (spd > 5 ? 12000 : 60000)) return;
-    limBusy = true;
-    const ahead = brg != null ? [lat + Math.cos(brg * Math.PI / 180) * 0.3 / 111, lon + Math.sin(brg * Math.PI / 180) * 0.3 / 89] : null;
-    const q = '[out:json][timeout:15];(way(around:30,' + lat + ',' + lon + ')[highway~"motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|service|motorway_link|trunk_link|primary_link"];' +
-      (ahead ? 'way(around:30,' + ahead[0] + ',' + ahead[1] + ')[highway~"motorway|trunk|primary|secondary|tertiary|unclassified|residential"];' : '') + ');out tags geom;';
-    overpass(q).then((j) => {
-      limAt = Date.now();
-      const ws = (j.elements || []).filter((e) => e.geometry);
-      if (!ws.length) return;
-      const pick = (la, lo) => ws.map((w) => ({ w, d: segDist(la, lo, w.geometry) })).sort((a, b) => a.d - b.d)[0];
-      const here = pick(lat, lon); if (!here || here.d > 0.05) return;
-      const now = new Date();
-      const L = parseLim(here.w.tags || {}, now); if (L.v == null) return;
-      let aheadV = null;
-      if (ahead) { const a = pick(ahead[0], ahead[1]); if (a && a.d < 0.05) { const LA = parseLim(a.w.tags || {}, now); if (LA.v != null && LA.v !== L.v) aheadV = LA.v; } }
-      const changed = !limLast || limLast.v !== L.v;
-      limLast = { v: L.v, est: L.est, school: L.school, label: (here.w.tags && (here.w.tags.name || here.w.tags.ref)) || '', at: changed ? Date.now() : (limLast ? limLast.at : 0), ahead: aheadV };
-      push({ limit: limLast });
-    }).catch(() => {}).then(() => { limBusy = false; });
+    const L = matchLimit(lat, lon, brg, spd); if (!L) return;
+    const changed = !limLast || limLast.v !== L.v || limLast.way !== L.way;
+    if (!changed && limLast && limLast.ahead === L.ahead && limLast.est === L.est) return;
+    limLast = Object.assign(L, { at: (!limLast || limLast.v !== L.v) ? Date.now() : limLast.at });
+    push({ limit: limLast });
+  };
+  // speeding reminder: only on a known (not estimated) limit, more than 3 km/h over for 4 s, once per road (#92)
+  let overSince = 0;
+  const checkSpeeding = (spd) => {
+    const L = limLast; if (!L || L.est || !(spd > 0)) { overSince = 0; return; }
+    if (spd > L.v + 3) { if (!overSince) overSince = Date.now(); const key = L.way + ':' + L.v; if (Date.now() - overSince > 4000 && !limWarned[key]) { limWarned[key] = 1; if ((window.__ui && window.__ui.state && window.__ui.state.set || {}).spWarn !== false) call('say', window.TC_LANG === 'en' ? 'Slow down, the limit is ' + L.v : 'Chạy chậm lại, giới hạn ' + L.v + ' cây số'); } }
+    else overSince = 0;
   };
   // places near us (prefer ahead of the car)
   const CATQ = {
     fuel: '[amenity=fuel]', mcd: '[amenity~"fast_food|restaurant"][brand~"McDonald",i]', hj: '[amenity~"fast_food|restaurant"][brand~"Hungry Jack",i]', kfc: '[amenity~"fast_food|restaurant"][brand~"KFC",i]',
-    cafe: '[amenity=cafe]', wc: '[amenity=toilets]', rest: '[highway=rest_area]', shop: '[shop=supermarket]'
+    cafe: '[amenity=cafe]', wc: '[amenity=toilets]', rest: '[highway=rest_area]', shop: '[shop=supermarket]',
+    // 0.9.10 (#85) quick chips
+    food: '[amenity=restaurant]', fast: '[amenity=fast_food]', pharm: '[amenity=pharmacy]', parking: '[amenity=parking][access!=private]', atm: '[amenity~"^(atm|bank)$"]', ev: '[amenity=charging_station]',
+    hosp: '[amenity~"^(hospital|clinic|doctors)$"]', church: '[amenity=place_of_worship]', hotel: '[tourism~"^(hotel|motel)$"]', repair: '[shop~"^(car_repair|tyres)$"]', green: '[leisure=park][name]', post: '[amenity=post_office]'
   };
   // brand logos: cached; OSM brand:wikidata first, otherwise look the brand up by name on Wikidata
   // #53: logos of the common Australian brands are packed into the app at build time (logos/logos.js) — never looked up by name.
@@ -149,7 +190,9 @@
   // staged search 5 → 15 → 30 km; remembers last results; status shown on screen
   const placeCache = (() => { try { return JSON.parse(localStorage.getItem('tc-places') || '{}'); } catch (e) { return {}; } })();
   let lastFind = { cat: null, lat: null, lon: null };
-  window.tcFindPlaces = (cat, quiet) => {
+  const KINDOF = { fuel: 'fuel', mcd: 'fast_food', hj: 'fast_food', kfc: 'fast_food', cafe: 'cafe', wc: 'toilets', rest: 'parking', shop: 'supermarket', food: 'restaurant', fast: 'fast_food', pharm: 'pharmacy', parking: 'parking', atm: 'atm', ev: 'charging_station', hosp: 'hospital', church: 'place_of_worship', hotel: 'hotel', repair: 'car_repair', green: 'park', post: 'post_office' };
+  window.tcFindPlaces = (cat, quiet, opt) => {
+    opt = opt || {};
     const u = window.__ui; if (!u) return;
     const lat = live.lat, lon = live.lon;
     if (lat == null) { if (placeCache[cat]) u.setState({ places: Object.assign({}, u.state.places, { [cat]: placeCache[cat].items }), placesMsg: 'Chưa có GPS — đang hiện kết quả lần trước' }); else u.setState({ placesMsg: 'Chưa có GPS — chờ chút rồi bấm Thử Lại', placesFail: true }); return; }
@@ -159,7 +202,8 @@
       u.setState({ placesBusy: true, placesFail: false, placesMsg: 'Đang tìm trong ' + radii[ri] / 1000 + ' km…' });
       let filt = CATQ[cat] || CATQ.fuel;
       if (/^q:/.test(cat)) { const raw = cat.slice(2).trim(); const bk = brandKey(raw); const term = (bk || raw).replace(/[^\w\s'&-]/g, '').replace(/'/g, '.'); filt = '[~"^(name|brand)$"~"' + term + '",i]'; }
-      const q = '[out:json][timeout:20];(nwr(around:' + radii[ri] + ',' + lat + ',' + lon + ')' + filt + ';);out center tags 60;';
+      const along = opt.along && opt.along.length > 1 ? opt.along : null;   // #85: points of the road ahead → search along the route
+      const q = along ? '[out:json][timeout:25];(nwr(around:' + [700, 1500, 3000][ri] + ',' + along.map((a) => a[0].toFixed(5) + ',' + a[1].toFixed(5)).join(',') + ')' + filt + ';);out center tags 60;' : '[out:json][timeout:20];(nwr(around:' + radii[ri] + ',' + lat + ',' + lon + ')' + filt + ';);out center tags 60;';
       return overpass(q).then((j) => {
         const brg = live.bearing;
         const items = (j.elements || []).map((e) => {
@@ -171,7 +215,7 @@
             const diff = ((b - brg + 540) % 360) - 180; ahead = Math.abs(diff) < 75; side = diff < 0 ? 'bên trái' : 'bên phải';
           }
           const nm = t.brand || t.name || '';
-          return { name: t.name || t.brand || ({ fuel: 'Trạm xăng', cafe: 'Café', wc: 'Nhà vệ sinh', rest: 'Chỗ nghỉ chân', shop: 'Siêu thị' }[cat] || 'Chỗ này'), brand: brandKey(nm), addr: [t['addr:street'], t['addr:suburb'] || t['addr:city']].filter(Boolean).join(', '), lat: la, lon: lo, km: Math.round(km * 10) / 10, ahead, side, open: isOpenNow(t.opening_hours), qid: t['brand:wikidata'] || '', k: cat === 'fuel' ? 'fuel' : cat === 'cafe' ? 'cafe' : cat === 'wc' ? 'wc' : cat === 'rest' ? 'rest' : cat === 'shop' ? 'shop' : 'food' };
+          return { name: t.name || t.brand || ({ fuel: 'Trạm xăng', cafe: 'Café', wc: 'Nhà vệ sinh', rest: 'Chỗ nghỉ chân', shop: 'Siêu thị' }[cat] || 'Chỗ này'), brand: brandKey(nm), addr: [t['addr:street'], t['addr:suburb'] || t['addr:city']].filter(Boolean).join(', '), lat: la, lon: lo, km: Math.round(km * 10) / 10, ahead, side, open: isOpenNow(t.opening_hours), kind: t.amenity === 'place_of_worship' ? (t.religion === 'buddhist' ? 'temple' : t.religion === 'muslim' ? 'mosque' : 'church') : (KINDOF[cat] || ''), qid: t['brand:wikidata'] || '', k: cat === 'fuel' ? 'fuel' : cat === 'cafe' ? 'cafe' : cat === 'wc' ? 'wc' : cat === 'rest' ? 'rest' : cat === 'shop' ? 'shop' : 'food' };
         }).filter((p) => p.lat != null).sort((a, b) => (b.ahead - a.ahead) || (a.km - b.km)).slice(0, 12);
         if (!items.length && ri + 1 < radii.length) return go(ri + 1);
         return Promise.all(items.map((p) => brandLogo(p.qid, p.brand || p.name).then((url) => Object.assign(p, { logo: url })))).then((its) => {
@@ -296,9 +340,19 @@
     NT: 'Vô Northern Territory: đường dài ít trạm xăng — đổ đầy trước khi đi.',
     TAS: 'Vô Tasmania: có kiểm dịch trái cây/rau tươi.'
   };
+  const RULES_EN = {
+    VIC: 'Entering Victoria: slow to 40 km/h past stopped emergency vehicles with flashing lights.',
+    NSW: 'Entering New South Wales: slow to 40 km/h past stopped emergency vehicles with flashing lights. Cameras catch phone use while driving.',
+    SA: 'Entering South Australia: SA time is 30 minutes behind VIC. Slow to 25 km/h past stopped emergency vehicles. Fruit fly quarantine checks.',
+    QLD: 'Entering Queensland: no daylight saving. Slow down past stopped emergency vehicles.',
+    ACT: 'Entering the ACT: slow to 40 km/h past stopped emergency vehicles with flashing lights.',
+    WA: 'Entering Western Australia: quarantine checks, no fresh fruit or vegetables. WA time is quite different.',
+    NT: 'Entering the Northern Territory: long stretches with few fuel stations — fill up first.',
+    TAS: 'Entering Tasmania: quarantine on fresh fruit and vegetables.'
+  };
   let lastState = null;
   const stateOf = (n) => ST[n] || n;
-  const checkState = () => { const n = live.place && live.place.state ? stateOf(live.place.state) : null; if (!n) return; if (lastState && n !== lastState && RULES[n] && window.__ui) { window.__ui.toast(RULES[n] + ' (luật có thể đổi — nhớ coi biển báo)'); if (window.__ui.state.set && window.__ui.state.set.stateRules !== false) window.__ui.say(RULES[n]); } lastState = n; };
+  const checkState = () => { const n = live.place && live.place.state ? stateOf(live.place.state) : null; if (!n) return; if (lastState && n !== lastState && RULES[n] && window.__ui) { window.__ui.toast(window.TC_LANG === 'en' ? RULES_EN[n] + ' (rules change — check the signs)' : RULES[n] + ' (luật có thể đổi — nhớ coi biển báo)'); if (window.__ui.state.set && window.__ui.state.set.stateRules !== false) window.__ui.say(window.TC_LANG === 'en' ? RULES_EN[n] : RULES[n]); } lastState = n; };
   setInterval(checkState, 20000);
   // ---- radio stations (radio-browser.info, free directory) ----
   const RB = 'https://de1.api.radio-browser.info/json/stations/';
@@ -383,7 +437,7 @@
   // ---- #49: trip start = where Tom is (home address if saved, else the first GPS fix while parked) ----
   let gpsStart = null;
   window.tcHome = () => { try { return JSON.parse(localStorage.getItem('tc-home') || 'null'); } catch (e) { return null; } };
-  window.tcSetHome = (clear) => { try { if (clear) { localStorage.removeItem('tc-home'); return null; } if (live.lat == null) return false; const h = { lat: live.lat, lon: live.lon, name: (live.place && live.place.suburb) || 'Nhà' }; localStorage.setItem('tc-home', JSON.stringify(h)); return h; } catch (e) { return false; } };
+  window.tcSetHome = (clear, obj) => { try { if (clear) { localStorage.removeItem('tc-home'); return null; } if (obj && obj.lat != null) { localStorage.setItem('tc-home', JSON.stringify(obj)); return obj; } if (live.lat == null) return false; const h = { lat: live.lat, lon: live.lon, name: (live.place && live.place.suburb) || 'Nhà' }; localStorage.setItem('tc-home', JSON.stringify(h)); return h; } catch (e) { return false; } };
   window.tcStartPt = () => { const h = window.tcHome(); if (h) return Object.assign({ home: true }, h); if (gpsStart) return { lat: gpsStart.lat, lon: gpsStart.lon, name: gpsStart.name || 'Vị trí của Tom' }; return null; };
   const push = (patch) => {
     live = Object.assign({}, live, patch);
@@ -397,7 +451,7 @@
     const patch = Object.assign({}, d, tripUpdate(d));
     if (d.lat != null && d.lon != null && !gpsStart && !(d.speed > 8)) gpsStart = { lat: d.lat, lon: d.lon, name: '' };   // #49: where the car was when the app started
     if (gpsStart && !gpsStart.name && live.place && live.place.suburb) gpsStart.name = live.place.suburb;
-    if (d.lat != null && d.lon != null) { fetchWx(d.lat, d.lon); fetchLimit(d.lat, d.lon, d.bearing, d.speed || 0); loadRadio(d.lat, d.lon); checkRegion(d.lat, d.lon); }
+    if (d.lat != null && d.lon != null) { fetchWx(d.lat, d.lon); fetchLimit(d.lat, d.lon, d.bearing, d.speed || 0); checkSpeeding(d.speed || 0); loadRadio(d.lat, d.lon); checkRegion(d.lat, d.lon); }
     push(patch);
     // 0.9.9: live navigation + trip log (nav.js) — once per new GPS fix
     if (window.NAV && d.lat != null && d.fix !== lastFix) { lastFix = d.fix; try { window.NAV.tick({ lat: d.lat, lon: d.lon, spd: d.speed || 0, acc: d.acc || 0, brg: d.bearing }); } catch (e) { console.log('NAV ' + e); } }

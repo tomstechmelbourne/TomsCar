@@ -135,6 +135,8 @@ shutil.copy(here / 'glue.js', out_dir / 'glue.js')
 shutil.copy(here / 'sky.js', out_dir / 'sky.js')
 shutil.copy(here / 'lowpoly.js', out_dir / 'lowpoly.js')
 shutil.copy(here / 'nav.js', out_dir / 'nav.js')
+shutil.copy(here / 'i18n.js', out_dir / 'i18n.js')
+shutil.copy(here / 'idle.js', out_dir / 'idle.js')
 shutil.copytree(here / 'sounds', out_dir / 'sounds', dirs_exist_ok=True)
 LF = pathlib.Path(os.environ.get('LEAFLET', '/tmp/node_modules/leaflet/dist'))
 shutil.copy(LF / 'leaflet.js', out_dir / 'leaflet.js')
@@ -184,6 +186,8 @@ body.narrow #scene{{display:none}}
 <body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="tcmap"></div><div id="ui"></div></div>
 <script>window.TC_VERSION = '{version}';</script>
 <script src="logos/logos.js"></script>
+<script src="i18n.js"></script>
+<script src="idle.js"></script>
 <script src="dcmini.js"></script>
 <script src="scene.js"></script>
 <script src="app.js"></script>
@@ -203,6 +207,6 @@ if (window.TCNative) {{ try {{ window.TCNative.call('ready', ''); }} catch (e) {
 """, encoding='utf-8')
 import subprocess, os
 esb = os.environ.get('ESBUILD', '/tmp/node_modules/.bin/esbuild')
-for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js', 'sky.js', 'lowpoly.js', 'nav.js'):
+for f in ('scene.js', 'app.js', 'glue.js', 'dcmini.js', 'sky.js', 'lowpoly.js', 'nav.js', 'i18n.js', 'idle.js'):
     subprocess.run([esb, str(out_dir / f), '--target=chrome61', '--allow-overwrite', '--log-level=warning', '--outfile=' + str(out_dir / f)], check=True)
 print('web UI written to', out_dir)

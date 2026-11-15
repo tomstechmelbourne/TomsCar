@@ -63,8 +63,11 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         if (hasMic()) loadHotword()
     }
 
+    /** "vi" or "en" (0.9.10 #83: English mode speaks and listens in en-AU) */
+    var lang = "vi"
     private fun applyVoice() {
         val t = tts ?: return
+        if (lang == "en") { t.setLanguage(Locale("en", "AU")); viReady = true; t.setSpeechRate(rate); t.setPitch(pitch); return }
         val vi = Locale("vi", "VN")
         val r = t.setLanguage(vi)
         viReady = r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED
@@ -85,6 +88,8 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         rate = o.optDouble("rate", rate.toDouble()).toFloat(); pitch = o.optDouble("pitch", pitch.toDouble()).toFloat()
         voiceName = o.optString("voice", voiceName); sensitivity = o.optInt("sens", sensitivity)
         muteWhenMusic = o.optBoolean("muteMusic", muteWhenMusic)
+        lang = o.optString("lang", lang)
+        clipVoice = o.optString("clip", clipVoice).let { if (it == "doan" || it == "son") it else "" }
         val hw = o.optBoolean("hot", hotwordWanted)
         if (hw != hotwordWanted) { hotwordWanted = hw; if (hw) startHotword() else stopHotword() }
         if (ttsOk) applyVoice()
@@ -169,7 +174,7 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
     /** Hear one command (button, steering-wheel button or "Hey Tom"). */
     fun listen() {
         if (!hasMic()) { emit(JSONObject().put("state", "error").put("text", "Cần cấp quyền micro (Cài Đặt → Quyền)")); return }
-        if (!SpeechRecognizer.isRecognitionAvailable(a)) { emit(JSONObject().put("state", "error").put("text", "Máy chưa có bộ nhận giọng nói của Google")); return }
+        if (!SpeechRecognizer.isRecognitionAvailable(a)) { emit(JSONObject().put("state", "error").put("text", if (lang == "en") "This phone has no Google speech recogniser" else "Máy chưa có bộ nhận giọng nói của Google")); return }
         busy = true; stopHotword()
         beep()
         main.postDelayed({
@@ -187,7 +192,7 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
                     override fun onEndOfSpeech() {}
                     override fun onError(e: Int) {
                         if (!busy) return
-                        if (e == SpeechRecognizer.ERROR_NO_MATCH || e == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) emit(JSONObject().put("state", if (heardSomething) "error" else "closed").put("text", "Không nghe rõ — bấm mic thử lại"))
+                        if (e == SpeechRecognizer.ERROR_NO_MATCH || e == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) emit(JSONObject().put("state", if (heardSomething) "error" else "closed").put("text", if (lang == "en") "Didn't catch that — tap the mic again" else "Không nghe rõ — bấm mic thử lại"))
                         else emit(JSONObject().put("state", "error").put("text", "Trợ lý chưa nghe được (lỗi $e)"))
                         done()
                     }
@@ -203,7 +208,7 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
                 })
                 val i = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                     .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi-VN")
+                    .putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (lang == "en") "en-AU" else "vi-VN")
                     .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                     .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                     .putExtra("android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES", arrayOf("en-AU"))
@@ -218,7 +223,41 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
 
     private fun beep() { try { val t = ToneGenerator(AudioManager.STREAM_MUSIC, 40); t.startTone(ToneGenerator.TONE_PROP_BEEP, 120); main.postDelayed({ t.release() }, 400) } catch (_: Exception) {} }
 
+    // ---- #77: pre-recorded southern voice (VieNeu · Thục Đoan / Thái Sơn) for fixed phrases ----
+    var clipVoice = ""   // "", "doan", "son"
+    private var clipKeys: Map<String, Int>? = null
+    private var clipPlayer: android.media.MediaPlayer? = null
+    private fun clipIndex(): Map<String, Int> {
+        clipKeys?.let { return it }
+        val m = HashMap<String, Int>()
+        try { val o = JSONObject(a.assets.open("voice/index.json").bufferedReader().readText()).getJSONObject("keys"); o.keys().forEach { k -> m[k] = o.getInt(k) } } catch (_: Exception) {}
+        clipKeys = m; return m
+    }
+    /** All parts of the sentence must be recorded, otherwise the Google voice reads it all (no mixed voices). */
+    private fun clipPlan(text: String): List<Int>? {
+        if (clipVoice.isEmpty() || lang == "en") return null
+        val idx = clipIndex(); if (idx.isEmpty()) return null
+        val norm = text.lowercase().trim().trimEnd('.', '!', '?')
+        idx[norm]?.let { return listOf(it) }
+        val parts = norm.split(Regex("[,.] +")).map { it.trim().trimEnd('.', '!', '?') }.filter { it.isNotEmpty() }
+        val ids = parts.map { idx[it] ?: return null }
+        return ids
+    }
+    private fun playClips(ids: List<Int>, i: Int = 0) {
+        if (i >= ids.size) { clipPlayer?.release(); clipPlayer = null; return }
+        try {
+            val fd = a.assets.openFd("voice/$clipVoice/${ids[i]}.mp3")
+            val mp = android.media.MediaPlayer()
+            mp.setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build())
+            mp.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length); fd.close()
+            mp.setOnCompletionListener { it.release(); if (clipPlayer === it) clipPlayer = null; playClips(ids, i + 1) }
+            mp.prepare(); clipPlayer?.release(); clipPlayer = mp; mp.start()
+        } catch (_: Exception) { clipPlayer = null }
+    }
+
     fun say(text: String) {
+        val plan = clipPlan(text)
+        if (plan != null) { tts?.stop(); playClips(plan); return }
         if (!ttsOk) return
         if (!viReady) { emit(JSONObject().put("state", "tts").put("ok", true).put("vi", false).put("google", hasGoogleTts())); return }
         val b = Bundle(); b.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC)

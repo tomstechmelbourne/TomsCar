@@ -1,0 +1,23 @@
+name: tts-clips
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  clips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Record southern voice clips (VieNeu · Thục Đoan, Thái Sơn)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg espeak-ng >/dev/null
+          pip install -q vieneu || pip install -q vieneu --extra-index-url https://pnnbao97.github.io/llama-cpp-python-v0.3.16/cpu/
+          python tools/tts_clips.py voice
+          du -sh voice; ls voice/*/ | head
+      - name: Publish to the voice-clips branch
+        run: |
+          cd voice && git init -q && git checkout -q -b voice-clips && git add -A
+          git -c user.name=ci -c user.email=ci@local commit -qm "voice clips"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" voice-clips

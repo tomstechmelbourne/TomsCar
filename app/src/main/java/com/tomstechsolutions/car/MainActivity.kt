@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
@@ -28,6 +29,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.KeyEvent
 import android.view.View
@@ -63,6 +65,15 @@ class MainActivity : Activity() {
     private var obd: Obd? = null
     private var location: Location? = null
     private var lastGeo: Location? = null
+    // 0.9.10 (#90): judge freshness by when the fix ARRIVED (phone's own clock), never by the GPS time in the fix —
+    // the Note 8's GPS chip can report a wrong date, which made every GPS fix look "old".
+    private var locAt = 0L
+    private var gpsAt = 0L
+    private var fixSeq = 0L
+    private var calcBrg: Float? = null
+    private var calcSpd: Double? = null
+    private var prevFix: Location? = null
+    private var prevFixAt = 0L
     private var place: JSONObject? = null
     private var ready = false
     private lateinit var phone: Phone
@@ -277,14 +288,27 @@ class MainActivity : Activity() {
     }
 
     private fun onLocation(l: Location) {
-        val prev = location
-        // prefer GPS fixes; accept network fixes only when GPS is old
-        if (prev != null && l.provider != LocationManager.GPS_PROVIDER && prev.provider == LocationManager.GPS_PROVIDER &&
-            l.time - prev.time < 10000) return
-        location = l
+        val now = SystemClock.elapsedRealtime()
+        val isGps = l.provider == LocationManager.GPS_PROVIDER
+        // prefer GPS fixes; accept network fixes only when no GPS fix arrived in the last 10 s
+        if (!isGps && now - gpsAt < 10000) return
+        if (isGps) gpsAt = now
+        // heading + speed worked out from the movement when the fix itself has none
+        val pf = prevFix
+        if (pf != null) {
+            val d = pf.distanceTo(l); val dt = (now - prevFixAt) / 1000.0
+            if (dt in 0.3..30.0) {
+                calcSpd = d / dt * 3.6
+                if (d > 4) calcBrg = pf.bearingTo(l).let { if (it < 0) it + 360f else it }
+                else if (d < 1.5 && calcSpd!! < 3) calcSpd = 0.0
+            }
+        }
+        if (pf == null || pf.distanceTo(l) > 2 || now - prevFixAt > 5000) { prevFix = Location(l); prevFixAt = now }
+        location = l; locAt = now; fixSeq++
         val g = lastGeo
-        if (g == null || g.distanceTo(l) > 250 || l.time - g.time > 60000) { lastGeo = l; geocode(l) }
+        if (g == null || g.distanceTo(l) > 250 || now - geoAt > 60000) { lastGeo = l; geoAt = now; geocode(l) }
     }
+    private var geoAt = 0L
 
     private fun geocode(l: Location) {
         if (!Geocoder.isPresent()) return
@@ -308,15 +332,21 @@ class MainActivity : Activity() {
     private fun push() {
         val o = JSONObject()
         val l = location
-        val fresh = l != null && System.currentTimeMillis() - l.time < 15000
+        val age = SystemClock.elapsedRealtime() - locAt
+        val fresh = l != null && age < 15000
         val ob = obd
         val obdSpeed = ob?.speed
+        val gpsSpeed = if (!fresh) null else if (l!!.hasSpeed() && l.speed > 0.2f) l.speed * 3.6 else (calcSpd ?: if (l.hasSpeed()) l.speed * 3.6 else null)
+        o.put("gpsSpeed", gpsSpeed ?: org.json.JSONObject.NULL)
+        o.put("obdSpeed", obdSpeed ?: org.json.JSONObject.NULL)
         when {
             obdSpeed != null -> o.put("speed", obdSpeed)
-            fresh && l!!.hasSpeed() -> o.put("speed", l.speed * 3.6)
+            gpsSpeed != null -> o.put("speed", gpsSpeed)
             fresh -> o.put("speed", 0)
+            else -> o.put("speed", org.json.JSONObject.NULL)
         }
         o.put("gps", fresh && l?.provider == LocationManager.GPS_PROVIDER)
+        o.put("fresh", fresh); o.put("age", age / 1000)
         if (l != null) { o.put("lat", l.latitude); o.put("lon", l.longitude) }
         place?.let { o.put("place", it) }
         o.put("bat", battery())
@@ -329,8 +359,9 @@ class MainActivity : Activity() {
             })
         }
         media()?.let { o.put("media", it) }
-        if (l != null && fresh && l.hasBearing()) o.put("bearing", l.bearing)
-        if (l != null && fresh) { o.put("acc", l.accuracy.toDouble()); o.put("fix", l.time) }
+        val brg = if (l != null && fresh && l.hasBearing() && (l.speed > 1.5f || calcBrg == null)) l.bearing else if (fresh) calcBrg else null
+        if (brg != null) o.put("bearing", brg.toDouble())
+        if (l != null && fresh) { o.put("acc", l.accuracy.toDouble()); o.put("fix", fixSeq) }
         o.put("perms", perms())
         phone.json()?.let { o.put("call", it) }
         o.put("missed", phone.missed)
@@ -488,22 +519,83 @@ class MainActivity : Activity() {
             .show()
     }
 
+    private val obdKeys = listOf("obd", "elm", "veepeak", "vgate", "icar", "vlink", "v-link", "obdlink", "obdii", "obdcheck")
+    @SuppressLint("MissingPermission")
+    private fun btName(d: BluetoothDevice): String = (try { d.name } catch (_: SecurityException) { null }) ?: d.address
+    private fun isObdName(n: String) = n.lowercase().let { x -> obdKeys.any { x.contains(it) } }
+
+    private fun useObd(d: BluetoothDevice) {
+        prefs.edit().putString("obd", d.address).apply()
+        obd?.stop(); val bm = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        obd = Obd(bm?.adapter) { prefs.getString("obd", null) }.also { it.start() }
+        Launcher.toast(this, "Đang nối " + btName(d) + "…")
+    }
+
+    /** #88: paired devices with OBD ones first, plus "scan nearby" that finds and pairs in-app (PIN 1234). */
     @SuppressLint("MissingPermission")
     private fun pickObd() {
         if (!hasBtPermission()) { askPermissions(); return }
         val adapter = (getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
-        val devs: List<BluetoothDevice> = try { adapter?.bondedDevices?.toList() ?: emptyList() } catch (_: SecurityException) { emptyList() }
-        if (devs.isEmpty()) { Launcher.toast(this, "Chưa ghép nối thiết bị Bluetooth nào. Vào Bluetooth của điện thoại để ghép cục OBD trước."); return }
-        val names = devs.map { (try { it.name } catch (_: SecurityException) { null } ?: it.address) + "\n" + it.address }.toTypedArray()
+        if (adapter == null || !adapter.isEnabled) { Launcher.toast(this, "Bluetooth đang tắt — bật Bluetooth rồi thử lại"); return }
+        val devs: List<BluetoothDevice> = (try { adapter.bondedDevices?.toList() ?: emptyList() } catch (_: SecurityException) { emptyList() })
+            .sortedByDescending { if (isObdName(btName(it))) 1 else 0 }
+        val names = (devs.map { (if (isObdName(btName(it))) "🚗 " else "") + btName(it) + "\n" + it.address } + listOf("🔍 Tìm thiết bị gần đây…")).toTypedArray()
         AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
             .setTitle("Chọn cục OBD-II")
-            .setItems(names) { _, w ->
-                prefs.edit().putString("obd", devs[w].address).apply()
-                obd?.stop(); val bm = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
-                obd = Obd(bm?.adapter) { prefs.getString("obd", null) }.also { it.start() }
-                Launcher.toast(this, "Đang nối cục OBD…")
-            }
+            .setItems(names) { _, w -> if (w < devs.size) useObd(devs[w]) else scanObd() }
             .setNegativeButton("Đóng", null)
+            .show()
+    }
+
+    private var scanRx: BroadcastReceiver? = null
+    @SuppressLint("MissingPermission")
+    private fun scanObd() {
+        if (Build.VERSION.SDK_INT >= 31 && checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) { requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT), 8); return }
+        if (Build.VERSION.SDK_INT < 31 && !hasLocation()) { askPermissions(); return }
+        val adapter = (getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter ?: return
+        val found = mutableListOf<BluetoothDevice>()
+        val items = mutableListOf<String>()
+        val ad = android.widget.ArrayAdapter(this, android.R.layout.simple_list_item_1, items)
+        var dlg: AlertDialog? = null
+        val stop = { try { scanRx?.let { unregisterReceiver(it) } } catch (_: Exception) {}; scanRx = null; try { adapter.cancelDiscovery() } catch (_: SecurityException) {} }
+        val rx = object : BroadcastReceiver() {
+            override fun onReceive(c: Context, i: Intent) {
+                when (i.action) {
+                    BluetoothDevice.ACTION_FOUND -> {
+                        val d: BluetoothDevice = (if (Build.VERSION.SDK_INT >= 33) i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java) else @Suppress("DEPRECATION") i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)) ?: return
+                        if (found.any { it.address == d.address }) return
+                        val n = btName(d); val obdLike = isObdName(n)
+                        val pos = if (obdLike) 0 else found.size
+                        found.add(pos, d); items.add(pos, (if (obdLike) "🚗 " else "") + n + "\n" + d.address); ad.notifyDataSetChanged()
+                    }
+                    BluetoothDevice.ACTION_PAIRING_REQUEST -> {   // OBD dongles use 1234 (some 0000)
+                        val d: BluetoothDevice? = if (Build.VERSION.SDK_INT >= 33) i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java) else @Suppress("DEPRECATION") i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        try { d?.setPin("1234".toByteArray()) } catch (_: Exception) {}
+                    }
+                    BluetoothDevice.ACTION_BOND_STATE_CHANGED -> {
+                        val d: BluetoothDevice? = if (Build.VERSION.SDK_INT >= 33) i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java) else @Suppress("DEPRECATION") i.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                        val st = i.getIntExtra(BluetoothDevice.EXTRA_BOND_STATE, -1)
+                        if (d != null && st == BluetoothDevice.BOND_BONDED) { stop(); useObd(d) }
+                        if (d != null && st == BluetoothDevice.BOND_NONE && i.getIntExtra(BluetoothDevice.EXTRA_PREVIOUS_BOND_STATE, -1) == BluetoothDevice.BOND_BONDING) Launcher.toast(this@MainActivity, "Ghép nối không được — thử mã 1234 hoặc 0000")
+                    }
+                    BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> dlg?.setTitle(if (found.isEmpty()) "Không thấy thiết bị nào — cắm cục OBD, mở máy xe rồi thử lại" else "Chạm để ghép nối")
+                }
+            }
+        }
+        scanRx = rx
+        val f = IntentFilter().apply { addAction(BluetoothDevice.ACTION_FOUND); addAction(BluetoothDevice.ACTION_PAIRING_REQUEST); addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED); addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED) }
+        if (Build.VERSION.SDK_INT >= 33) registerReceiver(rx, f, Context.RECEIVER_EXPORTED) else registerReceiver(rx, f)
+        try { adapter.startDiscovery() } catch (_: SecurityException) { Launcher.toast(this, "Chưa có quyền tìm Bluetooth"); stop(); return }
+        dlg = AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+            .setTitle("Đang tìm thiết bị… (cục OBD lên đầu)")
+            .setAdapter(ad) { _, w ->
+                val d = found.getOrNull(w) ?: return@setAdapter
+                try { adapter.cancelDiscovery() } catch (_: SecurityException) {}
+                if (d.bondState == BluetoothDevice.BOND_BONDED) { stop(); useObd(d) }
+                else { Launcher.toast(this, "Đang ghép nối " + btName(d) + " (mã 1234)…"); try { d.createBond() } catch (_: SecurityException) {} }
+            }
+            .setNegativeButton("Đóng") { _, _ -> stop() }
+            .setOnCancelListener { stop() }
             .show()
     }
 
