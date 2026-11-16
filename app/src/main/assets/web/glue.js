@@ -23,16 +23,16 @@
     narrow = w / h < 1.1 && !forceWide;
     document.body.classList.toggle("narrow", narrow);
     if (narrow) {
-      const vw = 420, vh = Math.round(420 * h / w), s = w / vw;
+      const vw = 420, s = w / vw, vh = h / s;
       stage.style.width = vw + "px";
       stage.style.height = vh + "px";
-      stage.style.transform = "translate(-50%, -50%) scale(" + s + ")";
-      if (window.__ui) window.__ui.setState({ narrow: true, live: Object.assign({}, live, { vw, vh }) });
+      stage.style.transform = "scale(" + s + ")";
+      if (window.__ui) window.__ui.setState({ narrow: true, live: Object.assign({}, live, { vw, vh: Math.round(vh) }) });
     } else {
-      const s = Math.min(w / 1280, h / 720);
-      stage.style.width = "1280px";
-      stage.style.height = "720px";
-      stage.style.transform = "translate(-50%, -50%) scale(" + s + ")";
+      const s = w / h >= 1280 / 720 ? h / 720 : w / 1280;
+      stage.style.width = w / s + "px";
+      stage.style.height = h / s + "px";
+      stage.style.transform = "scale(" + s + ")";
       if (window.__ui) window.__ui.setState({ narrow: false });
     }
   };
@@ -71,9 +71,9 @@
     }
     return { km: best.k / total * TOTAL, off: best.d };
   };
-  window.tcRouteKm = (lat, lon) => {
+  window.tcRouteKm = (lat, lon, max) => {
     const r = routeKm(lat, lon);
-    return r.off < 25 ? r.km : null;
+    return r.off < (max || 25) ? r.km : null;
   };
   const dist = (a, b, c, d) => {
     const x = (d - b) * Math.cos((a + c) / 2 * Math.PI / 180) * 111.32, y = (c - a) * 110.57;
@@ -458,7 +458,7 @@
     });
   };
   const ST = { Victoria: "VIC", "New South Wales": "NSW", Queensland: "QLD", "South Australia": "SA", "Western Australia": "WA", Tasmania: "TAS", "Northern Territory": "NT", "Australian Capital Territory": "ACT" };
-  const geocode = (q) => fetch("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=au&addressdetails=1&accept-language=en&q=" + encodeURIComponent(q)).then((r) => r.json()).then((a) => {
+  const geocode = (q) => (window.NAV && window.NAV.tfetch ? window.NAV.tfetch : fetch)("https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=au&addressdetails=1&accept-language=en&q=" + encodeURIComponent(q), 9e3).then((r) => r.json()).then((a) => {
     if (!a || !a[0]) throw new Error("nf:" + q);
     const ad = a[0].address || {};
     const nm = ad.city || ad.town || ad.village || ad.suburb || q.split(",")[0];
@@ -491,7 +491,7 @@
     const geo = (q) => q && typeof q === "object" && q.lat != null ? Promise.resolve({ name: q.name || "V\u1ECB tr\xED c\u1EE7a Tom", st: q.st || "", lat: q.lat, lon: q.lon }) : geocode(q);
     return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say("\u0110ang t\xECm \u0111\u01B0\u1EDDng " + a.name + " \u2192 " + b.name + "\u2026");
-      return fetch("https://router.project-osrm.org/route/v1/driving/" + a.lon + "," + a.lat + ";" + b.lon + "," + b.lat + "?overview=full&geometries=geojson").then((r) => r.json()).then((j) => {
+      return (window.NAV && window.NAV.tfetch ? window.NAV.tfetch : fetch)("https://router.project-osrm.org/route/v1/driving/" + a.lon + "," + a.lat + ";" + b.lon + "," + b.lat + "?overview=full&geometries=geojson", 15e3).then((r) => r.json()).then((j) => {
         const rt = j.routes && j.routes[0];
         if (!rt) throw new Error("route");
         const all = rt.geometry.coordinates.map((c) => [Math.round(c[1] * 1e5) / 1e5, Math.round(c[0] * 1e5) / 1e5]);
@@ -831,6 +831,10 @@
   };
   window.tcMsgs = (a) => {
     if (window.__ui) window.__ui.setState({ msgs: typeof a === "string" ? JSON.parse(a) : a });
+  };
+  window.tcCrash = (r) => {
+    const o = typeof r === "string" ? JSON.parse(r) : r;
+    if (window.__ui) window.__ui.setState({ crash: o && o.text || "" });
   };
   window.tcGeo = (r) => {
     if (window.__geoCb) window.__geoCb(typeof r === "string" ? JSON.parse(r) : r);

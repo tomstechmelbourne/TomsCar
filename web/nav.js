@@ -88,11 +88,21 @@
   const idbGet = (k) => db().then((d) => d ? new Promise((res) => { try { const q = d.transaction('t').objectStore('t').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }) : null);
   const idbPut = (k, v) => db().then((d) => { if (d) try { d.transaction('t', 'readwrite').objectStore('t').put(v, k); } catch (e) {} });
   const tileUrl = (tpl, z, x, y) => tpl.replace('{s}', 'abc'[Math.abs(x + y) % 3]).replace('{z}', z).replace('{x}', x).replace('{y}', y).replace('{r}', '');
+
+  // 0.9.11 (#99): every Road Trip stop gets a real position — looked up once from its address (kept on the phone),
+  // else placed by its km along the route; labels stay readable (zoomed out: start, next stop, end only)
+  const STOPLL = (() => { try { return JSON.parse(localStorage.getItem('tc-stopll') || '{}'); } catch (e) { return {}; } })();
+  const stopBusy = {}; let stopQ = [];
+  const stopRun = () => { if (stopQ.length === 0 || stopRun.on) return; stopRun.on = true; const q = stopQ.shift();
+    fetch('https://photon.komoot.io/api/?limit=1&lang=en&bbox=112.9,-43.8,153.7,-10.6&q=' + encodeURIComponent(q)).then((r) => r.json()).then((j) => { const f = j.features && j.features[0]; STOPLL[q] = f ? [f.geometry.coordinates[1], f.geometry.coordinates[0]] : 0; })
+      .catch(() => { delete stopBusy[q]; }).then(() => { try { localStorage.setItem('tc-stopll', JSON.stringify(STOPLL)); } catch (e) {} lastSig = ''; stopRun.on = false; setTimeout(stopRun, 1100); }); };
+  NAV.stopLL = (q) => { if (!q) return null; const c = STOPLL[q]; if (c) return { lat: c[0], lon: c[1] }; if (c === 0 || stopBusy[q]) return null; stopBusy[q] = 1; stopQ.push(q); stopRun(); return null; };
+  const ptAtFrac = (pts, f) => { if (!pts || pts.length < 2) return null; const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + dist(pts[i - 1], pts[i])); const t = Math.max(0, Math.min(1, f)) * L[L.length - 1]; let i = 1; while (i < L.length - 1 && L[i] < t) i++; const k = (t - L[i - 1]) / ((L[i] - L[i - 1]) || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k]; };
   let map = null, layer = null, layerKey = '', box = null, wrap = null;
   let routeL = null, routeC = null, altL = [], trailL = null, van = null, /*car*/ marks = [], follow = true, userAt = 0, lastVan = null, lastSig = '', fittedSig = '';
   const mkLayer = (T) => {
     const CTL = window.L.TileLayer.extend({ createTile(c, done) { const img = document.createElement('img'); img.alt = ''; const url = this.getTileUrl(c); img.onload = () => done(null, img); img.onerror = () => { if (img.__f) { done(new Error('tile'), img); return; } img.__f = 1; idbGet(url).then((b) => { if (b) img.src = URL.createObjectURL(b); else done(new Error('tile'), img); }); }; img.src = url; return img; } });
-    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : '', maxNativeZoom: l[1], maxZoom: 19, subdomains: 'abc', detectRetina: false, zIndex: i + 1 })));
+    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : '', maxNativeZoom: l[1], maxZoom: 19, subdomains: 'abc', detectRetina: false, zIndex: i + 1, keepBuffer: 1, updateWhenZooming: false })));
   };
   const ensure = () => {
     if (map) return true; if (!window.L) return false;
@@ -105,7 +115,25 @@
     map.on('dragstart', off);
     wrap.addEventListener('wheel', off, { passive: true });
     wrap.addEventListener('touchstart', (e) => { if (e.touches && e.touches.length > 1) off(); }, { passive: true });
-    map.on('click', (e) => { if (NAV.onMapClick) NAV.onMapClick(e.latlng); });
+    let zLab = 0; map.on('zoomend', () => { const zl = map.getZoom() >= 9 ? 1 : 0; if (zl !== zLab) { zLab = zl; lastSig = ''; } });
+    map.on('click', (e) => { if (Date.now() - Rot.movedAt < 400) return; if (NAV.onMapClick) NAV.onMapClick(e.latlng); });
+    // 0.9.11 (#95): free rotation like Google Maps — two fingers twist / pinch, one finger pans (also when turned)
+    map.dragging.disable(); map.touchZoom.disable(); map.doubleClickZoom.enable();
+    const P = new Map(); let g = null;
+    const scl = () => { const r = box.getBoundingClientRect(); return (r.width / (box.offsetWidth || r.width)) || 1; };
+    const two = () => { const a = [...P.values()]; return { d: Math.hypot(a[1].x - a[0].x, a[1].y - a[0].y), a: Math.atan2(a[1].y - a[0].y, a[1].x - a[0].x) * 180 / Math.PI }; };
+    box.addEventListener('pointerdown', (e) => { if (e.target.closest && e.target.closest('.leaflet-marker-icon,.leaflet-control')) return; P.set(e.pointerId, { x: e.clientX, y: e.clientY }); try { window.__mapTouched && window.__mapTouched(); } catch (x) {} try { box.setPointerCapture(e.pointerId); } catch (x) {}
+      if (P.size === 2) { const t = two(); g = { d0: t.d, a0: t.a, z0: map.getZoom(), r0: Rot.view }; } });
+    box.addEventListener('pointermove', (e) => { const q = P.get(e.pointerId); if (!q) return; const dx = e.clientX - q.x, dy = e.clientY - q.y;
+      if (P.size === 1) { if (Math.abs(dx) + Math.abs(dy) < 1) return; const s = scl(), th = -Rot.view * RAD, c = Math.cos(th), sn = Math.sin(th);
+        const mx = (dx * c - dy * sn) / s, my = (dx * sn + dy * c) / s; map.panBy([-mx, -my], { animate: false }); q.x = e.clientX; q.y = e.clientY;
+        if (Math.abs(dx) + Math.abs(dy) > 2) { Rot.movedAt = Date.now(); off(); } return; }
+      q.x = e.clientX; q.y = e.clientY; if (P.size !== 2 || !g) return; const t = two();
+      const dz = Math.log2(t.d / (g.d0 || 1)); if (Math.abs(dz) > 0.05) { map.setZoom(Math.max(4, Math.min(19, g.z0 + dz)), { animate: false }); userAt = Date.now(); }
+      const da = ((t.a - g.a0 + 540) % 360) - 180; if (Rot.free || Math.abs(da) > 8) { Rot.free = true; Rot.ang = (g.r0 + da + 360) % 360; Rot.movedAt = Date.now(); startLoop(); } });
+    const up = (e) => { P.delete(e.pointerId); if (P.size < 2) g = null; };
+    box.addEventListener('pointerup', up); box.addEventListener('pointercancel', up);
+    box.style.touchAction = 'none';
     return true;
   };
   NAV.zoomIn = () => { if (map) { map.zoomIn(1); follow = false; userAt = Date.now(); } };
@@ -125,7 +153,9 @@
     if (!o.show) return;
     if (!ensure()) return;
     NAV.padL = o.padL || 40;
-    const key = o.style === 'auto' || !TILES[o.style] ? (o.night ? 'dark' : 'light') : o.style;
+    let key = o.style === 'auto' || !TILES[o.style] ? (o.night ? 'dark' : 'light') : o.style;
+    // #102: satellite photos are heavy — whole-trip view (zoomed out) and fast driving use the light map instead
+    if (key === 'sat' && (map.getZoom() < 10 || (o.satFast !== false && (o.spd || 0) > 80))) key = o.night ? 'dark' : 'light';
     if (layerKey !== key) { if (layer) map.removeLayer(layer); layer = mkLayer(TILES[key]).addTo(map); layerKey = key; }
     const tp = wrap.querySelector('.leaflet-tile-pane'); if (tp) tp.style.filter = o.bright && o.bright !== 100 ? 'brightness(' + (o.bright / 100) + ')' : '';
     if (!box.__sized) { box.__sized = true; setTimeout(() => map.invalidateSize(false), 60); }
@@ -145,7 +175,14 @@
       } else if (o.rt && o.rt.pts && o.rt.pts.length > 1) {
         routeC = window.L.polyline(o.rt.pts, { color: '#5a3200', weight: 11, opacity: 0.7, lineCap: 'round' }).addTo(map);
         routeL = window.L.polyline(o.rt.pts, { color: '#FF8A1F', weight: 6, opacity: 1, lineCap: 'round' }).addTo(map);
-        (o.rt.stops || []).forEach((s) => { if (s.lat == null) return; marks.push(pin([s.lat, s.lon], dot(s.start ? '#14A05A' : s.end ? '#D0202E' : '#F28A1A', s.start ? '●' : s.end ? '⚑' : String(s.n || ''), s.short, s.logo), s.start || s.end ? 600 : 400).on('click', () => { if (s.id && window.__ui) window.__ui.setState({ dlg: 'stop', stopId: s.id }); }).addTo(map)); });
+        const zoomed = map.getZoom() >= 9;
+        (o.rt.stops || []).forEach((s) => { let ll = s.lat != null ? [s.lat, s.lon] : null;
+          if (!ll && s.q) { const g = NAV.stopLL(s.q); if (g) ll = [g.lat, g.lon]; }
+          if (!ll && s.frac != null) ll = ptAtFrac(s.rev ? o.rt.pts.slice().reverse() : o.rt.pts, s.frac);
+          if (!ll) return;
+          const lab = s.start || s.end || s.next || zoomed ? s.short : '';
+          marks.push(pin(ll, dot(s.start ? '#14A05A' : s.end ? '#D0202E' : s.next ? '#FBB040' : '#F28A1A', s.start ? '●' : s.end ? '⚑' : String(s.n || ''), lab, s.logo), s.start || s.end ? 600 : s.next ? 500 : 400).on('click', () => { if (s.id && window.__ui) window.__ui.setState({ dlg: 'stop', stopId: s.id }); }).addTo(map)); });
+        (o.rt.towns || []).forEach((t) => { if (!zoomed && !t.big) return; marks.push(pin([t.lat, t.lon], '<div style="transform:translate(-50%,-50%);font:700 12px Overpass,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 0 6px #000;white-space:nowrap;pointer-events:none">' + t.name + '</div>', 50).addTo(map)); });
       }
       if (S.preview && S.preview.pts && S.preview.pts.length > 1) {
         trailL = window.L.polyline(S.preview.pts, { color: '#2fd0f5', weight: 6, opacity: 0.95 }).addTo(map);
@@ -170,7 +207,7 @@
       if (!box.__first && follow) { box.__first = true; map.setView(tgt, 15, { animate: false }); }
       startLoop();
     }
-    Car.rotate = !!(S.active && NAV.cfg.rotate);
+    Car.rotate = !!(NAV.cfg.rotate && (S.active || (Car.drive && (o.spd || 0) > 8)));   // heading-up while navigating or driving (#95)
     // passed part of the route turns grey (#91)
     if (R && S.active && routeL && passedL0 !== S.idx + ':' + R.id) {
       passedL0 = S.idx + ':' + R.id;
@@ -184,13 +221,16 @@
   };
   // ---------------- smooth car + camera (#91) ----------------
   const Car = { cur: null, from: null, to: null, t0: 0, brg: 0, brgT: 0, spd: 0, rotate: false, drive: false };
+  const Rot = { free: false, ang: 0, view: 0, movedAt: 0 };   // view = how far the map is turned on screen (deg, clockwise)
+  NAV.compass = () => { Rot.free = false; Rot.ang = 0; follow = true; userAt = 0; if (map && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true }); startLoop(); redraw(); };
+  NAV.viewAngle = () => Rot.view;
   let passedL = null, passedL0 = '', loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999;
   const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
   const startLoop = () => { if (loopOn) return; loopOn = true; requestAnimationFrame(frame); };
   const frame = (ts) => {
-    if (!map || !Car.to || !document.body.classList.contains('map-on')) { loopOn = false; return; }
+    if (!map || !Car.to || !document.body.classList.contains('map-on') || window.__idleOn) { loopOn = false; return; }
     requestAnimationFrame(frame);
-    const fps = (NAV.st.active || Car.drive) ? 24 : 6;            // light on the Note 8 when parked
+    const fps = (NAV.st.active || Car.drive || Date.now() - Rot.movedAt < 1500) ? 24 : 6;   // smooth while turning the map
     if (ts - lastFrame < 1000 / fps) return; lastFrame = ts;
     // glide from the last position to the new one over ~1 s (fixes arrive about once a second)
     const k = Math.min(1, (ts - Car.t0) / 1000);
@@ -199,16 +239,19 @@
     van.setLatLng(Car.cur);
     // rotation: heading-up while navigating (map turns, arrow points up), otherwise north-up (arrow turns)
     const rot = Car.rotate;
-    if (rot !== rotOn) { rotOn = rot; wrap.style.width = wrap.style.height = rot ? '160%' : '100%'; map.invalidateSize(false); if (rot) map.dragging.disable(); else map.dragging.enable(); lastIcoBrg = -999; }
-    wrap.style.transform = 'translate(-50%,-50%)' + (rot ? ' rotate(' + (-Car.brg).toFixed(1) + 'deg)' : '');
-    const icoB = rot ? 0 : Math.round(Car.brg / 3) * 3;
+    const ang = Rot.free ? Rot.ang : (rot ? (360 - Car.brg) % 360 : 0); Rot.view = ang;
+    const turned = Math.abs(((ang + 540) % 360) - 180) < 179.5;   // any angle but 0
+    if (turned !== rotOn) { rotOn = turned; wrap.style.width = wrap.style.height = turned ? '160%' : '100%'; map.invalidateSize(false); lastIcoBrg = -999; }
+    wrap.style.transform = 'translate(-50%,-50%)' + (turned ? ' rotate(' + ang.toFixed(1) + 'deg)' : '');
+    const cmp = document.getElementById('tccompassN'); if (cmp) cmp.style.transform = 'rotate(' + ang.toFixed(0) + 'deg)';
+    const icoB = (Math.round((Car.brg + ang) / 3) * 3 + 360) % 360;
     if (icoB !== lastIcoBrg) { lastIcoBrg = icoB; van.setIcon(arrowIco(icoB)); }
     if (follow) {
       let z = map.getZoom();
       if (NAV.st.active) { const s = Car.spd; const zt = s > 85 ? 14.5 : s > 60 ? 15.5 : s > 30 ? 16.5 : 17; if (Math.abs(zt - z) >= 0.5) z = zt; }
       let c = Car.cur;
       if (NAV.st.active || Car.drive) {   // keep the car in the lower part of the screen, road ahead visible
-        const h = box.clientHeight || 720, off = h * 0.22, b = (rot ? Car.brg : 0) * RAD;
+        const h = box.clientHeight || 720, off = h * 0.22, b = -ang * RAD;
         const p0 = map.project(Car.cur, z); c = map.unproject(p0.add([Math.sin(b) * off, -Math.cos(b) * off]), z);
       }
       map.setView(c, z, { animate: false });
@@ -264,14 +307,17 @@
     return pl;
   };
   let sT = 0, sSeq = 0;
+  // 0.9.11 (#98): every lookup gives up after a few seconds instead of spinning forever
+  const tfetch = (u, ms) => { const ac = window.AbortController ? new AbortController() : null; const t = setTimeout(() => ac && ac.abort(), ms || 7000); return fetch(u, ac ? { signal: ac.signal } : {}).finally(() => clearTimeout(t)); };
+  NAV.tfetch = tfetch;
   NAV.search = (q, near, cb) => {
     clearTimeout(sT); q = (q || '').trim(); if (q.length < 3) { cb([]); return; }
     const local = NAV.knownPlaces().filter((p) => p.name.toLowerCase().indexOf(q.toLowerCase()) >= 0).slice(0, 3).map((p) => Object.assign({ mine: true }, p));
     sT = setTimeout(() => {
       const my = ++sSeq;
       const u = 'https://photon.komoot.io/api/?limit=7&lang=en&bbox=112.9,-43.8,153.7,-10.6&q=' + encodeURIComponent(q) + (near ? '&lat=' + near[0].toFixed(4) + '&lon=' + near[1].toFixed(4) : '');
-      fetch(u).then((r) => r.json()).then((j) => { if (my === sSeq) cb(local.concat((j.features || []).map((f) => toPlace(f, near))).slice(0, 8)); })
-        .catch(() => fetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=au&accept-language=en&q=' + encodeURIComponent(q)).then((r) => r.json()).then((a) => { if (my === sSeq) cb(local.concat((a || []).map((x) => ({ name: x.display_name.split(',')[0], sub: x.display_name.split(',').slice(1, 3).join(','), lat: +x.lat, lon: +x.lon, icon: '📍', logo: logoOf(x.display_name.split(',')[0]), km: near ? dist(near, [+x.lat, +x.lon]) / 1000 : null })))); }).catch(() => { if (my === sSeq) cb(local); }));
+      tfetch(u, 7000).then((r) => r.json()).then((j) => { if (my === sSeq) cb(local.concat((j.features || []).map((f) => toPlace(f, near))).slice(0, 8)); })
+        .catch(() => tfetch('https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=au&accept-language=en&q=' + encodeURIComponent(q)).then((r) => r.json()).then((a) => { if (my === sSeq) cb(local.concat((a || []).map((x) => ({ name: x.display_name.split(',')[0], sub: x.display_name.split(',').slice(1, 3).join(','), lat: +x.lat, lon: +x.lon, icon: '📍', logo: logoOf(x.display_name.split(',')[0]), km: near ? dist(near, [+x.lat, +x.lon]) / 1000 : null })))); }).catch(() => { if (my === sSeq) cb(local, true); }));
     }, 380);
   };
   NAV.reverse = (p) => fetch('https://photon.komoot.io/reverse?lang=en&lat=' + p[0] + '&lon=' + p[1]).then((r) => r.json()).then((j) => { const f = j.features && j.features[0]; if (!f) return ''; const pl = toPlace(f); return pl.name; }).catch(() => '');

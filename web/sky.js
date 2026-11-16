@@ -87,9 +87,9 @@
     const gap = ts - last; if (!frozen && gap < 33) return;  // ~30 fps when parked
     lastSig = sig; last = ts;
     const dt = frozen ? 0 : Math.min(80, gap) * (ws.calm ? 0.5 : 1);
+    if (window.__idleOn) { const ic = document.getElementById('idlesky'); if (ic && ic.style.display !== 'none') draw(ic, ws, dt, ts); return; }   // idle: only its own sky (#102)
     draw(document.getElementById('wxmini'), ws, dt, ts);
     draw(document.getElementById('phsky'), ws, dt, ts);
-    if (window.__idleOn) draw(document.getElementById('idlesky'), ws, dt, ts);
   }
   requestAnimationFrame(loop);
 })();

@@ -11,19 +11,21 @@
   let narrow = false, forceWide = false;
   // phone (#44): the compact screen can open the full screens; "Màn Hình Gọn" brings it back
   window.tcForceWide = (on) => { forceWide = !!on; live.forceWide = forceWide; fit(); if (window.__ui) window.__ui.setState({ live: Object.assign({}, live) }); };
+  // 0.9.11 (#103): the page fills the whole screen edge to edge (no strip on the right / bottom on DeX);
+  // the 1280×720 design grows sideways on wide screens and downwards on tall ones.
   const fit = () => {
     const w = window.innerWidth, h = window.innerHeight;
     narrow = w / h < 1.1 && !forceWide;
     document.body.classList.toggle('narrow', narrow);
     if (narrow) {
-      const vw = 420, vh = Math.round(420 * h / w), s = w / vw;
+      const vw = 420, s = w / vw, vh = h / s;
       stage.style.width = vw + 'px'; stage.style.height = vh + 'px';
-      stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
-      if (window.__ui) window.__ui.setState({ narrow: true, live: Object.assign({}, live, { vw, vh }) });
+      stage.style.transform = 'scale(' + s + ')';
+      if (window.__ui) window.__ui.setState({ narrow: true, live: Object.assign({}, live, { vw, vh: Math.round(vh) }) });
     } else {
-      const s = Math.min(w / 1280, h / 720);
-      stage.style.width = '1280px'; stage.style.height = '720px';
-      stage.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+      const s = w / h >= 1280 / 720 ? h / 720 : w / 1280;
+      stage.style.width = (w / s) + 'px'; stage.style.height = (h / s) + 'px';
+      stage.style.transform = 'scale(' + s + ')';
       if (window.__ui) window.__ui.setState({ narrow: false });
     }
   };
@@ -47,7 +49,7 @@
     }
     return { km: best.k / total * TOTAL, off: best.d };
   };
-  window.tcRouteKm = (lat, lon) => { const r = routeKm(lat, lon); return r.off < 25 ? r.km : null; };
+  window.tcRouteKm = (lat, lon, max) => { const r = routeKm(lat, lon); return r.off < (max || 25) ? r.km : null; };
   const dist = (a, b, c, d) => { const x = (d - b) * Math.cos((a + c) / 2 * Math.PI / 180) * 111.32, y = (c - a) * 110.57; return Math.hypot(x, y); };
 
   // ---- weather (Open-Meteo, no key) ----
@@ -268,7 +270,7 @@
 
   // ---- new trip: geocode (Nominatim) → road route (OSRM) → suggested stops (Overpass) ----
   const ST = { Victoria: 'VIC', 'New South Wales': 'NSW', Queensland: 'QLD', 'South Australia': 'SA', 'Western Australia': 'WA', Tasmania: 'TAS', 'Northern Territory': 'NT', 'Australian Capital Territory': 'ACT' };
-  const geocode = (q) => fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=au&addressdetails=1&accept-language=en&q=' + encodeURIComponent(q)).then((r) => r.json()).then((a) => {
+  const geocode = (q) => (window.NAV && window.NAV.tfetch ? window.NAV.tfetch : fetch)('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=au&addressdetails=1&accept-language=en&q=' + encodeURIComponent(q), 9000).then((r) => r.json()).then((a) => {
     if (!a || !a[0]) throw new Error('nf:' + q);
     const ad = a[0].address || {}; const nm = ad.city || ad.town || ad.village || ad.suburb || q.split(',')[0];
     return { name: nm.replace(/^City of /, ''), st: ST[ad.state] || '', lat: +a[0].lat, lon: +a[0].lon };
@@ -283,7 +285,7 @@
     const geo = (q) => (q && typeof q === 'object' && q.lat != null) ? Promise.resolve({ name: q.name || 'Vị trí của Tom', st: q.st || '', lat: q.lat, lon: q.lon }) : geocode(q);
     return Promise.all([geo(fromQ), geo(toQ)]).then(([a, b]) => {
       say('Đang tìm đường ' + a.name + ' → ' + b.name + '…');
-      return fetch('https://router.project-osrm.org/route/v1/driving/' + a.lon + ',' + a.lat + ';' + b.lon + ',' + b.lat + '?overview=full&geometries=geojson').then((r) => r.json()).then((j) => {
+      return (window.NAV && window.NAV.tfetch ? window.NAV.tfetch : fetch)('https://router.project-osrm.org/route/v1/driving/' + a.lon + ',' + a.lat + ';' + b.lon + ',' + b.lat + '?overview=full&geometries=geojson', 15000).then((r) => r.json()).then((j) => {
         const rt = j.routes && j.routes[0]; if (!rt) throw new Error('route');
         const all = rt.geometry.coordinates.map((c) => [Math.round(c[1] * 1e5) / 1e5, Math.round(c[0] * 1e5) / 1e5]);
         const n = Math.max(1, Math.ceil(all.length / 250)); const pts = all.filter((_, i) => i % n === 0); pts.push(all[all.length - 1]);
@@ -463,6 +465,7 @@
   window.tcApps = (a) => { if (window.__ui) window.__ui.setState({ apps: typeof a === 'string' ? JSON.parse(a) : a }); };
   window.tcCallLog = (a) => { if (window.__ui) window.__ui.setState({ calls: typeof a === 'string' ? JSON.parse(a) : a }); };
   window.tcMsgs = (a) => { if (window.__ui) window.__ui.setState({ msgs: typeof a === 'string' ? JSON.parse(a) : a }); };
+  window.tcCrash = (r) => { const o = typeof r === 'string' ? JSON.parse(r) : r; if (window.__ui) window.__ui.setState({ crash: (o && o.text) || '' }); };
   window.tcGeo = (r) => { if (window.__geoCb) window.__geoCb(typeof r === 'string' ? JSON.parse(r) : r); };
   window.tcToast = (t) => { if (window.__ui) window.__ui.toast(t); };
   // Tom's Jukebox answered: library summary + its current look

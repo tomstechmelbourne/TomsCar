@@ -243,8 +243,24 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         val ids = parts.map { idx[it] ?: return null }
         return ids
     }
+    // 0.9.11 (#100): the voice keeps its own loudness — if music is turned low, lift the stream while speaking, then put it back.
+    private var floorFrom = -1
+    private fun floorOn() {
+        val am = a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+        val mx = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC); val cur = am.getStreamVolume(AudioManager.STREAM_MUSIC)
+        val want = Math.round(mx * 0.55f)
+        if (floorFrom < 0 && cur < want) { floorFrom = cur; Vol.lifting = true; am.setStreamVolume(AudioManager.STREAM_MUSIC, want, 0) }
+    }
+    private fun floorOff() {
+        if (floorFrom < 0) return
+        val am = a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+        val f = floorFrom; floorFrom = -1
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ if (floorFrom < 0) { am.setStreamVolume(AudioManager.STREAM_MUSIC, f, 0); android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ if (floorFrom < 0) Vol.lifting = false }, 300) } }, 400)
+    }
+    private var ttsCbSet = false
     private fun playClips(ids: List<Int>, i: Int = 0) {
-        if (i >= ids.size) { clipPlayer?.release(); clipPlayer = null; return }
+        if (i >= ids.size) { clipPlayer?.release(); clipPlayer = null; floorOff(); return }
+        if (i == 0) floorOn()
         try {
             val fd = a.assets.openFd("voice/$clipVoice/${ids[i]}.mp3")
             val mp = android.media.MediaPlayer()
@@ -252,7 +268,7 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
             mp.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length); fd.close()
             mp.setOnCompletionListener { it.release(); if (clipPlayer === it) clipPlayer = null; playClips(ids, i + 1) }
             mp.prepare(); clipPlayer?.release(); clipPlayer = mp; mp.start()
-        } catch (_: Exception) { clipPlayer = null }
+        } catch (_: Exception) { clipPlayer = null; floorOff() }
     }
 
     fun say(text: String) {
@@ -261,6 +277,13 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         if (!ttsOk) return
         if (!viReady) { emit(JSONObject().put("state", "tts").put("ok", true).put("vi", false).put("google", hasGoogleTts())); return }
         val b = Bundle(); b.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC)
+        if (!ttsCbSet) { ttsCbSet = true; tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+            override fun onStart(id: String?) {}
+            override fun onDone(id: String?) { if (id == "tc") floorOff() }
+            @Deprecated("old api") override fun onError(id: String?) { if (id == "tc") floorOff() }
+            override fun onStop(id: String?, interrupted: Boolean) { if (id == "tc") floorOff() }
+        }) }
+        floorOn()
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, b, "tc")
     }
 

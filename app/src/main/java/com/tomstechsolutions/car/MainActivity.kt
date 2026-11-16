@@ -79,6 +79,7 @@ class MainActivity : Activity() {
     private lateinit var phone: Phone
     private lateinit var radio: Radio
     private lateinit var voice: Voice
+    private lateinit var vol: Vol
     private var fileCb: ValueCallback<Array<Uri>>? = null
     private var appt: JSONObject? = null
     private var apptAt = 0L
@@ -108,14 +109,7 @@ class MainActivity : Activity() {
         } catch (_: Exception) { }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        val loader = WebViewAssetLoader.Builder()
-            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
-            .build()
-
+    private fun buildWeb(loader: WebViewAssetLoader) {
         web = WebView(this)
         web.setBackgroundColor(0xFF010407.toInt())
         web.settings.javaScriptEnabled = true
@@ -136,17 +130,66 @@ class MainActivity : Activity() {
         web.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) =
                 loader.shouldInterceptRequest(request.url)
+            // 0.9.11 (#102): Android killed the page's process (memory) — build a new page instead of closing the app.
+            override fun onRenderProcessGone(view: WebView, detail: android.webkit.RenderProcessGoneDetail?): Boolean {
+                val why = if (Build.VERSION.SDK_INT >= 26 && detail != null) (if (detail.didCrash()) "renderer crashed" else "renderer killed for memory") else "renderer gone"
+                logCrash("WebView: $why")
+                ready = false
+                try { (view.parent as? android.view.ViewGroup)?.removeView(view); view.destroy() } catch (_: Exception) {}
+                main.post { buildWeb(loader); immersive() }
+                return true
+            }
         }
         web.addJavascriptInterface(Bridge(), "TCNative")
         setContentView(web)
-        immersive()
         web.loadUrl("https://appassets.androidplatform.net/assets/web/index.html")
+    }
+
+    /** 0.9.11 (#102): write why the app died to crash.txt, restart it in 1.5 s; the page offers "Gửi Báo Lỗi" next time. */
+    private fun logCrash(text: String) {
+        try { java.io.File(filesDir, "crash.txt").appendText(java.text.SimpleDateFormat("dd/MM HH:mm:ss", java.util.Locale.US).format(java.util.Date()) + " · " + Build.MODEL + " Android " + Build.VERSION.RELEASE + "\n" + text.take(6000) + "\n\n") } catch (_: Exception) {}
+    }
+    private fun installCrashGuard() {
+        val prev = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+            try {
+                logCrash("Thread " + t.name + ": " + android.util.Log.getStackTraceString(e))
+                val f = java.io.File(filesDir, "crash.txt")
+                val again = System.currentTimeMillis() - prefs.getLong("crashAt", 0) < 60_000
+                prefs.edit().putLong("crashAt", System.currentTimeMillis()).commit()
+                if (!again) {
+                    val pi = android.app.PendingIntent.getActivity(this, 77, Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK), android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_ONE_SHOT)
+                    (getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager).set(android.app.AlarmManager.RTC, System.currentTimeMillis() + 1500, pi)
+                }
+                f.length()
+            } catch (_: Throwable) {}
+            if (prev != null) prev.uncaughtException(t, e) else { android.os.Process.killProcess(android.os.Process.myPid()); kotlin.system.exitProcess(10) }
+        }
+    }
+    private fun sendCrashIfAny() {
+        val f = java.io.File(filesDir, "crash.txt"); if (!f.exists()) return
+        val t = try { f.readText() } catch (_: Exception) { "" }; f.delete()
+        if (t.isNotBlank()) js("tcCrash", JSONObject().put("text", t.takeLast(3000)).toString())
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        val loader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
+        installCrashGuard()
+        buildWeb(loader)
+        immersive()
 
         askPermissions()
         val bm = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         obd = Obd(bm?.adapter) { prefs.getString("obd", null) }
         phone = Phone(this)
         radio = Radio(this)
+        vol = Vol(this) { main.post { if (ready) push() } }.also { it.start() }
         voice = Voice(this) { o -> main.post { web.evaluateJavascript("window.tcVoice && tcVoice(" + JSONObject.quote(o.toString()) + ")", null) } }
         voice.init()
         jukebox = Jukebox(this) { j -> main.post { js("tcJukebox", j) } }
@@ -189,6 +232,7 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        try { vol.stop() } catch (_: Exception) {}
         Bubble.hide()
         main.removeCallbacks(tick)
         obd?.stop()
@@ -332,6 +376,7 @@ class MainActivity : Activity() {
     private fun push() {
         val o = JSONObject()
         val l = location
+        if (::vol.isInitialized) { o.put("vol", vol.percent); o.put("volAt", vol.changedAt) }
         val age = SystemClock.elapsedRealtime() - locAt
         val fresh = l != null && age < 15000
         val ob = obd
@@ -459,6 +504,10 @@ class MainActivity : Activity() {
             a.startsWith("jb:") -> { val o = JSONObject(a.removePrefix("jb:")); jukebox.play(o.optString("kind"), o.optString("name")) }
             a == "jbquery" -> jukebox.query()
             a == "volup" -> (getSystemService(Context.AUDIO_SERVICE) as AudioManager).adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0)
+            a.startsWith("vol:") -> vol.set(a.removePrefix("vol:").toIntOrNull() ?: vol.percent)
+            a == "volstep+" -> vol.step(10)
+            a == "volstep-" -> vol.step(-10)
+            a == "mute" -> vol.toggleMute()
             a == "voldown" -> (getSystemService(Context.AUDIO_SERVICE) as AudioManager).adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0)
         }
         main.postDelayed({ if (ready) push() }, 600)
@@ -715,12 +764,14 @@ class MainActivity : Activity() {
                         if (TomsCarApp.introShown) web.evaluateJavascript("window.tcSkipIntro && tcSkipIntro()", null)
                         TomsCarApp.introShown = true
                         push()
+                        sendCrashIfAny()
                     }
                     "settings" -> settings()
                     "chime" -> chime(arg)
                     "media" -> mediaAction(arg)
                     "launch" -> { Launcher.workspace(this@MainActivity, arg); Bubble.askOnce(this@MainActivity) }
                     "bubble" -> { Bubble.enabled = arg != "off"; if (!Bubble.enabled) Bubble.hide() }
+                    "mail" -> try { val o = JSONObject(arg); startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).putExtra(Intent.EXTRA_EMAIL, arrayOf("tomstechmelbourne@gmail.com")).putExtra(Intent.EXTRA_SUBJECT, o.optString("subject")).putExtra(Intent.EXTRA_TEXT, o.optString("body")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
                     "share" -> try { startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")).putExtra("sms_body", arg).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) { try { startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, arg), "Gửi giờ tới").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {} }
                     "park" -> try { val o = JSONObject(arg); ParkAlarm.set(this@MainActivity, o.optLong("at"), o.optString("text"))
                         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 9) } catch (_: Exception) {}
@@ -743,7 +794,7 @@ class MainActivity : Activity() {
                         else -> {}
                     }
                     "say" -> voice.say(arg)
-                    "geocode" -> bg.execute { val r = geocodeText(arg); main.post { js("tcGeo", r.toString()) } }
+                    "geocode" -> Thread { val r = try { geocodeText(arg) } catch (_: Throwable) { JSONObject() }; main.post { js("tcGeo", r.toString()) } }.start()   // own thread, never waits behind other jobs (#98)
                     "openApp" -> openApp(arg)
                     "openMedia" -> { val p = controller()?.packageName; if (p != null) packageManager.getLaunchIntentForPackage(p)?.let { startActivity(it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } else Launcher.toast(this@MainActivity, "Mở app nhạc rồi bấm phát") }
                 }

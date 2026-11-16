@@ -184,6 +184,54 @@
     }
   });
   const tileUrl = (tpl, z, x, y) => tpl.replace("{s}", "abc"[Math.abs(x + y) % 3]).replace("{z}", z).replace("{x}", x).replace("{y}", y).replace("{r}", "");
+  const STOPLL = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("tc-stopll") || "{}");
+    } catch (e) {
+      return {};
+    }
+  })();
+  const stopBusy = {};
+  let stopQ = [];
+  const stopRun = () => {
+    if (stopQ.length === 0 || stopRun.on) return;
+    stopRun.on = true;
+    const q = stopQ.shift();
+    fetch("https://photon.komoot.io/api/?limit=1&lang=en&bbox=112.9,-43.8,153.7,-10.6&q=" + encodeURIComponent(q)).then((r) => r.json()).then((j) => {
+      const f = j.features && j.features[0];
+      STOPLL[q] = f ? [f.geometry.coordinates[1], f.geometry.coordinates[0]] : 0;
+    }).catch(() => {
+      delete stopBusy[q];
+    }).then(() => {
+      try {
+        localStorage.setItem("tc-stopll", JSON.stringify(STOPLL));
+      } catch (e) {
+      }
+      lastSig = "";
+      stopRun.on = false;
+      setTimeout(stopRun, 1100);
+    });
+  };
+  NAV.stopLL = (q) => {
+    if (!q) return null;
+    const c = STOPLL[q];
+    if (c) return { lat: c[0], lon: c[1] };
+    if (c === 0 || stopBusy[q]) return null;
+    stopBusy[q] = 1;
+    stopQ.push(q);
+    stopRun();
+    return null;
+  };
+  const ptAtFrac = (pts, f) => {
+    if (!pts || pts.length < 2) return null;
+    const L = [0];
+    for (let i2 = 1; i2 < pts.length; i2++) L.push(L[i2 - 1] + dist(pts[i2 - 1], pts[i2]));
+    const t = Math.max(0, Math.min(1, f)) * L[L.length - 1];
+    let i = 1;
+    while (i < L.length - 1 && L[i] < t) i++;
+    const k = (t - L[i - 1]) / (L[i] - L[i - 1] || 1);
+    return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k];
+  };
   let map = null, layer = null, layerKey = "", box = null, wrap = null;
   let routeL = null, routeC = null, altL = [], trailL = null, van = null, marks = [], follow = true, userAt = 0, lastVan = null, lastSig = "", fittedSig = "";
   const mkLayer = (T) => {
@@ -206,7 +254,7 @@
       img.src = url;
       return img;
     } });
-    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : "", maxNativeZoom: l[1], maxZoom: 19, subdomains: "abc", detectRetina: false, zIndex: i + 1 })));
+    return window.L.layerGroup(T.L.map((l, i) => new CTL(l[0], { attribution: i === 0 ? T.a : "", maxNativeZoom: l[1], maxZoom: 19, subdomains: "abc", detectRetina: false, zIndex: i + 1, keepBuffer: 1, updateWhenZooming: false })));
   };
   const ensure = () => {
     if (map) return true;
@@ -228,9 +276,88 @@
     wrap.addEventListener("touchstart", (e) => {
       if (e.touches && e.touches.length > 1) off();
     }, { passive: true });
+    let zLab = 0;
+    map.on("zoomend", () => {
+      const zl = map.getZoom() >= 9 ? 1 : 0;
+      if (zl !== zLab) {
+        zLab = zl;
+        lastSig = "";
+      }
+    });
     map.on("click", (e) => {
+      if (Date.now() - Rot.movedAt < 400) return;
       if (NAV.onMapClick) NAV.onMapClick(e.latlng);
     });
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.enable();
+    const P = /* @__PURE__ */ new Map();
+    let g = null;
+    const scl = () => {
+      const r = box.getBoundingClientRect();
+      return r.width / (box.offsetWidth || r.width) || 1;
+    };
+    const two = () => {
+      const a = [...P.values()];
+      return { d: Math.hypot(a[1].x - a[0].x, a[1].y - a[0].y), a: Math.atan2(a[1].y - a[0].y, a[1].x - a[0].x) * 180 / Math.PI };
+    };
+    box.addEventListener("pointerdown", (e) => {
+      if (e.target.closest && e.target.closest(".leaflet-marker-icon,.leaflet-control")) return;
+      P.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      try {
+        window.__mapTouched && window.__mapTouched();
+      } catch (x) {
+      }
+      try {
+        box.setPointerCapture(e.pointerId);
+      } catch (x) {
+      }
+      if (P.size === 2) {
+        const t = two();
+        g = { d0: t.d, a0: t.a, z0: map.getZoom(), r0: Rot.view };
+      }
+    });
+    box.addEventListener("pointermove", (e) => {
+      const q = P.get(e.pointerId);
+      if (!q) return;
+      const dx = e.clientX - q.x, dy = e.clientY - q.y;
+      if (P.size === 1) {
+        if (Math.abs(dx) + Math.abs(dy) < 1) return;
+        const s = scl(), th = -Rot.view * RAD, c = Math.cos(th), sn = Math.sin(th);
+        const mx = (dx * c - dy * sn) / s, my = (dx * sn + dy * c) / s;
+        map.panBy([-mx, -my], { animate: false });
+        q.x = e.clientX;
+        q.y = e.clientY;
+        if (Math.abs(dx) + Math.abs(dy) > 2) {
+          Rot.movedAt = Date.now();
+          off();
+        }
+        return;
+      }
+      q.x = e.clientX;
+      q.y = e.clientY;
+      if (P.size !== 2 || !g) return;
+      const t = two();
+      const dz = Math.log2(t.d / (g.d0 || 1));
+      if (Math.abs(dz) > 0.05) {
+        map.setZoom(Math.max(4, Math.min(19, g.z0 + dz)), { animate: false });
+        userAt = Date.now();
+      }
+      const da = (t.a - g.a0 + 540) % 360 - 180;
+      if (Rot.free || Math.abs(da) > 8) {
+        Rot.free = true;
+        Rot.ang = (g.r0 + da + 360) % 360;
+        Rot.movedAt = Date.now();
+        startLoop();
+      }
+    });
+    const up = (e) => {
+      P.delete(e.pointerId);
+      if (P.size < 2) g = null;
+    };
+    box.addEventListener("pointerup", up);
+    box.addEventListener("pointercancel", up);
+    box.style.touchAction = "none";
     return true;
   };
   NAV.zoomIn = () => {
@@ -290,7 +417,8 @@
     if (!o.show) return;
     if (!ensure()) return;
     NAV.padL = o.padL || 40;
-    const key = o.style === "auto" || !TILES[o.style] ? o.night ? "dark" : "light" : o.style;
+    let key = o.style === "auto" || !TILES[o.style] ? o.night ? "dark" : "light" : o.style;
+    if (key === "sat" && (map.getZoom() < 10 || o.satFast !== false && (o.spd || 0) > 80)) key = o.night ? "dark" : "light";
     if (layerKey !== key) {
       if (layer) map.removeLayer(layer);
       layer = mkLayer(TILES[key]).addTo(map);
@@ -332,11 +460,23 @@
       } else if (o.rt && o.rt.pts && o.rt.pts.length > 1) {
         routeC = window.L.polyline(o.rt.pts, { color: "#5a3200", weight: 11, opacity: 0.7, lineCap: "round" }).addTo(map);
         routeL = window.L.polyline(o.rt.pts, { color: "#FF8A1F", weight: 6, opacity: 1, lineCap: "round" }).addTo(map);
+        const zoomed = map.getZoom() >= 9;
         (o.rt.stops || []).forEach((s) => {
-          if (s.lat == null) return;
-          marks.push(pin([s.lat, s.lon], dot(s.start ? "#14A05A" : s.end ? "#D0202E" : "#F28A1A", s.start ? "\u25CF" : s.end ? "\u2691" : String(s.n || ""), s.short, s.logo), s.start || s.end ? 600 : 400).on("click", () => {
+          let ll = s.lat != null ? [s.lat, s.lon] : null;
+          if (!ll && s.q) {
+            const g = NAV.stopLL(s.q);
+            if (g) ll = [g.lat, g.lon];
+          }
+          if (!ll && s.frac != null) ll = ptAtFrac(s.rev ? o.rt.pts.slice().reverse() : o.rt.pts, s.frac);
+          if (!ll) return;
+          const lab = s.start || s.end || s.next || zoomed ? s.short : "";
+          marks.push(pin(ll, dot(s.start ? "#14A05A" : s.end ? "#D0202E" : s.next ? "#FBB040" : "#F28A1A", s.start ? "\u25CF" : s.end ? "\u2691" : String(s.n || ""), lab, s.logo), s.start || s.end ? 600 : s.next ? 500 : 400).on("click", () => {
             if (s.id && window.__ui) window.__ui.setState({ dlg: "stop", stopId: s.id });
           }).addTo(map));
+        });
+        (o.rt.towns || []).forEach((t) => {
+          if (!zoomed && !t.big) return;
+          marks.push(pin([t.lat, t.lon], '<div style="transform:translate(-50%,-50%);font:700 12px Overpass,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 0 6px #000;white-space:nowrap;pointer-events:none">' + t.name + "</div>", 50).addTo(map));
         });
       }
       if (S.preview && S.preview.pts && S.preview.pts.length > 1) {
@@ -382,7 +522,7 @@
       }
       startLoop();
     }
-    Car.rotate = !!(S.active && NAV.cfg.rotate);
+    Car.rotate = !!(NAV.cfg.rotate && (S.active || Car.drive && (o.spd || 0) > 8));
     if (R && S.active && routeL && passedL0 !== S.idx + ":" + R.id) {
       passedL0 = S.idx + ":" + R.id;
       const k = Math.min(R.pts.length - 1, (S.idx || 0) + 1), cut = S.snap ? S.snap.p : R.pts[k];
@@ -400,6 +540,17 @@
     }
   };
   const Car = { cur: null, from: null, to: null, t0: 0, brg: 0, brgT: 0, spd: 0, rotate: false, drive: false };
+  const Rot = { free: false, ang: 0, view: 0, movedAt: 0 };
+  NAV.compass = () => {
+    Rot.free = false;
+    Rot.ang = 0;
+    follow = true;
+    userAt = 0;
+    if (map && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true });
+    startLoop();
+    redraw();
+  };
+  NAV.viewAngle = () => Rot.view;
   let passedL = null, passedL0 = "", loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999;
   const angDiff = (a, b) => (b - a + 540) % 360 - 180;
   const startLoop = () => {
@@ -408,12 +559,12 @@
     requestAnimationFrame(frame);
   };
   const frame = (ts) => {
-    if (!map || !Car.to || !document.body.classList.contains("map-on")) {
+    if (!map || !Car.to || !document.body.classList.contains("map-on") || window.__idleOn) {
       loopOn = false;
       return;
     }
     requestAnimationFrame(frame);
-    const fps = NAV.st.active || Car.drive ? 24 : 6;
+    const fps = NAV.st.active || Car.drive || Date.now() - Rot.movedAt < 1500 ? 24 : 6;
     if (ts - lastFrame < 1e3 / fps) return;
     lastFrame = ts;
     const k = Math.min(1, (ts - Car.t0) / 1e3);
@@ -421,16 +572,19 @@
     Car.brg = (Car.brg + angDiff(Car.brg, Car.brgT || 0) * 0.18 + 360) % 360;
     van.setLatLng(Car.cur);
     const rot = Car.rotate;
-    if (rot !== rotOn) {
-      rotOn = rot;
-      wrap.style.width = wrap.style.height = rot ? "160%" : "100%";
+    const ang = Rot.free ? Rot.ang : rot ? (360 - Car.brg) % 360 : 0;
+    Rot.view = ang;
+    const turned = Math.abs((ang + 540) % 360 - 180) < 179.5;
+    if (turned !== rotOn) {
+      rotOn = turned;
+      wrap.style.width = wrap.style.height = turned ? "160%" : "100%";
       map.invalidateSize(false);
-      if (rot) map.dragging.disable();
-      else map.dragging.enable();
       lastIcoBrg = -999;
     }
-    wrap.style.transform = "translate(-50%,-50%)" + (rot ? " rotate(" + (-Car.brg).toFixed(1) + "deg)" : "");
-    const icoB = rot ? 0 : Math.round(Car.brg / 3) * 3;
+    wrap.style.transform = "translate(-50%,-50%)" + (turned ? " rotate(" + ang.toFixed(1) + "deg)" : "");
+    const cmp = document.getElementById("tccompassN");
+    if (cmp) cmp.style.transform = "rotate(" + ang.toFixed(0) + "deg)";
+    const icoB = (Math.round((Car.brg + ang) / 3) * 3 + 360) % 360;
     if (icoB !== lastIcoBrg) {
       lastIcoBrg = icoB;
       van.setIcon(arrowIco(icoB));
@@ -444,7 +598,7 @@
       }
       let c = Car.cur;
       if (NAV.st.active || Car.drive) {
-        const h = box.clientHeight || 720, off = h * 0.22, b = (rot ? Car.brg : 0) * RAD;
+        const h = box.clientHeight || 720, off = h * 0.22, b = -ang * RAD;
         const p0 = map.project(Car.cur, z);
         c = map.unproject(p0.add([Math.sin(b) * off, -Math.cos(b) * off]), z);
       }
@@ -629,6 +783,12 @@
     return pl;
   };
   let sT = 0, sSeq = 0;
+  const tfetch = (u, ms) => {
+    const ac = window.AbortController ? new AbortController() : null;
+    const t = setTimeout(() => ac && ac.abort(), ms || 7e3);
+    return fetch(u, ac ? { signal: ac.signal } : {}).finally(() => clearTimeout(t));
+  };
+  NAV.tfetch = tfetch;
   NAV.search = (q, near, cb) => {
     clearTimeout(sT);
     q = (q || "").trim();
@@ -640,12 +800,12 @@
     sT = setTimeout(() => {
       const my = ++sSeq;
       const u = "https://photon.komoot.io/api/?limit=7&lang=en&bbox=112.9,-43.8,153.7,-10.6&q=" + encodeURIComponent(q) + (near ? "&lat=" + near[0].toFixed(4) + "&lon=" + near[1].toFixed(4) : "");
-      fetch(u).then((r) => r.json()).then((j) => {
+      tfetch(u, 7e3).then((r) => r.json()).then((j) => {
         if (my === sSeq) cb(local.concat((j.features || []).map((f) => toPlace(f, near))).slice(0, 8));
-      }).catch(() => fetch("https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=au&accept-language=en&q=" + encodeURIComponent(q)).then((r) => r.json()).then((a) => {
+      }).catch(() => tfetch("https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=au&accept-language=en&q=" + encodeURIComponent(q)).then((r) => r.json()).then((a) => {
         if (my === sSeq) cb(local.concat((a || []).map((x) => ({ name: x.display_name.split(",")[0], sub: x.display_name.split(",").slice(1, 3).join(","), lat: +x.lat, lon: +x.lon, icon: "\u{1F4CD}", logo: logoOf(x.display_name.split(",")[0]), km: near ? dist(near, [+x.lat, +x.lon]) / 1e3 : null }))));
       }).catch(() => {
-        if (my === sSeq) cb(local);
+        if (my === sSeq) cb(local, true);
       }));
     }, 380);
   };

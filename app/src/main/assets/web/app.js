@@ -7,6 +7,47 @@ window.__AppComp = function() {
     }
   };
   const STORE = APP ? "tomscar-ui" : "tomscar-fix-demo";
+  const TOWNS = [
+    ["Melton", -37.683, 144.583],
+    ["Bacchus Marsh", -37.675, 144.438],
+    ["Ballarat", -37.562, 143.85, 1],
+    ["Beaufort", -37.43, 143.383],
+    ["Ararat", -37.283, 142.933],
+    ["Stawell", -37.057, 142.78],
+    ["Horsham", -36.717, 142.2, 1],
+    ["Dimboola", -36.457, 142.025],
+    ["Nhill", -36.333, 141.65],
+    ["Kaniva", -36.38, 141.243],
+    ["Bordertown", -36.307, 140.772, 1],
+    ["Keith", -36.1, 140.35],
+    ["Tintinara", -35.883, 140.05],
+    ["Coonalpyn", -35.695, 139.855],
+    ["Tailem Bend", -35.255, 139.455],
+    ["Murray Bridge", -35.12, 139.276, 1],
+    ["Hahndorf", -35.028, 138.81],
+    ["Adelaide", -34.929, 138.601, 1],
+    ["Geelong", -38.15, 144.362, 1],
+    ["Bendigo", -36.757, 144.279, 1],
+    ["Castlemaine", -37.064, 144.217],
+    ["Daylesford", -37.342, 144.143],
+    ["Mildura", -34.208, 142.125, 1],
+    ["Swan Hill", -35.338, 143.554],
+    ["Echuca", -36.13, 144.75],
+    ["Mount Gambier", -37.828, 140.78, 1],
+    ["Naracoorte", -36.958, 140.738],
+    ["Hamilton", -37.744, 142.022],
+    ["Warrnambool", -38.382, 142.488, 1],
+    ["Colac", -38.339, 143.585],
+    ["Shepparton", -36.383, 145.4, 1],
+    ["Seymour", -37.027, 145.139],
+    ["Wangaratta", -36.358, 146.312],
+    ["Albury", -36.074, 146.914, 1],
+    ["Wodonga", -36.122, 146.888],
+    ["Traralgon", -38.195, 146.541],
+    ["Sale", -38.1, 147.067],
+    ["Gawler", -34.6, 138.75],
+    ["Victor Harbor", -35.552, 138.617]
+  ];
   const ADDR = {
     "The Flywheel Bar & Cafe": "27 Neill St, Beaufort VIC 3373",
     "Ampol Foodary Beaufort": "74 Neill St, Beaufort VIC 3373",
@@ -256,6 +297,8 @@ window.__AppComp = function() {
     autoScene: true,
     sceneMove: "still",
     idleOn: true,
+    wsCol: false,
+    wsGuideOff: false,
     idleMin: 3,
     idleClock: "min",
     idleWxBg: true,
@@ -685,6 +728,7 @@ window.__AppComp = function() {
           })(),
           tg("idleOn", "M\xE0n h\xECnh ch\u1EDD", "Khi \u0111\u1EADu xe v\xE0 l\xE2u kh\xF4ng \u0111\u1EE5ng m\xE0n h\xECnh"),
           ch("idleLayout", "Ki\u1EC3u \u0111\u1ED3ng h\u1ED3 m\xE0n h\xECnh ch\u1EDD", "HTC l\xE0 ki\u1EC3u g\u1EE3i \xFD", [["htc", "HTC l\u1EADt s\u1ED1"], ["mini", "L\u1EADt s\u1ED1 mini + 5 ng\xE0y"], ["flap", "B\u1EA3ng s\xE2n bay"], ["analog", "Kim m\u1EB7t k\xEDnh"], ["minimal", "S\u1ED1 l\u1EDBn t\u1ED1i gi\u1EA3n"], ["ios", "iOS 6"], ["xiaomi", "Xiaomi"], ["samsung", "Samsung"], ["sony", "Sony"]]),
+          tg("idleEdge", "Vi\u1EC1n s\xE1ng tr\xEAn m\xE0n h\xECnh ch\u1EDD", "Vi\u1EC1n m\u1EA3nh \u0111\u1EC1u 4 c\u1EA1nh; t\u1EAFt = kh\xF4ng vi\u1EC1n (m\u1EB7c \u0111\u1ECBnh)"),
           tg("idlePlace", "T\xEAn \u0111\u1ECBa danh to", "Hi\u1EC7n t\xEAn n\u01A1i \u0111ang \u0111\u1EADu xe th\u1EADt to, nh\u01B0 app th\u1EDDi ti\u1EBFt Yahoo"),
           tg("idlePhoto", "H\xECnh \u0111\u1ECBa danh l\xE0m n\u1EC1n", "L\u1EA5y h\xECnh c\u1EE7a n\u01A1i \u0111\xF3 t\u1EEB Wikipedia / Wikimedia Commons (c\u1EA7n m\u1EA1ng)"),
           tg("clkLunar", "Ng\xE0y \xE2m l\u1ECBch", "Hi\u1EC7n ng\xE0y \xE2m l\u1ECBch, R\u1EB1m, m\xF9ng 1, T\u1EBFt \u2014 c\u1EA3 ti\u1EBFng Vi\u1EC7t l\u1EABn ti\u1EBFng Anh"),
@@ -768,6 +812,7 @@ window.__AppComp = function() {
             const on = cur.indexOf(k) >= 0;
             return { label: QC[k][0] + " " + QC[k][1], on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS("qcList", on ? cur.filter((x) => x !== k) : cur.concat([k])) };
           }) },
+          tg("satFast", "V\u1EC7 Tinh nh\u1EB9 khi ch\u1EA1y nhanh", "\u0110ang d\xF9ng V\u1EC7 Tinh m\xE0 ch\u1EA1y tr\xEAn 80 km/g ho\u1EB7c xem c\u1EA3 tuy\u1EBFn th\xEC t\u1EA1m d\xF9ng b\u1EA3n \u0111\u1ED3 th\u01B0\u1EDDng cho nh\u1EB9 m\xE1y"),
           ch("mapStyle", "Ki\u1EC3u b\u1EA3n \u0111\u1ED3", "T\u1EF1 \u0110\u1ED9ng = S\xE1ng ban ng\xE0y, T\u1ED1i ban \u0111\xEAm (theo gi\u1EDD m\u1EB7t tr\u1EDDi m\u1ECDc/l\u1EB7n)", [["auto", "T\u1EF1 \u0110\u1ED9ng"], ["dark", "T\u1ED1i"], ["light", "S\xE1ng"], ["topo", "\u0110\u1ECBa H\xECnh"], ["sat", "V\u1EC7 Tinh"]]),
           ch("mapBright", "\u0110\u1ED9 s\xE1ng b\u1EA3n \u0111\u1ED3", "B\u1EADt D\u1ECBu M\u1EAFt th\xEC t\u1EF1 gi\u1EA3m", [[70, "70%"], [85, "85%"], [100, "100%"], [115, "115%"]]),
           tg("odoOn", "\u0110\u1ED3ng h\u1ED3 km ki\u1EC3u cu\u1ED9n", "Trip A, Trip B, km t\u1EDBi ch\u1EB7ng k\u1EBF, v\xF2ng % chuy\u1EBFn"),
@@ -1361,9 +1406,9 @@ window.__AppComp = function() {
       };
       const catTitle = /^q:/.test(S.cat) ? ("\u201C" + S.cat.slice(2) + "\u201D").toUpperCase() : (CATS.find((c) => c[0] === S.cat) || CATS[0])[1].toUpperCase();
       const addPlaceStop = (p) => {
-        const km = window.tcRouteKm ? window.tcRouteKm(p.lat, p.lon) : null;
+        const km = window.tcRouteKm ? window.tcRouteKm(p.lat, p.lon, 150) : null;
         if (km == null) {
-          self.toast("Ch\u1ED7 n\xE0y kh\xF4ng n\u1EB1m tr\xEAn tuy\u1EBFn Melbourne \u21C4 Adelaide");
+          self.toast("Ch\u1ED7 n\xE0y c\xE1ch tuy\u1EBFn \u0111\u01B0\u1EDDng qu\xE1 xa (h\u01A1n 150 km)");
           return;
         }
         const id = "c" + Date.now();
@@ -2103,26 +2148,61 @@ window.__AppComp = function() {
         addPlaceStop({ name: PL && PL.street || "Ch\u1ED7 \u0111\xE3 l\u01B0u", addr: PL ? [PL.suburb, PL.state].filter(Boolean).join(" ") : "", lat: LV.lat, lon: LV.lon, k: "rest" });
         self.setState({ dlg: null });
       };
+      const addNear = (() => {
+        const pts = window.__rtRealPts || (S.tripId && (S.trips || []).find((t) => t.id === S.tripId) || {}).pts;
+        return pts && pts.length ? pts[Math.floor(pts.length / 2)] : LV.lat != null ? [LV.lat, LV.lon] : APP ? null : [-37.7466, 144.7326];
+      })();
+      const addSearch = (q2) => {
+        clearTimeout(self.addT);
+        if (!NV || (q2 || "").trim().length < 3) {
+          self.setState({ addRes: [], addBusy: false });
+          return;
+        }
+        self.setState({ addBusy: true, addMsg: "\u0110ang t\xECm\u2026", addRetry: false });
+        self.addT = setTimeout(() => NV.search(q2, addNear, (r, err) => self.setState({ addRes: r || [], addBusy: false, addMsg: err && !(r || []).length ? "M\u1EA1ng ch\u1EADm \u2014 kh\xF4ng t\xECm \u0111\u01B0\u1EE3c" : (r || []).length ? "Ch\u1EA1m m\u1ED9t ch\u1ED7 \u0111\u1EC3 th\xEAm v\xE0o chuy\u1EBFn" : "Kh\xF4ng t\xECm th\u1EA5y \u2014 th\u1EED g\xF5 th\xEAm t\xEAn v\xF9ng (vd Parafield Gardens SA)", addRetry: !!err })), 300);
+      };
+      const addPick = (p) => {
+        if (!p || p.lat == null) return;
+        addPlaceStop({ name: p.name, addr: p.sub || p.addr || "", lat: p.lat, lon: p.lon, k: "food" });
+        self.setState({ dlg: null, addQ: "", addLink: "", addMsg: "", addRes: [] });
+      };
       const addFind = () => {
         if (!APP) {
           self.setState({ dlg: null });
           return;
         }
-        const q2 = (S.addLink || S.addQ || "").trim();
-        if (!q2) {
+        const link = (S.addLink || "").trim(), q2 = (S.addQ || "").trim();
+        if (!link && !q2) {
           self.setState({ addMsg: "G\xF5 t\xEAn/\u0111\u1ECBa ch\u1EC9 ho\u1EB7c d\xE1n link" });
           return;
         }
-        self.setState({ addMsg: "\u0110ang t\xECm\u2026" });
+        if (!link && (S.addRes || []).length) {
+          addPick(S.addRes[0]);
+          return;
+        }
+        if (!link) {
+          addSearch(q2);
+          return;
+        }
+        self.setState({ addMsg: "\u0110ang \u0111\u1ECDc link\u2026", addRetry: false });
+        let done = false;
+        const to = setTimeout(() => {
+          if (done) return;
+          done = true;
+          window.__geoCb = null;
+          self.setState({ addMsg: "M\u1EA1ng ch\u1EADm \u2014 kh\xF4ng \u0111\u1ECDc \u0111\u01B0\u1EE3c link", addRetry: true });
+        }, 1e4);
         window.__geoCb = (r) => {
+          if (done) return;
+          done = true;
+          clearTimeout(to);
           if (!r || r.lat == null) {
-            self.setState({ addMsg: "Kh\xF4ng t\xECm th\u1EA5y ch\u1ED7 n\xE0y" });
+            self.setState({ addMsg: "Kh\xF4ng \u0111\u1ECDc \u0111\u01B0\u1EE3c ch\u1ED7 trong link n\xE0y", addRetry: true });
             return;
           }
-          addPlaceStop({ name: r.name || q2, addr: r.addr || "", lat: r.lat, lon: r.lon, k: "food" });
-          self.setState({ dlg: null, addQ: "", addLink: "", addMsg: "" });
+          addPick({ name: r.name || "Ch\u1ED7 gh\xE9", sub: r.addr || "", lat: r.lat, lon: r.lon });
         };
-        tcn("geocode", q2);
+        tcn("geocode", link);
       };
       const fmtT = (ms) => {
         if (!ms || ms < 0) return "0:00";
@@ -2327,14 +2407,14 @@ window.__AppComp = function() {
           days: dDays,
           batt: LV.batt != null ? (EN ? "Battery " : "Pin ") + LV.batt + "%" : ""
         };
-        setTimeout(() => {
-          try {
-            window.TCIdle.paint(idata);
-          } catch (e) {
-            console.log("idle " + e);
-          }
-        }, 0);
-      } else if (window.TCIdle) window.TCIdle.reset();
+        Object.assign(idata, { shift, bgOp: C.idleWxBg === false ? 0 : 1, dark: tod === "night" ? 0.2 : 0.02, edge: C.idleEdge === true });
+        window.__idleClose = () => self.setState({ clkBig: false, idleOn: false, last: Date.now(), parkedAt: S.now });
+        try {
+          window.TCIdle.paint(idata);
+        } catch (e) {
+          console.log("idle " + e);
+        }
+      } else if (window.TCIdle && window.TCIdle.isOn()) window.TCIdle.hide();
       const NV = window.NAV || null;
       const shell = !nar && (S.scr === "home" || S.scr === "trip" || S.scr === "rt");
       if (window.tcLangSync) window.tcLangSync(C.lang === "en" ? "en" : "vi");
@@ -2566,6 +2646,9 @@ window.__AppComp = function() {
           } };
         }),
         rot: () => self.setS("navHeading", C.navHeading === false),
+        compass: () => {
+          if (NV) NV.compass();
+        },
         followOff: shell && mapShow && NV && !NV.following() && (navAct || drive),
         refollowL: "B\u1EA3n \u0111\u1ED3 s\u1EBD t\u1EF1 theo xe sau 10 gi\xE2y"
       };
@@ -2704,7 +2787,8 @@ window.__AppComp = function() {
         self.setState({ ntToP: toWp(p), ntTo: p.name, nRes: null, nField: "", nq: "", ntName: S.ntNameTouched ? S.ntName : fromN + " - " + shortN(p.name) });
       };
       const nxS2 = nextIdx >= 0 ? list[nextIdx] : null;
-      const nxLL = nxS2 ? nxS2.id === "end" ? TRIP ? isGo ? TRIP.to : TRIP.from : isGo ? { lat: -34.9285, lon: 138.6007 } : SP || { lat: -37.8136, lon: 144.9631 } : nxS2 : null;
+      const nxLL0 = nxS2 ? nxS2.id === "end" ? TRIP ? isGo ? TRIP.to : TRIP.from : isGo ? { lat: -34.9285, lon: 138.6007 } : SP || { lat: -37.8136, lon: 144.9631 } : nxS2 : null;
+      const nxLL = nxLL0 && nxLL0.lat == null && NV && NV.stopLL ? NV.stopLL(nxS2.addr || ADDR[nxS2.name] || nxS2.name + (nxS2.town ? ", " + nxS2.town : "")) || nxLL0 : nxLL0;
       const OD0 = LV.odo || { a: S.demoA != null ? S.demoA : 128.4, b: pos };
       const offKey = "tc-off-" + S.tripId;
       const offDone = (() => {
@@ -2840,7 +2924,7 @@ window.__AppComp = function() {
         const rtPts = TRIP ? TRIP.pts : window.__rtRealPts || window.__routePts || null;
         const rtStops = [Object.assign({ id: "", start: true, short: isGo ? FROM : TO }, rtStartP && isGo ? { lat: rtStartP.lat, lon: rtStartP.lon } : TRIP ? isGo ? TRIP.from : TRIP.to : {})].concat(list.map((x, i) => {
           const endLL = x.id === "end" ? TRIP ? isGo ? TRIP.to : TRIP.from : isGo ? { lat: -34.9285, lon: 138.6007 } : SP || { lat: -37.8136, lon: 144.9631 } : x;
-          return { id: x.id, n: i + 1, end: x.id === "end", short: x.id === "end" ? SP && !isGo ? SP.name : x.name : (x.name || "").split(" (")[0], logo: NV.logoOf(x.name), lat: endLL.lat, lon: endLL.lon };
+          return { id: x.id, n: i + 1, end: x.id === "end", next: i === nextIdx && x.id !== "end", short: x.id === "end" ? SP && !isGo ? SP.name : x.name : (x.name || "").split(" (")[0], logo: NV.logoOf(x.name), lat: endLL.lat, lon: endLL.lon, q: endLL.lat == null ? x.addr || ADDR[x.name] || x.name + (x.town ? ", " + x.town : "") : null, frac: TOTAL ? x.km / TOTAL : null, rev: !isGo };
         }));
         const vis = S.scr === "rt" && rtPts;
         NV.onPlaceClick = null;
@@ -2854,7 +2938,16 @@ window.__AppComp = function() {
           spd: LV.speed || 0,
           drive,
           padL: (S.scr === "trip" || S.scr === "rt") && !pnlMin ? 430 : S.scr === "home" ? 380 : 40,
-          rt: vis ? { sig: S.tripId + ":" + leg + ":" + rtPts.length + ":" + list.map((x) => x.id).join(","), pts: rtPts, stops: rtStops } : null,
+          rt: vis ? { sig: S.tripId + ":" + leg + ":" + rtPts.length + ":" + list.map((x) => x.id).join(",") + ":" + nextIdx, pts: rtPts, stops: rtStops, towns: (() => {
+            const k = rtPts.length + ":" + (rtPts[0] || []).join();
+            if (self.townK !== k) {
+              self.townK = k;
+              const smp = rtPts.filter((_, j) => j % 3 === 0);
+              self.townL = TOWNS.filter((t) => smp.some((q2) => Math.abs(q2[0] - t[1]) < 0.045 && Math.abs(q2[1] - t[2]) < 0.055)).map((t) => ({ name: t[0], lat: t[1], lon: t[2], big: !!t[3] }));
+            }
+            return self.townL;
+          })() } : null,
+          satFast: C.satFast !== false,
           places: (S.scr === "home" || S.scr === "trip") && S.qc ? qcPins : null,
           park: S.scr === "trip" && H0.park ? H0.park : null
         });
@@ -2975,9 +3068,23 @@ window.__AppComp = function() {
           { l: "M\u1EDF R\u1ED9ng", c: "#CFE6EE", ic: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5", go: () => openFull("home") }
         ]
       };
+      const wsHid = navAct || spd > 15 ? !S.wsOpen : !!C.wsCol;
+      window.__mapTouched = () => {
+        if (shell && self.state.scr === "home" && !self.state.qc && !wsHid) {
+          if (navAct || spd > 15) self.setState({ wsOpen: false });
+          else self.setS("wsCol", true);
+        }
+      };
       return {
-        rootW: nar ? "100%" : "1280px",
-        rootH: nar ? "100%" : "720px",
+        crashOn: !!S.crash,
+        crashClose: () => self.setState({ crash: "" }),
+        crashSend: () => {
+          const v = window.TC_VERSION || "0.9.x-beta";
+          tcn("mail", JSON.stringify({ subject: "G\xF3p \xDD Tom's Car " + v, body: "App v\u1EEBa b\u1ECB t\u1EAFt b\u1EA5t ng\u1EDD.\n\n" + S.crash }));
+          self.setState({ crash: "" });
+        },
+        rootW: nar || APP ? "100%" : "1280px",
+        rootH: nar || APP ? "100%" : "720px",
         verL: window.TC_VERSION || "0.9.x-beta",
         ph,
         rootBg: APP ? "transparent" : "#03111C",
@@ -2988,11 +3095,13 @@ window.__AppComp = function() {
         rtp,
         lf,
         pe,
-        wsShow: shell && S.scr === "home" && !S.qc && (!(navAct || spd > 15) || S.wsOpen),
-        S_wsOpen: !!S.wsOpen,
+        wsShow: shell && S.scr === "home" && !S.qc && !wsHid,
+        wsGuide: !C.wsGuideOff,
+        wsLater: () => self.setS("wsGuideOff", true),
+        wsHide: () => navAct || spd > 15 ? self.setState({ wsOpen: false }) : self.setS("wsCol", true),
         upCardOn: drive && !navAct,
-        wsPill: shell && S.scr === "home" && (navAct || spd > 15) && !S.wsOpen,
-        wsTog: () => self.setState({ wsOpen: !S.wsOpen }),
+        wsPill: shell && S.scr === "home" && !S.qc && wsHid,
+        wsTog: () => navAct || spd > 15 ? self.setState({ wsOpen: true }) : (self.setS("wsCol", false), self.setState({ wsOpen: false })),
         rtDlgOn: shell,
         kbLk,
         clock,
@@ -3045,12 +3154,65 @@ window.__AppComp = function() {
           tcn("exit", "bg");
         },
         addQ: S.addQ,
-        setAddQ: (e) => self.setState({ addQ: e.target.value, addLink: "" }),
+        setAddQ: (e) => {
+          const v = e.target.value;
+          self.setState({ addQ: v, addLink: "" });
+          addSearch(v);
+        },
+        addResOn: (S.addRes || []).length > 0,
+        addRetryOn: !!S.addRetry,
+        addRes: (S.addRes || []).slice(0, 6).map((p) => {
+          const pg = NV && NV.pict ? NV.pict(p.kind || "", p.house) : null;
+          const lg = p.logo || "";
+          return { name: p.name, sub: p.sub || p.addr || "", km: p.km != null ? (p.km < 10 ? String(Math.round(p.km * 10) / 10).replace(".", ",") : Math.round(p.km)) + " km" : "", img: lg || (pg ? pg.url : ""), icBg: lg ? "#FFFFFF" : pg ? pg.bg : "#1F5FAE", pick: () => addPick(p) };
+        }),
         addLink: S.addLink,
         setAddLink: (e) => self.setState({ addLink: e.target.value }),
         addHere,
         addFind,
         addMsg: S.addMsg,
+        vo: (() => {
+          const now = Date.now(), nat = typeof LV.vol === "number" ? LV.vol : S.volDemo != null ? S.volDemo : 60;
+          const p = S.volSet != null && now - (S.volSetAt || 0) < 1500 ? S.volSet : nat;
+          const extAt = LV.volAt || 0;
+          const on = S.volOpen && now - (S.volTouch || 0) < 4e3 || extAt > (S.volSeenAt || 0) && now - extAt < 4e3 && !S.idleOn;
+          const icon = p <= 0 ? "\u{1F507}" : p < 50 ? "\u{1F508}" : "\u{1F50A}";
+          const setP = (v) => {
+            v = Math.max(0, Math.min(100, Math.round(v)));
+            if (APP) tcn("media", "vol:" + v);
+            self.setState({ volSet: v, volSetAt: Date.now(), volDemo: APP ? S.volDemo : v, volOpen: true, volTouch: Date.now() });
+          };
+          return {
+            on,
+            onA: on ? "true" : "false",
+            p,
+            pL: p + "%",
+            icon,
+            x: 640,
+            aria: "\xC2m l\u01B0\u1EE3ng nh\u1EA1c " + p + "%",
+            muteA: p <= 0 ? "B\u1EADt ti\u1EBFng" : "T\u1EAFt ti\u1EBFng",
+            tap: () => self.setState({ volOpen: !on, volTouch: Date.now(), volSeenAt: on ? Date.now() : S.volSeenAt || 0, srcMenu: false }),
+            touch: () => self.setState({ volTouch: Date.now(), volOpen: true }),
+            up: () => setP(p + 10),
+            down: () => setP(p - 10),
+            mute: () => {
+              if (APP) {
+                tcn("media", "mute");
+                self.setState({ volTouch: Date.now(), volOpen: true, volSet: null });
+              } else setP(p > 0 ? 0 : S.volMuteFrom || 40);
+              if (!APP && p > 0) self.setState({ volMuteFrom: p });
+            },
+            drag: (e) => {
+              if (e.type === "pointermove" && !e.buttons && e.pointerType === "mouse") return;
+              if (e.type === "pointermove" && e.pointerType !== "mouse" && !e.pressure) return;
+              const r = e.currentTarget.getBoundingClientRect();
+              const v = (e.clientX - r.left) / r.width * 100;
+              const st2 = Math.round(v / 5) * 5;
+              if (st2 !== p) setP(st2);
+              else self.setState({ volTouch: Date.now() });
+            }
+          };
+        })(),
         srcL: S.src === "music" ? "NH\u1EA0C" : S.src === "radio" ? "RADIO" : "PODCAST",
         cycleSrc: () => {
           const n = { music: "radio", radio: "podcast", podcast: "music" }[S.src];
@@ -3097,8 +3259,8 @@ window.__AppComp = function() {
         isContacts: !nar && S.scr === "contacts",
         isCompact: nar,
         appTop: APP ? 0 : 40,
-        appW: nar ? "100%" : "1280px",
-        appH: nar ? "100%" : APP ? "720px" : "680px",
+        appW: nar || APP ? "100%" : "1280px",
+        appH: nar || APP ? "100%" : "680px",
         appBg: APP ? "transparent" : "linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)",
         touch: () => {
           if (!S.dragging && !S.panning) self.setState({ last: Date.now() });
@@ -3440,15 +3602,18 @@ input[type=range]{accent-color:#FBB040}
       <!-- c\u1ED9t Workspace: tr\u1ED1ng l\u1EA7n \u0111\u1EA7u -->
       <sc-if value="{{wsShow}}" hint-placeholder-val="{{ true }}">
       <section aria-label="Workspace" style="position: absolute; left: 20px; top: 138px; width: 330px; bottom: 100px; display: flex; flex-direction: column; gap: 8px">
-        <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">WORKSPACE</span><sc-if value="{{S_wsOpen}}" hint-placeholder-val="{{ false }}"><button onClick="{{wsTog}}" aria-label="\u1EA8n Workspace" class="btn" style="width: 36px; height: 32px; padding: 0">\u25C2</button></sc-if><sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}"><button onClick="{{openCreate}}" class="btn" style="height: 34px; font-size: 12px">+ T\u1EA1o</button></sc-if></div>
+        <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">WORKSPACE</span><button onClick="{{wsHide}}" aria-label="Thu g\u1ECDn Workspace" class="btn" style="width: 40px; height: 34px; padding: 0">\u25C2</button><sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}"><button onClick="{{openCreate}}" class="btn" style="height: 34px; font-size: 12px">+ T\u1EA1o</button></sc-if></div>
         <sc-if value="{{wsEmpty}}" hint-placeholder-val="{{ true }}">
         <div class="pnl glb" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
           <button onClick="{{openCreate}}" class="btn btn-o" style="height: 64px; font-size: 18px; width: 100%">+ T\u1EA1o Workspace \u0110\u1EA7u Ti\xEAn</button>
+          <sc-if value="{{wsGuide}}" hint-placeholder-val="{{ true }}">
           <div style="font-size: 13px; color: #CFE6EE; line-height: 1.55">
             <div>1. Ch\u1ECDn 1, 2 ho\u1EB7c 3 app (Waze, nh\u1EA1c, YouTube\u2026)</div>
             <div>2. \u0110\u1EB7t t\xEAn, ch\u1ECDn c\xF3 m\u1EDF Road Trip kh\xF4ng</div>
             <div>3. L\xEAn xe b\u1EA5m m\u1ED9t c\xE1i l\xE0 c\xE1c app t\u1EF1 m\u1EDF</div>
           </div>
+          <button onClick="{{wsLater}}" class="btn" style="height: 40px; font-size: 14px; color: #CFF6FF; align-self: flex-end; padding: 0 16px">\u0110\u1EC3 Sau</button>
+          </sc-if>
         </div>
         </sc-if>
         <sc-if value="{{wsAny}}" hint-placeholder-val="{{ false }}">
@@ -3583,7 +3748,7 @@ input[type=range]{accent-color:#FBB040}
               <sc-for list="{{nv.lyOpts}}" as="o" hint-placeholder-count="5"><button onClick="{{o.pick}}" role="menuitemradio" aria-checked="{{o.on}}" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 16px; color: {{o.fg}}; background: {{o.bg}}">{{o.ic}} {{o.label}}</button></sc-for>
             </div>
           </sc-if>
-          <sc-if value="{{nv.rotOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.rot}}" aria-label="{{nv.rotA}}" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 20px; font-weight: 800; color: #FFD08A">{{nv.rotL}}</button></sc-if>
+          <button onClick="{{nv.compass}}" aria-label="La b\xE0n \u2014 v\u1EC1 v\u1ECB tr\xED xe, theo h\u01B0\u1EDBng xe ch\u1EA1y" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg id="tccompassN" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="transition: transform 0.15s linear"><path d="M17 3 L22 17 L12 17 Z" fill="#FF5A4E"></path><path d="M17 31 L12 17 L22 17 Z" fill="#E8F1F5"></path><text x="17" y="12.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Overpass, sans-serif">N</text></svg></button>
         </div>
       </sc-if>
 
@@ -3795,6 +3960,7 @@ input[type=range]{accent-color:#FBB040}
           </div>
         </div>
         <button onClick="{{srcMenuTap}}" aria-label="Ch\u1ECDn ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" aria-expanded="{{srcMenuOn}}" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}} \u25BE</button>
+        <button onClick="{{vo.tap}}" aria-label="{{vo.aria}}" aria-expanded="{{vo.onA}}" class="jbbtn" style="width: 40px; height: 40px; flex-shrink: 0; font-size: 18px; line-height: 1">{{vo.icon}}</button>
         <sc-if value="{{needPerm}}" hint-placeholder-val="{{ false }}">
           <button onClick="{{grantPerm}}" class="btn" style="position: relative; height: 34px; font-size: 11px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040; flex-shrink: 0">\u26A0 C\u1EA5p quy\u1EC1n</button>
         </sc-if>
@@ -3810,6 +3976,19 @@ input[type=range]{accent-color:#FBB040}
       </div>
 
 
+      <sc-if value="{{vo.on}}" hint-placeholder-val="{{ false }}">
+        <div class="glc fadein" role="group" aria-label="\xC2m l\u01B0\u1EE3ng nh\u1EA1c" onPointerDown="{{vo.touch}}" style="position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
+          <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 52px; height: 52px; font-size: 24px; line-height: 1">{{vo.icon}}</button>
+          <button onClick="{{vo.down}}" aria-label="Nh\u1ECF l\u1EA1i 10%" class="pill" style="width: 58px; height: 52px; font-size: 30px; font-weight: 700; background: #0D2C40; color: #FBB040">\u2212</button>
+          <div onPointerDown="{{vo.drag}}" onPointerMove="{{vo.drag}}" style="position: relative; width: 300px; height: 52px; touch-action: none; cursor: pointer">
+            <span style="position: absolute; left: 0; right: 0; top: 22px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
+            <span style="position: absolute; left: 0; top: 22px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
+            <span style="position: absolute; top: 14px; left: calc({{vo.p}}% - 12px); width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
+          </div>
+          <button onClick="{{vo.up}}" aria-label="To l\xEAn 10%" class="pill" style="width: 58px; height: 52px; font-size: 28px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
+          <span class="tnum" style="min-width: 58px; text-align: right; font-size: 20px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
+        </div>
+      </sc-if>
       <sc-if value="{{srcMenuOn}}" hint-placeholder-val="{{ false }}">
         <div class="glc fadein" role="menu" aria-label="Ch\u1ECDn ngu\u1ED3n nghe" style="position: absolute; left: {{srcMenuX}}px; bottom: 96px; z-index: 9; padding: 8px; display: flex; gap: 8px">
           <sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" role="menuitem" aria-pressed="{{o.on}}" class="pill" style="height: 48px; padding: 0 18px; font-size: 15px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
@@ -3975,6 +4154,13 @@ input[type=range]{accent-color:#FBB040}
       <div class="pnl" role="status" style="position: absolute; left: 50%; top: 150px; transform: translateX(-50%); z-index: 15; padding: 10px 14px; display: flex; align-items: center; gap: 12px; background: rgba(12,92,66,0.95)"><span style="font-size: 16px; font-weight: 700">\u{1F446} Ch\u1EA1m l\xEAn b\u1EA3n \u0111\u1ED3 ch\u1ED7 {{pe.what}}</span><button onClick="{{pe.cancelPick}}" class="btn" style="height: 40px">Hu\u1EF7</button></div>
     </sc-if>
     <!-- c\xE1c h\u1ED9p tho\u1EA1i Road Trip (b\u1EA3ng Road Trip n\u1EB1m tr\xEAn b\u1EA3n \u0111\u1ED3 \u1EDF M\xE0n H\xECnh Ch\xEDnh) -->
+    <sc-if value="{{crashOn}}" hint-placeholder-val="{{ false }}">
+      <div role="alertdialog" aria-label="App v\u1EEBa b\u1ECB t\u1EAFt b\u1EA5t ng\u1EDD" class="pnl glb fadein" style="position: absolute; left: 50%; top: 120px; transform: translateX(-50%); width: 560px; z-index: 30; padding: 22px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; background: rgba(4,18,30,0.96); box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1.5px rgba(251,176,64,0.7)">
+        <div style="font-size: 22px; font-weight: 800; color: #FBB040">App V\u1EEBa B\u1ECB T\u1EAFt B\u1EA5t Ng\u1EDD</div>
+        <div style="font-size: 15px; color: #CFE6EE; line-height: 1.5">Tom's Car \u0111\xE3 t\u1EF1 m\u1EDF l\u1EA1i. B\u1EA5m G\u1EEDi B\xE1o L\u1ED7i \u0111\u1EC3 g\u1EEDi l\xFD do cho Tom's Technology Solutions (kh\xF4ng k\xE8m d\u1EEF li\u1EC7u ri\xEAng).</div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end"><button onClick="{{crashClose}}" class="btn" style="height: 48px; padding: 0 20px; font-size: 15px">\u0110\xF3ng</button><button onClick="{{crashSend}}" class="btn btn-o" style="height: 48px; padding: 0 22px; font-size: 15px; font-weight: 800">G\u1EEDi B\xE1o L\u1ED7i</button></div>
+      </div>
+    </sc-if>
     <sc-if value="{{rtDlgOn}}" hint-placeholder-val="{{ false }}">
       <sc-if value="{{tp.open}}" hint-placeholder-val="{{ false }}">
         <div role="dialog" aria-label="C\xE1c Chuy\u1EBFn" class="pnl glb fadein" style="position: absolute; left: 50%; top: 70px; transform: translateX(-50%); width: 720px; max-height: 560px; z-index: 12; padding: 16px 18px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; background: rgba(4,18,30,0.94); box-shadow: 0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1.5px rgba(251,176,64,0.75)">
@@ -4198,16 +4384,7 @@ input[type=range]{accent-color:#FBB040}
 
 
     <!-- ===== m\xE0n h\xECnh ch\u1EDD ki\u1EC3u Th\u1EDDi Ti\u1EBFt Samsung (\u0111\u1EADu xe l\xE2u kh\xF4ng \u0111\u1EE5ng m\xE0n h\xECnh / ch\u1EA1m \xF4 th\u1EDDi ti\u1EBFt / ch\u1EA1m \u0111\u1ED3ng h\u1ED3) ===== -->
-    <sc-if value="{{idl.on}}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{idl.close}}" aria-label="\u0110\xF3ng m\xE0n h\xECnh ch\u1EDD" class="fadein" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 22; border: 0; padding: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; background: #0B1A2A; overflow: hidden; text-align: left">
-        <canvas id="idlesky" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; opacity: {{idl.bgOp}}"></canvas>
-        <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(0,0,0,{{idl.dark}})"></div>
-        <div style="position: absolute; left: {{idl.x}}px; top: {{idl.y}}px; width: 1280px; height: 720px">
-          <div id="tcidle" aria-live="off" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"></div>
-        </div>
-        <span class="tapfade" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; font-size: 14px; color: #FFFFFF; text-shadow: 0 1px 4px rgba(0,0,0,0.5)">Ch\u1EA1m \u0111\u1EC3 \u0111\xF3ng</span>
-      </button>
-    </sc-if>
+    <!-- 0.9.11: m\xE0n h\xECnh ch\u1EDD v\u1EBD \u1EDF l\u1EDBp ri\xEAng (idle.js), kh\xF4ng n\u1EB1m trong trang n\xE0y n\u1EEFa -->
 
     <!-- ===== \u0111i\u1EC7n tho\u1EA1i / c\u1EEDa s\u1ED5 h\u1EB9p (#44): vi\xEAn thu\u1ED1c tr\xEAn, \u0111\u1ED3ng h\u1ED3 k\xEDnh tr\xF2n, th\u1EBB chuy\u1EBFn ho\u1EB7c th\u1EDDi ti\u1EBFt, thanh nh\u1EA1c, 4 n\xFAt ===== -->
     <sc-if value="{{isCompact}}" hint-placeholder-val="{{ false }}">
@@ -4323,10 +4500,15 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.7); display: flex; align-items: center; justify-content: center; z-index: 20">
         <div role="dialog" aria-label="Th\xEAm ch\u1EB7ng" class="pnl fadein" style="width: 560px; padding: 24px; display: flex; flex-direction: column; gap: 12px; background: #06192A">
           <div style="font-size: 22px; font-weight: 700">Th\xEAm Ch\u1EB7ng</div>
-          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #8FC3D3">G\xF5 t\xEAn ho\u1EB7c \u0111\u1ECBa ch\u1EC9<input type="text" value="{{addQ}}" onChange="{{setAddQ}}" placeholder="vd: Bordertown Bakery" style="height: 44px; padding: 0 12px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #8FC3D3">G\xF5 t\xEAn ho\u1EB7c \u0111\u1ECBa ch\u1EC9<input type="text" value="{{addQ}}" onInput="{{setAddQ}}" placeholder="vd: Bordertown Bakery" style="height: 44px; padding: 0 12px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
           <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #8FC3D3">Ho\u1EB7c d\xE1n link Google Maps<input type="text" value="{{addLink}}" onChange="{{setAddLink}}" placeholder="https://maps.app.goo.gl/\u2026" style="height: 44px; padding: 0 12px; border: 0; border-radius: 8px; font-family: inherit; font-size: 15px; background: #0D2C40; color: #E8F1F5"></label>
+          <sc-if value="{{addResOn}}" hint-placeholder-val="{{ false }}">
+            <div class="scrl" style="max-height: 230px; display: flex; flex-direction: column; gap: 4px; margin-top: -4px">
+              <sc-for list="{{addRes}}" as="r" hint-placeholder-count="3"><button onClick="{{r.pick}}" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 10px; padding: 8px 10px; text-align: left"><span style="width: 34px; height: 34px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden"><img src="{{r.img}}" alt="" style="width: 30px; height: 30px; object-fit: contain"></span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.sub}}</span></span><span style="font-size: 13px; color: #FFD08A; white-space: nowrap">{{r.km}}</span></button></sc-for>
+            </div>
+          </sc-if>
           <button onClick="{{addHere}}" class="btn" style="height: 50px">L\u01B0u Ch\u1ED7 \u0110ang \u0110\u1EE9ng</button>
-          <div style="font-size: 12px; color: #FFD08A">{{addMsg}}</div>
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 12px; color: #FFD08A; flex: 1">{{addMsg}}</span><sc-if value="{{addRetryOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{addFind}}" class="btn" style="height: 36px; font-size: 13px">\u21BB Th\u1EED L\u1EA1i</button></sc-if></div>
           <div style="display: flex; gap: 10px; justify-content: flex-end"><button onClick="{{closeDlg}}" class="btn">H\u1EE7y</button><button onClick="{{addFind}}" class="btn btn-o">Th\xEAm</button></div>
         </div>
       </div>
