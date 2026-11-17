@@ -222,6 +222,9 @@ window.__AppComp = function() {
   const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
   const DEFAULTS = {
     vnVoice: "doan",
+    navVol: 80,
+    startScr: "home",
+    splashSec: 3,
     idlePlace: true,
     idlePhoto: false,
     spWarn: true,
@@ -534,18 +537,44 @@ window.__AppComp = function() {
       if (!APP) return;
       tcn("media", "app:" + (C.musicApp || "jukebox"));
       tcn("bubble", C.bubbleOn === false ? "off" : "on");
-      tcn("voice", "cfg:" + JSON.stringify({ lang: C.lang === "en" ? "en" : "vi", clip: C.vnVoice || "", rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || "", sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false }));
+      tcn("voice", "cfg:" + JSON.stringify({ lang: C.lang === "en" ? "en" : "vi", clip: C.vnVoice || "", rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || "", sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false, navVol: +C.navVol || 80 }));
     }
     componentWillUnmount() {
       clearInterval(this.tick);
       clearTimeout(this.b1);
       clearTimeout(this.b2);
     }
+    // 0.9.12 (#111): which screen opens after the splash, and how long the splash stays
+    startScr() {
+      const C = this.state.set || {};
+      let k = C.startScr || "home";
+      if (k === "last") {
+        try {
+          k = localStorage.getItem("tc-lastScr") || "home";
+        } catch (e) {
+          k = "home";
+        }
+      }
+      if (k === "ws") {
+        const L = C.wsLastLaunch;
+        k = "home";
+        if (L && L.apps) {
+          if (APP) tcn("launch", JSON.stringify(L.apps));
+          if (L.rt) k = "rt";
+        }
+      }
+      return ["home", "trip", "rt", "contacts", "search", "split", "dex"].indexOf(k) >= 0 ? k : "home";
+    }
     startBoot() {
       clearTimeout(this.b1);
       clearTimeout(this.b2);
+      const C = this.state.set || {}, sec = C.splashSec == null ? 3 : +C.splashSec;
+      if (!sec) {
+        this.setState({ boot: null, scr: this.startScr(), last: Date.now() });
+        return;
+      }
       this.setState({ boot: "splash", scr: "home", last: Date.now() });
-      this.b2 = setTimeout(() => this.setState({ boot: null, scr: "home", last: Date.now() }), 3200);
+      this.b2 = setTimeout(() => this.setState({ boot: null, scr: this.startScr(), last: Date.now() }), sec * 1e3 + 200);
     }
     save(patch) {
       const st = Object.assign({}, this.state, patch);
@@ -610,6 +639,15 @@ window.__AppComp = function() {
       const priv = C.privacy;
       const nar = APP && !!S.narrow;
       let dk = { on: false }, mpPos = null;
+      if (!S.boot && S.scr !== self.__lastScr) {
+        self.__lastScr = S.scr;
+        if (["home", "trip", "rt", "contacts", "search", "split", "dex"].indexOf(S.scr) >= 0) {
+          try {
+            localStorage.setItem("tc-lastScr", S.scr);
+          } catch (e) {
+          }
+        }
+      }
       const SCR = [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"], ["contacts", "Li\xEAn L\u1EA1c"]];
       const scrBtns = SCR.map(([k, label]) => {
         const on = S.scr === k;
@@ -713,7 +751,8 @@ window.__AppComp = function() {
             } };
           }) }),
           ch("chimeVol", "\xC2m l\u01B0\u1EE3ng nh\u1EA1c ch\xE0o", "So v\u1EDBi \xE2m l\u01B0\u1EE3ng nh\u1EA1c c\u1EE7a m\xE1y", [[30, "Nh\u1ECF"], [60, "V\u1EEBa"], [100, "L\u1EDBn"]]),
-          stt("M\xE0n h\xECnh ch\xE0o", "Logo + phi\xEAn b\u1EA3n, t\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh sau 3 gi\xE2y, ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm", true, "Lu\xF4n b\u1EADt", "", "", null),
+          ch("startScr", "M\u1EDF app th\xEC v\xE0o", "Sau m\xE0n h\xECnh ch\xE0o \xB7 app t\u1EF1 m\u1EDF l\u1EA1i sau s\u1EF1 c\u1ED1 th\xEC v\u1EC1 \u0111\xFAng m\xE0n h\xECnh \u0111ang xem", [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["trip", "H\xE0nh Tr\xECnh"], ["rt", "Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"], ["ws", "Workspace g\u1EA7n nh\u1EA5t"], ["last", "M\xE0n h\xECnh l\xFAc t\u1EAFt app"]]),
+          ch("splashSec", "M\xE0n h\xECnh ch\xE0o", "Logo + phi\xEAn b\u1EA3n \xB7 ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm", [[0, "T\u1EAFt"], [1, "1 gi\xE2y"], [3, "3 gi\xE2y"], [5, "5 gi\xE2y"]]),
           info("M\u1EDF app v\xE0o th\u1EB3ng", "Lu\xF4n v\xE0o tab n\xE0y sau m\xE0n h\xECnh ch\xE0o", "M\xE0n H\xECnh Ch\xEDnh"),
           stt("Nh\u1EDB m\u1ECDi l\u1EF1a ch\u1ECDn khi tho\xE1t", "Giao di\u1EC7n, t\xEDnh n\u0103ng, Workspace, ch\u1EB7ng Road Trip\u2026", true, "Lu\xF4n nh\u1EDB", "", "", null),
           tg("privacy", "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0", "Gi\u1EA5u t\xEAn ng\u01B0\u1EDDi g\u1ECDi, n\u1ED9i dung tin nh\u1EAFn, th\xF4ng tin kh\xE1ch"),
@@ -732,7 +771,7 @@ window.__AppComp = function() {
           tg("idlePlace", "T\xEAn \u0111\u1ECBa danh to", "Hi\u1EC7n t\xEAn n\u01A1i \u0111ang \u0111\u1EADu xe th\u1EADt to, nh\u01B0 app th\u1EDDi ti\u1EBFt Yahoo"),
           tg("idlePhoto", "H\xECnh \u0111\u1ECBa danh l\xE0m n\u1EC1n", "L\u1EA5y h\xECnh c\u1EE7a n\u01A1i \u0111\xF3 t\u1EEB Wikipedia / Wikimedia Commons (c\u1EA7n m\u1EA1ng)"),
           tg("clkLunar", "Ng\xE0y \xE2m l\u1ECBch", "Hi\u1EC7n ng\xE0y \xE2m l\u1ECBch, R\u1EB1m, m\xF9ng 1, T\u1EBFt \u2014 c\u1EA3 ti\u1EBFng Vi\u1EC7t l\u1EABn ti\u1EBFng Anh"),
-          ch("idleMin", "Hi\u1EC7n m\xE0n h\xECnh ch\u1EDD sau", "", [[1, "1 ph\xFAt"], [3, "3 ph\xFAt"], [5, "5 ph\xFAt"], [10, "10 ph\xFAt"]]),
+          ch("idleMin", "Hi\u1EC7n m\xE0n h\xECnh ch\u1EDD sau", "Kh\xF4ng bao gi\u1EDD hi\u1EC7n khi \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng ho\u1EB7c xe \u0111ang ch\u1EA1y", [[0, "T\u1EAFt"], [1, "1 ph\xFAt"], [3, "3 ph\xFAt"], [5, "5 ph\xFAt"], [10, "10 ph\xFAt"]]),
           tg("idleWxBg", "N\u1EC1n tr\u1EDDi \u0111\u1ED9ng", "M\xE2y tr\xF4i m\u01B0\u1EE3t khi \u0111\u1EADu xe, \u0111\u1EE9ng y\xEAn khi xe ch\u1EA1y"),
           tg("idleVN", "Gi\u1EDD Vi\u1EC7t Nam", "Hi\u1EC7n gi\u1EDD S\xE0i G\xF2n d\u01B0\u1EDBi ng\xE0y th\xE1ng"),
           tg("idleAppt", "L\u1ECBch h\u1EB9n", "T\u1EEB Google Calendar"),
@@ -803,7 +842,8 @@ window.__AppComp = function() {
           ch("rest", "Nh\u1EAFc ngh\u1EC9 ch\xE2n m\u1ED7i", "Theo gi\u1EDD l\xE1i li\xEAn t\u1EE5c", [[1.5, "1,5 gi\u1EDD"], [2, "2 gi\u1EDD"], [3, "3 gi\u1EDD"]]),
           tg("homeMap", "M\xE0n H\xECnh Ch\xEDnh l\xE0 b\u1EA3n \u0111\u1ED3", "T\u1EAFt th\xEC n\u1EC1n l\xE0 c\u1EA3nh low-poly nh\u01B0 c\u0169 (\u0111\u1ED5i trong Giao Di\u1EC7n)"),
           tg("autoMap", "T\u1EF1 hi\u1EC7n b\u1EA3n \u0111\u1ED3 khi xe ch\u1EA1y", "Tr\xEAn 10 km/g: n\u1EC1n low-poly \u0111\u1ED5i sang b\u1EA3n \u0111\u1ED3, T\xECm Ch\u1ED7 / Li\xEAn L\u1EA1c t\u1EF1 v\u1EC1 b\u1EA3n \u0111\u1ED3"),
-          tg("navVoice", "\u0110\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng", "R\u1EBD tr\xE1i, r\u1EBD ph\u1EA3i, v\xF2ng xoay\u2026 b\u1EB1ng gi\u1ECDng Vi\u1EC7t"),
+          tg("navVoice", "\u0110\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng", "Qu\u1EB9o tr\xE1i, qu\u1EB9o ph\u1EA3i, b\xF9ng binh\u2026 b\u1EB1ng gi\u1ECDng Vi\u1EC7t \xB7 t\u1EAFt nhanh b\u1EB1ng n\xFAt \u{1F50A} c\u1EA1nh gi\u1EDD t\u1EDBi"),
+          ch("navVol", "\xC2m l\u01B0\u1EE3ng gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng", "Nh\u1EA1c t\u1EF1 nh\u1ECF l\u1EA1i trong l\xFAc gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng n\xF3i", [[60, "V\u1EEBa"], [80, "To"], [100, "R\u1EA5t to"]]),
           tg("navCams", "Nh\u1EAFc camera t\u1ED1c \u0111\u1ED9 + v\xF9ng tr\u01B0\u1EDDng h\u1ECDc", "D\u1EEF li\u1EC7u OpenStreetMap \u2014 c\xF3 th\u1EC3 thi\u1EBFu ch\u1ED7"),
           ch("navHeading", "H\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3 khi ch\u1EC9 \u0111\u01B0\u1EDDng", "Theo h\u01B0\u1EDBng xe: h\u01B0\u1EDBng ch\u1EA1y lu\xF4n \u1EDF ph\xEDa tr\xEAn, nh\u01B0 Google Maps", [[true, "Theo h\u01B0\u1EDBng xe"], [false, "H\u01B0\u1EDBng B\u1EAFc"]]),
           tg("tripLog", "Nh\u1EADt k\xFD H\xE0nh Tr\xECnh", "T\u1EF1 ghi ch\u1ED7 \u0111\u1EADu h\u01A1n 3 ph\xFAt \u2014 ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y, kh\xF4ng g\u1EEDi \u0111i \u0111\xE2u"),
@@ -1518,7 +1558,9 @@ window.__AppComp = function() {
         },
         open: () => {
           const pcts = wsPcts(w);
-          tcn("launch", JSON.stringify(w.apps.filter((a) => a.indexOf("w-") !== 0).map((a, k) => [a, pcts[k]])));
+          const apps = w.apps.filter((a) => a.indexOf("w-") !== 0).map((a, k) => [a, pcts[k]]);
+          tcn("launch", JSON.stringify(apps));
+          self.setS("wsLastLaunch", { apps, rt: !!w.rt, name: w.name });
           if (w.rt) self.setState({ scr: "rt" });
         },
         del: () => self.save({ wsList: S.wsList.filter((_, k) => k !== i) })
@@ -2121,6 +2163,7 @@ window.__AppComp = function() {
       const OB = LV.obd || null;
       const engT = APP ? OB && OB.coolant != null ? Math.round(OB.coolant) + "\xB0" : "--" : "88\xB0";
       const voltT = APP ? OB && OB.volt != null ? OB.volt.toFixed(1) + " V" : "-- V" : "14.1 V";
+      const obdHint = APP && !OB && LV.obdSt === "wait" ? "M\u1EDF m\xE1y \u0111\u1EC3 n\u1ED1i OBD" : "";
       const nxS = list[nextIdx];
       const upL = APP && LT && nxS ? "CH\u1EB6NG GH\xC9 K\u1EBE" : "S\u1EAEP T\u1EDAI";
       const upMain = APP && LT && nxS ? nxS.name + " \xB7 " + (nxS.km - pos) + " km" : APP ? street : "Qu\u1EB9o tr\xE1i \xB7 300 m";
@@ -2233,8 +2276,10 @@ window.__AppComp = function() {
           if (APP) tcn("media", "jb:" + JSON.stringify({ kind: "record", name: "" }));
         }
       };
-      const idleMs = (C.idleMin || 3) * 6e4;
-      const idleAuto = C.idleOn && APP && !drive && S.scr === "home" && !S.mpOpen && !S.va && S.now - (S.last || S.now) >= idleMs;
+      const idleMs = (C.idleMin == null ? 3 : C.idleMin) * 6e4;
+      const NV0 = window.NAV, navOn0 = !!(NV0 && NV0.st && (NV0.st.active || NV0.st.route));
+      if (navOn0 || (LV.speed || 0) >= 5) self.__busyAt = S.now;
+      const idleAuto = C.idleOn && C.idleMin !== 0 && APP && !drive && !navOn0 && !(LV.speed >= 5) && S.scr === "home" && !S.mpOpen && !S.va && S.now - Math.max(S.last || S.now, self.__busyAt || 0) >= idleMs;
       const idlOn = !nar && (S.clkBig || S.idleOn || idleAuto);
       const ist = C.idleClock === "theme" ? { neon: "neon", synth: "neon", cyber: "neon", rally: "led", plane: "led", sgold: "retro", outback: "sign", coast: "sign", melb: "sign", lp_au: "min" }[C.lpTheme] || "min" : C.idleClock || "min";
       const IS = {
@@ -3122,6 +3167,8 @@ window.__AppComp = function() {
         wxL2,
         engT,
         voltT,
+        obdHint,
+        obdHintOn: !!obdHint,
         upL,
         upMain,
         cp,
@@ -3175,7 +3222,7 @@ window.__AppComp = function() {
           const now = Date.now(), nat = typeof LV.vol === "number" ? LV.vol : S.volDemo != null ? S.volDemo : 60;
           const p = S.volSet != null && now - (S.volSetAt || 0) < 1500 ? S.volSet : nat;
           const extAt = LV.volAt || 0;
-          const on = S.volOpen && now - (S.volTouch || 0) < 4e3 || extAt > (S.volSeenAt || 0) && now - extAt < 4e3 && !S.idleOn;
+          const on = !!self.__volDrag || S.volOpen && now - (S.volTouch || 0) < 4e3 || extAt > (S.volSeenAt || 0) && now - extAt < 4e3 && !S.idleOn;
           const icon = p <= 0 ? "\u{1F507}" : p < 50 ? "\u{1F508}" : "\u{1F50A}";
           const setP = (v) => {
             v = Math.max(0, Math.min(100, Math.round(v)));
@@ -3202,14 +3249,33 @@ window.__AppComp = function() {
               } else setP(p > 0 ? 0 : S.volMuteFrom || 40);
               if (!APP && p > 0) self.setState({ volMuteFrom: p });
             },
+            // 0.9.12 (#104): the finger is followed on the whole window until it lifts, so a redraw of the bar cannot drop it
             drag: (e) => {
-              if (e.type === "pointermove" && !e.buttons && e.pointerType === "mouse") return;
-              if (e.type === "pointermove" && e.pointerType !== "mouse" && !e.pressure) return;
               const r = e.currentTarget.getBoundingClientRect();
-              const v = (e.clientX - r.left) / r.width * 100;
-              const st2 = Math.round(v / 5) * 5;
-              if (st2 !== p) setP(st2);
-              else self.setState({ volTouch: Date.now() });
+              if (!r.width) return;
+              if (e.preventDefault) e.preventDefault();
+              if (e.stopPropagation) e.stopPropagation();
+              const val = (x) => Math.round(Math.max(0, Math.min(1, (x - r.left) / r.width)) * 20) * 5;
+              self.__volDrag = true;
+              self.__volLast = val(e.clientX);
+              setP(self.__volLast);
+              const mv = (ev) => {
+                const v = val(ev.clientX);
+                if (v !== self.__volLast) {
+                  self.__volLast = v;
+                  setP(v);
+                }
+              };
+              const up = () => {
+                window.removeEventListener("pointermove", mv);
+                window.removeEventListener("pointerup", up);
+                window.removeEventListener("pointercancel", up);
+                self.__volDrag = false;
+                self.setState({ volTouch: Date.now(), volOpen: true });
+              };
+              window.addEventListener("pointermove", mv);
+              window.addEventListener("pointerup", up);
+              window.addEventListener("pointercancel", up);
             }
           };
         })(),
@@ -3428,10 +3494,11 @@ window.__AppComp = function() {
         ct,
         aboutNote: C.autoBoot ? "T\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh sau 4 gi\xE2y \u2014 kh\xF4ng c\u1EA7n b\u1EA5m" : "T\u1EF1 chuy\u1EC3n \u0111ang t\u1EAFt (C\xE0i \u0110\u1EB7t \u2192 Chung) \u2014 b\u1EA5m V\xE0o Ngay",
         bootSplash: S.boot === "splash",
+        bootDur: Math.max(0.6, (C.splashSec == null ? 3 : +C.splashSec) - 0.4),
         bootAbout: S.boot === "about",
         skipBoot: () => {
           clearTimeout(self.b2);
-          self.setState({ boot: null, scr: S.boot === "about" ? S.scr : "home", last: Date.now() });
+          self.setState({ boot: null, scr: S.boot === "about" ? S.scr : self.startScr(), last: Date.now() });
         },
         restart: () => self.startBoot(),
         listOpen: S.listOpen,
@@ -3569,7 +3636,7 @@ input[type=range]{accent-color:#FBB040}
           <span class="lbl">\u0110ANG CH\u1EA0Y TR\xCAN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
           <span role="group" aria-label="Pin thi\u1EBFt b\u1ECB" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
-        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl gl" style="position: absolute; left: 640px; top: 0; transform: translateX(-50%); border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
+        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl gl" style="position: relative; margin: 0 auto; border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
           <sc-if value="{{clk.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 2px"><sc-for list="{{clk.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
           <sc-if value="{{clk.analog}}" hint-placeholder-val="{{ false }}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0B141B" stroke="#A9C7D4" stroke-width="1.5"></circle><line x1="20" y1="20" x2="{{clk.hx}}" y2="{{clk.hy}}" stroke="#E8F1F5" stroke-width="2.6" stroke-linecap="round"></line><line x1="20" y1="20" x2="{{clk.mx}}" y2="{{clk.my}}" stroke="#FBB040" stroke-width="1.8" stroke-linecap="round"></line><circle cx="20" cy="20" r="2" fill="#FBB040"></circle></svg></sc-if>
           <sc-if value="{{clk.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 24px; font-weight: {{clk.fw}}; font-family: {{clk.font}}; font-style: {{clk.fst}}; color: {{clk.c}}; text-shadow: {{clk.glow}}; letter-spacing: {{clk.ls}}">{{clk.h}}<span style="opacity: {{clk.colonOp}}">:</span>{{clk.m}}<span style="font-size: 12px; margin-left: 3px">{{clk.ap}}</span></span></sc-if>
@@ -3578,7 +3645,7 @@ input[type=range]{accent-color:#FBB040}
             <sc-if value="{{clk.line2On}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: {{clk.line2C}}; white-space: nowrap">{{clk.line2}}</span></sc-if>
           </span>
         </button>
-        <button onClick="{{wxc.open}}" aria-label="Th\u1EDDi ti\u1EBFt: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
+        <button onClick="{{wxc.open}}" aria-label="Th\u1EDDi ti\u1EBFt: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; min-width: 150px; flex-shrink: 1; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 1; background: {{wxc.sky}}">
           <canvas id="wxmini" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas><span aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(10,30,50,0.3); pointer-events: none"></span>
           <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true" style="position: relative; flex-shrink: 0"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg>
           <span style="position: relative; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; min-width: 0">
@@ -3716,7 +3783,7 @@ input[type=range]{accent-color:#FBB040}
       </sc-if>
 
       <sc-if value="{{nv.etaMini}}" hint-placeholder-val="{{ false }}">
-        <button onClick="{{nv.etaTap}}" aria-label="Gi\u1EDD t\u1EDBi \u2014 ch\u1EA1m \u0111\u1EC3 hi\u1EC7n n\xFAt" class="pnl glb" style="position: absolute; right: 20px; bottom: 100px; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">\xB7 {{nv.left}} \xB7 {{nv.km}}</span></button>
+        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Gi\u1EDD t\u1EDBi \u2014 ch\u1EA1m \u0111\u1EC3 hi\u1EC7n n\xFAt" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">\xB7 {{nv.left}} \xB7 {{nv.km}}</span></button></div>
       </sc-if>
       <!-- th\u1EBB gi\u1EDD t\u1EDBi (\u0111ang ch\u1EA1y) -->
       <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
@@ -3924,7 +3991,7 @@ input[type=range]{accent-color:#FBB040}
       <!-- thanh d\u01B0\u1EDBi c\xF9ng (l\xE0m m\u1EDD) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
         <button onClick="{{startListen}}" aria-label="Tr\u1EE3 l\xFD gi\u1ECDng n\xF3i ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
-        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHI\u1EC6T M\xC1Y</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span></div>
+        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHI\u1EC6T M\xC1Y</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span><sc-if value="{{obdHintOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 700; color: #FBB040; white-space: nowrap">{{obdHint}}</span></sc-if></div>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">B\xCCNH \u0110I\u1EC6N</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
       </div>
       <sc-if value="{{upCardOn}}" hint-placeholder-val="{{ false }}">
@@ -3977,13 +4044,13 @@ input[type=range]{accent-color:#FBB040}
 
 
       <sc-if value="{{vo.on}}" hint-placeholder-val="{{ false }}">
-        <div class="glc fadein" role="group" aria-label="\xC2m l\u01B0\u1EE3ng nh\u1EA1c" onPointerDown="{{vo.touch}}" style="position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
+        <div class="glc fadein" role="group" aria-label="\xC2m l\u01B0\u1EE3ng nh\u1EA1c" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
           <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 52px; height: 52px; font-size: 24px; line-height: 1">{{vo.icon}}</button>
           <button onClick="{{vo.down}}" aria-label="Nh\u1ECF l\u1EA1i 10%" class="pill" style="width: 58px; height: 52px; font-size: 30px; font-weight: 700; background: #0D2C40; color: #FBB040">\u2212</button>
-          <div onPointerDown="{{vo.drag}}" onPointerMove="{{vo.drag}}" style="position: relative; width: 300px; height: 52px; touch-action: none; cursor: pointer">
-            <span style="position: absolute; left: 0; right: 0; top: 22px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
-            <span style="position: absolute; left: 0; top: 22px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
-            <span style="position: absolute; top: 14px; left: calc({{vo.p}}% - 12px); width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
+          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="K\xE9o \u0111\u1EC3 ch\u1EC9nh \xE2m l\u01B0\u1EE3ng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 320px; height: 64px; touch-action: none; cursor: pointer">
+            <span style="position: absolute; left: 0; right: 0; top: 28px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
+            <span style="position: absolute; left: 0; top: 28px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
+            <span style="position: absolute; top: 15px; left: calc({{vo.p}}% - 17px); width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
           </div>
           <button onClick="{{vo.up}}" aria-label="To l\xEAn 10%" class="pill" style="width: 58px; height: 52px; font-size: 28px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
           <span class="tnum" style="min-width: 58px; text-align: right; font-size: 20px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
@@ -4584,7 +4651,7 @@ input[type=range]{accent-color:#FBB040}
       <button onClick="{{skipBoot}}" aria-label="V\xE0o M\xE0n H\xECnh Ch\xEDnh" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
         <div style="font-size: 72px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 20px rgba(95,212,240,0.7)"><span style="color: #48B0C8">TOM'S</span> <span style="color: #FBB040">CAR</span></div>
         <div style="font-size: 16px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
-        <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040"></div></div>
+        <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040; animation-duration: {{bootDur}}s"></div></div>
         <div style="font-size: 13px; color: #8FC3D3">{{verL}} \xB7 Tom's Technology Solutions</div>
       </button>
     </sc-if>

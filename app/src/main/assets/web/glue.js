@@ -834,7 +834,16 @@
   };
   window.tcCrash = (r) => {
     const o = typeof r === "string" ? JSON.parse(r) : r;
-    if (window.__ui) window.__ui.setState({ crash: o && o.text || "" });
+    let last = "home";
+    try {
+      last = localStorage.getItem("tc-lastScr") || "home";
+    } catch (e) {
+    }
+    const u = window.__ui;
+    if (u) {
+      clearTimeout(u.b2);
+      u.setState({ crash: o && o.text || "", boot: null, scr: last });
+    }
   };
   window.tcGeo = (r) => {
     if (window.__geoCb) window.__geoCb(typeof r === "string" ? JSON.parse(r) : r);

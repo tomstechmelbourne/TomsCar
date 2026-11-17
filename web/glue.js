@@ -465,7 +465,7 @@
   window.tcApps = (a) => { if (window.__ui) window.__ui.setState({ apps: typeof a === 'string' ? JSON.parse(a) : a }); };
   window.tcCallLog = (a) => { if (window.__ui) window.__ui.setState({ calls: typeof a === 'string' ? JSON.parse(a) : a }); };
   window.tcMsgs = (a) => { if (window.__ui) window.__ui.setState({ msgs: typeof a === 'string' ? JSON.parse(a) : a }); };
-  window.tcCrash = (r) => { const o = typeof r === 'string' ? JSON.parse(r) : r; if (window.__ui) window.__ui.setState({ crash: (o && o.text) || '' }); };
+  window.tcCrash = (r) => { const o = typeof r === 'string' ? JSON.parse(r) : r; let last = 'home'; try { last = localStorage.getItem('tc-lastScr') || 'home'; } catch (e) {} const u = window.__ui; if (u) { clearTimeout(u.b2); u.setState({ crash: (o && o.text) || '', boot: null, scr: last }); } };   // #111: after a crash, back to the screen Tom was on
   window.tcGeo = (r) => { if (window.__geoCb) window.__geoCb(typeof r === 'string' ? JSON.parse(r) : r); };
   window.tcToast = (t) => { if (window.__ui) window.__ui.toast(t); };
   // Tom's Jukebox answered: library summary + its current look

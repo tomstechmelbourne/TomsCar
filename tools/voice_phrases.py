@@ -34,7 +34,10 @@ def phrases():
               'Dạ', 'Dạ, phát nhạc nè', 'Dạ, đã bật Dịu Mắt', 'Dạ, đã tắt', 'Dạ, không có tin nhắn mới', 'Dạ, hết chặng ghé rồi', 'Dạ, mình chưa ghi chỗ đậu xe nào',
               'Dạ, mình chưa hiểu. Bạn nói lại giúp mình nha', 'Dạ, mình vẫn chưa hiểu. Bạn bấm nút mic thử lại nha', 'Dạ, mở danh sách đài vùng này',
               'Dạ, đang tìm trạm xăng gần nhất', 'Đang bật Riêng Tư nên không đọc tin nhắn', 'Dạ, em là trợ lý Tom\'s Car. Anh cần gì cứ nói nha', 'Có cuộc gọi',
-              'Mình đang lái xe, lát gọi lại nha', 'Còn 10 phút là hết giờ đậu xe']:
+              'Mình đang lái xe, lát gọi lại nha', 'Còn 10 phút là hết giờ đậu xe',
+              # 0.9.12 (#119): southern wording, roundabouts by direction
+              'Quẹo gắt qua phải', 'Quẹo phải', 'Quẹo nhẹ qua phải', 'Quẹo nhẹ qua trái', 'Quẹo trái', 'Quẹo gắt qua trái', 'Quẹo',
+              'Cuối đường quẹo phải', 'Cuối đường quẹo trái', 'Tới bùng binh', 'Ra khỏi bùng binh', 'Đang tìm đường mới', 'Mình chưa nghe rõ, nói lại giúp mình nha']:
         add(t, t.replace('40', 'bốn mươi'))
     for i in range(1, 7): add(f'ra lối thứ {i}', f'ra lối thứ {["", "nhất", "hai", "ba", "tư", "năm", "sáu"][i]}')
     return P

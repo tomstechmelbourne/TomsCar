@@ -91,7 +91,7 @@ class Obd(private val adapter: BluetoothAdapter?, private val pickAddress: () ->
             }
             try { socket?.close() } catch (_: Exception) {}
             clear("Mất kết nối OBD")
-            sleep(wait); wait = (wait * 2).coerceAtMost(30000L)
+            sleep(wait); wait = (wait * 2).coerceAtMost(8000L)   // 0.9.12 (#108): try again often, so it connects soon after the car starts
         }
     }
 

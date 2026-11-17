@@ -134,7 +134,7 @@ input[type=range]{accent-color:#FBB040}
           <span class="lbl">ĐANG CHẠY TRÊN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
           <span role="group" aria-label="Pin thiết bị" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
-        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl gl" style="position: absolute; left: 640px; top: 0; transform: translateX(-50%); border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
+        <button onClick="{{clk.tap}}" aria-label="{{clk.aria}}" class="pnl gl" style="position: relative; margin: 0 auto; border: 0; cursor: pointer; font-family: inherit; color: inherit; height: 58px; padding: 0 24px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: rgba(3,17,28,0.82); opacity: {{clk.op}}">
           <sc-if value="{{clk.flip}}" hint-placeholder-val="{{ false }}"><span style="display: flex; align-items: center; gap: 2px"><sc-for list="{{clk.cards}}" as="cd" hint-placeholder-count="4"><span class="fcard {{cd.cls}}" style="margin-left: {{cd.gap}}px">{{cd.d}}</span></sc-for></span></sc-if>
           <sc-if value="{{clk.analog}}" hint-placeholder-val="{{ false }}"><svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#0B141B" stroke="#A9C7D4" stroke-width="1.5"></circle><line x1="20" y1="20" x2="{{clk.hx}}" y2="{{clk.hy}}" stroke="#E8F1F5" stroke-width="2.6" stroke-linecap="round"></line><line x1="20" y1="20" x2="{{clk.mx}}" y2="{{clk.my}}" stroke="#FBB040" stroke-width="1.8" stroke-linecap="round"></line><circle cx="20" cy="20" r="2" fill="#FBB040"></circle></svg></sc-if>
           <sc-if value="{{clk.text}}" hint-placeholder-val="{{ true }}"><span class="tnum" style="font-size: 24px; font-weight: {{clk.fw}}; font-family: {{clk.font}}; font-style: {{clk.fst}}; color: {{clk.c}}; text-shadow: {{clk.glow}}; letter-spacing: {{clk.ls}}">{{clk.h}}<span style="opacity: {{clk.colonOp}}">:</span>{{clk.m}}<span style="font-size: 12px; margin-left: 3px">{{clk.ap}}</span></span></sc-if>
@@ -143,7 +143,7 @@ input[type=range]{accent-color:#FBB040}
             <sc-if value="{{clk.line2On}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; color: {{clk.line2C}}; white-space: nowrap">{{clk.line2}}</span></sc-if>
           </span>
         </button>
-        <button onClick="{{wxc.open}}" aria-label="Thời tiết: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; margin-left: auto; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 0; background: {{wxc.sky}}">
+        <button onClick="{{wxc.open}}" aria-label="Thời tiết: {{wxc.aria}}" class="pnl gl {{wxc.cls}}" style="position: relative; border: 0; cursor: pointer; font-family: inherit; color: #FFFFFF; height: 58px; width: 230px; min-width: 150px; flex-shrink: 1; padding: 0 18px; overflow: hidden; display: flex; align-items: center; gap: 10px; flex-shrink: 1; background: {{wxc.sky}}">
           <canvas id="wxmini" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas><span aria-hidden="true" style="position: absolute; inset: 0; background: rgba(10,30,50,0.3); pointer-events: none"></span>
           <svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true" style="position: relative; flex-shrink: 0"><sc-for list="{{wxc.parts}}" as="pp" hint-placeholder-count="3"><path class="{{pp.cls}}" d="{{pp.d}}" fill="{{pp.fill}}" stroke="{{pp.stroke}}" stroke-width="{{pp.sw}}" stroke-linecap="round"></path></sc-for></svg>
           <span style="position: relative; display: flex; flex-direction: column; align-items: flex-start; line-height: 1.1; min-width: 0">
@@ -281,7 +281,7 @@ input[type=range]{accent-color:#FBB040}
       </sc-if>
 
       <sc-if value="{{nv.etaMini}}" hint-placeholder-val="{{ false }}">
-        <button onClick="{{nv.etaTap}}" aria-label="Giờ tới — chạm để hiện nút" class="pnl glb" style="position: absolute; right: 20px; bottom: 100px; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">· {{nv.left}} · {{nv.km}}</span></button>
+        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Giờ tới — chạm để hiện nút" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">· {{nv.left}} · {{nv.km}}</span></button></div>
       </sc-if>
       <!-- thẻ giờ tới (đang chạy) -->
       <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
@@ -489,7 +489,7 @@ input[type=range]{accent-color:#FBB040}
       <!-- thanh dưới cùng (làm mờ) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
         <button onClick="{{startListen}}" aria-label="Trợ lý giọng nói ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
-        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHIỆT MÁY</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span></div>
+        <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHIỆT MÁY</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span><sc-if value="{{obdHintOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 700; color: #FBB040; white-space: nowrap">{{obdHint}}</span></sc-if></div>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">BÌNH ĐIỆN</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
       </div>
       <sc-if value="{{upCardOn}}" hint-placeholder-val="{{ false }}">
@@ -542,13 +542,13 @@ input[type=range]{accent-color:#FBB040}
 
 
       <sc-if value="{{vo.on}}" hint-placeholder-val="{{ false }}">
-        <div class="glc fadein" role="group" aria-label="Âm lượng nhạc" onPointerDown="{{vo.touch}}" style="position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
+        <div class="glc fadein" role="group" aria-label="Âm lượng nhạc" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
           <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 52px; height: 52px; font-size: 24px; line-height: 1">{{vo.icon}}</button>
           <button onClick="{{vo.down}}" aria-label="Nhỏ lại 10%" class="pill" style="width: 58px; height: 52px; font-size: 30px; font-weight: 700; background: #0D2C40; color: #FBB040">−</button>
-          <div onPointerDown="{{vo.drag}}" onPointerMove="{{vo.drag}}" style="position: relative; width: 300px; height: 52px; touch-action: none; cursor: pointer">
-            <span style="position: absolute; left: 0; right: 0; top: 22px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
-            <span style="position: absolute; left: 0; top: 22px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
-            <span style="position: absolute; top: 14px; left: calc({{vo.p}}% - 12px); width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
+          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="Kéo để chỉnh âm lượng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 320px; height: 64px; touch-action: none; cursor: pointer">
+            <span style="position: absolute; left: 0; right: 0; top: 28px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
+            <span style="position: absolute; left: 0; top: 28px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
+            <span style="position: absolute; top: 15px; left: calc({{vo.p}}% - 17px); width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
           </div>
           <button onClick="{{vo.up}}" aria-label="To lên 10%" class="pill" style="width: 58px; height: 52px; font-size: 28px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
           <span class="tnum" style="min-width: 58px; text-align: right; font-size: 20px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
@@ -1149,7 +1149,7 @@ input[type=range]{accent-color:#FBB040}
       <button onClick="{{skipBoot}}" aria-label="Vào Màn Hình Chính" style="position: absolute; inset: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
         <div style="font-size: 72px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 20px rgba(95,212,240,0.7)"><span style="color: #48B0C8">TOM'S</span> <span style="color: #FBB040">CAR</span></div>
         <div style="font-size: 16px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
-        <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040"></div></div>
+        <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040; animation-duration: {{bootDur}}s"></div></div>
         <div style="font-size: 13px; color: #8FC3D3">{{verL}} · Tom's Technology Solutions</div>
       </button>
     </sc-if>
@@ -1264,7 +1264,7 @@ function rnd(i) { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.
 const DROPS = Array.from({ length: 46 }, (_, i) => ({ x: Math.round(rnd(i + 1) * 1270), dur: (5 + rnd(i + 50) * 4).toFixed(2), del: (-rnd(i + 99) * 9).toFixed(2), op: (0.3 + rnd(i + 7) * 0.5).toFixed(2) }));
 const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rnd(i + 200) * 9); return { x: Math.round(rnd(i + 300) * 1260), y: Math.round(60 + rnd(i + 400) * 420), s, dur: (9 + rnd(i + 500) * 8).toFixed(1), del: (-rnd(i + 600) * 16).toFixed(1) }; });
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
-const DEFAULTS = { vnVoice: 'doan', idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
+const DEFAULTS = { vnVoice: 'doan', navVol: 80, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
   musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chime: 'soft', chimeVol: 60 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
@@ -1358,13 +1358,22 @@ class Component extends DCLogic {
     if (!APP) return;
     tcn('media', 'app:' + (C.musicApp || 'jukebox'));
     tcn('bubble', C.bubbleOn === false ? 'off' : 'on');
-    tcn('voice', 'cfg:' + JSON.stringify({ lang: C.lang === 'en' ? 'en' : 'vi', clip: C.vnVoice || '', rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || '', sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false }));
+    tcn('voice', 'cfg:' + JSON.stringify({ lang: C.lang === 'en' ? 'en' : 'vi', clip: C.vnVoice || '', rate: +C.ttsRate || 1, pitch: +C.ttsPitch || 1, voice: C.ttsVoice || '', sens: C.hotSens == null ? 1 : +C.hotSens, muteMusic: !!C.hotMuteMusic, hot: C.hotOn !== false, navVol: +C.navVol || 80 }));
   }
   componentWillUnmount() { clearInterval(this.tick); clearTimeout(this.b1); clearTimeout(this.b2); }
+  // 0.9.12 (#111): which screen opens after the splash, and how long the splash stays
+  startScr() {
+    const C = this.state.set || {}; let k = C.startScr || 'home';
+    if (k === 'last') { try { k = localStorage.getItem('tc-lastScr') || 'home'; } catch (e) { k = 'home'; } }
+    if (k === 'ws') { const L = C.wsLastLaunch; k = 'home'; if (L && L.apps) { if (APP) tcn('launch', JSON.stringify(L.apps)); if (L.rt) k = 'rt'; } }
+    return ['home', 'trip', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(k) >= 0 ? k : 'home';
+  }
   startBoot() {
     clearTimeout(this.b1); clearTimeout(this.b2);
+    const C = this.state.set || {}, sec = C.splashSec == null ? 3 : +C.splashSec;
+    if (!sec) { this.setState({ boot: null, scr: this.startScr(), last: Date.now() }); return; }
     this.setState({ boot: 'splash', scr: 'home', last: Date.now() });
-    this.b2 = setTimeout(() => this.setState({ boot: null, scr: 'home', last: Date.now() }), 3200);
+    this.b2 = setTimeout(() => this.setState({ boot: null, scr: this.startScr(), last: Date.now() }), sec * 1000 + 200);
   }
   save(patch) {
     const st = Object.assign({}, this.state, patch);
@@ -1399,6 +1408,7 @@ class Component extends DCLogic {
     let dk = { on: false }, mpPos = null;
 
     // ---- màn hình (Tìm Chỗ sau Workspace DeX) ----
+    if (!S.boot && S.scr !== self.__lastScr) { self.__lastScr = S.scr; if (['home', 'trip', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(S.scr) >= 0) { try { localStorage.setItem('tc-lastScr', S.scr); } catch (e) {} } }
     const SCR = [['home', 'Màn Hình Chính'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ'], ['contacts', 'Liên Lạc']];
     const scrBtns = SCR.map(([k, label]) => { const on = S.scr === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: go(k) }; });
 
@@ -1467,7 +1477,8 @@ class Component extends DCLogic {
         tg('chimeOn', 'Nhạc chào khi mở app', 'Khoảng 2 giây · không kêu khi máy để im lặng hoặc đang phát nhạc'),
         Object.assign(ch('chime', 'Kiểu nhạc chào', 'Bấm là nghe thử', [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']]), { opts: [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']].map(([v, l]) => { const on = (C.chime || 'soft') === v; return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { self.setS('chime', v); tcn('chime', JSON.stringify({ name: 'chime_' + v, vol: C.chimeVol == null ? 60 : C.chimeVol, test: true })); } }; }) }),
         ch('chimeVol', 'Âm lượng nhạc chào', 'So với âm lượng nhạc của máy', [[30, 'Nhỏ'], [60, 'Vừa'], [100, 'Lớn']]),
-        stt('Màn hình chào', 'Logo + phiên bản, tự vào Màn Hình Chính sau 3 giây, chạm để vào sớm', true, 'Luôn bật', '', '', null),
+        ch('startScr', 'Mở app thì vào', 'Sau màn hình chào · app tự mở lại sau sự cố thì về đúng màn hình đang xem', [['home', 'Màn Hình Chính'], ['trip', 'Hành Trình'], ['rt', 'Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ'], ['ws', 'Workspace gần nhất'], ['last', 'Màn hình lúc tắt app']]),
+        ch('splashSec', 'Màn hình chào', 'Logo + phiên bản · chạm để vào sớm', [[0, 'Tắt'], [1, '1 giây'], [3, '3 giây'], [5, '5 giây']]),
         info('Mở app vào thẳng', 'Luôn vào tab này sau màn hình chào', 'Màn Hình Chính'),
         stt('Nhớ mọi lựa chọn khi thoát', 'Giao diện, tính năng, Workspace, chặng Road Trip…', true, 'Luôn nhớ', '', '', null),
         tg('privacy', 'Chế Độ Riêng Tư', 'Giấu tên người gọi, nội dung tin nhắn, thông tin khách'),
@@ -1482,7 +1493,7 @@ class Component extends DCLogic {
         tg('idlePlace', 'Tên địa danh to', 'Hiện tên nơi đang đậu xe thật to, như app thời tiết Yahoo'),
         tg('idlePhoto', 'Hình địa danh làm nền', 'Lấy hình của nơi đó từ Wikipedia / Wikimedia Commons (cần mạng)'),
         tg('clkLunar', 'Ngày âm lịch', 'Hiện ngày âm lịch, Rằm, mùng 1, Tết — cả tiếng Việt lẫn tiếng Anh'),
-        ch('idleMin', 'Hiện màn hình chờ sau', '', [[1, '1 phút'], [3, '3 phút'], [5, '5 phút'], [10, '10 phút']]),
+        ch('idleMin', 'Hiện màn hình chờ sau', 'Không bao giờ hiện khi đang chỉ đường hoặc xe đang chạy', [[0, 'Tắt'], [1, '1 phút'], [3, '3 phút'], [5, '5 phút'], [10, '10 phút']]),
         tg('idleWxBg', 'Nền trời động', 'Mây trôi mượt khi đậu xe, đứng yên khi xe chạy'),
         tg('idleVN', 'Giờ Việt Nam', 'Hiện giờ Sài Gòn dưới ngày tháng'),
         tg('idleAppt', 'Lịch hẹn', 'Từ Google Calendar'),
@@ -1539,7 +1550,8 @@ class Component extends DCLogic {
         ch('rest', 'Nhắc nghỉ chân mỗi', 'Theo giờ lái liên tục', [[1.5, '1,5 giờ'], [2, '2 giờ'], [3, '3 giờ']]),
         tg('homeMap', 'Màn Hình Chính là bản đồ', 'Tắt thì nền là cảnh low-poly như cũ (đổi trong Giao Diện)'),
         tg('autoMap', 'Tự hiện bản đồ khi xe chạy', 'Trên 10 km/g: nền low-poly đổi sang bản đồ, Tìm Chỗ / Liên Lạc tự về bản đồ'),
-        tg('navVoice', 'Đọc chỉ đường', 'Rẽ trái, rẽ phải, vòng xoay… bằng giọng Việt'),
+        tg('navVoice', 'Đọc chỉ đường', 'Quẹo trái, quẹo phải, bùng binh… bằng giọng Việt · tắt nhanh bằng nút 🔊 cạnh giờ tới'),
+        ch('navVol', 'Âm lượng giọng chỉ đường', 'Nhạc tự nhỏ lại trong lúc giọng chỉ đường nói', [[60, 'Vừa'], [80, 'To'], [100, 'Rất to']]),
         tg('navCams', 'Nhắc camera tốc độ + vùng trường học', 'Dữ liệu OpenStreetMap — có thể thiếu chỗ'),
         ch('navHeading', 'Hướng bản đồ khi chỉ đường', 'Theo hướng xe: hướng chạy luôn ở phía trên, như Google Maps', [[true, 'Theo hướng xe'], [false, 'Hướng Bắc']]),
         tg('tripLog', 'Nhật ký Hành Trình', 'Tự ghi chỗ đậu hơn 3 phút — chỉ lưu trong máy này, không gửi đi đâu'),
@@ -1858,7 +1870,7 @@ class Component extends DCLogic {
     const wsPcts = (w) => (w.pcts && w.pcts.length === w.apps.length) ? w.pcts : wsEq(w.apps.length);
     const wsCards = S.wsList.map((w, i) => ({ name: w.name, rt: !!w.rt, boxes: w.apps.map((id, k) => ({ name: nameOf(id), flex: wsPcts(w)[k], bg: WCOL[k] })),
       edit: () => { self.setState({ createOpen: true, wsEdit: i, wsSel: w.apps.slice(), wsPct: wsPcts(w).slice(), wsName: w.name, rtCheck: !!w.rt }); if (APP && !S.apps) tcn('apps'); },
-      open: () => { const pcts = wsPcts(w); tcn('launch', JSON.stringify(w.apps.filter((a) => a.indexOf('w-') !== 0).map((a, k) => [a, pcts[k]]))); if (w.rt) self.setState({ scr: 'rt' }); },
+      open: () => { const pcts = wsPcts(w); const apps = w.apps.filter((a) => a.indexOf('w-') !== 0).map((a, k) => [a, pcts[k]]); tcn('launch', JSON.stringify(apps)); self.setS('wsLastLaunch', { apps, rt: !!w.rt, name: w.name }); if (w.rt) self.setState({ scr: 'rt' }); },
       del: () => self.save({ wsList: S.wsList.filter((_, k) => k !== i) }) }));
 
     // ---- cuộc gọi ----
@@ -2174,6 +2186,7 @@ class Component extends DCLogic {
     const OB = LV.obd || null;
     const engT = APP ? (OB && OB.coolant != null ? Math.round(OB.coolant) + '°' : '--') : '88°';
     const voltT = APP ? (OB && OB.volt != null ? OB.volt.toFixed(1) + ' V' : '-- V') : '14.1 V';
+    const obdHint = APP && !OB && LV.obdSt === 'wait' ? 'Mở máy để nối OBD' : '';
     const nxS = list[nextIdx];
     const upL = (APP && LT && nxS) ? 'CHẶNG GHÉ KẾ' : 'SẮP TỚI';
     const upMain = (APP && LT && nxS) ? nxS.name + ' · ' + (nxS.km - pos) + ' km' : APP ? street : 'Quẹo trái · 300 m';
@@ -2215,8 +2228,10 @@ class Component extends DCLogic {
     };
 
     // ---- màn hình chờ (mục 20): kiểu đồng hồ chọn được, chỉ khi đậu xe, chống in hình ----
-    const idleMs = (C.idleMin || 3) * 60000;
-    const idleAuto = C.idleOn && APP && !drive && S.scr === 'home' && !S.mpOpen && !S.va && (S.now - (S.last || S.now)) >= idleMs;
+    const idleMs = (C.idleMin == null ? 3 : C.idleMin) * 60000;
+    const NV0 = window.NAV, navOn0 = !!(NV0 && NV0.st && (NV0.st.active || NV0.st.route));   // 0.9.12 (#116): never while navigating / a route is on screen
+    if (navOn0 || (LV.speed || 0) >= 5) self.__busyAt = S.now;   // the wait starts again after stopping / finishing the route
+    const idleAuto = C.idleOn && C.idleMin !== 0 && APP && !drive && !navOn0 && !(LV.speed >= 5) && S.scr === 'home' && !S.mpOpen && !S.va && (S.now - Math.max(S.last || S.now, self.__busyAt || 0)) >= idleMs;
     const idlOn = !nar && (S.clkBig || S.idleOn || idleAuto);
     const ist = C.idleClock === 'theme' ? ({ neon: 'neon', synth: 'neon', cyber: 'neon', rally: 'led', plane: 'led', sgold: 'retro', outback: 'sign', coast: 'sign', melb: 'sign', lp_au: 'min' }[C.lpTheme] || 'min') : (C.idleClock || 'min');
     const IS = {
@@ -2546,7 +2561,7 @@ class Component extends DCLogic {
     window.__mapTouched = () => { if (shell && self.state.scr === 'home' && !self.state.qc && !wsHid) { if (navAct || spd > 15) self.setState({ wsOpen: false }); else self.setS('wsCol', true); } };
     return {
       crashOn: !!S.crash, crashClose: () => self.setState({ crash: '' }), crashSend: () => { const v = window.TC_VERSION || '0.9.x-beta'; tcn('mail', JSON.stringify({ subject: "Góp Ý Tom's Car " + v, body: 'App vừa bị tắt bất ngờ.\n\n' + S.crash })); self.setState({ crash: '' }); },
-      rootW: nar || APP ? '100%' : '1280px', rootH: nar || APP ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || !shell), nv, tabs, hj, rtp, lf, pe, wsShow: shell && S.scr === 'home' && !S.qc && !wsHid, wsGuide: !C.wsGuideOff, wsLater: () => self.setS('wsGuideOff', true), wsHide: () => (navAct || spd > 15) ? self.setState({ wsOpen: false }) : self.setS('wsCol', true), upCardOn: drive && !navAct, wsPill: shell && S.scr === 'home' && !S.qc && wsHid, wsTog: () => (navAct || spd > 15) ? self.setState({ wsOpen: true }) : (self.setS('wsCol', false), self.setState({ wsOpen: false })), rtDlgOn: shell, kbLk, clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
+      rootW: nar || APP ? '100%' : '1280px', rootH: nar || APP ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || !shell), nv, tabs, hj, rtp, lf, pe, wsShow: shell && S.scr === 'home' && !S.qc && !wsHid, wsGuide: !C.wsGuideOff, wsLater: () => self.setS('wsGuideOff', true), wsHide: () => (navAct || spd > 15) ? self.setState({ wsOpen: false }) : self.setS('wsCol', true), upCardOn: drive && !navAct, wsPill: shell && S.scr === 'home' && !S.qc && wsHid, wsTog: () => (navAct || spd > 15) ? self.setState({ wsOpen: true }) : (self.setS('wsCol', false), self.setState({ wsOpen: false })), rtDlgOn: shell, kbLk, clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, obdHint, obdHintOn: !!obdHint, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
       unreadN: APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3,
       wsTitle: S.wsEdit != null ? 'Sửa Workspace' : 'Tạo Workspace', wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
       exitHard: () => { self.setState({ exitOpen: false }); tcn('exit', 'hard'); }, exitBg: () => { self.setState({ exitOpen: false }); tcn('exit', 'bg'); },
@@ -2555,7 +2570,7 @@ class Component extends DCLogic {
         const now = Date.now(), nat = typeof LV.vol === 'number' ? LV.vol : (S.volDemo != null ? S.volDemo : 60);
         const p = (S.volSet != null && now - (S.volSetAt || 0) < 1500) ? S.volSet : nat;
         const extAt = LV.volAt || 0;
-        const on = (S.volOpen && now - (S.volTouch || 0) < 4000) || (extAt > (S.volSeenAt || 0) && now - extAt < 4000 && !S.idleOn);
+        const on = !!self.__volDrag || (S.volOpen && now - (S.volTouch || 0) < 4000) || (extAt > (S.volSeenAt || 0) && now - extAt < 4000 && !S.idleOn);
         const icon = p <= 0 ? '🔇' : p < 50 ? '🔈' : '🔊';
         const setP = (v) => { v = Math.max(0, Math.min(100, Math.round(v))); if (APP) tcn('media', 'vol:' + v); self.setState({ volSet: v, volSetAt: Date.now(), volDemo: APP ? S.volDemo : v, volOpen: true, volTouch: Date.now() }); };
         return { on, onA: on ? 'true' : 'false', p, pL: p + '%', icon, x: 640, aria: 'Âm lượng nhạc ' + p + '%',
@@ -2564,7 +2579,13 @@ class Component extends DCLogic {
           touch: () => self.setState({ volTouch: Date.now(), volOpen: true }),
           up: () => setP(p + 10), down: () => setP(p - 10),
           mute: () => { if (APP) { tcn('media', 'mute'); self.setState({ volTouch: Date.now(), volOpen: true, volSet: null }); } else setP(p > 0 ? 0 : (S.volMuteFrom || 40)); if (!APP && p > 0) self.setState({ volMuteFrom: p }); },
-          drag: (e) => { if (e.type === 'pointermove' && !e.buttons && e.pointerType === 'mouse') return; if (e.type === 'pointermove' && e.pointerType !== 'mouse' && !e.pressure) return; const r = e.currentTarget.getBoundingClientRect(); const v = (e.clientX - r.left) / r.width * 100; const st = Math.round(v / 5) * 5; if (st !== p) setP(st); else self.setState({ volTouch: Date.now() }); } };
+          // 0.9.12 (#104): the finger is followed on the whole window until it lifts, so a redraw of the bar cannot drop it
+          drag: (e) => { const r = e.currentTarget.getBoundingClientRect(); if (!r.width) return; if (e.preventDefault) e.preventDefault(); if (e.stopPropagation) e.stopPropagation();
+            const val = (x) => Math.round(Math.max(0, Math.min(1, (x - r.left) / r.width)) * 20) * 5;
+            self.__volDrag = true; self.__volLast = val(e.clientX); setP(self.__volLast);
+            const mv = (ev) => { const v = val(ev.clientX); if (v !== self.__volLast) { self.__volLast = v; setP(v); } };
+            const up = () => { window.removeEventListener('pointermove', mv); window.removeEventListener('pointerup', up); window.removeEventListener('pointercancel', up); self.__volDrag = false; self.setState({ volTouch: Date.now(), volOpen: true }); };
+            window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up); } };
       })(),
       srcL: S.src === 'music' ? 'NHẠC' : S.src === 'radio' ? 'RADIO' : 'PODCAST', cycleSrc: () => { const n = { music: 'radio', radio: 'podcast', podcast: 'music' }[S.src]; self.setState({ src: n, mpTab: TABS[n][0][0], nowT: '', nowS: '' }); },
       togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }), panelExp: mpOpen ? 'true' : 'false', startListen: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); }, micOff: APP && PM.mic === false, micCls: (APP && PM.mic === false) ? '' : S.va ? 'mic-listen' : (S.now - (S.replyAt || 0) < 3000) ? 'mic-reply' : drive ? 'mic-idle mic-calm' : 'mic-idle', micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
@@ -2609,7 +2630,7 @@ class Component extends DCLogic {
       cb, simCall: () => self.setState({ call: 'ring', mute: false }), toastOn, toastText: S.toast,
       ct,
       aboutNote: C.autoBoot ? 'Tự vào Màn Hình Chính sau 4 giây — không cần bấm' : 'Tự chuyển đang tắt (Cài Đặt → Chung) — bấm Vào Ngay',
-      bootSplash: S.boot === 'splash', bootAbout: S.boot === 'about', skipBoot: () => { clearTimeout(self.b2); self.setState({ boot: null, scr: S.boot === 'about' ? S.scr : 'home', last: Date.now() }); }, restart: () => self.startBoot(),
+      bootSplash: S.boot === 'splash', bootDur: Math.max(0.6, (C.splashSec == null ? 3 : +C.splashSec) - 0.4), bootAbout: S.boot === 'about', skipBoot: () => { clearTimeout(self.b2); self.setState({ boot: null, scr: S.boot === 'about' ? S.scr : self.startScr(), last: Date.now() }); }, restart: () => self.startBoot(),
       listOpen: S.listOpen, openList: () => self.setState({ listOpen: true }), closeList: () => self.setState({ listOpen: false }), items
     };
   }

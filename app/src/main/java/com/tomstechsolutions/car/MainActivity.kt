@@ -403,6 +403,8 @@ class MainActivity : Activity() {
                 ob.speed?.let { put("speed", it) }; put("protocol", ob.protocol)
             })
         }
+        // 0.9.12 (#108): say why there are no engine numbers yet (the OBD plug only has power while the car is on)
+        else if (ob != null) o.put("obdSt", if (ob.status == "Chưa thấy cục OBD") "none" else "wait")
         media()?.let { o.put("media", it) }
         val brg = if (l != null && fresh && l.hasBearing() && (l.speed > 1.5f || calcBrg == null)) l.bearing else if (fresh) calcBrg else null
         if (brg != null) o.put("bearing", brg.toDouble())

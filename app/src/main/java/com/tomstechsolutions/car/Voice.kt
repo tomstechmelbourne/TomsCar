@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.ToneGenerator
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -88,6 +89,7 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         rate = o.optDouble("rate", rate.toDouble()).toFloat(); pitch = o.optDouble("pitch", pitch.toDouble()).toFloat()
         voiceName = o.optString("voice", voiceName); sensitivity = o.optInt("sens", sensitivity)
         muteWhenMusic = o.optBoolean("muteMusic", muteWhenMusic)
+        navVol = o.optInt("navVol", navVol).coerceIn(30, 100)
         lang = o.optString("lang", lang)
         clipVoice = o.optString("clip", clipVoice).let { if (it == "doan" || it == "son") it else "" }
         val hw = o.optBoolean("hot", hotwordWanted)
@@ -127,8 +129,13 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
             rec.setWords(true)
             val s = SpeechService(rec, 16000.0f)
             s.startListening(object : org.vosk.android.RecognitionListener {
-                override fun onPartialResult(h: String?) {}
-                override fun onResult(h: String?) { if (h != null && isWake(h)) wake() }
+                // 0.9.12 (#110): react while "hey tom" is still being heard (2 partial hits in a row), not after the pause
+                override fun onPartialResult(h: String?) {
+                    if (sensitivity == 0 || h == null) return
+                    val t = try { JSONObject(h).optString("partial").trim() } catch (_: Exception) { "" }
+                    if (t.endsWith("hey tom") || t.endsWith("hi tom")) { partHits++; if (partHits >= 2 && System.currentTimeMillis() - lastWake > 5000) { lastWake = System.currentTimeMillis(); partHits = 0; wake() } } else partHits = 0
+                }
+                override fun onResult(h: String?) { partHits = 0; if (h != null && isWake(h)) wake() }
                 override fun onFinalResult(h: String?) {}
                 override fun onError(e: Exception?) { stopHotword() }
                 override fun onTimeout() {}
@@ -163,6 +170,11 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
     }
 
     private var heardSomething = false
+    private var partHits = 0
+    private var lastPartial = ""
+    private var partialAt = 0L
+    private var offlineOk = true   // the phone's own Vietnamese recogniser works without internet; off after it fails once
+    private var srGen = 0
 
     fun stopHotword() {
         try { hot?.stop(); hot?.shutdown() } catch (_: Exception) {}
@@ -176,33 +188,49 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         if (!hasMic()) { emit(JSONObject().put("state", "error").put("text", "Cần cấp quyền micro (Cài Đặt → Quyền)")); return }
         if (!SpeechRecognizer.isRecognitionAvailable(a)) { emit(JSONObject().put("state", "error").put("text", if (lang == "en") "This phone has no Google speech recogniser" else "Máy chưa có bộ nhận giọng nói của Google")); return }
         busy = true; stopHotword()
-        beep()
-        main.postDelayed({
+        beep(); emit(JSONObject().put("state", "listening"))
+        main.postDelayed({ startSr(offlineOk) }, 120)
+    }
+
+    /** 0.9.12 (#110): listen at most ~7 s; when the words stop changing for 1.2 s, take them — noise in the car
+     *  (engine, fan) no longer keeps the recogniser waiting for silence for up to a minute. */
+    private fun startSr(offline: Boolean) {
+            val gen = ++srGen
+            lastPartial = ""; partialAt = 0L
+            main.postDelayed({ if (busy && gen == srGen) finishWith(lastPartial) }, 9000)   // even if the recogniser never answers
             try {
                 sr?.destroy()
                 val r = SpeechRecognizer.createSpeechRecognizer(a); sr = r
                 r.setRecognitionListener(object : RecognitionListener {
                     override fun onReadyForSpeech(p: Bundle?) {
                         heardSomething = false; emit(JSONObject().put("state", "listening"))
-                        main.postDelayed({ if (busy && !heardSomething) { try { sr?.cancel() } catch (_: Exception) {}; emit(JSONObject().put("state", "closed")); done() } }, 3500)
+                        main.postDelayed({ if (busy && gen == srGen && !heardSomething && lastPartial.isEmpty()) { try { sr?.cancel() } catch (_: Exception) {}; emit(JSONObject().put("state", "closed")); done() } }, 4000)
+                        main.postDelayed({ if (busy && gen == srGen) finishWith(lastPartial) }, 7500)   // hard limit
                     }
                     override fun onBeginningOfSpeech() { heardSomething = true }
                     override fun onRmsChanged(v: Float) {}
                     override fun onBufferReceived(b: ByteArray?) {}
                     override fun onEndOfSpeech() {}
                     override fun onError(e: Int) {
-                        if (!busy) return
+                        if (!busy || gen != srGen) return
+                        // the phone has no offline Vietnamese pack (or it failed): ask Google online once, and remember
+                        if (offline && (e == 12 || e == 13 || e == SpeechRecognizer.ERROR_SERVER || e == SpeechRecognizer.ERROR_CLIENT) && lastPartial.isEmpty()) { offlineOk = false; main.post { startSr(false) }; return }
+                        if (lastPartial.isNotEmpty()) { finishWith(lastPartial); return }
                         if (e == SpeechRecognizer.ERROR_NO_MATCH || e == SpeechRecognizer.ERROR_SPEECH_TIMEOUT) emit(JSONObject().put("state", if (heardSomething) "error" else "closed").put("text", if (lang == "en") "Didn't catch that — tap the mic again" else "Không nghe rõ — bấm mic thử lại"))
                         else emit(JSONObject().put("state", "error").put("text", "Trợ lý chưa nghe được (lỗi $e)"))
                         done()
                     }
                     override fun onResults(b: Bundle?) {
+                        if (!busy || gen != srGen) return
                         val t = b?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: ""
-                        emit(JSONObject().put("state", "result").put("text", t)); done()
+                        finishWith(if (t.isNotBlank()) t else lastPartial)
                     }
                     override fun onPartialResults(b: Bundle?) {
-                        val t = b?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull() ?: return
+                        val t = b?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull()?.trim() ?: return
+                        if (t.isEmpty() || gen != srGen) return
                         emit(JSONObject().put("state", "partial").put("text", t))
+                        if (t != lastPartial) { lastPartial = t; val at = System.currentTimeMillis(); partialAt = at
+                            main.postDelayed({ if (busy && gen == srGen && partialAt == at) { try { sr?.stopListening() } catch (_: Exception) {}; main.postDelayed({ if (busy && gen == srGen) finishWith(lastPartial) }, 900) } }, 1200) }
                     }
                     override fun onEvent(t: Int, p: Bundle?) {}
                 })
@@ -212,9 +240,20 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
                     .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
                     .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                     .putExtra("android.speech.extra.EXTRA_ADDITIONAL_LANGUAGES", arrayOf("en-AU"))
+                    .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, offline)
+                    .putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 900L)
+                    .putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 700L)
                 r.startListening(i)
             } catch (e: Exception) { emit(JSONObject().put("state", "error").put("text", "Trợ lý lỗi: ${e.message}")); done() }
-        }, 250)
+    }
+
+    private fun finishWith(t: String) {
+        if (!busy) return
+        srGen++   // ignore anything the old recogniser still sends
+        try { sr?.cancel() } catch (_: Exception) {}
+        if (t.isNotBlank()) emit(JSONObject().put("state", "result").put("text", t))
+        else emit(JSONObject().put("state", "error").put("text", if (lang == "en") "Didn't catch that — say it again" else "Mình chưa nghe rõ, nói lại giúp mình nha"))
+        done()
     }
 
     fun cancel() { try { sr?.cancel() } catch (_: Exception) {}; done() }
@@ -245,13 +284,28 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
     }
     // 0.9.11 (#100): the voice keeps its own loudness — if music is turned low, lift the stream while speaking, then put it back.
     private var floorFrom = -1
+    var navVol = 80   // 0.9.12 (#119): voice loudness (% of the phone's music volume), Cài Đặt › Chỉ đường
+    private var focusReq: android.media.AudioFocusRequest? = null
+    private fun duckOn() {   // music apps lower themselves while the voice speaks
+        if (Build.VERSION.SDK_INT < 26 || focusReq != null) return
+        try { val am = a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+            val r = android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                .setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH).build()).build()
+            am.requestAudioFocus(r); focusReq = r } catch (_: Exception) {}
+    }
+    private fun duckOff() {
+        val r = focusReq ?: return; focusReq = null
+        try { (a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager).abandonAudioFocusRequest(r) } catch (_: Exception) {}
+    }
     private fun floorOn() {
+        duckOn()
         val am = a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
         val mx = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC); val cur = am.getStreamVolume(AudioManager.STREAM_MUSIC)
-        val want = Math.round(mx * 0.55f)
+        val want = Math.round(mx * navVol / 100f)
         if (floorFrom < 0 && cur < want) { floorFrom = cur; Vol.lifting = true; am.setStreamVolume(AudioManager.STREAM_MUSIC, want, 0) }
     }
     private fun floorOff() {
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ if (floorFrom < 0 && clipPlayer == null && tts?.isSpeaking != true) duckOff() }, 500)
         if (floorFrom < 0) return
         val am = a.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
         val f = floorFrom; floorFrom = -1

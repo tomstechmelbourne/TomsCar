@@ -32,7 +32,10 @@
   const fmtDur = (s) => { const m = Math.max(1, Math.round(s / 60)); if (EN()) return m >= 60 ? Math.floor(m / 60) + ' h ' + (m % 60 ? (m % 60) + ' min' : '') : m + ' min'; return m >= 60 ? Math.floor(m / 60) + ' giờ ' + (m % 60 ? (m % 60) + ' ph' : '') : m + ' phút'; };
   const hhmm = (t) => { const d = new Date(t); return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
   NAV.fmtDist = fmtDist; NAV.fmtDur = fmtDur; NAV.hhmm = hhmm;
-  const DIRW = { uturn: 'Quay đầu', 'sharp right': 'Rẽ gắt phải', right: 'Rẽ phải', 'slight right': 'Chếch phải', straight: 'Đi thẳng', 'slight left': 'Chếch trái', left: 'Rẽ trái', 'sharp left': 'Rẽ gắt trái' };
+  const DIRW = { uturn: 'Quay đầu', 'sharp right': 'Quẹo gắt qua phải', right: 'Quẹo phải', 'slight right': 'Quẹo nhẹ qua phải', straight: 'Đi thẳng', 'slight left': 'Quẹo nhẹ qua trái', left: 'Quẹo trái', 'sharp left': 'Quẹo gắt qua trái' };
+  // 0.9.12 (#119): at a roundabout say which way to go (Australia: clockwise, exit 1 ≈ left, 2 ≈ straight, 3 ≈ right), never "exit number"
+  const rbWay = (m) => { const mod = m.modifier || ''; if (/uturn/.test(mod)) return 'u'; if (/right/.test(mod)) return 'r'; if (/left/.test(mod)) return 'l'; if (mod === 'straight') return 's'; const e = m.exit || 2; return e <= 1 ? 'l' : e === 2 ? 's' : e === 3 ? 'r' : 'u'; };
+  const RBW = { l: 'quẹo trái', s: 'đi thẳng', r: 'quẹo phải', u: 'quay đầu' }, RBE = { l: 'turn left', s: 'go straight on', r: 'turn right', u: 'make a U-turn' };
   const side = (m) => /right/.test(m || '') ? 'phải' : /left/.test(m || '') ? 'trái' : '';
   const nm = (s) => { const n = (s.name || '').trim(), r = (s.ref || '').split(';')[0]; return n ? n + (r && n.indexOf(r) < 0 ? ' (' + r + ')' : '') : r; };
   const DIRE = { uturn: 'Make a U-turn', 'sharp right': 'Turn sharp right', right: 'Turn right', 'slight right': 'Bear right', straight: 'Go straight', 'slight left': 'Bear left', left: 'Turn left', 'sharp left': 'Turn sharp left' };
@@ -46,8 +49,7 @@
       case 'off ramp': { const d = (s.destinations || '').split(',')[0].replace(/^[^:]*:\s*/, ''); return 'Take exit' + (s.exits ? ' ' + s.exits.split(';')[0] : '') + (sd ? ' on the ' + sd : '') + (d ? ' towards ' + d : onto); }
       case 'fork': return 'Keep ' + (sd || 'straight') + (n ? ' on ' + n : '');
       case 'end of road': return 'At the end of the road, ' + (DIRE[mod] || 'turn').toLowerCase() + onto;
-      case 'roundabout': case 'rotary': return 'At the roundabout, take exit ' + (m.exit || 1) + onto;
-      case 'roundabout turn': return (DIRE[mod] || 'Continue') + ' at the roundabout' + onto;
+      case 'roundabout': case 'rotary': case 'roundabout turn': return 'At the roundabout, ' + RBE[rbWay(m)] + onto;
       case 'exit roundabout': case 'exit rotary': return 'Exit the roundabout' + onto;
       case 'continue': case 'new name': return mod && mod !== 'straight' ? (DIRE[mod] || 'Continue') + onto : 'Continue' + (n ? ' on ' + n : '');
       default: return (DIRE[mod] || 'Continue') + onto;
@@ -62,10 +64,9 @@
       case 'on ramp': return 'Lên đường dẫn' + (side(mod) ? ' bên ' + side(mod) : '') + onto;
       case 'off ramp': { const d = (s.destinations || '').split(',')[0].replace(/^[^:]*:\s*/, ''); return 'Ra lối' + (s.exits ? ' số ' + s.exits.split(';')[0] : '') + (side(mod) ? ' bên ' + side(mod) : '') + (d ? ' về ' + d : onto); }
       case 'fork': return 'Giữ ' + (side(mod) || 'thẳng') + (n ? ' theo ' + n : '');
-      case 'end of road': return 'Cuối đường ' + (DIRW[mod] || 'rẽ').toLowerCase() + onto;
-      case 'roundabout': case 'rotary': return 'Vô vòng xoay, ra lối thứ ' + (m.exit || 1) + onto;
-      case 'roundabout turn': return (DIRW[mod] || 'Đi') + ' ở vòng xoay' + onto;
-      case 'exit roundabout': case 'exit rotary': return 'Ra khỏi vòng xoay' + onto;
+      case 'end of road': return 'Cuối đường ' + (DIRW[mod] || 'quẹo').toLowerCase() + onto;
+      case 'roundabout': case 'rotary': case 'roundabout turn': return 'Tới bùng binh, ' + RBW[rbWay(m)] + onto;
+      case 'exit roundabout': case 'exit rotary': return 'Ra khỏi bùng binh' + onto;
       case 'continue': case 'new name': return mod && mod !== 'straight' ? (DIRW[mod] || 'Đi tiếp') + onto : 'Đi thẳng' + (n ? ' theo ' + n : '');
       default: return (DIRW[mod] || 'Đi tiếp') + onto;
     }
@@ -150,7 +151,7 @@
   // o = { show, night, style, bright, van, brg, spd, drive, padL, rt:{sig,pts,stops,color}, places:[{lat,lon,name,logo}], park }
   NAV.sync = (o) => {
     document.body.classList.toggle('map-on', !!o.show);
-    if (!o.show) return;
+    if (!o.show) { NAV.__shown = false; return; }
     if (!ensure()) return;
     NAV.padL = o.padL || 40;
     let key = o.style === 'auto' || !TILES[o.style] ? (o.night ? 'dark' : 'light') : o.style;
@@ -159,6 +160,10 @@
     if (layerKey !== key) { if (layer) map.removeLayer(layer); layer = mkLayer(TILES[key]).addTo(map); layerKey = key; }
     const tp = wrap.querySelector('.leaflet-tile-pane'); if (tp) tp.style.filter = o.bright && o.bright !== 100 ? 'brightness(' + (o.bright / 100) + ')' : '';
     if (!box.__sized) { box.__sized = true; setTimeout(() => map.invalidateSize(false), 60); }
+    { const sz = box.clientWidth + 'x' + box.clientHeight;
+      if (box.clientWidth && (sz !== box.__sz || !NAV.__shown)) { box.__sz = sz; NAV.__shown = true; if (rotOn) sizeWrap(); map.invalidateSize(false); setTimeout(() => { map.invalidateSize(false); if (layer && layer.redraw) layer.redraw(); }, 120); NAV.__shownAt = Date.now(); if (follow && (Car.cur || o.van)) map.setView(Car.cur || o.van, map.getZoom(), { animate: false }); startLoop(); }
+      // still no map picture 2.5 s after showing → build the layer again
+      if (NAV.__shownAt && Date.now() - NAV.__shownAt > 2500 && Date.now() - NAV.__shownAt < 9000 && layer && !wrap.querySelector('.leaflet-tile-loaded') && navigator.onLine !== false) { NAV.__shownAt = 0; map.removeLayer(layer); layer = mkLayer(TILES[layerKey]).addTo(map); } }
     // what to draw: active/preview navigation route > Road Trip route; history trail; places
     const S = NAV.st, R = S.route;
     const sig = (R ? 'n' + R.id + ':' + S.altPick + ':' + S.alts.length : '') + '|' + (o.rt ? o.rt.sig : '') + '|' + (S.preview ? S.preview.t0 : '') + '|' + (o.places || []).map((p) => p.name).join(',') + '|' + (o.park ? o.park.t : '') + '|' + (S.wps || []).length;
@@ -197,17 +202,20 @@
     // the car: targets only — the animation loop moves the arrow and the map smoothly (#91)
     lastVan = o.van || null; Car.spd = o.spd || 0; Car.drive = !!o.drive;
     if (o.van) {
-      let tgt = o.van, brg = o.brg;
-      // snap onto the route while following it, so the arrow sits on the blue line (#89/#90)
-      if (S.active && S.snap && Date.now() - S.snap.t < 3000) { tgt = S.snap.p; if (S.snap.brg != null && (o.spd || 0) > 3) brg = S.snap.brg; }
-      if (!Car.to || dist(Car.to, tgt) > 0.5) { Car.from = Car.cur || tgt; Car.to = tgt; Car.t0 = performance.now(); }
-      if (brg != null && (o.spd || 0) > 2) Car.brgT = brg; else if (Car.brgT == null) Car.brgT = brg || 0;
+      let tgt = o.van, brg = null;
+      // 0.9.12 (#106/#112): a parked phone's GPS heading is random — the heading only follows GPS from 5 km/h;
+      // while navigating on the route it follows the blue line (also at a standstill, e.g. right after "Đi")
+      if (S.active && !S.offRoute && S.snap && Date.now() - S.snap.t < 3000) { tgt = S.snap.p; brg = S.snap.brg; }
+      else if (S.active && !S.offRoute && R && R.pts.length > 1 && !S.snap) brg = bearingOf(R.pts[0], R.pts[Math.min(R.pts.length - 1, 3)]);
+      else if (o.brg != null && (o.spd || 0) >= 5) brg = o.brg;
+      if (!Car.to || dist(Car.to, tgt) > 0.5) { const nw = performance.now(); if (Car.t0) Car.iv = Math.max(600, Math.min(2000, (Car.iv || 1000) * 0.7 + (nw - Car.t0) * 0.3)); Car.from = Car.cur || tgt; Car.to = tgt; Car.t0 = nw; }
+      if (brg != null) Car.brgT = brg; else if (Car.brgT == null) Car.brgT = 0;
       if (!van) { Car.cur = tgt; Car.brg = Car.brgT || 0; van = window.L.marker(tgt, { icon: arrowIco(0), keyboard: false, zIndexOffset: 1000 }).addTo(map); }
       if (!follow && userAt && (o.drive || S.active) && Date.now() - userAt > 10000) follow = true;
       if (!box.__first && follow) { box.__first = true; map.setView(tgt, 15, { animate: false }); }
       startLoop();
     }
-    Car.rotate = !!(NAV.cfg.rotate && (S.active || (Car.drive && (o.spd || 0) > 8)));   // heading-up while navigating or driving (#95)
+    Car.rotate = !!(NAV.cfg.rotate && !NAV.northUp && (S.active || (Car.drive && (o.spd || 0) > 8)));   // heading-up while navigating or driving (#95)
     // passed part of the route turns grey (#91)
     if (R && S.active && routeL && passedL0 !== S.idx + ':' + R.id) {
       passedL0 = S.idx + ':' + R.id;
@@ -222,9 +230,12 @@
   // ---------------- smooth car + camera (#91) ----------------
   const Car = { cur: null, from: null, to: null, t0: 0, brg: 0, brgT: 0, spd: 0, rotate: false, drive: false };
   const Rot = { free: false, ang: 0, view: 0, movedAt: 0 };   // view = how far the map is turned on screen (deg, clockwise)
-  NAV.compass = () => { Rot.free = false; Rot.ang = 0; follow = true; userAt = 0; if (map && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true }); startLoop(); redraw(); };
+  NAV.northUp = false;
+  NAV.compass = () => { if (Rot.free || !follow) NAV.northUp = false; else if (NAV.cfg.rotate) { NAV.northUp = !NAV.northUp; toast(NAV.northUp ? (EN() ? 'North up' : 'Hướng Bắc lên trên') : (EN() ? 'Heading up' : 'Theo hướng xe chạy')); } Rot.free = false; Rot.ang = 0; follow = true; userAt = 0; if (map && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true }); startLoop(); redraw(); };
   NAV.viewAngle = () => Rot.view;
-  let passedL = null, passedL0 = '', loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999;
+  let passedL = null, passedL0 = '', loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999, rotSz = '';
+  const sizeWrap = () => { rotSz = box.clientWidth + 'x' + box.clientHeight; const d = Math.ceil(Math.hypot(box.clientWidth, box.clientHeight)) + 8; wrap.style.width = rotOn ? d + 'px' : '100%'; wrap.style.height = rotOn ? d + 'px' : '100%'; };
+  const bearingOf = (a, b) => { const y = Math.sin((b[1] - a[1]) * RAD) * Math.cos(b[0] * RAD), x = Math.cos(a[0] * RAD) * Math.sin(b[0] * RAD) - Math.sin(a[0] * RAD) * Math.cos(b[0] * RAD) * Math.cos((b[1] - a[1]) * RAD); return (Math.atan2(y, x) / RAD + 360) % 360; };
   const angDiff = (a, b) => ((b - a + 540) % 360) - 180;
   const startLoop = () => { if (loopOn) return; loopOn = true; requestAnimationFrame(frame); };
   const frame = (ts) => {
@@ -233,7 +244,7 @@
     const fps = (NAV.st.active || Car.drive || Date.now() - Rot.movedAt < 1500) ? 24 : 6;   // smooth while turning the map
     if (ts - lastFrame < 1000 / fps) return; lastFrame = ts;
     // glide from the last position to the new one over ~1 s (fixes arrive about once a second)
-    const k = Math.min(1, (ts - Car.t0) / 1000);
+    const k = Math.min(Car.spd >= 5 ? 1.2 : 1, (ts - Car.t0) / (Car.iv || 1000));
     Car.cur = [Car.from[0] + (Car.to[0] - Car.from[0]) * k, Car.from[1] + (Car.to[1] - Car.from[1]) * k];
     Car.brg = (Car.brg + angDiff(Car.brg, Car.brgT || 0) * 0.18 + 360) % 360;
     van.setLatLng(Car.cur);
@@ -241,10 +252,10 @@
     const rot = Car.rotate;
     const ang = Rot.free ? Rot.ang : (rot ? (360 - Car.brg) % 360 : 0); Rot.view = ang;
     const turned = Math.abs(((ang + 540) % 360) - 180) < 179.5;   // any angle but 0
-    if (turned !== rotOn) { rotOn = turned; wrap.style.width = wrap.style.height = turned ? '160%' : '100%'; map.invalidateSize(false); lastIcoBrg = -999; }
+    if (turned !== rotOn || (turned && box.clientWidth + 'x' + box.clientHeight !== rotSz)) { rotOn = turned; sizeWrap(); map.invalidateSize(false); lastIcoBrg = -999; }
     wrap.style.transform = 'translate(-50%,-50%)' + (turned ? ' rotate(' + ang.toFixed(1) + 'deg)' : '');
     const cmp = document.getElementById('tccompassN'); if (cmp) cmp.style.transform = 'rotate(' + ang.toFixed(0) + 'deg)';
-    const icoB = (Math.round((Car.brg + ang) / 3) * 3 + 360) % 360;
+    const icoB = (Math.round(Car.brg / 3) * 3 + 360) % 360;
     if (icoB !== lastIcoBrg) { lastIcoBrg = icoB; van.setIcon(arrowIco(icoB)); }
     if (follow) {
       let z = map.getZoom();
@@ -344,11 +355,16 @@
     } catch (e) {}
     return { id: Math.random().toString(36).slice(2, 8), lim, pts, cum, steps, dist: r.distance, dur: r.duration, tolls, noEx: !!noEx, legs: r.legs.map((l) => ({ dist: l.distance, dur: l.duration })) };
   };
-  NAV.route = (wps, avoid) => {
+  // 0.9.12 (#113): every routing call has a time limit, and a second server answers when the first is slow or busy
+  const OSRM2 = 'https://routing.openstreetmap.de/routed-car/route/v1/driving/';
+  NAV.route = (wps, avoid, startBrg) => {
     const coords = wps.map((w) => (+w.lon).toFixed(6) + ',' + (+w.lat).toFixed(6)).join(';');
-    const base = OSRM + coords + '?overview=full&geometries=geojson&steps=true&annotations=maxspeed&alternatives=' + (wps.length === 2 ? '3' : 'false');
+    // start in the direction the car is facing, so a new route does not ask for a U-turn
+    const brgs = startBrg != null ? '&bearings=' + Math.round(startBrg) + ',60' + ';'.repeat(wps.length - 1) : '';
+    const base = OSRM + coords + '?overview=full&geometries=geojson&steps=true&annotations=maxspeed&alternatives=' + (wps.length === 2 ? '3' : 'false') + brgs;
     const ex = (avoid || []).join(',');
-    const go = (u) => fetch(u).then((r) => r.json());
+    const go = (u) => tfetch(u, 8000).then((r) => { if (!r.ok) throw new Error('http ' + r.status); return r.json(); })
+      .catch(() => tfetch(u.replace(OSRM, OSRM2), 10000).then((r) => r.json()));
     const noAnn = (u) => u.replace('&annotations=maxspeed', '');
     return go(base + (ex ? '&exclude=' + ex : '')).then((j) => j.code === 'Ok' ? j : go(noAnn(base) + (ex ? '&exclude=' + ex : ''))).then((j) => (j.code === 'Ok' || !ex) ? j : go(noAnn(base)).then((j2) => { j2.noEx = true; return j2; }))
       .then((j) => { if (j.code !== 'Ok' || !j.routes || !j.routes.length) throw new Error(j.message || 'route'); return j.routes.map((r) => build(r, wps, j.noEx)); });
@@ -367,7 +383,7 @@
   NAV.cancel = () => { const S = NAV.st; S.active = false; S.route = null; S.alts = []; S.wps = []; S.dest = null; S.err = ''; fittedSig = ''; redraw(); };
   NAV.start = () => {
     const S = NAV.st; if (!S.route) return;
-    S.active = true; S.idx = 0; S.said = {}; S.off = 0; S.startAt = Date.now(); S.alts = [S.route]; S.next = 1; S.toNext = S.route.steps[1] ? S.route.steps[1].at : S.route.dist;
+    S.active = true; S.idx = 0; S.said = {}; S.off = 0; S.offRoute = false; S.rerouting = false; S.snap = null; S.startAt = Date.now(); S.alts = [S.route]; S.next = 1; S.toNext = S.route.steps[1] ? S.route.steps[1].at : S.route.dist;
     S.remain = S.route.dist; S.remainDur = S.route.dur; follow = true; userAt = 0;
     const first = S.route.steps[1];
     if (EN()) say('Starting directions to ' + (S.dest ? S.dest.name : 'your destination') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' In ' + sayDist(first.at) + ', ' + first.text.toLowerCase() + '.' : '')); else if (NAV.cfg.clip) say('Bắt đầu chỉ đường.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + stepSay(first).toLowerCase() + '.' : '')); else say('Bắt đầu chỉ đường tới ' + (S.dest ? S.dest.name : 'nơi đến') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + first.text.toLowerCase() + '.' : ''));
@@ -390,8 +406,12 @@
     const p = [f.lat, f.lon];
     let best = 1e9, bi = S.idx || 0, bt = 0; const a = Math.max(0, (S.idx || 0) - 8), b = Math.min(R.pts.length - 1, (S.idx || 0) + 600);
     for (let i = a; i < b; i++) { const q = segProj(p, R.pts[i], R.pts[i + 1]); if (q.d < best) { best = q.d; bi = i; bt = q.t; } }
-    if (best > Math.max(55, (f.acc || 0) * 1.5)) { S.off = (S.off || 0) + 1; if (S.off >= 3 && Date.now() - (S.rerouteAt || 0) > 15000) reroute(p); return; }
-    S.off = 0; S.idx = bi;
+    if (best > Math.max(40, (f.acc || 0) * 1.5)) {
+      S.off = (S.off || 0) + 1; if (S.off >= 2 && !S.offRoute) { S.offRoute = true; redraw(); }
+      if (S.off >= 2 && !S.rerouting && Date.now() - (S.rerouteAt || 0) > (S.rerouteOk ? 10000 : 4000)) reroute(p, f.spd >= 5 ? f.brg : null);
+      return;
+    }
+    S.off = 0; S.idx = bi; if (S.offRoute) { S.offRoute = false; }
     { const A = R.pts[bi], B = R.pts[bi + 1] || A; const sp = [A[0] + (B[0] - A[0]) * bt, A[1] + (B[1] - A[1]) * bt];
       const y = Math.sin((B[1] - A[1]) * RAD) * Math.cos(B[0] * RAD), x = Math.cos(A[0] * RAD) * Math.sin(B[0] * RAD) - Math.sin(A[0] * RAD) * Math.cos(B[0] * RAD) * Math.cos((B[1] - A[1]) * RAD);
       S.snap = { p: sp, brg: (Math.atan2(y, x) / RAD + 360) % 360, t: Date.now() }; }
@@ -407,18 +427,21 @@
     redraw();
   };
   const arrive = () => { const S = NAV.st, d = S.dest; say(EN() ? 'You have arrived' + (d && d.name ? ' at ' + d.name : '') + '.' : 'Đã tới nơi' + (d && d.name && !NAV.cfg.clip ? ', ' + d.name : '') + '.'); toast('🏁 Đã tới ' + (d ? d.name : 'nơi')); S.arrivedAt = Date.now(); S.active = false; setTimeout(() => { if (!NAV.st.active) NAV.cancel(); }, 45000); redraw(); };
-  const reroute = (p) => {
-    const S = NAV.st; S.rerouteAt = Date.now(); say(EN() ? 'Recalculating' : 'Đang tính lại đường');
+  const reroute = (p, brg) => {
+    const S = NAV.st; S.rerouteAt = Date.now(); S.rerouting = true; redraw();
+    if (Date.now() - (S.rerouteSaid || 0) > 25000) { S.rerouteSaid = Date.now(); say(EN() ? 'Recalculating' : 'Đang tìm đường mới'); }
     const R = S.route; const passedLegs = R.steps.slice(0, S.next).filter((s) => s.wp).length;
     const rest = S.wps.slice(1 + passedLegs);
-    if (!rest.length) return;
-    NAV.route([{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest), NAV.cfg.avoid).then((rs) => { S.route = rs[0]; S.alts = [rs[0]]; S.wps = [{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest); S.idx = 0; S.said = {}; S.off = 0; redraw(); }).catch(() => {});
+    if (!rest.length) { S.rerouting = false; return; }
+    NAV.route([{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest), NAV.cfg.avoid, brg).then((rs) => { if (!S.active) return; S.route = rs[0]; S.alts = [rs[0]]; S.wps = [{ name: 'Vị trí của Tom', lat: p[0], lon: p[1] }].concat(rest); S.idx = 0; S.said = {}; S.off = 0; S.offRoute = false; S.snap = null; S.rerouting = false; S.rerouteOk = true; S.rerouteAt = Date.now(); redraw(); })
+      .catch(() => { S.rerouting = false; S.rerouteOk = false; S.rerouteAt = Date.now(); if (Date.now() - (S.netToast || 0) > 30000) { S.netToast = Date.now(); toast(EN() ? 'Slow network — trying again…' : 'Mạng chậm — đang thử lại…'); } redraw(); });
   };
   NAV.limitNow = () => { const S = NAV.st, R = S.route; if (!S.active || !R || !R.lim || !R.lim.length) return null; const along = R.dist - (S.remain || R.dist); let v = null, ahead = null; for (let i = 0; i < R.lim.length; i++) { if (R.lim[i].at <= along + 5) v = R.lim[i].v; else { if (R.lim[i].at - along < 300) ahead = R.lim[i].v; break; } } return v ? { v, ahead: ahead && ahead !== v ? ahead : null } : null; };
   NAV.navView = () => {
     const S = NAV.st, R = S.route; if (!R) return null;
     const st = R.steps[S.next || 1] || R.steps[R.steps.length - 1], st2 = R.steps[(S.next || 1) + 1];
     const remain = S.active ? S.remain : R.dist, dur = S.active ? S.remainDur : R.dur;
+    if (S.active && (S.rerouting || S.offRoute)) return { active: true, ico: 'straight', dist: '…', text: EN() ? 'Finding a new route…' : 'Đang tìm đường mới…', then: '', thenDist: '', thenIco: '', eta: hhmm(Date.now() + dur * 1000), left: fmtDur(dur), km: fmtDist(remain), dest: S.dest ? S.dest.name : '', destLogo: '', tolls: R.tolls, noEx: R.noEx, alts: [], planning: false, err: '', rerouting: true };
     return { active: S.active, ico: st ? st.ico : 'straight', dist: fmtDist(S.active ? S.toNext : (R.steps[1] ? R.steps[1].at : R.dist)), text: st ? st.text : '', then: st2 ? st2.text : '', thenDist: st2 ? fmtDist(st2.at - st.at) : '', thenIco: st2 ? st2.ico : '',
       eta: hhmm(Date.now() + dur * 1000), left: fmtDur(dur), km: fmtDist(remain), dest: S.dest ? S.dest.name : '', destLogo: S.dest ? S.dest.logo || logoOf(S.dest.name) : '', tolls: R.tolls, noEx: R.noEx,
       alts: S.alts.map((a, i) => ({ label: a.label || ('Đường ' + (i + 1)), km: fmtDist(a.dist), min: fmtDur(a.dur), toll: a.tolls.length > 0, on: i === S.altPick, pick: () => NAV.pickAlt(i) })), planning: !!S.planning, err: S.err };
