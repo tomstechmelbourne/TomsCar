@@ -89,7 +89,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: ['29', '35']
+        api: ['31', '35']   # 31 = Android 12 (S10 Plus), 35 = Android 15
     steps:
       - uses: actions/checkout@v4
       - name: Get APK
@@ -109,7 +109,7 @@ jobs:
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
-          target: ${{ matrix.api == '35' && 'google_apis' || 'default' }}
+          target: google_apis
           disable-animations: true
           disk-size: 6000M
           ram-size: 4096M

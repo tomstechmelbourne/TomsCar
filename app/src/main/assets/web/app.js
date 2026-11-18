@@ -223,6 +223,9 @@ window.__AppComp = function() {
   const DEFAULTS = {
     vnVoice: "doan",
     navVol: 80,
+    mapEngine: "gl",
+    mapTilt: true,
+    driveRec: true,
     startScr: "home",
     splashSec: 3,
     idlePlace: true,
@@ -593,6 +596,16 @@ window.__AppComp = function() {
     toast(t) {
       this.setState({ toast: t, toastAt: Date.now() });
     }
+    // 0.9.13 (#125): the HERE key is pasted from the clipboard (Tom copies it in the HERE website)
+    onClip(t) {
+      if (this.__clipFor !== "here") return;
+      this.__clipFor = "";
+      const k = String(t || "").trim();
+      if (/^[A-Za-z0-9_-]{30,64}$/.test(k)) {
+        this.setS("hereKey", k);
+        this.toast("\u0110\xE3 l\u01B0u kh\xF3a HERE \u2014 chuy\u1EBFn sau t\xECm \u0111\u01B0\u1EDDng b\u1EB1ng HERE");
+      } else this.toast(k ? "Ch\u1EEF v\u1EEBa ch\xE9p kh\xF4ng gi\u1ED1ng kh\xF3a HERE \u2014 ch\xE9p l\u1EA1i kh\xF3a r\u1ED3i b\u1EA5m D\xE1n Kh\xF3a" : "B\u1ED9 nh\u1EDB t\u1EA1m \u0111ang tr\u1ED1ng \u2014 ch\xE9p kh\xF3a HERE tr\u01B0\u1EDBc");
+    }
     say(t, sensitive) {
       if (window.tcTr) t = window.tcTr(t);
       this.toast(t);
@@ -845,7 +858,28 @@ window.__AppComp = function() {
           tg("navVoice", "\u0110\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng", "Qu\u1EB9o tr\xE1i, qu\u1EB9o ph\u1EA3i, b\xF9ng binh\u2026 b\u1EB1ng gi\u1ECDng Vi\u1EC7t \xB7 t\u1EAFt nhanh b\u1EB1ng n\xFAt \u{1F50A} c\u1EA1nh gi\u1EDD t\u1EDBi"),
           ch("navVol", "\xC2m l\u01B0\u1EE3ng gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng", "Nh\u1EA1c t\u1EF1 nh\u1ECF l\u1EA1i trong l\xFAc gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng n\xF3i", [[60, "V\u1EEBa"], [80, "To"], [100, "R\u1EA5t to"]]),
           tg("navCams", "Nh\u1EAFc camera t\u1ED1c \u0111\u1ED9 + v\xF9ng tr\u01B0\u1EDDng h\u1ECDc", "D\u1EEF li\u1EC7u OpenStreetMap \u2014 c\xF3 th\u1EC3 thi\u1EBFu ch\u1ED7"),
-          ch("navHeading", "H\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3 khi ch\u1EC9 \u0111\u01B0\u1EDDng", "Theo h\u01B0\u1EDBng xe: h\u01B0\u1EDBng ch\u1EA1y lu\xF4n \u1EDF ph\xEDa tr\xEAn, nh\u01B0 Google Maps", [[true, "Theo h\u01B0\u1EDBng xe"], [false, "H\u01B0\u1EDBng B\u1EAFc"]]),
+          ch("navHeading", "H\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3 khi ch\u1EC9 \u0111\u01B0\u1EDDng", "Theo h\u01B0\u1EDBng xe: h\u01B0\u1EDBng ch\u1EA1y lu\xF4n \u1EDF ph\xEDa tr\xEAn, nh\u01B0 Google Maps \xB7 n\xFAt la b\xE0n c\u0169ng \u0111\u1ED5i \u0111\u01B0\u1EE3c", [[true, "Theo h\u01B0\u1EDBng xe"], [false, "H\u01B0\u1EDBng B\u1EAFc"]]),
+          ch("mapEngine", "Lo\u1EA1i b\u1EA3n \u0111\u1ED3", "Vector: ch\u1EEF lu\xF4n \u0111\u1EE9ng th\u1EB3ng, xoay m\u01B0\u1EE3t, nghi\xEAng 3D \xB7 Ki\u1EC3u c\u0169: d\xF9ng \u0111\u01B0\u1EE3c b\u1EA3n \u0111\u1ED3 offline \u0111\xE3 t\u1EA3i \xB7 \u0111\u1ED5i xong m\u1EDF l\u1EA1i app", [["gl", "Vector (m\u1EDBi)"], ["old", "Ki\u1EC3u c\u0169"]]),
+          tg("mapTilt", "Nghi\xEAng 3D khi ch\u1EA1y", "Ch\u1EC9 v\u1EDBi b\u1EA3n \u0111\u1ED3 Vector \xB7 m\xE1y y\u1EBFu th\xEC app t\u1EF1 t\u1EAFt cho m\u01B0\u1EE3t"),
+          Object.assign(
+            stt("Kh\xF3a HERE \u2014 t\xECm \u0111\u01B0\u1EDDng c\xF3 k\u1EB9t xe", C.hereKey ? "Kh\xF3a " + C.hereKey.slice(0, 4) + "\u2026" + C.hereKey.slice(-3) + " \xB7 h\xF4m nay " + (window.NAV ? window.NAV.hereToday() : 0) + "/300 l\u01B0\u1EE3t \xB7 l\u1ED7i hay h\u1EBFt l\u01B0\u1EE3t th\xEC t\u1EF1 d\xF9ng m\xE1y ch\u1EE7 mi\u1EC5n ph\xED" : "Ch\xE9p kh\xF3a API c\u1EE7a HERE r\u1ED3i b\u1EA5m D\xE1n Kh\xF3a \xB7 ch\u01B0a c\xF3 th\xEC d\xF9ng m\xE1y ch\u1EE7 mi\u1EC5n ph\xED", !!C.hereKey, "\u0110ang d\xF9ng HERE", "Ch\u01B0a c\xF3 kh\xF3a", "D\xE1n Kh\xF3a", () => {
+              self.__clipFor = "here";
+              tcn("clip", "");
+            }),
+            C.hereKey ? { hasAct: true, actL: "Xo\xE1 Kh\xF3a", act: () => {
+              self.setS("hereKey", "");
+              self.toast("\u0110\xE3 xo\xE1 kh\xF3a HERE");
+            } } : {}
+          ),
+          tg("driveRec", "Ghi chuy\u1EBFn \u0111i", "Ghi v\u1ECB tr\xED GPS, h\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3, c\xE2u ch\u1EC9 \u0111\u01B0\u1EDDng\u2026 \u0111\u1EC3 g\u1EEDi Claude s\u1EEDa l\u1ED7i b\u1EA3n \u0111\u1ED3 \xB7 ch\u1EC9 l\u01B0u trong m\xE1y"),
+          Object.assign(stt("G\u1EEDi chuy\u1EBFn \u0111i", window.NAV ? "Chuy\u1EBFn n\xE0y: " + window.NAV.recInfo().min + " ph\xFAt \xB7 k\xE8m chuy\u1EBFn tr\u01B0\u1EDBc" : "", false, "", C.driveRec ? "Ch\u01B0a g\u1EEDi" : 'B\u1EADt "Ghi chuy\u1EBFn \u0111i" tr\u01B0\u1EDBc', C.driveRec ? "G\u1EEDi Chuy\u1EBFn \u0110i" : "", () => {
+            const NV1 = window.NAV;
+            if (!NV1) return;
+            const v = window.TC_VERSION || "";
+            const d2 = /* @__PURE__ */ new Date();
+            const nm = "TomsCar-chuyen-di-" + d2.getFullYear() + ("0" + (d2.getMonth() + 1)).slice(-2) + ("0" + d2.getDate()).slice(-2) + "-" + ("0" + d2.getHours()).slice(-2) + ("0" + d2.getMinutes()).slice(-2) + ".json";
+            tcn("sharefile", JSON.stringify({ name: nm, subject: "Chuy\u1EBFn \u0111i Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || "" }) }));
+          }), { stC: "#8FC3D3" }),
           tg("tripLog", "Nh\u1EADt k\xFD H\xE0nh Tr\xECnh", "T\u1EF1 ghi ch\u1ED7 \u0111\u1EADu h\u01A1n 3 ph\xFAt \u2014 ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y, kh\xF4ng g\u1EEDi \u0111i \u0111\xE2u"),
           { isChoice: true, label: "N\xFAt t\xECm nhanh (M\xE0n H\xECnh Ch\xEDnh)", hint: "Ch\u1EA1m \u0111\u1EC3 b\u1EADt/t\u1EAFt t\u1EEBng n\xFAt \u2014 k\u1EBFt qu\u1EA3 hi\u1EC7n ngay tr\xEAn b\u1EA3n \u0111\u1ED3, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng th\xEC t\xECm d\u1ECDc \u0111\u01B0\u1EDDng", opts: Object.keys(QC).map((k) => {
             const cur = Array.isArray(C.qcList) && C.qcList.length ? C.qcList : QC_DEF;
@@ -885,13 +919,14 @@ window.__AppComp = function() {
         ] },
         gt: { label: "Gi\u1EDBi Thi\u1EC7u", icon: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01", desc: "Th\xF4ng tin app", rows: [
           info("Phi\xEAn b\u1EA3n", "Tom\u2019s Technology Solutions", window.TC_VERSION || "0.9.5-beta"),
+          info("M\xE1y \u0111ang ch\u1EA1y", "G\u1EEDi k\xE8m khi b\xE1o l\u1ED7i", LV.device || (APP ? "\u2014" : "Tr\xECnh duy\u1EC7t")),
           info("Kh\u1EA9u hi\u1EC7u", "", "Focus On One Thing And Do It Well"),
           info("Bi\u1EC3u t\u01B0\u1EE3ng d\u1ECBch v\u1EE5", "Theo AS 1742.6 (n\u1EC1n xanh, h\xECnh tr\u1EAFng)", "D\u1EF1a theo b\u1ED9 bi\u1EC3n c\u1EE7a QLD TMR \u2014 CC BY 4.0"),
           info("H\xECnh \u0111\u1ECBa \u0111i\u1EC3m", "", "Wikimedia Commons \xB7 Wikidata"),
           info("Logo h\xE3ng", "\u0110\xF3ng s\u1EB5n trong app l\xFAc build", "Trang web ch\xEDnh th\u1EE9c c\u1EE7a t\u1EEBng h\xE3ng"),
           info("Th\u1EDDi ti\u1EBFt", "", "Open-Meteo"),
-          info("B\u1EA3n \u0111\u1ED3", "T\u1ED1i/S\xE1ng \xA9 CARTO \xB7 \u0110\u1ECBa H\xECnh \xA9 OpenTopoMap \xB7 V\u1EC7 Tinh \xA9 Esri", "\xA9 OpenStreetMap contributors"),
-          info("T\xECm \u0111\u01B0\u1EDDng chuy\u1EBFn m\u1EDBi", "", "OSRM \xB7 Nominatim (OpenStreetMap)")
+          info("B\u1EA3n \u0111\u1ED3", "Vector \xA9 OpenFreeMap \xB7 ki\u1EC3u c\u0169 \xA9 Esri \xB7 \u0110\u1ECBa H\xECnh \xA9 OpenTopoMap \xB7 V\u1EC7 Tinh \xA9 Esri", "\xA9 OpenStreetMap contributors \xB7 MapLibre"),
+          info("T\xECm \u0111\u01B0\u1EDDng", "HERE (khi c\xF3 kh\xF3a) \xB7 OSRM", "\xA9 HERE \xB7 OpenStreetMap")
         ] }
       };
       const warnOf = (g) => GRP[g].rows.some((r) => r.isStatus && r.stL.charAt(0) === "\u26A0");
@@ -2464,6 +2499,10 @@ window.__AppComp = function() {
       const shell = !nar && (S.scr === "home" || S.scr === "trip" || S.scr === "rt");
       if (window.tcLangSync) window.tcLangSync(C.lang === "en" ? "en" : "vi");
       if (NV) {
+        NV.cfg.engine = C.mapEngine || "gl";
+        NV.cfg.tilt = C.mapTilt !== false;
+        NV.cfg.hereKey = C.hereKey || "";
+        NV.cfg.rec = !!C.driveRec;
         NV.cfg.rotate = C.navHeading !== false;
         NV.cfg.cams = C.navCams !== false;
         NV.cfg.histOff = C.tripLog === false;
@@ -2646,6 +2685,7 @@ window.__AppComp = function() {
         },
         gmaps: extNav("gmaps"),
         waze: extNav("waze"),
+        here: extNav("here"),
         etaOn: shell && navAct && mapShow && etaOpen,
         etaMini: shell && navAct && mapShow && !etaOpen,
         etaTap: () => self.setState({ etaOpen: !etaOpen }),
@@ -2692,7 +2732,7 @@ window.__AppComp = function() {
         }),
         rot: () => self.setS("navHeading", C.navHeading === false),
         compass: () => {
-          if (NV) NV.compass();
+          if (NV && NV.compass() === "toggle") self.setS("navHeading", !(C.navHeading !== false));
         },
         followOff: shell && mapShow && NV && !NV.following() && (navAct || drive),
         refollowL: "B\u1EA3n \u0111\u1ED3 s\u1EBD t\u1EF1 theo xe sau 10 gi\xE2y"
@@ -3291,7 +3331,18 @@ window.__AppComp = function() {
           tcn("voice", "start");
         },
         micOff: APP && PM.mic === false,
-        micCls: APP && PM.mic === false ? "" : S.va ? "mic-listen" : S.now - (S.replyAt || 0) < 3e3 ? "mic-reply" : drive ? "mic-idle mic-calm" : "mic-idle",
+        micCls: APP && PM.mic === false ? "" : S.va ? "mic-listen" : S.now - (S.replyAt || 0) < 3e3 ? "mic-reply" : C.hotOn === false ? "" : drive ? "mic-idle mic-calm" : "mic-idle",
+        // 0.9.13 (#122): ear button — turn listening for "Hey Tom" off/on right from Màn Hình Chính (the mic button still works)
+        earOn: C.hotOn === false ? "false" : "true",
+        earC: C.hotOn === false ? "#8A9AA6" : "#5FD4F0",
+        earSlash: C.hotOn === false ? 1 : 0,
+        earL: C.hotOn === false ? "T\u1EAET" : "HEY TOM",
+        earA: C.hotOn === false ? "B\u1EADt nghe Hey Tom" : "T\u1EAFt nghe Hey Tom",
+        earTap: () => {
+          const on = C.hotOn === false;
+          self.setS("hotOn", on);
+          self.toast(on ? '\u0110\xE3 b\u1EADt nghe "Hey Tom"' : '\u0110\xE3 t\u1EAFt nghe "Hey Tom" \u2014 b\u1EA5m n\xFAt mic \u0111\u1EC3 g\u1ECDi tr\u1EE3 l\xFD');
+        },
         micBg: APP && PM.mic === false ? "#5E6B73" : "#FBB040",
         micW: APP && PM.mic === false ? "#5E6B73" : S.va ? "#FBB040" : "#5FD4F0",
         micA: APP && PM.mic === false ? "ch\u01B0a c\u1EA5p quy\u1EC1n micro" : S.va ? "\u0111ang nghe" : "s\u1EB5n s\xE0ng",
@@ -3777,7 +3828,7 @@ input[type=range]{accent-color:#FBB040}
           <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
           <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
           <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">B\u1EAFt \u0110\u1EA7u</button>
-          <div style="display: flex; gap: 6px"><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">M\u1EDF b\u1EB1ng Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">M\u1EDF b\u1EB1ng Waze</button></div>
+          <div style="display: flex; gap: 6px"><span style="font-size: 12px; color: #9FB6C2; align-self: center; white-space: nowrap">M\u1EDF b\u1EB1ng</span><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Waze</button><button onClick="{{nv.here}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">HERE WeGo</button></div>
           <div style="font-size: 11px; color: #8FC3D3">Th\u1EDDi gian \u01B0\u1EDBc t\xEDnh theo \u0111\u01B0\u1EDDng, ch\u01B0a t\xEDnh k\u1EB9t xe.</div>
         </div>
       </sc-if>
@@ -3991,6 +4042,7 @@ input[type=range]{accent-color:#FBB040}
       <!-- thanh d\u01B0\u1EDBi c\xF9ng (l\xE0m m\u1EDD) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
         <button onClick="{{startListen}}" aria-label="Tr\u1EE3 l\xFD gi\u1ECDng n\xF3i ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
+        <button onClick="{{earTap}}" aria-label="{{earA}}" aria-pressed="{{earOn}}" class="pnl glb" style="width: 52px; height: 64px; padding: 0; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{earC}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 12 0c0 3.5-3 4.5-3 7.5a3.5 3.5 0 0 1-6.2 2.2"></path><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-1.5 3.5"></path><path d="M3 3l18 18" stroke-opacity="{{earSlash}}"></path></svg><span style="font-size: 9px; font-weight: 700; color: {{earC}}; letter-spacing: 0.04em">{{earL}}</span></button>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHI\u1EC6T M\xC1Y</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span><sc-if value="{{obdHintOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 700; color: #FBB040; white-space: nowrap">{{obdHint}}</span></sc-if></div>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">B\xCCNH \u0110I\u1EC6N</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
       </div>

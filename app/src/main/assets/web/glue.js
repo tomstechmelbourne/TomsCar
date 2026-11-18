@@ -27,12 +27,14 @@
       stage.style.width = vw + "px";
       stage.style.height = vh + "px";
       stage.style.transform = "scale(" + s + ")";
+      window.__stageScale = s;
       if (window.__ui) window.__ui.setState({ narrow: true, live: Object.assign({}, live, { vw, vh: Math.round(vh) }) });
     } else {
       const s = w / h >= 1280 / 720 ? h / 720 : w / 1280;
       stage.style.width = w / s + "px";
       stage.style.height = h / s + "px";
       stage.style.transform = "scale(" + s + ")";
+      window.__stageScale = s;
       if (window.__ui) window.__ui.setState({ narrow: false });
     }
   };
@@ -844,6 +846,10 @@
       clearTimeout(u.b2);
       u.setState({ crash: o && o.text || "", boot: null, scr: last });
     }
+  };
+  window.tcClip = (r) => {
+    const o = typeof r === "string" ? JSON.parse(r) : r;
+    if (window.__ui && window.__ui.onClip) window.__ui.onClip(o && o.text);
   };
   window.tcGeo = (r) => {
     if (window.__geoCb) window.__geoCb(typeof r === "string" ? JSON.parse(r) : r);

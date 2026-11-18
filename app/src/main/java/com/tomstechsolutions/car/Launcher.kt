@@ -128,7 +128,17 @@ object Launcher {
     /** Navigate with Waze (main), else Google Maps, else any map app. */
     fun navigate(a: Activity, address0: String) {
         // 0.9.9: "gmaps:lat,lon|name" / "waze:lat,lon|name" = open that app on the route Tom's Car planned
-        val m = Regex("^(gmaps|waze):(-?\\d+\\.?\\d*),(-?\\d+\\.?\\d*)(\\|.*)?$").find(address0.trim())
+        val m = Regex("^(gmaps|waze|here):(-?\\d+\\.?\\d*),(-?\\d+\\.?\\d*)(\\|.*)?$").find(address0.trim())
+        if (m != null && m.groupValues[1] == "here") {
+            // 0.9.13 (#125): HERE WeGo with its own map and voice
+            val ll = m.groupValues[2] + "," + m.groupValues[3]; val nm = Uri.encode(m.groupValues[4].removePrefix("|").ifBlank { "Điểm đến" })
+            val tries = listOf(Intent(Intent.ACTION_VIEW, Uri.parse("here.directions://v1.0/mylocation/$ll,$nm?ref=TomsCar&m=d")).setPackage("com.here.app.maps"),
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://share.here.com/r/mylocation/$ll,$nm?m=d")).setPackage("com.here.app.maps"))
+            for (i in tries) { try { a.startActivity(i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)); return } catch (_: ActivityNotFoundException) {} }
+            toast(a, "Chưa cài HERE WeGo — mở trong CH Play để cài")
+            try { a.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.here.app.maps")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
+            return
+        }
         if (m != null) {
             val ll = m.groupValues[2] + "," + m.groupValues[3]
             val i = if (m.groupValues[1] == "waze") Intent(Intent.ACTION_VIEW, Uri.parse("https://waze.com/ul?ll=$ll&navigate=yes")).setPackage("com.waze")

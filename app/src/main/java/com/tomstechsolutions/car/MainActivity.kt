@@ -377,6 +377,7 @@ class MainActivity : Activity() {
         val o = JSONObject()
         val l = location
         if (::vol.isInitialized) { o.put("vol", vol.percent); o.put("volAt", vol.changedAt) }
+        o.put("device", Build.MANUFACTURER.replaceFirstChar { it.uppercase() } + " " + Build.MODEL + " · Android " + Build.VERSION.RELEASE)
         val age = SystemClock.elapsedRealtime() - locAt
         val fresh = l != null && age < 15000
         val ob = obd
@@ -773,6 +774,15 @@ class MainActivity : Activity() {
                     "media" -> mediaAction(arg)
                     "launch" -> { Launcher.workspace(this@MainActivity, arg); Bubble.askOnce(this@MainActivity) }
                     "bubble" -> { Bubble.enabled = arg != "off"; if (!Bubble.enabled) Bubble.hide() }
+                    // 0.9.13: share a trip recording as a file (Gmail, Drive…) and read the clipboard for the HERE key
+                    "sharefile" -> try { val o = JSONObject(arg); val dir = java.io.File(cacheDir, "share").apply { mkdirs() }
+                        dir.listFiles()?.forEach { if (System.currentTimeMillis() - it.lastModified() > 86400000L) it.delete() }
+                        val f = java.io.File(dir, o.optString("name", "chuyen-di.json").replace(Regex("[^A-Za-z0-9._-]"), "_")); f.writeText(o.optString("text"))
+                        val uri = androidx.core.content.FileProvider.getUriForFile(this@MainActivity, "$packageName.files", f)
+                        val i = Intent(Intent.ACTION_SEND).setType("application/json").putExtra(Intent.EXTRA_STREAM, uri).putExtra(Intent.EXTRA_SUBJECT, o.optString("subject")).putExtra(Intent.EXTRA_EMAIL, arrayOf("tomstechmelbourne@gmail.com")).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(Intent.createChooser(i, "Gửi chuyến đi").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
+                    "clip" -> { val t = try { (getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager).primaryClip?.getItemAt(0)?.coerceToText(this@MainActivity)?.toString() ?: "" } catch (_: Exception) { "" }
+                        js("tcClip", JSONObject().put("text", t.trim().take(200)).toString()) }
                     "mail" -> try { val o = JSONObject(arg); startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).putExtra(Intent.EXTRA_EMAIL, arrayOf("tomstechmelbourne@gmail.com")).putExtra(Intent.EXTRA_SUBJECT, o.optString("subject")).putExtra(Intent.EXTRA_TEXT, o.optString("body")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
                     "share" -> try { startActivity(Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")).putExtra("sms_body", arg).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) { try { startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, arg), "Gửi giờ tới").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {} }
                     "park" -> try { val o = JSONObject(arg); ParkAlarm.set(this@MainActivity, o.optLong("at"), o.optString("text"))

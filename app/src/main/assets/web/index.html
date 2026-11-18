@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Tom's Car</title>
 <link rel="stylesheet" href="leaflet.css">
+<link rel="stylesheet" href="maplibre-gl.css">
 <style>
 @font-face{font-family:'Chakra Petch';font-weight:400;src:url(fonts/ChakraPetch-Regular.ttf)}
 @font-face{font-family:'Chakra Petch';font-weight:500;src:url(fonts/ChakraPetch-Medium.ttf)}
@@ -27,6 +28,9 @@ body.map-on #tcmap{display:block}
 body.map-on #scene,body.map-on #lp{display:none!important}
 #tcmap .leaflet-control-attribution{font-size:9px;background:rgba(0,0,0,.35);color:#aab}
 #tcmap .leaflet-control-attribution a{color:#ccd}
+#tcmap .maplibregl-ctrl-attrib{font-size:9px;background:rgba(0,0,0,.35)!important;color:#aab}
+#tcmap .maplibregl-ctrl-attrib a{color:#ccd}
+#tcmap .maplibregl-ctrl-attrib-button{filter:invert(1);opacity:.6}
 #ui{pointer-events:none}
 #ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{pointer-events:auto}
 #ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{pointer-events:auto}
@@ -34,7 +38,7 @@ body.theme-open #ui{display:none}
 body.narrow #scene{display:none}
 </style></head>
 <body><div id="stage"><div id="scene"></div><canvas id="lp"></canvas><div id="tcmap"></div><div id="ui"></div></div>
-<script>window.TC_VERSION = '0.9.12-beta';</script>
+<script>window.TC_VERSION = '0.9.13-beta';</script>
 <script src="logos/logos.js"></script>
 <script src="i18n.js"></script>
 <script src="idle.js"></script>
@@ -42,6 +46,8 @@ body.narrow #scene{display:none}
 <script src="scene.js"></script>
 <script src="app.js"></script>
 <script src="leaflet.js"></script>
+<script src="maplibre-gl.js"></script>
+<script src="glmap.js"></script>
 <script src="nav.js"></script>
 <script src="glue.js"></script>
 <script src="sky.js"></script>

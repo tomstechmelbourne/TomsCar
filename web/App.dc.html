@@ -275,7 +275,7 @@ input[type=range]{accent-color:#FBB040}
           <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
           <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
           <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">Bắt Đầu</button>
-          <div style="display: flex; gap: 6px"><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Mở bằng Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Mở bằng Waze</button></div>
+          <div style="display: flex; gap: 6px"><span style="font-size: 12px; color: #9FB6C2; align-self: center; white-space: nowrap">Mở bằng</span><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Waze</button><button onClick="{{nv.here}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">HERE WeGo</button></div>
           <div style="font-size: 11px; color: #8FC3D3">Thời gian ước tính theo đường, chưa tính kẹt xe.</div>
         </div>
       </sc-if>
@@ -489,6 +489,7 @@ input[type=range]{accent-color:#FBB040}
       <!-- thanh dưới cùng (làm mờ) -->
       <div class="dimbox" style="position: absolute; left: 20px; bottom: 16px; display: flex; gap: 8px; opacity: {{opBottom}}">
         <button onClick="{{startListen}}" aria-label="Trợ lý giọng nói ({{micA}})" class="{{micCls}}" style="width: 128px; height: 64px; padding: 0; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg><span style="width: 60px; height: 60px; border-radius: 50%; background: {{micBg}}; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(0,0,0,0.45)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3" fill="#FFFFFF"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path><sc-if value="{{micOff}}" hint-placeholder-val="{{ false }}"><path d="M3 3l18 18" stroke="#FFFFFF" stroke-width="2.6"></path></sc-if></svg></span><svg width="28" height="40" viewBox="0 0 28 40" aria-hidden="true"><path class="mw mw2" d="M6 4v32" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw" d="M14 8v24" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path><path class="mw mw2" d="M22 14v12" stroke="{{micW}}" stroke-width="3" stroke-linecap="round"></path></svg></button>
+        <button onClick="{{earTap}}" aria-label="{{earA}}" aria-pressed="{{earOn}}" class="pnl glb" style="width: 52px; height: 64px; padding: 0; border: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="{{earC}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 12 0c0 3.5-3 4.5-3 7.5a3.5 3.5 0 0 1-6.2 2.2"></path><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-1.5 3.5"></path><path d="M3 3l18 18" stroke-opacity="{{earSlash}}"></path></svg><span style="font-size: 9px; font-weight: 700; color: {{earC}}; letter-spacing: 0.04em">{{earL}}</span></button>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">NHIỆT MÁY</span><span style="font-size: 20px; font-weight: 700">{{engT}}</span><sc-if value="{{obdHintOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; font-weight: 700; color: #FBB040; white-space: nowrap">{{obdHint}}</span></sc-if></div>
         <div class="pnl glb" style="width: 120px; height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center"><span class="lbl">BÌNH ĐIỆN</span><span style="font-size: 20px; font-weight: 700">{{voltT}}</span></div>
       </div>
@@ -1264,7 +1265,7 @@ function rnd(i) { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.
 const DROPS = Array.from({ length: 46 }, (_, i) => ({ x: Math.round(rnd(i + 1) * 1270), dur: (5 + rnd(i + 50) * 4).toFixed(2), del: (-rnd(i + 99) * 9).toFixed(2), op: (0.3 + rnd(i + 7) * 0.5).toFixed(2) }));
 const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rnd(i + 200) * 9); return { x: Math.round(rnd(i + 300) * 1260), y: Math.round(60 + rnd(i + 400) * 420), s, dur: (9 + rnd(i + 500) * 8).toFixed(1), del: (-rnd(i + 600) * 16).toFixed(1) }; });
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
-const DEFAULTS = { vnVoice: 'doan', navVol: 80, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
+const DEFAULTS = { vnVoice: 'doan', navVol: 80, mapEngine: 'gl', mapTilt: true, driveRec: true, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
   musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chime: 'soft', chimeVol: 60 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
@@ -1382,6 +1383,13 @@ class Component extends DCLogic {
   }
   setS(k, v) { const n = Object.assign({}, this.state.set, { [k]: v }); this.save({ set: n }); if (/^(musicApp|tts|hot|bubbleOn)/.test(k)) this.syncNative(n); if (k === 'jbFollow' && v) tcn('media', 'jbquery'); }
   toast(t) { this.setState({ toast: t, toastAt: Date.now() }); }
+  // 0.9.13 (#125): the HERE key is pasted from the clipboard (Tom copies it in the HERE website)
+  onClip(t) {
+    if (this.__clipFor !== 'here') return; this.__clipFor = '';
+    const k = String(t || '').trim();
+    if (/^[A-Za-z0-9_-]{30,64}$/.test(k)) { this.setS('hereKey', k); this.toast('Đã lưu khóa HERE — chuyến sau tìm đường bằng HERE'); }
+    else this.toast(k ? 'Chữ vừa chép không giống khóa HERE — chép lại khóa rồi bấm Dán Khóa' : 'Bộ nhớ tạm đang trống — chép khóa HERE trước');
+  }
   say(t, sensitive) { if (window.tcTr) t = window.tcTr(t); this.toast(t); this.setState({ replyAt: Date.now() }); if (APP && !(sensitive && this.state.set.privacy)) tcn('say', t); }
   runVoice(text) {
     const t = (text || '').toLowerCase();
@@ -1553,7 +1561,15 @@ class Component extends DCLogic {
         tg('navVoice', 'Đọc chỉ đường', 'Quẹo trái, quẹo phải, bùng binh… bằng giọng Việt · tắt nhanh bằng nút 🔊 cạnh giờ tới'),
         ch('navVol', 'Âm lượng giọng chỉ đường', 'Nhạc tự nhỏ lại trong lúc giọng chỉ đường nói', [[60, 'Vừa'], [80, 'To'], [100, 'Rất to']]),
         tg('navCams', 'Nhắc camera tốc độ + vùng trường học', 'Dữ liệu OpenStreetMap — có thể thiếu chỗ'),
-        ch('navHeading', 'Hướng bản đồ khi chỉ đường', 'Theo hướng xe: hướng chạy luôn ở phía trên, như Google Maps', [[true, 'Theo hướng xe'], [false, 'Hướng Bắc']]),
+        ch('navHeading', 'Hướng bản đồ khi chỉ đường', 'Theo hướng xe: hướng chạy luôn ở phía trên, như Google Maps · nút la bàn cũng đổi được', [[true, 'Theo hướng xe'], [false, 'Hướng Bắc']]),
+        ch('mapEngine', 'Loại bản đồ', 'Vector: chữ luôn đứng thẳng, xoay mượt, nghiêng 3D · Kiểu cũ: dùng được bản đồ offline đã tải · đổi xong mở lại app', [['gl', 'Vector (mới)'], ['old', 'Kiểu cũ']]),
+        tg('mapTilt', 'Nghiêng 3D khi chạy', 'Chỉ với bản đồ Vector · máy yếu thì app tự tắt cho mượt'),
+        Object.assign(stt('Khóa HERE — tìm đường có kẹt xe', C.hereKey ? 'Khóa ' + C.hereKey.slice(0, 4) + '…' + C.hereKey.slice(-3) + ' · hôm nay ' + (window.NAV ? window.NAV.hereToday() : 0) + '/300 lượt · lỗi hay hết lượt thì tự dùng máy chủ miễn phí' : 'Chép khóa API của HERE rồi bấm Dán Khóa · chưa có thì dùng máy chủ miễn phí', !!C.hereKey, 'Đang dùng HERE', 'Chưa có khóa', 'Dán Khóa', () => { self.__clipFor = 'here'; tcn('clip', ''); }),
+          C.hereKey ? { hasAct: true, actL: 'Xoá Khóa', act: () => { self.setS('hereKey', ''); self.toast('Đã xoá khóa HERE'); } } : {}),
+        tg('driveRec', 'Ghi chuyến đi', 'Ghi vị trí GPS, hướng bản đồ, câu chỉ đường… để gửi Claude sửa lỗi bản đồ · chỉ lưu trong máy'),
+        Object.assign(stt('Gửi chuyến đi', window.NAV ? 'Chuyến này: ' + window.NAV.recInfo().min + ' phút · kèm chuyến trước' : '', false, '', C.driveRec ? 'Chưa gửi' : 'Bật "Ghi chuyến đi" trước', C.driveRec ? 'Gửi Chuyến Đi' : '', () => {
+          const NV1 = window.NAV; if (!NV1) return; const v = window.TC_VERSION || ''; const d = new Date(); const nm = 'TomsCar-chuyen-di-' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2) + '-' + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + '.json';
+          tcn('sharefile', JSON.stringify({ name: nm, subject: "Chuyến đi Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || '' }) })); }), { stC: '#8FC3D3' }),
         tg('tripLog', 'Nhật ký Hành Trình', 'Tự ghi chỗ đậu hơn 3 phút — chỉ lưu trong máy này, không gửi đi đâu'),
         { isChoice: true, label: 'Nút tìm nhanh (Màn Hình Chính)', hint: 'Chạm để bật/tắt từng nút — kết quả hiện ngay trên bản đồ, đang chỉ đường thì tìm dọc đường', opts: Object.keys(QC).map((k) => { const cur = Array.isArray(C.qcList) && C.qcList.length ? C.qcList : QC_DEF; const on = cur.indexOf(k) >= 0; return { label: QC[k][0] + ' ' + QC[k][1], on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS('qcList', on ? cur.filter((x) => x !== k) : cur.concat([k])) }; }) },
         tg('satFast', 'Vệ Tinh nhẹ khi chạy nhanh', 'Đang dùng Vệ Tinh mà chạy trên 80 km/g hoặc xem cả tuyến thì tạm dùng bản đồ thường cho nhẹ máy'),
@@ -1580,12 +1596,13 @@ class Component extends DCLogic {
         stt('Hiện trên app khác', 'Dải Tom\u2019s Car trên Waze (bản sau)', !!PM.overlay, 'Đã cấp', 'Chưa cấp', 'Cấp Quyền', () => tcn('perm', 'overlay'))] },
       gt: { label: 'Giới Thiệu', icon: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 11v6M12 7.5h.01', desc: 'Thông tin app', rows: [
         info('Phiên bản', 'Tom’s Technology Solutions', (window.TC_VERSION || '0.9.5-beta')),
+        info('Máy đang chạy', 'Gửi kèm khi báo lỗi', LV.device || (APP ? '—' : 'Trình duyệt')),
         info('Khẩu hiệu', '', 'Focus On One Thing And Do It Well'),
         info('Biểu tượng dịch vụ', 'Theo AS 1742.6 (nền xanh, hình trắng)', 'Dựa theo bộ biển của QLD TMR — CC BY 4.0'),
         info('Hình địa điểm', '', 'Wikimedia Commons · Wikidata'), info('Logo hãng', 'Đóng sẵn trong app lúc build', 'Trang web chính thức của từng hãng'),
         info('Thời tiết', '', 'Open-Meteo'),
-        info('Bản đồ', 'Tối/Sáng © CARTO · Địa Hình © OpenTopoMap · Vệ Tinh © Esri', '© OpenStreetMap contributors'),
-        info('Tìm đường chuyến mới', '', 'OSRM · Nominatim (OpenStreetMap)')] }
+        info('Bản đồ', 'Vector © OpenFreeMap · kiểu cũ © Esri · Địa Hình © OpenTopoMap · Vệ Tinh © Esri', '© OpenStreetMap contributors · MapLibre'),
+        info('Tìm đường', 'HERE (khi có khóa) · OSRM', '© HERE · OpenStreetMap')] }
     };
     const warnOf = (g) => GRP[g].rows.some((r) => r.isStatus && r.stL.charAt(0) === '⚠');
     const groups = Object.keys(GRP).map((k) => { const on = S.grp === k, w = warnOf(k); return { label: GRP[k].label, icon: GRP[k].icon, on: on ? 'true' : 'false', bg: on ? 'rgba(251,176,64,0.16)' : 'transparent', fg: on ? '#FFE2A8' : '#CFE6EE', ring: on ? 'inset 0 0 0 1px #FBB040' : 'none', mark: w ? '⚠' : '✓', markC: w ? '#FFD08A' : '#7BD88F', pick: () => self.setState({ grp: k }) }; });
@@ -2331,7 +2348,7 @@ class Component extends DCLogic {
     const NV = window.NAV || null;
     const shell = !nar && (S.scr === 'home' || S.scr === 'trip' || S.scr === 'rt');
     if (window.tcLangSync) window.tcLangSync(C.lang === 'en' ? 'en' : 'vi');
-    if (NV) { NV.cfg.rotate = C.navHeading !== false; NV.cfg.cams = C.navCams !== false; NV.cfg.histOff = C.tripLog === false; NV.cfg.mute = C.navVoice === false; NV.cfg.clip = C.vnVoice === 'doan' || C.vnVoice === 'son'; }
+    if (NV) { NV.cfg.engine = C.mapEngine || 'gl'; NV.cfg.tilt = C.mapTilt !== false; NV.cfg.hereKey = C.hereKey || ''; NV.cfg.rec = !!C.driveRec; NV.cfg.rotate = C.navHeading !== false; NV.cfg.cams = C.navCams !== false; NV.cfg.histOff = C.tripLog === false; NV.cfg.mute = C.navVoice === false; NV.cfg.clip = C.vnVoice === 'doan' || C.vnVoice === 'son'; }
     const navV = NV && NV.st.route ? NV.navView() : null;
     const navAct = !!(navV && navV.active);
     const arrived = !!(NV && NV.st.arrivedAt && !navAct && Date.now() - NV.st.arrivedAt < 45000);
@@ -2406,7 +2423,7 @@ class Component extends DCLogic {
       avoid: [['toll', 'Tránh thu phí'], ['motorway', 'Tránh cao tốc'], ['ferry', 'Tránh phà']].map(([k, l]) => { const on = AV.indexOf(k) >= 0; return { l: (on ? '✓ ' : '') + l, on: on ? 'true' : 'false', bg: on ? 'rgba(123,216,143,0.2)' : 'rgba(255,255,255,0.05)', fg: on ? '#7BD88F' : '#CFE6EE', tap: avoidT(k) }; }),
       tollOn: !!(navV && navV.tolls.length), tollL: navV && navV.tolls.length ? '⚠ Có đoạn thu phí: ' + navV.tolls.slice(0, 2).join(', ') + (navV.noEx ? ' (không né được hết)' : '') : '',
       msg: navV ? (navV.planning ? 'Đang tìm đường…' : navV.err || '') : '', msgOn: !!(navV && (navV.planning || navV.err)),
-      start: () => NV && NV.start(), cancel: () => { self.setState({ wp: [] }); NV && NV.cancel(); }, gmaps: extNav('gmaps'), waze: extNav('waze'),
+      start: () => NV && NV.start(), cancel: () => { self.setState({ wp: [] }); NV && NV.cancel(); }, gmaps: extNav('gmaps'), waze: extNav('waze'), here: extNav('here'),
       etaOn: shell && navAct && mapShow && etaOpen, etaMini: shell && navAct && mapShow && !etaOpen, etaTap: () => self.setState({ etaOpen: !etaOpen }), eta: navV ? navV.eta : '', left: navV ? navV.left : '', km: navV ? navV.km : '',
       voiceIc: C.navVoice === false ? '🔇' : '🔊', voiceA: C.navVoice === false ? 'Bật đọc chỉ đường' : 'Tắt đọc chỉ đường', voice: () => self.setS('navVoice', C.navVoice === false),
       share: () => { if (!navV) return; tcn('share', 'Tom đang trên đường tới ' + navV.dest + ', dự kiến tới lúc ' + navV.eta + ' (còn ' + navV.left + ').'); },
@@ -2416,7 +2433,7 @@ class Component extends DCLogic {
       fit: () => NV && NV.fitAll(), fitOn: !!navV || S.scr === 'rt' || !!(NV && NV.st.preview),
       rotOn: navAct, rotL: C.navHeading !== false ? '🧭' : 'N', rotA: C.navHeading !== false ? 'Bản đồ theo hướng xe — bấm để về Hướng Bắc' : 'Bản đồ Hướng Bắc — bấm để theo hướng xe', lyOpen: !!S.lyOpen, lyTap: () => self.setState({ lyOpen: !S.lyOpen }), lyName: ({ auto: 'Tự Động', dark: 'Tối', light: 'Sáng', topo: 'Địa Hình', sat: 'Vệ Tinh' })[C.mapStyle || 'auto'],
       lyOpts: [['auto', '🌗', 'Tự Động'], ['dark', '🌙', 'Tối'], ['light', '☀️', 'Sáng'], ['topo', '⛰️', 'Địa Hình'], ['sat', '🛰️', 'Vệ Tinh']].map(([k, ic, label]) => { const on = (C.mapStyle || 'auto') === k; return { ic, label, on, fg: on ? '#0A1A24' : '#E8F1F5', bg: on ? '#FBB040' : 'rgba(255,255,255,0.06)', pick: () => { self.setS('mapStyle', k); self.setState({ lyOpen: false }); } }; }),
-      rot: () => self.setS('navHeading', C.navHeading === false), compass: () => { if (NV) NV.compass(); },
+      rot: () => self.setS('navHeading', C.navHeading === false), compass: () => { if (NV && NV.compass() === 'toggle') self.setS('navHeading', !(C.navHeading !== false)); },
       followOff: shell && mapShow && NV && !NV.following() && (navAct || drive), refollowL: 'Bản đồ sẽ tự theo xe sau 10 giây'
     };
     // tab row on the map screens: Màn Hình Chính · ➤ Hành Trình · 🗺 Road Trip · Liên Lạc · Tìm Chỗ
@@ -2588,7 +2605,10 @@ class Component extends DCLogic {
             window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up); } };
       })(),
       srcL: S.src === 'music' ? 'NHẠC' : S.src === 'radio' ? 'RADIO' : 'PODCAST', cycleSrc: () => { const n = { music: 'radio', radio: 'podcast', podcast: 'music' }[S.src]; self.setState({ src: n, mpTab: TABS[n][0][0], nowT: '', nowS: '' }); },
-      togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }), panelExp: mpOpen ? 'true' : 'false', startListen: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); }, micOff: APP && PM.mic === false, micCls: (APP && PM.mic === false) ? '' : S.va ? 'mic-listen' : (S.now - (S.replyAt || 0) < 3000) ? 'mic-reply' : drive ? 'mic-idle mic-calm' : 'mic-idle', micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
+      togglePanel: () => self.setState({ mpOpen: !mpOpen, panelAt: Date.now() }), panelExp: mpOpen ? 'true' : 'false', startListen: () => { self.setState({ va: true, vaHeard: '', vaHint: '', vaRetry: 0 }); tcn('voice', 'start'); }, micOff: APP && PM.mic === false, micCls: (APP && PM.mic === false) ? '' : S.va ? 'mic-listen' : (S.now - (S.replyAt || 0) < 3000) ? 'mic-reply' : C.hotOn === false ? '' : drive ? 'mic-idle mic-calm' : 'mic-idle',
+      // 0.9.13 (#122): ear button — turn listening for "Hey Tom" off/on right from Màn Hình Chính (the mic button still works)
+      earOn: C.hotOn === false ? 'false' : 'true', earC: C.hotOn === false ? '#8A9AA6' : '#5FD4F0', earSlash: C.hotOn === false ? 1 : 0, earL: C.hotOn === false ? 'TẮT' : 'HEY TOM', earA: C.hotOn === false ? 'Bật nghe Hey Tom' : 'Tắt nghe Hey Tom',
+      earTap: () => { const on = C.hotOn === false; self.setS('hotOn', on); self.toast(on ? 'Đã bật nghe "Hey Tom"' : 'Đã tắt nghe "Hey Tom" — bấm nút mic để gọi trợ lý'); }, micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
       isHome: shell, isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: false, tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => (APP && k === 'podcast' && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
       appTop: APP ? 0 : 40, appW: nar || APP ? '100%' : '1280px', appH: nar || APP ? '100%' : '680px', appBg: APP ? 'transparent' : 'linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)',
       touch: () => { if (!S.dragging && !S.panning) self.setState({ last: Date.now() }); },

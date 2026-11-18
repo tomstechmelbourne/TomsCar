@@ -34,6 +34,7 @@
   };
   const stepSay = (st) => NAV.cfg && NAV.cfg.clip && !EN() && st.plain ? st.plain : st.text;
   const say = (t) => {
+    if (NAV.logEvt) NAV.logEvt("say", t);
     try {
       if (window.TCN && !(NAV.cfg && NAV.cfg.mute)) window.TCN.call("say", t);
     } catch (e) {
@@ -50,6 +51,72 @@
     NAV.cfg[k] = v;
     LS.set("tc-navcfg", NAV.cfg);
     redraw();
+  };
+  const REC = { t0: Date.now(), rows: [], ev: [] };
+  try {
+    const prev = localStorage.getItem("tc-drive-cur");
+    if (prev) localStorage.setItem("tc-drive-prev", prev);
+    localStorage.removeItem("tc-drive-cur");
+  } catch (e) {
+  }
+  let recT = 0;
+  const recSave = (force) => {
+    if (!force && Date.now() - recT < 3e4) return;
+    recT = Date.now();
+    try {
+      localStorage.setItem("tc-drive-cur", JSON.stringify(REC));
+    } catch (e) {
+      REC.rows = REC.rows.slice(-3600);
+    }
+  };
+  const r1 = (x, k) => x == null || isNaN(x) ? null : Math.round(x * k) / k;
+  NAV.logEvt = (k, v) => {
+    if (!NAV.cfg.rec) return;
+    REC.ev.push([r1((Date.now() - REC.t0) / 1e3, 10), k, v == null ? "" : String(v).slice(0, 160)]);
+    if (REC.ev.length > 4e3) REC.ev.shift();
+  };
+  NAV.recFix = (f) => {
+    if (!NAV.cfg.rec) return;
+    const S = NAV.st;
+    REC.rows.push([
+      r1((Date.now() - REC.t0) / 1e3, 10),
+      r1(f.lat, 1e6),
+      r1(f.lon, 1e6),
+      r1(f.spd, 10),
+      r1(f.brg, 1),
+      r1(f.acc, 1),
+      S.active ? 1 : 0,
+      S.idx || 0,
+      r1(S.along, 1),
+      S.offRoute ? 1 : 0,
+      S.rerouting ? 1 : 0,
+      r1(Car.brg, 1),
+      r1(GLM && map ? map.gl.getBearing() : -Rot.view, 1),
+      follow ? 1 : 0,
+      r1(GLM && map ? map.gl.getPitch() : 0, 1),
+      NAV.lowFx ? 1 : 0
+    ]);
+    if (REC.rows.length > 4 * 3600) REC.rows.shift();
+    recSave();
+  };
+  NAV.recInfo = () => ({ min: Math.round(REC.rows.length / 60), ev: REC.ev.length });
+  NAV.recExport = (meta) => {
+    recSave(true);
+    let prev = null;
+    try {
+      prev = JSON.parse(localStorage.getItem("tc-drive-prev") || "null");
+    } catch (e) {
+    }
+    return JSON.stringify(Object.assign({
+      v: 1,
+      t0: new Date(REC.t0).toISOString(),
+      engine: NAV.engine,
+      here: !!NAV.cfg.hereKey,
+      cols: ["t", "lat", "lon", "spd", "gpsBrg", "acc", "nav", "idx", "along", "off", "rerouting", "carBrg", "mapBrg", "follow", "pitch", "lowFx"],
+      rows: REC.rows,
+      ev: REC.ev,
+      prev
+    }, meta || {}));
   };
   const fmtDist = (m) => m >= 1e3 ? (m >= 1e4 ? Math.round(m / 1e3) : (Math.round(m / 100) / 10).toString().replace(".", ",")) + " km" : (m >= 100 ? Math.round(m / 50) * 50 : Math.max(10, Math.round(m / 10) * 10)) + " m";
   const EN = () => window.TC_LANG === "en";
@@ -69,6 +136,7 @@
   NAV.hhmm = hhmm;
   const DIRW = { uturn: "Quay \u0111\u1EA7u", "sharp right": "Qu\u1EB9o g\u1EAFt qua ph\u1EA3i", right: "Qu\u1EB9o ph\u1EA3i", "slight right": "Qu\u1EB9o nh\u1EB9 qua ph\u1EA3i", straight: "\u0110i th\u1EB3ng", "slight left": "Qu\u1EB9o nh\u1EB9 qua tr\xE1i", left: "Qu\u1EB9o tr\xE1i", "sharp left": "Qu\u1EB9o g\u1EAFt qua tr\xE1i" };
   const rbWay = (m) => {
+    if (m.__way) return m.__way;
     const mod = m.modifier || "";
     if (/uturn/.test(mod)) return "u";
     if (/right/.test(mod)) return "r";
@@ -241,6 +309,14 @@
     return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k];
   };
   let map = null, layer = null, layerKey = "", box = null, wrap = null;
+  let Lf = window.L, GLM = false;
+  const OFM = "https://tiles.openfreemap.org/styles/";
+  const rasterStyle = (T) => ({
+    version: 8,
+    sources: Object.assign({}, ...T.L.map((l, i) => ({ ["r" + i]: { type: "raster", tiles: l[0].indexOf("{s}") >= 0 ? ["a", "b", "c"].map((x) => l[0].replace("{s}", x)) : [l[0]], tileSize: 256, maxzoom: l[1], attribution: i === 0 ? T.a : "" } }))),
+    layers: [{ id: "bg", type: "background", paint: { "background-color": "#0b1620" } }].concat(T.L.map((l, i) => ({ id: "r" + i, type: "raster", source: "r" + i })))
+  });
+  const glStyle = (key) => key === "light" ? OFM + "liberty" : key === "dark" ? OFM + "dark" : rasterStyle(TILES[key] || TILES.light);
   let routeL = null, routeC = null, altL = [], trailL = null, van = null, marks = [], follow = true, userAt = 0, lastVan = null, lastSig = "", fittedSig = "";
   const mkLayer = (T) => {
     const CTL = window.L.TileLayer.extend({ createTile(c, done) {
@@ -266,9 +342,80 @@
   };
   const ensure = () => {
     if (map) return true;
-    if (!window.L) return false;
     box = document.getElementById("tcmap");
     if (!box) return false;
+    GLM = !!(window.GLL && window.GLL.ok && NAV.cfg.engine !== "old" && navigator.onLine !== false && !NAV.__glFailed);
+    NAV.engine = GLM ? "gl" : "old";
+    if (GLM) {
+      Lf = window.GLL;
+      wrap = box;
+      map = Lf.map(box, { style: glStyle("light"), center: [-37.75, 144.73], zoom: 13 });
+      map.styleKey = "light";
+      let styled = false;
+      map.gl.once("style.load", () => {
+        styled = true;
+      });
+      setTimeout(() => {
+        if (styled || !map || !GLM) return;
+        NAV.__glFailed = true;
+        NAV.logEvt && NAV.logEvt("gl-fallback");
+        try {
+          map.gl.remove();
+        } catch (e) {
+        }
+        box.innerHTML = "";
+        map = null;
+        van = null;
+        layer = null;
+        layerKey = "";
+        lastSig = "";
+        fittedSig = "";
+        routeL = routeC = trailL = passedL = null;
+        altL = [];
+        marks = [];
+        passedL0 = "";
+        GLM = false;
+        loopOn = false;
+        box.__first = false;
+        box.__sz = "";
+        NAV.__shown = false;
+        redraw();
+        toast("B\u1EA3n \u0111\u1ED3 vector ch\u01B0a t\u1EA3i \u0111\u01B0\u1EE3c \u2014 t\u1EA1m d\xF9ng b\u1EA3n \u0111\u1ED3 ki\u1EC3u c\u0169");
+      }, 1e4);
+      map.gl.on("error", (e) => {
+        const m = String(e && e.error && (e.error.message || e.error.url) || "");
+        if (map.styleKey === "dark" && /styles\/dark/.test(m)) {
+          map.styleKey = "";
+          map.setStyle("dark2", OFM + "fiord");
+        }
+      });
+      const off2 = () => {
+        follow = false;
+        userAt = Date.now();
+        redraw();
+      };
+      map.on("dragstart", off2);
+      let zLab2 = 0;
+      map.on("zoomend", () => {
+        const zl = map.getZoom() >= 9 ? 1 : 0;
+        if (zl !== zLab2) {
+          zLab2 = zl;
+          lastSig = "";
+        }
+      });
+      map.on("click", (e) => {
+        if (NAV.onMapClick) NAV.onMapClick(e.latlng);
+      });
+      box.addEventListener("pointerdown", () => {
+        try {
+          window.__mapTouched && window.__mapTouched();
+        } catch (x) {
+        }
+      });
+      return true;
+    }
+    if (!window.L) return false;
+    Lf = window.L;
     wrap = document.createElement("div");
     wrap.style.cssText = "position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%)";
     box.appendChild(wrap);
@@ -401,7 +548,7 @@
       }
     });
     marks.forEach((m) => {
-      b = b ? b.extend(m.getLatLng()) : window.L.latLngBounds(m.getLatLng(), m.getLatLng());
+      b = b ? b.extend(m.getLatLng()) : Lf.latLngBounds(m.getLatLng(), m.getLatLng());
     });
     if (lastVan) b = b ? b.extend(lastVan) : null;
     if (b && b.isValid()) {
@@ -416,10 +563,10 @@
     userAt = Date.now();
     map.setView(ll, z || 15, { animate: true });
   };
-  const pin = (ll, html, z) => window.L.marker(ll, { icon: window.L.divIcon({ className: "", html, iconSize: [0, 0] }), keyboard: false, zIndexOffset: z || 0 });
+  const pin = (ll, html, z) => Lf.marker(ll, { icon: Lf.divIcon({ className: "", html, iconSize: [0, 0] }), keyboard: false, zIndexOffset: z || 0 });
   const esc = (s) => String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
   const dot = (bg, inner, label, logo) => '<div style="transform:translate(-13px,-13px);display:flex;align-items:center;gap:5px;white-space:nowrap"><span style="min-width:26px;height:26px;border-radius:13px;box-sizing:border-box;padding:0 4px;background:' + bg + ';border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);color:#fff;font:800 13px Overpass,sans-serif;display:flex;align-items:center;justify-content:center">' + inner + "</span>" + (label ? '<span style="display:flex;align-items:center;gap:4px;font:700 12px Overpass,sans-serif;color:#10202c;background:rgba(255,255,255,.94);padding:2px 7px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.3)">' + (logo ? '<img src="' + logo + '" style="width:16px;height:16px;border-radius:3px">' : "") + esc(label) + "</span>" : "") + "</div>";
-  const arrowIco = (brg) => window.L.divIcon({ className: "", iconSize: [0, 0], html: '<div style="transform:translate(-22px,-22px) rotate(' + Math.round(brg || 0) + 'deg);width:44px;height:44px"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="rgba(47,208,245,0.18)"/><path d="M22 6l11 28-11-6-11 6z" fill="#FBB040" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg></div>' });
+  const arrowIco = (brg) => Lf.divIcon({ className: "", iconSize: [0, 0], html: '<div style="transform:translate(-22px,-22px) rotate(' + Math.round(brg || 0) + 'deg);width:44px;height:44px"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="rgba(47,208,245,0.18)"/><path d="M22 6l11 28-11-6-11 6z" fill="#FBB040" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg></div>' });
   NAV.sync = (o) => {
     document.body.classList.toggle("map-on", !!o.show);
     if (!o.show) {
@@ -430,36 +577,50 @@
     NAV.padL = o.padL || 40;
     let key = o.style === "auto" || !TILES[o.style] ? o.night ? "dark" : "light" : o.style;
     if (key === "sat" && (map.getZoom() < 10 || o.satFast !== false && (o.spd || 0) > 80)) key = o.night ? "dark" : "light";
-    if (layerKey !== key) {
-      if (layer) map.removeLayer(layer);
-      layer = mkLayer(TILES[key]).addTo(map);
-      layerKey = key;
-    }
-    const tp = wrap.querySelector(".leaflet-tile-pane");
-    if (tp) tp.style.filter = o.bright && o.bright !== 100 ? "brightness(" + o.bright / 100 + ")" : "";
-    if (!box.__sized) {
-      box.__sized = true;
-      setTimeout(() => map.invalidateSize(false), 60);
-    }
-    {
+    if (GLM) {
+      if (layerKey !== key) {
+        layerKey = key;
+        map.setStyle(key, glStyle(key));
+      }
+      const cv = map.gl.getCanvas();
+      const flt = o.bright && o.bright !== 100 ? "brightness(" + o.bright / 100 + ")" : "";
+      if (cv.style.filter !== flt) cv.style.filter = flt;
       const sz = box.clientWidth + "x" + box.clientHeight;
       if (box.clientWidth && (sz !== box.__sz || !NAV.__shown)) {
         box.__sz = sz;
         NAV.__shown = true;
-        if (rotOn) sizeWrap();
-        map.invalidateSize(false);
-        setTimeout(() => {
-          map.invalidateSize(false);
-          if (layer && layer.redraw) layer.redraw();
-        }, 120);
-        NAV.__shownAt = Date.now();
-        if (follow && (Car.cur || o.van)) map.setView(Car.cur || o.van, map.getZoom(), { animate: false });
+        map.invalidateSize();
         startLoop();
       }
-      if (NAV.__shownAt && Date.now() - NAV.__shownAt > 2500 && Date.now() - NAV.__shownAt < 9e3 && layer && !wrap.querySelector(".leaflet-tile-loaded") && navigator.onLine !== false) {
-        NAV.__shownAt = 0;
-        map.removeLayer(layer);
-        layer = mkLayer(TILES[layerKey]).addTo(map);
+    } else {
+      if (layerKey !== key) {
+        if (layer) map.removeLayer(layer);
+        layer = mkLayer(TILES[key]).addTo(map);
+        layerKey = key;
+      }
+      const tp = wrap.querySelector(".leaflet-tile-pane");
+      if (tp) tp.style.filter = o.bright && o.bright !== 100 ? "brightness(" + o.bright / 100 + ")" : "";
+      if (!box.__sized) {
+        box.__sized = true;
+        setTimeout(() => map.invalidateSize(false), 60);
+      }
+      {
+        const sz = box.clientWidth + "x" + box.clientHeight;
+        if (box.clientWidth && (sz !== box.__sz || !NAV.__shown)) {
+          box.__sz = sz;
+          NAV.__shown = true;
+          if (rotOn) sizeWrap();
+          map.invalidateSize(false);
+          setTimeout(() => map.invalidateSize(false), 120);
+          NAV.__shownAt = Date.now();
+          if (follow && (Car.cur || o.van)) map.setView(Car.cur || o.van, map.getZoom(), { animate: false });
+          startLoop();
+        }
+        if (NAV.__shownAt && Date.now() - NAV.__shownAt > 4e3 && Date.now() - NAV.__shownAt < 9e3 && layer && !wrap.querySelector(".leaflet-tile-loaded") && navigator.onLine !== false) {
+          NAV.__shownAt = 0;
+          map.removeLayer(layer);
+          layer = mkLayer(TILES[layerKey]).addTo(map);
+        }
       }
     }
     const S = NAV.st, R = S.route;
@@ -477,12 +638,12 @@
       if (R) {
         S.alts.forEach((a, i) => {
           if (a === R) return;
-          const l = window.L.polyline(a.pts, { color: "#7d8f9c", weight: 7, opacity: 0.75 }).addTo(map);
+          const l = Lf.polyline(a.pts, { color: "#7d8f9c", weight: 7, opacity: 0.75 }).addTo(map);
           l.on("click", () => NAV.pickAlt(i));
           altL.push(l);
         });
-        routeC = window.L.polyline(R.pts, { color: "#0b5f7a", weight: 12, opacity: 0.9, lineCap: "round" }).addTo(map);
-        routeL = window.L.polyline(R.pts, { color: "#2fd0f5", weight: 7, opacity: 1, lineCap: "round" }).addTo(map);
+        routeC = Lf.polyline(R.pts, { color: "#0b5f7a", weight: 12, opacity: 0.9, lineCap: "round" }).addTo(map);
+        routeL = Lf.polyline(R.pts, { color: "#2fd0f5", weight: 7, opacity: 1, lineCap: "round" }).addTo(map);
         const wps = S.wps || [];
         wps.forEach((w, i) => {
           if (i === 0) return;
@@ -490,8 +651,8 @@
           marks.push(pin([w.lat, w.lon], dot(last ? "#D0202E" : "#F28A1A", last ? "\u2691" : String(i), w.name, w.logo), 500).addTo(map));
         });
       } else if (o.rt && o.rt.pts && o.rt.pts.length > 1) {
-        routeC = window.L.polyline(o.rt.pts, { color: "#5a3200", weight: 11, opacity: 0.7, lineCap: "round" }).addTo(map);
-        routeL = window.L.polyline(o.rt.pts, { color: "#FF8A1F", weight: 6, opacity: 1, lineCap: "round" }).addTo(map);
+        routeC = Lf.polyline(o.rt.pts, { color: "#5a3200", weight: 11, opacity: 0.7, lineCap: "round" }).addTo(map);
+        routeL = Lf.polyline(o.rt.pts, { color: "#FF8A1F", weight: 6, opacity: 1, lineCap: "round" }).addTo(map);
         const zoomed = map.getZoom() >= 9;
         (o.rt.stops || []).forEach((s) => {
           let ll = s.lat != null ? [s.lat, s.lon] : null;
@@ -512,7 +673,7 @@
         });
       }
       if (S.preview && S.preview.pts && S.preview.pts.length > 1) {
-        trailL = window.L.polyline(S.preview.pts, { color: "#2fd0f5", weight: 6, opacity: 0.95 }).addTo(map);
+        trailL = Lf.polyline(S.preview.pts, { color: "#2fd0f5", weight: 6, opacity: 0.95 }).addTo(map);
         marks.push(pin(S.preview.pts[0], dot("#14A05A", "\u25CF", ""), 300).addTo(map));
         marks.push(pin(S.preview.pts[S.preview.pts.length - 1], dot("#D0202E", "\u2691", ""), 300).addTo(map));
       }
@@ -531,11 +692,13 @@
     Car.drive = !!o.drive;
     if (o.van) {
       let tgt = o.van, brg = null;
-      if (S.active && !S.offRoute && S.snap && Date.now() - S.snap.t < 3e3) {
+      const moving = (o.spd || 0) >= 8;
+      if (S.active && !S.offRoute && S.snap && Date.now() - S.snap.t < 4e3) {
         tgt = S.snap.p;
-        brg = S.snap.brg;
-      } else if (S.active && !S.offRoute && R && R.pts.length > 1 && !S.snap) brg = bearingOf(R.pts[0], R.pts[Math.min(R.pts.length - 1, 3)]);
-      else if (o.brg != null && (o.spd || 0) >= 5) brg = o.brg;
+        if (moving || !Car.headInit) brg = S.snap.brgA != null ? S.snap.brgA : S.snap.brg;
+      } else if (S.active && !S.offRoute && R && R.pts.length > 1 && !S.snap && !Car.headInit) brg = bearingOf(R.pts[0], posAlong(R, 40));
+      else if (o.brg != null && moving) brg = o.brg;
+      if ((o.spd || 0) < 3 && Car.to && dist(Car.to, tgt) < Math.max(15, Math.min(40, o.acc || 15))) tgt = Car.to;
       if (!Car.to || dist(Car.to, tgt) > 0.5) {
         const nw = performance.now();
         if (Car.t0) Car.iv = Math.max(600, Math.min(2e3, (Car.iv || 1e3) * 0.7 + (nw - Car.t0) * 0.3));
@@ -543,12 +706,14 @@
         Car.to = tgt;
         Car.t0 = nw;
       }
-      if (brg != null) Car.brgT = brg;
-      else if (Car.brgT == null) Car.brgT = 0;
+      if (brg != null) {
+        Car.brgT = brg;
+        Car.headInit = true;
+      } else if (Car.brgT == null) Car.brgT = 0;
       if (!van) {
         Car.cur = tgt;
         Car.brg = Car.brgT || 0;
-        van = window.L.marker(tgt, { icon: arrowIco(0), keyboard: false, zIndexOffset: 1e3 }).addTo(map);
+        van = Lf.marker(tgt, { icon: arrowIco(0), keyboard: false, zIndexOffset: 1e3, flat: true }).addTo(map);
       }
       if (!follow && userAt && (o.drive || S.active) && Date.now() - userAt > 1e4) follow = true;
       if (!box.__first && follow) {
@@ -557,16 +722,16 @@
       }
       startLoop();
     }
-    Car.rotate = !!(NAV.cfg.rotate && !NAV.northUp && (S.active || Car.drive && (o.spd || 0) > 8));
+    Car.rotate = !!(NAV.cfg.rotate && (S.active || Car.drive));
     if (R && S.active && routeL && passedL0 !== S.idx + ":" + R.id) {
       passedL0 = S.idx + ":" + R.id;
       const k = Math.min(R.pts.length - 1, (S.idx || 0) + 1), cut = S.snap ? S.snap.p : R.pts[k];
       const done = R.pts.slice(0, k).concat([cut]), rest = [cut].concat(R.pts.slice(k));
-      if (!passedL) passedL = window.L.polyline(done, { color: "#8a97a3", weight: 7, opacity: 0.85, lineCap: "round" }).addTo(map);
+      if (!passedL) passedL = Lf.polyline(done, { color: "#8a97a3", weight: 7, opacity: 0.85, lineCap: "round" }).addTo(map);
       else passedL.setLatLngs(done);
       routeL.setLatLngs(rest);
       if (routeC) routeC.setLatLngs(rest);
-      if (passedL._map) passedL.bringToBack();
+      if (passedL._map || passedL.map) passedL.bringToBack();
     }
     if (!S.active && passedL) {
       map.removeLayer(passedL);
@@ -576,20 +741,21 @@
   };
   const Car = { cur: null, from: null, to: null, t0: 0, brg: 0, brgT: 0, spd: 0, rotate: false, drive: false };
   const Rot = { free: false, ang: 0, view: 0, movedAt: 0 };
-  NAV.northUp = false;
   NAV.compass = () => {
-    if (Rot.free || !follow) NAV.northUp = false;
-    else if (NAV.cfg.rotate) {
-      NAV.northUp = !NAV.northUp;
-      toast(NAV.northUp ? EN() ? "North up" : "H\u01B0\u1EDBng B\u1EAFc l\xEAn tr\xEAn" : EN() ? "Heading up" : "Theo h\u01B0\u1EDBng xe ch\u1EA1y");
+    let r = "follow";
+    if (!(Rot.free || !follow)) {
+      NAV.cfg.rotate = !NAV.cfg.rotate;
+      r = "toggle";
+      toast(NAV.cfg.rotate ? EN() ? "Heading up" : "Theo h\u01B0\u1EDBng xe ch\u1EA1y" : EN() ? "North up" : "H\u01B0\u1EDBng B\u1EAFc l\xEAn tr\xEAn");
     }
     Rot.free = false;
     Rot.ang = 0;
     follow = true;
     userAt = 0;
-    if (map && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true });
+    if (map && !GLM && (Car.cur || lastVan)) map.setView(Car.cur || lastVan, NAV.st.active ? map.getZoom() : Math.max(map.getZoom(), 15), { animate: true });
     startLoop();
     redraw();
+    return r;
   };
   NAV.viewAngle = () => Rot.view;
   let passedL = null, passedL0 = "", loopOn = false, lastFrame = 0, rotOn = false, lastIcoBrg = -999, rotSz = "";
@@ -604,6 +770,14 @@
     return (Math.atan2(y, x) / RAD + 360) % 360;
   };
   const angDiff = (a, b) => (b - a + 540) % 360 - 180;
+  const posAlong = (R, m, d0) => {
+    const t = Math.max(0, Math.min(R.cum[R.cum.length - 1], (d0 || 0) + m));
+    let i = 1;
+    while (i < R.cum.length - 1 && R.cum[i] < t) i++;
+    const k = (t - R.cum[i - 1]) / (R.cum[i] - R.cum[i - 1] || 1);
+    const A = R.pts[i - 1], B = R.pts[i] || A;
+    return [A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k];
+  };
   const startLoop = () => {
     if (loopOn) return;
     loopOn = true;
@@ -612,6 +786,11 @@
   const frame = (ts) => {
     if (!map || !Car.to || !document.body.classList.contains("map-on") || window.__idleOn) {
       loopOn = false;
+      return;
+    }
+    if (GLM) {
+      glFrame(ts);
+      if (loopOn) requestAnimationFrame(frame);
       return;
     }
     requestAnimationFrame(frame);
@@ -656,7 +835,63 @@
       map.setView(c, z, { animate: false });
     }
   };
+  const Cam = { z: null, b: 0, p: 0, last: 0, slow: 0, n: 0 };
+  NAV.lowFx = false;
+  const glFrame = (ts) => {
+    const S = NAV.st, busy = S.active || Car.drive, easing = Cam.easing;
+    const fps = busy || easing ? 30 : 8;
+    if (ts - lastFrame < 1e3 / fps - 2) return;
+    const dt = Math.min(0.25, lastFrame ? (ts - lastFrame) / 1e3 : 0.03);
+    lastFrame = ts;
+    if (busy) {
+      Cam.n++;
+      if (dt > 0.075) Cam.slow++;
+      if (Cam.n >= 150) {
+        if (Cam.slow > 60 && !NAV.lowFx) {
+          NAV.lowFx = true;
+          NAV.logEvt && NAV.logEvt("lowfx");
+        }
+        Cam.n = Cam.slow = 0;
+      }
+    }
+    const k = Math.min(Car.spd >= 5 ? 1.2 : 1, (ts - Car.t0) / (Car.iv || 1e3));
+    Car.cur = [Car.from[0] + (Car.to[0] - Car.from[0]) * k, Car.from[1] + (Car.to[1] - Car.from[1]) * k];
+    const d = angDiff(Car.brg, Car.brgT || 0);
+    Car.brg = (Car.brg + Math.max(-120 * dt, Math.min(120 * dt, d * Math.min(1, dt * 4))) + 360) % 360;
+    van.setLatLng(Car.cur);
+    van.setRotation(Car.brg);
+    let still = Math.abs(d) < 0.5 && k >= 1;
+    if (follow) {
+      const g = map.gl, z0 = g.getZoom();
+      let zt = z0;
+      if (S.active) {
+        const sp = Car.spd;
+        zt = sp > 85 ? 14.8 : sp > 60 ? 15.6 : sp > 30 ? 16.4 : 16.9;
+        if (S.toNext != null && S.toNext < 220 && sp < 75) zt = 17.3;
+      } else if (Car.drive) zt = Math.max(15, Math.min(17, z0));
+      const bt = Car.rotate ? Car.brg : 0;
+      const pt = NAV.cfg.tilt !== false && !NAV.lowFx && busy ? 52 : 0;
+      const z = z0 + (zt - z0) * Math.min(1, dt * 1.6), b = (g.getBearing() + angDiff(g.getBearing(), bt) * Math.min(1, dt * 5) + 360) % 360, p = g.getPitch() + (pt - g.getPitch()) * Math.min(1, dt * 1.8);
+      const h = box.clientHeight || 720, pad = { top: busy ? Math.round(h * (pt ? 0.34 : 0.42)) : 0, bottom: 0, left: NAV.padL > 100 ? NAV.padL : 0, right: 0 };
+      Cam.easing = Math.abs(zt - z) > 0.02 || Math.abs(angDiff(b, bt)) > 0.3 || Math.abs(pt - p) > 0.3;
+      const c = g.getCenter();
+      const moved = Math.abs(c.lat - Car.cur[0]) + Math.abs(c.lng - Car.cur[1]) > 2e-7;
+      if (moved || Cam.easing || Cam.padT !== pad.top || Cam.padL !== pad.left) {
+        Cam.padT = pad.top;
+        Cam.padL = pad.left;
+        g.jumpTo({ center: [Car.cur[1], Car.cur[0]], zoom: z, bearing: b, pitch: p, padding: pad });
+        still = false;
+      }
+    } else Cam.easing = false;
+    Rot.view = (360 - map.gl.getBearing()) % 360;
+    const cmp = document.getElementById("tccompassN");
+    if (cmp) cmp.style.transform = "rotate(" + (-map.gl.getBearing()).toFixed(0) + "deg)";
+    if (still && !busy && !Cam.easing) {
+      loopOn = false;
+    }
+  };
   NAV.carPos = () => Car.cur;
+  NAV.debug = () => ({ engine: NAV.engine, carBrg: Car.brg, carBrgT: Car.brgT, mapBrg: GLM && map ? map.gl.getBearing() : -Rot.view, pitch: GLM && map ? map.gl.getPitch() : 0, zoom: map ? map.getZoom() : 0, follow, lowFx: NAV.lowFx, cur: Car.cur });
   NAV.ahead = (km) => {
     const S = NAV.st, R = S.route;
     if (!R || !S.active || !R.pts) return null;
@@ -866,13 +1101,38 @@
     const pl = toPlace(f);
     return pl.name;
   }).catch(() => "");
+  const along = (g, m) => {
+    let acc = 0;
+    for (let i = 1; i < g.length; i++) {
+      const d = dist([g[i - 1][1], g[i - 1][0]], [g[i][1], g[i][0]]);
+      if (acc + d >= m) {
+        const k = (m - acc) / (d || 1);
+        return [g[i - 1][1] + (g[i][1] - g[i - 1][1]) * k, g[i - 1][0] + (g[i][0] - g[i - 1][0]) * k];
+      }
+      acc += d;
+    }
+    const e = g[g.length - 1];
+    return [e[1], e[0]];
+  };
+  const fixStep = (s) => {
+    const m = s.maneuver, g = s.geometry && s.geometry.coordinates || [];
+    if (/roundabout|rotary/.test(m.type) && !/^exit/.test(m.type) && g.length > 1 && m.bearing_before != null) {
+      const len = Math.min(s.distance || 80, 90), d = angDiff(m.bearing_before, bearingOf(along(g, Math.max(10, len * 0.45)), along(g, len)));
+      m.__way = Math.abs(d) < 35 ? "s" : Math.abs(d) >= 150 ? "u" : d > 0 ? "r" : "l";
+    } else if (/^(turn|end of road|continue|new name|fork|merge|on ramp|off ramp)$/.test(m.type) && m.bearing_before != null && m.bearing_after != null && m.modifier) {
+      const d = angDiff(m.bearing_before, m.bearing_after);
+      if (/left/.test(m.modifier) && d > 30) m.modifier = d > 120 ? "sharp right" : d > 55 ? "right" : "slight right";
+      else if (/right/.test(m.modifier) && d < -30) m.modifier = d < -120 ? "sharp left" : d < -55 ? "left" : "slight left";
+    }
+  };
   const OSRM = "https://router.project-osrm.org/route/v1/driving/";
   const build = (r, wps, noEx) => {
     const pts = [], steps = [], cum = [0];
     let tolls = [];
     let legI = 0;
-    r.legs.forEach((leg, li) => leg.steps.forEach((s) => {
+    r.legs.forEach((leg, li) => leg.steps.forEach((s, si) => {
       const g = s.geometry && s.geometry.coordinates || [];
+      fixStep(s);
       const startIdx = Math.max(0, pts.length - 1);
       g.forEach((c, k) => {
         if (pts.length && k === 0) return;
@@ -880,7 +1140,12 @@
         if (pts.length > 1) cum.push(cum[cum.length - 1] + dist(pts[pts.length - 2], pts[pts.length - 1]));
       });
       const isWp = s.maneuver.type === "arrive" && li < r.legs.length - 1;
-      steps.push({ at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: "", ref: "", destinations: "", exits: "" }), ""), text: viText(s, isWp ? wps[li + 1] && wps[li + 1].name : s.maneuver.type === "arrive" ? wps[wps.length - 1] && wps[wps.length - 1].name : ""), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === "arrive" });
+      const rb = /roundabout|rotary/.test(s.maneuver.type), prev = steps[steps.length - 1];
+      if (/^exit (roundabout|rotary)$/.test(s.maneuver.type) || rb && prev && prev.rb && (cum[startIdx] || 0) - prev.at < 45) {
+        legI = li;
+        return;
+      }
+      steps.push({ rb, at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: "", ref: "", destinations: "", exits: "" }), ""), text: viText(s, isWp ? wps[li + 1] && wps[li + 1].name : s.maneuver.type === "arrive" ? wps[wps.length - 1] && wps[wps.length - 1].name : ""), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === "arrive" });
       (s.intersections || []).forEach((x) => {
         if ((x.classes || []).indexOf("toll") >= 0 && s.name && tolls.indexOf(s.name) < 0) tolls.push(s.name);
       });
@@ -908,7 +1173,121 @@
     return { id: Math.random().toString(36).slice(2, 8), lim, pts, cum, steps, dist: r.distance, dur: r.duration, tolls, noEx: !!noEx, legs: r.legs.map((l) => ({ dist: l.distance, dur: l.duration })) };
   };
   const OSRM2 = "https://routing.openstreetmap.de/routed-car/route/v1/driving/";
+  const HERE = "https://router.hereapi.com/v8/routes";
+  const today = () => (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+  NAV.hereToday = () => LS.get("tc-herecnt", {})[today()] || 0;
+  const hereOk = () => !!(NAV.cfg.hereKey && NAV.hereToday() < 300);
+  const hereCount = () => {
+    const o = {};
+    o[today()] = NAV.hereToday() + 1;
+    LS.set("tc-herecnt", o);
+  };
+  const FPC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  const fpDecode = (str) => {
+    const vals = [];
+    let r = 0, mul = 1;
+    for (let q = 0; q < str.length; q++) {
+      const v = FPC.indexOf(str.charAt(q));
+      r += (v & 31) * mul;
+      if ((v & 32) === 0) {
+        vals.push(r);
+        r = 0;
+        mul = 1;
+      } else mul *= 32;
+    }
+    const hdr = vals[1], prec = hdr & 15, third = hdr >> 4 & 7, f = Math.pow(10, prec);
+    const sg = (x) => x % 2 ? -(x + 1) / 2 : x / 2;
+    const out = [];
+    let la = 0, lo = 0;
+    for (let k = 2; k < vals.length; ) {
+      la += sg(vals[k]);
+      lo += sg(vals[k + 1]);
+      k += third ? 3 : 2;
+      out.push([la / f, lo / f]);
+    }
+    return out;
+  };
+  const hereToOsrm = (j) => {
+    if (!j || !j.routes || !j.routes.length) throw new Error(j && (j.title || j.error_description) || "here");
+    const routes = j.routes.map((rt) => {
+      let allC = [], D = 0, T = 0;
+      const legs = rt.sections.map((sec) => {
+        const pts = fpDecode(sec.polyline), C = pts.map((q) => [q[1], q[0]]), acts = sec.turnByTurnActions || sec.actions || [], steps = [];
+        const brgAt = (o, back) => {
+          const a = pts[Math.max(0, Math.min(pts.length - 1, o + (back ? -1 : 0)))], b = pts[Math.max(0, Math.min(pts.length - 1, o + (back ? 0 : 1)))];
+          return a && b && (a[0] !== b[0] || a[1] !== b[1]) ? bearingOf(a, b) : null;
+        };
+        for (let i = 0; i < acts.length; i++) {
+          const a = acts[i];
+          let k = i, type = "turn", mod = "straight", exit;
+          const dir = a.direction || "", sev = a.severity || "";
+          const side2 = (x) => x === "left" || x === "right" ? sev === "light" ? "slight " + x : sev === "heavy" ? "sharp " + x : x : "straight";
+          if (a.action === "depart") type = "depart";
+          else if (a.action === "arrive") type = "arrive";
+          else if (/^roundabout/.test(a.action)) {
+            type = "roundabout";
+            if (a.action !== "roundaboutExit") {
+              let j2 = i + 1;
+              while (j2 < acts.length && acts[j2].action !== "roundaboutExit" && acts[j2].action !== "arrive") j2++;
+              if (j2 < acts.length && acts[j2].action === "roundaboutExit") k = j2;
+            }
+            exit = acts[k].exit;
+          } else if (a.action === "keep") {
+            type = "fork";
+            mod = dir === "middle" ? "straight" : "slight " + (dir || "right");
+          } else if (a.action === "uTurn") mod = "uturn";
+          else if (a.action === "continue") {
+            type = "continue";
+            mod = "straight";
+          } else if (/ramp|exit|enterHighway/.test(a.action)) {
+            type = a.action === "enterHighway" ? "on ramp" : "off ramp";
+            mod = "slight " + (dir === "left" ? "left" : "right");
+          } else mod = side2(dir);
+          const nx = acts[k + 1], o0 = a.offset || 0, o1 = nx ? nx.offset : C.length - 1;
+          let len = 0, dur = 0;
+          for (let q = i; q <= k; q++) {
+            len += acts[q].length || 0;
+            dur += acts[q].duration || 0;
+          }
+          const road = acts[k].nextRoad || {}, nm2 = road.name && road.name[0] ? road.name[0].value : "", ref = road.number && road.number[0] ? road.number[0].value : "";
+          steps.push({
+            distance: len,
+            duration: dur,
+            name: nm2,
+            ref,
+            geometry: { coordinates: C.slice(o0, Math.max(o0 + 2, o1 + 1)) },
+            maneuver: { type, modifier: mod, exit, location: C[o0], bearing_before: o0 > 0 ? brgAt(o0, true) : null, bearing_after: brgAt(o0, false) }
+          });
+          i = k;
+        }
+        const sm = sec.summary || {};
+        D += sm.length || 0;
+        T += sm.duration || 0;
+        allC = allC.concat(allC.length ? C.slice(1) : C);
+        return { distance: sm.length || 0, duration: sm.duration || 0, steps };
+      });
+      return { distance: D, duration: T, geometry: { coordinates: allC }, legs };
+    });
+    return { code: "Ok", routes, here: true };
+  };
+  const hereRoute = (wps, avoid, startBrg) => {
+    const ll = (w) => (+w.lat).toFixed(6) + "," + (+w.lon).toFixed(6);
+    const AV = { toll: "tollRoad", motorway: "controlledAccessHighway", ferry: "ferry" }, av = (avoid || []).map((x) => AV[x]).filter(Boolean);
+    const u = HERE + "?transportMode=car&origin=" + ll(wps[0]) + (startBrg != null ? ";course=" + Math.round(startBrg) : "") + "&destination=" + ll(wps[wps.length - 1]) + wps.slice(1, -1).map((w) => "&via=" + ll(w)).join("") + "&return=polyline,summary,turnByTurnActions" + (wps.length === 2 ? "&alternatives=2" : "") + (av.length ? "&avoid[features]=" + av.join(",") : "") + "&apikey=" + encodeURIComponent(NAV.cfg.hereKey);
+    hereCount();
+    return tfetch(u, 8e3).then((r) => {
+      if (!r.ok) throw new Error("here " + r.status);
+      return r.json();
+    }).then(hereToOsrm);
+  };
   NAV.route = (wps, avoid, startBrg) => {
+    if (hereOk()) return hereRoute(wps, avoid, startBrg).then((j) => j.routes.map((r) => Object.assign(build(r, wps, false), { src: "here" }))).catch((e) => {
+      NAV.logEvt && NAV.logEvt("here-fail", String(e && e.message));
+      return osrmRoute(wps, avoid, startBrg);
+    });
+    return osrmRoute(wps, avoid, startBrg);
+  };
+  const osrmRoute = (wps, avoid, startBrg) => {
     const coords = wps.map((w) => (+w.lon).toFixed(6) + "," + (+w.lat).toFixed(6)).join(";");
     const brgs = startBrg != null ? "&bearings=" + Math.round(startBrg) + ",60" + ";".repeat(wps.length - 1) : "";
     const base = OSRM + coords + "?overview=full&geometries=geojson&steps=true&annotations=maxspeed&alternatives=" + (wps.length === 2 ? "3" : "false") + brgs;
@@ -923,7 +1302,7 @@
       return j2;
     })).then((j) => {
       if (j.code !== "Ok" || !j.routes || !j.routes.length) throw new Error(j.message || "route");
-      return j.routes.map((r) => build(r, wps, j.noEx));
+      return j.routes.map((r) => Object.assign(build(r, wps, j.noEx), { src: "osrm" }));
     });
   };
   NAV.plan = (wps, opt) => {
@@ -977,11 +1356,15 @@
     if (!S.route) return;
     S.active = true;
     S.idx = 0;
+    S.along = null;
+    S.moved = false;
+    S.fixedStart = false;
     S.said = {};
     S.off = 0;
     S.offRoute = false;
     S.rerouting = false;
     S.snap = null;
+    Car.headInit = false;
     S.startAt = Date.now();
     S.alts = [S.route];
     S.next = 1;
@@ -1017,13 +1400,20 @@
   NAV.tick = (f) => {
     if (f.lat == null) return;
     NAV.st.fixAt = Date.now();
+    NAV.recFix(f);
     histTick(f);
     camTick(f);
     const S = NAV.st, R = S.route;
     if (!S.active || !R) return;
-    const p = [f.lat, f.lon];
+    const p = [f.lat, f.lon], spd0 = f.spd || 0, slow = spd0 < 10;
+    if (spd0 >= 10) S.moved = true;
+    if (!S.moved && !S.fixedStart && (f.acc || 99) <= 30 && R.pts.length > 1 && dist(p, R.pts[0]) > 60 && !S.rerouting) {
+      S.fixedStart = true;
+      reroute(p, null, true);
+      return;
+    }
     let best = 1e9, bi = S.idx || 0, bt = 0;
-    const a = Math.max(0, (S.idx || 0) - 8), b = Math.min(R.pts.length - 1, (S.idx || 0) + 600);
+    const a = Math.max(0, (S.idx || 0) - 40), b = Math.min(R.pts.length - 1, (S.idx || 0) + 600);
     for (let i = a; i < b; i++) {
       const q = segProj(p, R.pts[i], R.pts[i + 1]);
       if (q.d < best) {
@@ -1032,15 +1422,23 @@
         bt = q.t;
       }
     }
-    if (best > Math.max(40, (f.acc || 0) * 1.5)) {
+    const segB = (i) => {
+      const A = R.pts[i], B = R.pts[i + 1] || A;
+      return bearingOf(A, B);
+    };
+    const wrongWay = f.brg != null && spd0 >= 12 && best > 20 && Math.abs(angDiff(segB(bi), f.brg)) > 70;
+    if (!slow && (best > Math.max(40, (f.acc || 0) * 1.5) || wrongWay)) {
       S.off = (S.off || 0) + 1;
       if (S.off >= 2 && !S.offRoute) {
         S.offRoute = true;
         redraw();
       }
-      if (S.off >= 2 && !S.rerouting && Date.now() - (S.rerouteAt || 0) > (S.rerouteOk ? 1e4 : 4e3)) reroute(p, f.spd >= 5 ? f.brg : null);
+      if (S.off >= 2 && !S.rerouting && Date.now() - (S.rerouteAt || 0) > (S.rerouteOk ? 8e3 : 4e3)) reroute(p, spd0 >= 15 ? f.brg : null);
       return;
     }
+    if (best > Math.max(40, (f.acc || 0) * 1.5)) return;
+    const along0 = R.cum[bi] + bt * ((R.cum[bi + 1] || R.cum[bi]) - R.cum[bi]);
+    if (slow && S.along != null && along0 > S.along + 12) return;
     S.off = 0;
     S.idx = bi;
     if (S.offRoute) {
@@ -1049,16 +1447,16 @@
     {
       const A = R.pts[bi], B = R.pts[bi + 1] || A;
       const sp = [A[0] + (B[0] - A[0]) * bt, A[1] + (B[1] - A[1]) * bt];
-      const y = Math.sin((B[1] - A[1]) * RAD) * Math.cos(B[0] * RAD), x = Math.cos(A[0] * RAD) * Math.sin(B[0] * RAD) - Math.sin(A[0] * RAD) * Math.cos(B[0] * RAD) * Math.cos((B[1] - A[1]) * RAD);
-      S.snap = { p: sp, brg: (Math.atan2(y, x) / RAD + 360) % 360, t: Date.now() };
+      S.snap = { p: sp, brg: segB(bi), brgA: bearingOf(sp, posAlong(R, 40, along0)), t: Date.now() };
     }
-    const along = R.cum[bi] + bt * ((R.cum[bi + 1] || R.cum[bi]) - R.cum[bi]);
-    S.remain = Math.max(0, R.dist - along);
+    const along2 = along0;
+    S.along = along0;
+    S.remain = Math.max(0, R.dist - along2);
     S.remainDur = R.dur * (S.remain / (R.dist || 1));
     let n = 1;
-    while (n < R.steps.length - 1 && R.steps[n].at <= along + 4) n++;
+    while (n < R.steps.length - 1 && R.steps[n].at <= along2 + 4) n++;
     S.next = n;
-    S.toNext = Math.max(0, R.steps[n].at - along);
+    S.toNext = Math.max(0, R.steps[n].at - along2);
     const st = R.steps[n], spd = f.spd || 0, said = S.said[n] || (S.said[n] = {});
     const far = spd > 75 ? 1500 : spd > 45 ? 600 : 350, near = spd > 75 ? 350 : spd > 45 ? 160 : 70;
     if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && R.steps[n].at - R.steps[n - 1].at > near * 2) {
@@ -1084,12 +1482,13 @@
     }, 45e3);
     redraw();
   };
-  const reroute = (p, brg) => {
+  const reroute = (p, brg, quiet) => {
     const S = NAV.st;
     S.rerouteAt = Date.now();
     S.rerouting = true;
     redraw();
-    if (Date.now() - (S.rerouteSaid || 0) > 25e3) {
+    NAV.logEvt && NAV.logEvt("reroute", quiet ? "start-fix" : "");
+    if (!quiet && Date.now() - (S.rerouteSaid || 0) > 25e3) {
       S.rerouteSaid = Date.now();
       say(EN() ? "Recalculating" : "\u0110ang t\xECm \u0111\u01B0\u1EDDng m\u1EDBi");
     }
@@ -1106,6 +1505,7 @@
       S.alts = [rs[0]];
       S.wps = [{ name: "V\u1ECB tr\xED c\u1EE7a Tom", lat: p[0], lon: p[1] }].concat(rest);
       S.idx = 0;
+      S.along = null;
       S.said = {};
       S.off = 0;
       S.offRoute = false;
@@ -1113,6 +1513,7 @@
       S.rerouting = false;
       S.rerouteOk = true;
       S.rerouteAt = Date.now();
+      NAV.logEvt && NAV.logEvt("route", rs[0].src + " " + Math.round(rs[0].dist) + "m");
       redraw();
     }).catch(() => {
       S.rerouting = false;
@@ -1128,12 +1529,12 @@
   NAV.limitNow = () => {
     const S = NAV.st, R = S.route;
     if (!S.active || !R || !R.lim || !R.lim.length) return null;
-    const along = R.dist - (S.remain || R.dist);
+    const along2 = R.dist - (S.remain || R.dist);
     let v = null, ahead = null;
     for (let i = 0; i < R.lim.length; i++) {
-      if (R.lim[i].at <= along + 5) v = R.lim[i].v;
+      if (R.lim[i].at <= along2 + 5) v = R.lim[i].v;
       else {
-        if (R.lim[i].at - along < 300) ahead = R.lim[i].v;
+        if (R.lim[i].at - along2 < 300) ahead = R.lim[i].v;
         break;
       }
     }

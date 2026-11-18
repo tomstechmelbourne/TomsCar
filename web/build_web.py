@@ -141,6 +141,12 @@ shutil.copytree(here / 'sounds', out_dir / 'sounds', dirs_exist_ok=True)
 LF = pathlib.Path(os.environ.get('LEAFLET', '/tmp/node_modules/leaflet/dist'))
 shutil.copy(LF / 'leaflet.js', out_dir / 'leaflet.js')
 shutil.copy(LF / 'leaflet.css', out_dir / 'leaflet.css')
+# 0.9.13 (#126): vector map engine (MapLibre GL, BSD-3) + the small Leaflet-style wrapper nav.js uses
+ML = pathlib.Path(os.environ.get('MAPLIBRE', '/tmp/ml/node_modules/maplibre-gl/dist'))
+shutil.copy(ML / 'maplibre-gl.js', out_dir / 'maplibre-gl.js')
+shutil.copy(ML / 'maplibre-gl.css', out_dir / 'maplibre-gl.css')
+shutil.copy(ML.parent / 'LICENSE.txt', out_dir / 'maplibre-LICENSE.txt')
+shutil.copy(here / 'glmap.js', out_dir / 'glmap.js')
 (out_dir / 'scene.js').write_text(
     'window.__SceneComp = (function () {\n' + code + '\nreturn Component;\n})();\nwindow.__SCENE_TPL = ' + json.dumps(tpl, ensure_ascii=False) + ';\nwindow.__SCENE_PROPS = ' + json.dumps(props) + ';\n',
     encoding='utf-8')
@@ -162,6 +168,7 @@ FONTS = """
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Tom's Car</title>
 <link rel="stylesheet" href="leaflet.css">
+<link rel="stylesheet" href="maplibre-gl.css">
 <style>{FONTS}
 html,body{{margin:0;height:100%;background:#010407;overflow:hidden;-webkit-tap-highlight-color:transparent;user-select:none}}
 body.app [data-demo]{{display:none!important}}
@@ -177,6 +184,9 @@ body.map-on #tcmap{{display:block}}
 body.map-on #scene,body.map-on #lp{{display:none!important}}
 #tcmap .leaflet-control-attribution{{font-size:9px;background:rgba(0,0,0,.35);color:#aab}}
 #tcmap .leaflet-control-attribution a{{color:#ccd}}
+#tcmap .maplibregl-ctrl-attrib{{font-size:9px;background:rgba(0,0,0,.35)!important;color:#aab}}
+#tcmap .maplibregl-ctrl-attrib a{{color:#ccd}}
+#tcmap .maplibregl-ctrl-attrib-button{{filter:invert(1);opacity:.6}}
 #ui{{pointer-events:none}}
 #ui button,#ui input,#ui label,#ui .pnl,#ui section,#ui [role=dialog],#ui [role=separator],#ui [role=switch],#ui [role=checkbox],#ui .scrl{{pointer-events:auto}}
 #ui > div > div[style*="inset"],#ui [style*="background: rgba(1,6,10"]{{pointer-events:auto}}
@@ -192,6 +202,8 @@ body.narrow #scene{{display:none}}
 <script src="scene.js"></script>
 <script src="app.js"></script>
 <script src="leaflet.js"></script>
+<script src="maplibre-gl.js"></script>
+<script src="glmap.js"></script>
 <script src="nav.js"></script>
 <script src="glue.js"></script>
 <script src="sky.js"></script>
