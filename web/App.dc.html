@@ -1464,7 +1464,7 @@ const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rn
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
 const DEFAULTS = { vnVoice: 'doan', navVol: 80, mapEngine: 'gl', mapTilt: true, driveRec: true, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
-  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chimeSilent: true, chime: 'soft', chimeVol: 60 };
+  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chimeSilent: true, chime: 'soft', chimeVol: 100 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
 const APPS = [
   ['waze', 'Waze', 'map', '#2D8FD6', 'W'], ['gmaps', 'Google Maps', 'map', '#3C8F5A', 'GM'], ['here', 'HERE WeGo', 'map', '#2A6F8F', 'H'],
@@ -1522,6 +1522,7 @@ class Component extends DCLogic {
     let sv = {};
     try { sv = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { sv = {}; }
     try { const s1 = JSON.parse(window.localStorage.getItem(STORE + '-set') || 'null'); if (s1 && typeof s1 === 'object') sv.set = s1; } catch (e) {}
+    if (sv.set && !sv.set.v14) { if (sv.set.chimeVol === 60) sv.set.chimeVol = 100; sv.set.v14 = true; }   // 0.9.14 (#127): start-up sound louder by default
     this.state = {
       scr: 'home', boot: 'splash', drive: false, playing: false, perm: false, now: Date.now(), last: Date.now(),
       grp: 'chung', exitOpen: false, createOpen: false, rtCheck: false, listOpen: false,
@@ -1550,7 +1551,7 @@ class Component extends DCLogic {
     }, 1000);
     this.startBoot();
     // hand the saved choices to the Android side once the bridge is up
-    setTimeout(() => { const c0 = this.state.set || {}; if (APP && c0.chimeOn !== false) tcn('chime', JSON.stringify({ name: 'chime_' + (c0.chime || 'soft'), vol: c0.chimeVol == null ? 60 : c0.chimeVol, silent: c0.chimeSilent !== false })); }, 250);   // #56
+    setTimeout(() => { const c0 = this.state.set || {}; if (APP && c0.chimeOn !== false) tcn('chime', JSON.stringify({ name: 'chime_' + (c0.chime || 'soft'), vol: c0.chimeVol == null ? 100 : c0.chimeVol, silent: c0.chimeSilent !== false })); }, 250);   // #56
     setTimeout(() => { this.syncNative(this.state.set); if (APP && this.state.set.autoPlay) tcn('media', 'autoplay'); if (APP) { tcn('media', 'jbquery'); tcn('voice', 'report'); } }, 1500);
   }
   syncNative(C) {

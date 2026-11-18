@@ -406,7 +406,7 @@ window.__AppComp = function() {
     chimeOn: true,
     chimeSilent: true,
     chime: "soft",
-    chimeVol: 60
+    chimeVol: 100
   };
   const APPS = [
     ["waze", "Waze", "map", "#2D8FD6", "W"],
@@ -497,6 +497,10 @@ window.__AppComp = function() {
         const s1 = JSON.parse(window.localStorage.getItem(STORE + "-set") || "null");
         if (s1 && typeof s1 === "object") sv.set = s1;
       } catch (e) {
+      }
+      if (sv.set && !sv.set.v14) {
+        if (sv.set.chimeVol === 60) sv.set.chimeVol = 100;
+        sv.set.v14 = true;
       }
       this.state = {
         scr: "home",
@@ -609,7 +613,7 @@ window.__AppComp = function() {
       this.startBoot();
       setTimeout(() => {
         const c0 = this.state.set || {};
-        if (APP && c0.chimeOn !== false) tcn("chime", JSON.stringify({ name: "chime_" + (c0.chime || "soft"), vol: c0.chimeVol == null ? 60 : c0.chimeVol, silent: c0.chimeSilent !== false }));
+        if (APP && c0.chimeOn !== false) tcn("chime", JSON.stringify({ name: "chime_" + (c0.chime || "soft"), vol: c0.chimeVol == null ? 100 : c0.chimeVol, silent: c0.chimeSilent !== false }));
       }, 250);
       setTimeout(() => {
         this.syncNative(this.state.set);
