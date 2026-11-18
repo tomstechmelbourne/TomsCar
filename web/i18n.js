@@ -41,7 +41,7 @@ Hình địa danh làm nền|Place photo background
 Lấy hình của nơi đó từ Wikipedia / Wikimedia Commons (cần mạng)|Photo of the place from Wikipedia / Wikimedia Commons (needs internet)
 Hiện ngày âm lịch, Rằm, mùng 1, Tết — cả tiếng Việt lẫn tiếng Anh|Show the lunar date, full moon, new moon, Lunar New Year — in both languages
 Kiểu số tốc độ|Speed number style
-Chọn là đổi ngay trên Màn Hình Chính|Changes right away on Home
+Chọn là đổi ngay trên màn hình Hành Trình|Changes right away on the Drive screen
 Cỡ số tốc độ|Speed number size
 Vòng cung giới hạn quanh số|Limit arc around the number
 Gần chạm giới hạn thì vòng gần kín|The ring nearly closes near the limit
@@ -242,9 +242,9 @@ Road Trip + Bản Đồ|Road Trip + Map
 Điện thoại --|Phone --
 Ghé|Stop
 Màn Hình Chính|Home
-➤ Hành Trình|➤ Journeys
+➤ Hành Trình|➤ Drive
 ➤ Hành Trình ▸|➤ Journeys ▸
-Hành Trình|Journeys
+Hành Trình|Drive
 HÀNH TRÌNH|JOURNEYS
 🗺 Road Trip|🗺 Road Trip
 Liên Lạc|Contacts
@@ -518,14 +518,14 @@ Giọng Tiếng Việt|Vietnamese voice
 Giọng Tiếng Việt cho trợ lý|Vietnamese voice for the assistant
 Tải Giọng Việt|Download Vietnamese voice
 Bản Đồ & Road Trip|Map & Road Trip
-Màn Hình Chính là bản đồ|Home screen is a map
+Màn hình Hành Trình là bản đồ|Drive screen is a map
 Tự hiện bản đồ khi xe chạy|Show the map when driving
 Bản đồ nằm bên|Map side
 Trái|Left
 Phải|Right
 Độ sáng bản đồ|Map brightness
 Hướng bản đồ khi chỉ đường|Map orientation while navigating
-Nút tìm nhanh (Màn Hình Chính)|Quick-search buttons (Home)
+Nút tìm nhanh (Hành Trình)|Quick-search buttons (Drive screen)
 Chạm để bật/tắt từng nút — kết quả hiện ngay trên bản đồ, đang chỉ đường thì tìm dọc đường|Tap to turn each button on/off — results show on the map; while navigating it searches along the route
 Tự Động = Sáng ban ngày, Tối ban đêm (theo giờ mặt trời mọc/lặn)|Auto = light by day, dark at night (by sunrise/sunset)
 Khoá bàn phím khi xe chạy|Lock keyboard while driving

@@ -86,14 +86,14 @@
   const fetchWx = (lat, lon) => {
     if (wxBusy || Date.now() - wxAt < 15 * 60 * 1e3) return;
     wxBusy = true;
-    const u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat.toFixed(3) + "&longitude=" + lon.toFixed(3) + "&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=6";
+    const u = "https://api.open-meteo.com/v1/forecast?latitude=" + lat.toFixed(3) + "&longitude=" + lon.toFixed(3) + "&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,precipitation_probability_max&timezone=auto&forecast_days=7";
     fetch(u).then((r) => r.json()).then((j) => {
       wxAt = Date.now();
       const nowH = /* @__PURE__ */ new Date();
       nowH.setMinutes(0, 0, 0);
       const hourly = [];
       const ht = j.hourly && j.hourly.time || [];
-      for (let i = 0; i < ht.length && hourly.length < 12; i++) {
+      for (let i = 0; i < ht.length && hourly.length < 25; i++) {
         const t = new Date(ht[i]);
         if (t >= nowH) {
           const hr = t.getHours();
@@ -102,7 +102,7 @@
           hourly.push({ t: ht[i], temp: j.hourly.temperature_2m[i], code: c, rain: j.hourly.precipitation_probability ? j.hourly.precipitation_probability[i] : null });
         }
       }
-      const daily = (j.daily && j.daily.time || []).map((d, i) => ({ d, hi: j.daily.temperature_2m_max[i], lo: j.daily.temperature_2m_min[i], code: wxCode(j.daily.weather_code[i]) }));
+      const daily = (j.daily && j.daily.time || []).map((d, i) => ({ d, hi: j.daily.temperature_2m_max[i], lo: j.daily.temperature_2m_min[i], code: wxCode(j.daily.weather_code[i]), rain: j.daily.precipitation_probability_max ? j.daily.precipitation_probability_max[i] : null }));
       const sun = j.daily && j.daily.sunrise ? { rise: j.daily.sunrise[0], set: j.daily.sunset[0] } : null;
       window.__sun = sun;
       window.__sunDays = j.daily ? { rise: j.daily.sunrise, set: j.daily.sunset } : null;
@@ -1041,8 +1041,6 @@
   const drawCtl = (o) => {
     ctl.innerHTML = "";
     const set = (k, v) => window.__ui && window.__ui.setS(k, v);
-    [["auto", "T\u1EF1 \u0110\u1ED9ng"], ["dark", "T\u1ED1i"], ["light", "S\xE1ng"], ["topo", "\u0110\u1ECBa H\xECnh"], ["sat", "V\u1EC7 Tinh"]].forEach(([k, l]) => ctl.appendChild(btn(l, o.style === k, () => set("mapStyle", k))));
-    ctl.appendChild(btn(o.night ? "\u{1F319}" : "\u2600", false, () => set("mapStyle", o.night ? "light" : "dark")));
     const r = document.createElement("input");
     r.type = "range";
     r.min = 40;

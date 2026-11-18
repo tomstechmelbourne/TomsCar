@@ -53,21 +53,52 @@
     redraw();
   };
   const REC = { t0: Date.now(), rows: [], ev: [] };
+  const recDb = new Promise((res) => {
+    try {
+      const r = indexedDB.open("tc-rec", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("r");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => res(null);
+    } catch (e) {
+      res(null);
+    }
+  });
+  const recGet = (k) => recDb.then((d) => d ? new Promise((res) => {
+    try {
+      const q = d.transaction("r").objectStore("r").get(k);
+      q.onsuccess = () => res(q.result || null);
+      q.onerror = () => res(null);
+    } catch (e) {
+      res(null);
+    }
+  }) : null);
+  const recPut = (k, v) => recDb.then((d) => {
+    if (d) try {
+      d.transaction("r", "readwrite").objectStore("r").put(v, k);
+    } catch (e) {
+    }
+  });
+  let recPrev = null;
   try {
-    const prev = localStorage.getItem("tc-drive-cur");
-    if (prev) localStorage.setItem("tc-drive-prev", prev);
+    const old = localStorage.getItem("tc-drive-cur") || localStorage.getItem("tc-drive-prev");
     localStorage.removeItem("tc-drive-cur");
+    localStorage.removeItem("tc-drive-prev");
+    if (old) recPut("cur", old);
   } catch (e) {
   }
+  recGet("cur").then((v) => {
+    if (v) {
+      recPrev = v;
+      recPut("prev", v);
+    } else recGet("prev").then((p) => {
+      recPrev = p;
+    });
+  });
   let recT = 0;
   const recSave = (force) => {
     if (!force && Date.now() - recT < 3e4) return;
     recT = Date.now();
-    try {
-      localStorage.setItem("tc-drive-cur", JSON.stringify(REC));
-    } catch (e) {
-      REC.rows = REC.rows.slice(-3600);
-    }
+    recPut("cur", JSON.stringify(REC));
   };
   const r1 = (x, k) => x == null || isNaN(x) ? null : Math.round(x * k) / k;
   NAV.logEvt = (k, v) => {
@@ -104,7 +135,7 @@
     recSave(true);
     let prev = null;
     try {
-      prev = JSON.parse(localStorage.getItem("tc-drive-prev") || "null");
+      prev = recPrev ? JSON.parse(recPrev) : null;
     } catch (e) {
     }
     return JSON.stringify(Object.assign({
@@ -288,6 +319,8 @@
       setTimeout(stopRun, 1100);
     });
   };
+  const STOPPOS = {};
+  NAV.stopPos = (id) => STOPPOS[id] || null;
   NAV.stopLL = (q) => {
     if (!q) return null;
     const c = STOPLL[q];
@@ -554,7 +587,7 @@
     if (b && b.isValid()) {
       follow = false;
       userAt = Date.now();
-      map.fitBounds(b, { paddingTopLeft: [NAV.padL || 40, 150], paddingBottomRight: [80, 130], maxZoom: 15 });
+      map.fitBounds(b, { paddingTopLeft: [NAV.padL || 40, 150], paddingBottomRight: [NAV.padR || 80, 130], maxZoom: 15 });
     }
   };
   NAV.flyTo = (ll, z) => {
@@ -575,6 +608,7 @@
     }
     if (!ensure()) return;
     NAV.padL = o.padL || 40;
+    NAV.padR = o.padR || 80;
     let key = o.style === "auto" || !TILES[o.style] ? o.night ? "dark" : "light" : o.style;
     if (key === "sat" && (map.getZoom() < 10 || o.satFast !== false && (o.spd || 0) > 80)) key = o.night ? "dark" : "light";
     if (GLM) {
@@ -662,6 +696,7 @@
           }
           if (!ll && s.frac != null) ll = ptAtFrac(s.rev ? o.rt.pts.slice().reverse() : o.rt.pts, s.frac);
           if (!ll) return;
+          if (s.id) STOPPOS[s.id] = ll;
           const lab = s.start || s.end || s.next || zoomed ? s.short : "";
           marks.push(pin(ll, dot(s.start ? "#14A05A" : s.end ? "#D0202E" : s.next ? "#FBB040" : "#F28A1A", s.start ? "\u25CF" : s.end ? "\u2691" : String(s.n || ""), lab, s.logo), s.start || s.end ? 600 : s.next ? 500 : 400).on("click", () => {
             if (s.id && window.__ui) window.__ui.setState({ dlg: "stop", stopId: s.id });

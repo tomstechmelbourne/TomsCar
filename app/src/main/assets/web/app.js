@@ -169,6 +169,84 @@ window.__AppComp = function() {
     if (lunarMonth >= 11 && diff < 4) lunarYear -= 1;
     return [lunarDay, lunarMonth, lunarYear, lunarLeap];
   }
+  const easterSun = (y) => {
+    const a = y % 19, b = INT(y / 100), c = y % 100, d = INT(b / 4), e = b % 4, f = INT((b + 8) / 25), g = INT((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = INT(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = INT((a + 11 * h + 22 * l) / 451), mo = INT((h + l - 7 * m + 114) / 31), da = (h + l - 7 * m + 114) % 31 + 1;
+    return new Date(y, mo - 1, da);
+  };
+  const nthDow = (y, m, dow, n) => {
+    const d1 = new Date(y, m, 1);
+    return new Date(y, m, 1 + (dow - d1.getDay() + 7) % 7 + (n - 1) * 7);
+  };
+  const ymd = (d) => d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+  const HOLI = {};
+  function holidaysOf(y) {
+    if (HOLI[y]) return HOLI[y];
+    const H = {};
+    const add = (d, name, kind, off) => {
+      const k = ymd(d);
+      (H[k] = H[k] || []).push({ name, kind, off: !!off });
+    };
+    const D = (m, dd) => new Date(y, m - 1, dd);
+    const subst = (d, name) => {
+      const w = d.getDay();
+      if (w === 6) add(new Date(y, d.getMonth(), d.getDate() + 2), name + " (ngh\u1EC9 b\xF9)", "au", true);
+      if (w === 0) add(new Date(y, d.getMonth(), d.getDate() + 1), name + " (ngh\u1EC9 b\xF9)", "au", true);
+    };
+    add(D(1, 1), "New Year's Day", "au", true);
+    subst(D(1, 1), "New Year's Day");
+    add(D(1, 26), "Australia Day", "au", true);
+    subst(D(1, 26), "Australia Day");
+    add(nthDow(y, 2, 1, 2), "Labour Day (VIC)", "au", true);
+    const es = easterSun(y), eo = (n) => new Date(es.getFullYear(), es.getMonth(), es.getDate() + n);
+    add(eo(-2), "Good Friday", "au", true);
+    add(eo(-1), "Easter Saturday", "au", true);
+    add(es, "Easter Sunday", "au", true);
+    add(eo(1), "Easter Monday", "au", true);
+    add(D(4, 25), "ANZAC Day", "au", true);
+    add(nthDow(y, 4, 0, 2), "Mother's Day", "au", false);
+    add(nthDow(y, 5, 1, 2), "King's Birthday", "au", true);
+    add(nthDow(y, 8, 0, 1), "Father's Day", "au", false);
+    add(nthDow(y, 10, 2, 1), "Melbourne Cup (Melbourne)", "au", true);
+    const xm = D(12, 25), bx = D(12, 26);
+    add(xm, "Christmas Day", "au", true);
+    add(bx, "Boxing Day", "au", true);
+    if (xm.getDay() === 6) {
+      add(D(12, 27), "Christmas Day (ngh\u1EC9 b\xF9)", "au", true);
+      add(D(12, 28), "Boxing Day (ngh\u1EC9 b\xF9)", "au", true);
+    }
+    if (xm.getDay() === 0) add(D(12, 27), "Christmas Day (ngh\u1EC9 b\xF9)", "au", true);
+    if (bx.getDay() === 6) add(D(12, 28), "Boxing Day (ngh\u1EC9 b\xF9)", "au", true);
+    [[1, 1, "T\u1EBFt D\u01B0\u01A1ng L\u1ECBch", 1], [2, 3, "Th\xE0nh l\u1EADp \u0110\u1EA3ng", 0], [3, 8, "Qu\u1ED1c t\u1EBF Ph\u1EE5 n\u1EEF", 0], [4, 30, "Gi\u1EA3i ph\xF3ng mi\u1EC1n Nam", 1], [5, 1, "Qu\u1ED1c t\u1EBF Lao \u0111\u1ED9ng", 1], [6, 1, "Qu\u1ED1c t\u1EBF Thi\u1EBFu nhi", 0], [9, 2, "Qu\u1ED1c Kh\xE1nh", 1], [10, 20, "Ph\u1EE5 n\u1EEF Vi\u1EC7t Nam", 0], [11, 20, "Nh\xE0 gi\xE1o Vi\u1EC7t Nam", 0]].forEach(([m, dd, n, o]) => add(D(m, dd), n, "vn", !!o));
+    const LUN = { "1/1": ["T\u1EBFt Nguy\xEAn \u0110\xE1n \xB7 M\xF9ng 1", 1], "2/1": ["T\u1EBFt \xB7 M\xF9ng 2", 1], "3/1": ["T\u1EBFt \xB7 M\xF9ng 3", 1], "15/1": ["R\u1EB1m Th\xE1ng Gi\xEAng", 0], "10/3": ["Gi\u1ED7 T\u1ED5 H\xF9ng V\u01B0\u01A1ng", 1], "15/4": ["L\u1EC5 Ph\u1EADt \u0110\u1EA3n", 0], "5/5": ["T\u1EBFt \u0110oan Ng\u1ECD", 0], "15/7": ["L\u1EC5 Vu Lan", 0], "15/8": ["T\u1EBFt Trung Thu", 0], "23/12": ["\xD4ng T\xE1o v\u1EC1 tr\u1EDDi", 0] };
+    for (let t = new Date(y, 0, 1); t.getFullYear() === y; t = new Date(y, t.getMonth(), t.getDate() + 1)) {
+      const l = solar2lunar(t.getDate(), t.getMonth() + 1, y);
+      if (l[3]) continue;
+      const v = LUN[l[0] + "/" + l[1]];
+      if (v) add(t, v[0], "vn", !!v[1]);
+      const nx = new Date(y, t.getMonth(), t.getDate() + 1), l2 = solar2lunar(nx.getDate(), nx.getMonth() + 1, nx.getFullYear());
+      if (l2[0] === 1 && l2[1] === 1 && !l2[3]) add(t, "Giao Th\u1EEBa", "vn", false);
+    }
+    HOLI[y] = H;
+    return H;
+  }
+  const CAN = ["Canh", "T\xE2n", "Nh\xE2m", "Qu\xFD", "Gi\xE1p", "\u1EA4t", "B\xEDnh", "\u0110inh", "M\u1EADu", "K\u1EF7"], CHI = ["Th\xE2n", "D\u1EADu", "Tu\u1EA5t", "H\u1EE3i", "T\xFD", "S\u1EEDu", "D\u1EA7n", "M\xE3o", "Th\xECn", "T\u1EF5", "Ng\u1ECD", "M\xF9i"];
+  const canChi = (ly) => CAN[ly % 10] + " " + CHI[ly % 12];
+  const moonPhase = (t) => {
+    const jd = t / 864e5 + 24405875e-1;
+    let k = INT((jd - 2415021076998695e-9) / 29.530588853);
+    if (newMoon(k) > jd) k--;
+    if (newMoon(k + 1) <= jd) k++;
+    const nm = newMoon(k), nx = newMoon(k + 1);
+    return Math.max(0, Math.min(0.9999, (jd - nm) / (nx - nm)));
+  };
+  function moonPath(p, cx, cy, r) {
+    if (p < 0.025 || p > 0.975) return "";
+    if (Math.abs(p - 0.5) < 0.02) return "M" + cx + " " + (cy - r) + "a" + r + " " + r + " 0 1 0 0.01 0z";
+    const litLeft = p < 0.5, k = Math.cos(2 * Math.PI * p), rx = Math.max(0.01, r * Math.abs(k)).toFixed(2), crescent = k > 0;
+    const limb = litLeft ? 0 : 1, term = crescent ? litLeft ? 1 : 0 : litLeft ? 0 : 1;
+    return "M" + cx + " " + (cy - r) + " A" + r + " " + r + " 0 0 " + limb + " " + cx + " " + (cy + r) + " A" + rx + " " + r + " 0 0 " + term + " " + cx + " " + (cy - r) + " Z";
+  }
+  const moonName = (p) => p < 0.03 || p > 0.97 ? "Tr\u0103ng non" : p < 0.22 ? "Tr\u0103ng l\u01B0\u1EE1i li\u1EC1m" : p < 0.28 ? "Tr\u0103ng th\u01B0\u1EE3ng huy\u1EC1n" : p < 0.47 ? "Tr\u0103ng khuy\u1EBFt" : p < 0.53 ? "Tr\u0103ng tr\xF2n" : p < 0.72 ? "Tr\u0103ng khuy\u1EBFt" : p < 0.78 ? "Tr\u0103ng h\u1EA1 huy\u1EC1n" : "Tr\u0103ng l\u01B0\u1EE1i li\u1EC1m";
   function tzTime(d, zone) {
     try {
       return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: zone }).format(d);
@@ -326,6 +404,7 @@ window.__AppComp = function() {
     odoOn: true,
     stateRules: true,
     chimeOn: true,
+    chimeSilent: true,
     chime: "soft",
     chimeVol: 60
   };
@@ -413,6 +492,11 @@ window.__AppComp = function() {
         sv = JSON.parse(window.localStorage.getItem(STORE) || "{}") || {};
       } catch (e) {
         sv = {};
+      }
+      try {
+        const s1 = JSON.parse(window.localStorage.getItem(STORE + "-set") || "null");
+        if (s1 && typeof s1 === "object") sv.set = s1;
+      } catch (e) {
       }
       this.state = {
         scr: "home",
@@ -525,7 +609,7 @@ window.__AppComp = function() {
       this.startBoot();
       setTimeout(() => {
         const c0 = this.state.set || {};
-        if (APP && c0.chimeOn !== false) tcn("chime", JSON.stringify({ name: "chime_" + (c0.chime || "soft"), vol: c0.chimeVol == null ? 60 : c0.chimeVol }));
+        if (APP && c0.chimeOn !== false) tcn("chime", JSON.stringify({ name: "chime_" + (c0.chime || "soft"), vol: c0.chimeVol == null ? 60 : c0.chimeVol, silent: c0.chimeSilent !== false }));
       }, 250);
       setTimeout(() => {
         this.syncNative(this.state.set);
@@ -566,7 +650,8 @@ window.__AppComp = function() {
           if (L.rt) k = "rt";
         }
       }
-      return ["home", "trip", "rt", "contacts", "search", "split", "dex"].indexOf(k) >= 0 ? k : "home";
+      if (k === "trip") k = "home";
+      return ["home", "rt", "contacts", "search", "split", "dex"].indexOf(k) >= 0 ? k : "home";
     }
     startBoot() {
       clearTimeout(this.b1);
@@ -581,6 +666,24 @@ window.__AppComp = function() {
     }
     save(patch) {
       const st = Object.assign({}, this.state, patch);
+      const put = (k, v) => {
+        try {
+          window.localStorage.setItem(k, v);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      };
+      const setJ = JSON.stringify(st.set || {});
+      if (!put(STORE + "-set", setJ)) {
+        ["tc-places", "tc-logos2", "tc-drive-cur", "tc-drive-prev"].forEach((k) => {
+          try {
+            window.localStorage.removeItem(k);
+          } catch (e) {
+          }
+        });
+        put(STORE + "-set", setJ);
+      }
       try {
         window.localStorage.setItem(STORE, JSON.stringify({ set: st.set, goList: st.goList, backList: st.backList, skip: st.skip, wsList: st.wsList, custom: st.custom, photos: st.photos, savedPl: st.savedPl, trips: st.trips, tripId: st.tripId, melStore: st.melStore }));
       } catch (e) {
@@ -654,14 +757,14 @@ window.__AppComp = function() {
       let dk = { on: false }, mpPos = null;
       if (!S.boot && S.scr !== self.__lastScr) {
         self.__lastScr = S.scr;
-        if (["home", "trip", "rt", "contacts", "search", "split", "dex"].indexOf(S.scr) >= 0) {
+        if (["home", "rt", "contacts", "search", "split", "dex"].indexOf(S.scr) >= 0) {
           try {
             localStorage.setItem("tc-lastScr", S.scr);
           } catch (e) {
           }
         }
       }
-      const SCR = [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"], ["contacts", "Li\xEAn L\u1EA1c"]];
+      const SCR = [["home", "H\xE0nh Tr\xECnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"], ["contacts", "Li\xEAn L\u1EA1c"]];
       const scrBtns = SCR.map(([k, label]) => {
         const on = S.scr === k;
         return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: go(k) };
@@ -755,7 +858,8 @@ window.__AppComp = function() {
           ch("lang", "Ng\xF4n ng\u1EEF", "Ch\u1EEF tr\xEAn m\u1ECDi m\xE0n h\xECnh", [["vi", "Ti\u1EBFng Vi\u1EC7t"], ["en", "English"]]),
           ch("clock", "Ki\u1EC3u gi\u1EDD", "M\u1EB7c \u0111\u1ECBnh 24h", [["24", "24h"], ["12", "12h"]]),
           ch("unit", "\u0110\u01A1n v\u1ECB t\u1ED1c \u0111\u1ED9", "M\u1EB7c \u0111\u1ECBnh km/g", [["kmg", "km/g"], ["mph", "mph"]]),
-          tg("chimeOn", "Nh\u1EA1c ch\xE0o khi m\u1EDF app", "Kho\u1EA3ng 2 gi\xE2y \xB7 kh\xF4ng k\xEAu khi m\xE1y \u0111\u1EC3 im l\u1EB7ng ho\u1EB7c \u0111ang ph\xE1t nh\u1EA1c"),
+          tg("chimeOn", "Nh\u1EA1c ch\xE0o khi m\u1EDF app", "Kho\u1EA3ng 2 gi\xE2y \xB7 k\xEAu khi m\u1EDF app sau Tho\xE1t H\u1EB3n (Ch\u1EA1y N\u1EC1n r\u1ED3i quay l\u1EA1i th\xEC kh\xF4ng k\xEAu) \xB7 \u0111ang c\xF3 nh\u1EA1c th\xEC nh\u1EA1c nh\u1ECF xu\u1ED1ng m\u1ED9t ch\xFAt"),
+          tg("chimeSilent", "K\xEAu c\u1EA3 khi m\xE1y \u0111\u1EC3 Rung / Im L\u1EB7ng", "T\u1EAFt th\xEC m\xE1y \u0111\u1EC3 Rung ho\u1EB7c Im L\u1EB7ng s\u1EBD kh\xF4ng k\xEAu"),
           Object.assign(ch("chime", "Ki\u1EC3u nh\u1EA1c ch\xE0o", "B\u1EA5m l\xE0 nghe th\u1EED", [["soft", "Nh\u1EB9 Nh\xE0ng"], ["modern", "Hi\u1EC7n \u0110\u1EA1i"], ["engine", "N\u1ED5 M\xE1y"]]), { opts: [["soft", "Nh\u1EB9 Nh\xE0ng"], ["modern", "Hi\u1EC7n \u0110\u1EA1i"], ["engine", "N\u1ED5 M\xE1y"]].map(([v, l]) => {
             const on = (C.chime || "soft") === v;
             return { label: l, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => {
@@ -764,9 +868,9 @@ window.__AppComp = function() {
             } };
           }) }),
           ch("chimeVol", "\xC2m l\u01B0\u1EE3ng nh\u1EA1c ch\xE0o", "So v\u1EDBi \xE2m l\u01B0\u1EE3ng nh\u1EA1c c\u1EE7a m\xE1y", [[30, "Nh\u1ECF"], [60, "V\u1EEBa"], [100, "L\u1EDBn"]]),
-          ch("startScr", "M\u1EDF app th\xEC v\xE0o", "Sau m\xE0n h\xECnh ch\xE0o \xB7 app t\u1EF1 m\u1EDF l\u1EA1i sau s\u1EF1 c\u1ED1 th\xEC v\u1EC1 \u0111\xFAng m\xE0n h\xECnh \u0111ang xem", [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["trip", "H\xE0nh Tr\xECnh"], ["rt", "Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"], ["ws", "Workspace g\u1EA7n nh\u1EA5t"], ["last", "M\xE0n h\xECnh l\xFAc t\u1EAFt app"]]),
+          ch("startScr", "M\u1EDF app th\xEC v\xE0o", "Sau m\xE0n h\xECnh ch\xE0o \xB7 app t\u1EF1 m\u1EDF l\u1EA1i sau s\u1EF1 c\u1ED1 th\xEC v\u1EC1 \u0111\xFAng m\xE0n h\xECnh \u0111ang xem", [["home", "H\xE0nh Tr\xECnh"], ["rt", "Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"], ["ws", "Workspace g\u1EA7n nh\u1EA5t"], ["last", "M\xE0n h\xECnh l\xFAc t\u1EAFt app"]]),
           ch("splashSec", "M\xE0n h\xECnh ch\xE0o", "Logo + phi\xEAn b\u1EA3n \xB7 ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm", [[0, "T\u1EAFt"], [1, "1 gi\xE2y"], [3, "3 gi\xE2y"], [5, "5 gi\xE2y"]]),
-          info("M\u1EDF app v\xE0o th\u1EB3ng", "Lu\xF4n v\xE0o tab n\xE0y sau m\xE0n h\xECnh ch\xE0o", "M\xE0n H\xECnh Ch\xEDnh"),
+          info("M\u1EDF app v\xE0o th\u1EB3ng", "Lu\xF4n v\xE0o tab n\xE0y sau m\xE0n h\xECnh ch\xE0o", "H\xE0nh Tr\xECnh"),
           stt("Nh\u1EDB m\u1ECDi l\u1EF1a ch\u1ECDn khi tho\xE1t", "Giao di\u1EC7n, t\xEDnh n\u0103ng, Workspace, ch\u1EB7ng Road Trip\u2026", true, "Lu\xF4n nh\u1EDB", "", "", null),
           tg("privacy", "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0", "Gi\u1EA5u t\xEAn ng\u01B0\u1EDDi g\u1ECDi, n\u1ED9i dung tin nh\u1EAFn, th\xF4ng tin kh\xE1ch"),
           info("Cu\u1ED9c g\u1ECDi \u0111\u1EBFn", 'Kh\xF4ng \u0111\u1ECDc t\xEAn ra loa \u2014 ch\u1EC9 b\xE1o "C\xF3 cu\u1ED9c g\u1ECDi"', "Chu\xF4ng theo nh\xF3m \u25B8"),
@@ -788,7 +892,7 @@ window.__AppComp = function() {
           tg("idleWxBg", "N\u1EC1n tr\u1EDDi \u0111\u1ED9ng", "M\xE2y tr\xF4i m\u01B0\u1EE3t khi \u0111\u1EADu xe, \u0111\u1EE9ng y\xEAn khi xe ch\u1EA1y"),
           tg("idleVN", "Gi\u1EDD Vi\u1EC7t Nam", "Hi\u1EC7n gi\u1EDD S\xE0i G\xF2n d\u01B0\u1EDBi ng\xE0y th\xE1ng"),
           tg("idleAppt", "L\u1ECBch h\u1EB9n", "T\u1EEB Google Calendar"),
-          ch("spStyle", "Ki\u1EC3u s\u1ED1 t\u1ED1c \u0111\u1ED9", "Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay tr\xEAn M\xE0n H\xECnh Ch\xEDnh", Object.keys(STY).map((k) => [k, STY[k].label])),
+          ch("spStyle", "Ki\u1EC3u s\u1ED1 t\u1ED1c \u0111\u1ED9", "Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay tr\xEAn m\xE0n h\xECnh H\xE0nh Tr\xECnh", Object.keys(STY).map((k) => [k, STY[k].label])),
           ch("spSize", "C\u1EE1 s\u1ED1 t\u1ED1c \u0111\u1ED9", "", [["S", "Nh\u1ECF"], ["M", "V\u1EEBa"], ["L", "To"]]),
           tg("spRing", "V\xF2ng cung gi\u1EDBi h\u1EA1n quanh s\u1ED1", "G\u1EA7n ch\u1EA1m gi\u1EDBi h\u1EA1n th\xEC v\xF2ng g\u1EA7n k\xEDn"),
           tg("spAuto", "Ki\u1EC3u s\u1ED1 t\u1EF1 \u0111\u1ED5i theo giao di\u1EC7n", "Giao di\u1EC7n \xDAc \u2192 Bi\u1EC3n B\xE1o \xDAc, Synthwave \u2192 Neon\u2026"),
@@ -853,7 +957,7 @@ window.__AppComp = function() {
           tg("placePhotos", "H\xECnh \u0111\u1EA1i di\u1EC7n \u0111\u1ECBa \u0111i\u1EC3m", "H\xECnh b\u1EA1n ch\u1EE5p \u2192 Wikimedia Commons \u2192 bi\u1EC3n b\xE1o"),
           tg("limitEst", "Gi\u1EDBi h\u1EA1n \u01B0\u1EDBc t\xEDnh khi thi\u1EBFu d\u1EEF li\u1EC7u", '50 khu d\xE2n c\u01B0 / 100 ngo\xE0i th\u1ECB tr\u1EA5n \u2014 c\xF3 ch\u1EEF "\u01B0\u1EDBc t\xEDnh" d\u01B0\u1EDBi bi\u1EC3n'),
           ch("rest", "Nh\u1EAFc ngh\u1EC9 ch\xE2n m\u1ED7i", "Theo gi\u1EDD l\xE1i li\xEAn t\u1EE5c", [[1.5, "1,5 gi\u1EDD"], [2, "2 gi\u1EDD"], [3, "3 gi\u1EDD"]]),
-          tg("homeMap", "M\xE0n H\xECnh Ch\xEDnh l\xE0 b\u1EA3n \u0111\u1ED3", "T\u1EAFt th\xEC n\u1EC1n l\xE0 c\u1EA3nh low-poly nh\u01B0 c\u0169 (\u0111\u1ED5i trong Giao Di\u1EC7n)"),
+          tg("homeMap", "M\xE0n h\xECnh H\xE0nh Tr\xECnh l\xE0 b\u1EA3n \u0111\u1ED3", "T\u1EAFt th\xEC n\u1EC1n l\xE0 c\u1EA3nh low-poly nh\u01B0 c\u0169 (\u0111\u1ED5i trong Giao Di\u1EC7n)"),
           tg("autoMap", "T\u1EF1 hi\u1EC7n b\u1EA3n \u0111\u1ED3 khi xe ch\u1EA1y", "Tr\xEAn 10 km/g: n\u1EC1n low-poly \u0111\u1ED5i sang b\u1EA3n \u0111\u1ED3, T\xECm Ch\u1ED7 / Li\xEAn L\u1EA1c t\u1EF1 v\u1EC1 b\u1EA3n \u0111\u1ED3"),
           tg("navVoice", "\u0110\u1ECDc ch\u1EC9 \u0111\u01B0\u1EDDng", "Qu\u1EB9o tr\xE1i, qu\u1EB9o ph\u1EA3i, b\xF9ng binh\u2026 b\u1EB1ng gi\u1ECDng Vi\u1EC7t \xB7 t\u1EAFt nhanh b\u1EB1ng n\xFAt \u{1F50A} c\u1EA1nh gi\u1EDD t\u1EDBi"),
           ch("navVol", "\xC2m l\u01B0\u1EE3ng gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng", "Nh\u1EA1c t\u1EF1 nh\u1ECF l\u1EA1i trong l\xFAc gi\u1ECDng ch\u1EC9 \u0111\u01B0\u1EDDng n\xF3i", [[60, "V\u1EEBa"], [80, "To"], [100, "R\u1EA5t to"]]),
@@ -881,7 +985,7 @@ window.__AppComp = function() {
             tcn("sharefile", JSON.stringify({ name: nm, subject: "Chuy\u1EBFn \u0111i Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || "" }) }));
           }), { stC: "#8FC3D3" }),
           tg("tripLog", "Nh\u1EADt k\xFD H\xE0nh Tr\xECnh", "T\u1EF1 ghi ch\u1ED7 \u0111\u1EADu h\u01A1n 3 ph\xFAt \u2014 ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y, kh\xF4ng g\u1EEDi \u0111i \u0111\xE2u"),
-          { isChoice: true, label: "N\xFAt t\xECm nhanh (M\xE0n H\xECnh Ch\xEDnh)", hint: "Ch\u1EA1m \u0111\u1EC3 b\u1EADt/t\u1EAFt t\u1EEBng n\xFAt \u2014 k\u1EBFt qu\u1EA3 hi\u1EC7n ngay tr\xEAn b\u1EA3n \u0111\u1ED3, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng th\xEC t\xECm d\u1ECDc \u0111\u01B0\u1EDDng", opts: Object.keys(QC).map((k) => {
+          { isChoice: true, label: "N\xFAt t\xECm nhanh (H\xE0nh Tr\xECnh)", hint: "Ch\u1EA1m \u0111\u1EC3 b\u1EADt/t\u1EAFt t\u1EEBng n\xFAt \u2014 k\u1EBFt qu\u1EA3 hi\u1EC7n ngay tr\xEAn b\u1EA3n \u0111\u1ED3, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng th\xEC t\xECm d\u1ECDc \u0111\u01B0\u1EDDng", opts: Object.keys(QC).map((k) => {
             const cur = Array.isArray(C.qcList) && C.qcList.length ? C.qcList : QC_DEF;
             const on = cur.indexOf(k) >= 0;
             return { label: QC[k][0] + " " + QC[k][1], on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS("qcList", on ? cur.filter((x) => x !== k) : cur.concat([k])) };
@@ -1873,7 +1977,7 @@ window.__AppComp = function() {
         } },
         { t: "Xe t\xF4i \u1EDF \u0111\xE2u?", re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park)|my car)/, run: () => {
           const pk = window.NAV && window.NAV.hist.park;
-          self.setState({ va: false, scr: "trip" });
+          self.setState({ va: false, scr: "home", goOpen: true });
           if (pk) {
             window.NAV.flyTo([pk.lat, pk.lon], 17);
             sayV("D\u1EA1, xe \u0111\u1EADu \u1EDF " + (pk.name || "ch\u1ED7 \u0111\xE1nh d\u1EA5u tr\xEAn b\u1EA3n \u0111\u1ED3"));
@@ -2015,14 +2119,25 @@ window.__AppComp = function() {
       };
       const SKYC = { day: "linear-gradient(180deg,#3f8fd6,#86c1ea)", dawn: "linear-gradient(180deg,#f19a6b,#f9d1a6)", dusk: "linear-gradient(180deg,#d9734f,#f0b27f)", night: "linear-gradient(180deg,#07112a,#22345e)" };
       const wxSky = wk === "rain" ? "linear-gradient(180deg,#3d4e5e,#6c7f8f)" : wk === "storm" ? "linear-gradient(180deg,#1f2833,#3b4756)" : wk === "fog" ? "linear-gradient(180deg,#8e9aa3,#c3cacf)" : wk === "cloudy" && tod === "day" ? "linear-gradient(180deg,#5d7488,#93a6b4)" : SKYC[tod];
+      const mph = moonPhase(d.getTime()), nightSky = tod === "night";
+      const lunNow = solar2lunar(d.getDate(), d.getMonth() + 1, d.getFullYear());
+      const moonL = moonName(mph) + " \xB7 " + lunNow[0] + " \xC2L";
+      const MOONP = (cx, cy, r) => [{ d: "M" + cx + " " + (cy - r) + "a" + r + " " + r + " 0 1 0 0.01 0z", fill: "rgba(200,210,235,0.22)", stroke: "none", sw: 0, cls: "" }, { d: moonPath(mph, cx, cy, r) || "M0 0", fill: "#F3EFDC", stroke: "none", sw: 0, cls: "" }];
+      if (nightSky) {
+        WP.night = MOONP(22, 24, 15).concat([{ d: "M40 9l1 2 2 1-2 1-1 2-1-2-2-1 2-1z", fill: "#FFFFFF", stroke: "none", sw: 0, cls: "fl" }]);
+        WP.cloudy = MOONP(30, 14, 8).concat([{ d: CLOUD, fill: "#E8F1F5", stroke: "none", sw: 0, cls: "cl" }]);
+      }
       const wxc = {
+        moonOn: nightSky && (wk === "night" || wk === "cloudy"),
+        moonL,
         parts: WP[wk] || WP.cloudy,
         sky: wxSky,
         cls: "wx-anim" + (drive ? " wx-calm" : ""),
         hl: WX && WX.hi != null ? "\u2191" + Math.round(WX.hi) + "\xB0  \u2193" + Math.round(WX.lo) + "\xB0" : "",
         desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 " + Math.round(WX.rain) + "%" : "") : "\u0110ang l\u1EA5y\u2026",
         aria: WX ? wxT + " " + (WXVI[wk] || "") : "\u0111ang l\u1EA5y",
-        open: () => self.setState({ idleOn: true, idleAt: Date.now() })
+        open: () => self.setState({ fcOpen: true, last: Date.now() })
+        // #130: the forecast, not the idle screen
       };
       window.__wxState = { kind: wk, tod, calm: drive && !!C.calm, drive };
       const THEMEMAP = { outback: "au", coast: "au", melb: "au", neonau: "neon", dandenong: "au", yarra: "au", snow: "au", sgold: "retro", synth: "neon", cyber: "neon", minimal: "minimal", rally: "led" };
@@ -2066,8 +2181,8 @@ window.__AppComp = function() {
         line2,
         line2C: "#FFD08A",
         op: night ? 0.82 : 1,
-        aria: "\u0110\u1ED3ng h\u1ED3 " + hh + ":" + mm + " \u2014 ch\u1EA1m \u0111\u1EC3 ph\xF3ng to",
-        tap: () => self.setState({ clkBig: true }),
+        aria: "\u0110\u1ED3ng h\u1ED3 " + hh + ":" + mm + " \u2014 ch\u1EA1m \u0111\u1EC3 xem l\u1ECBch",
+        tap: () => self.setState({ calOpen: true, calY: null, calM: null, calSel: null, calYear: false, last: Date.now() }),
         closeBig: () => self.setState({ clkBig: false, parkedAt: S.now }),
         big: !nar && (S.clkBig || APP && !drive && C.autoBig !== false && LV.parkedMin >= 10 && S.scr === "home" && !(S.parkedAt && S.now - S.parkedAt < 6e5)),
         bigCards: mkCards(true),
@@ -2343,13 +2458,20 @@ window.__AppComp = function() {
         storm: [{ d: "M16 32h30a10 10 0 0 0 0-20 14 14 0 0 0-27-3A11 11 0 0 0 16 32z", f: "#D5DCE2", s: "none", w: 0 }, { d: "M34 34l-8 12h8l-5 10", f: "none", s: "#FFE066", w: 3.5 }],
         fog: [{ d: "M10 24h44M6 34h52M12 44h40", f: "none", s: "#E8EEF2", w: 4 }]
       };
+      {
+        const mp0 = moonPhase(Date.now());
+        IC.cloudyN = [{ d: "M24 13a11 11 0 1 0 0.01 0z", f: "rgba(200,210,235,0.2)", s: "none", w: 0 }, { d: moonPath(mp0, 24, 24, 11) || "M0 0", f: "#F3EFDC", s: "none", w: 0 }, IC.cloudy[1]];
+        IC.night = [{ d: "M32 12a20 20 0 1 0 0.01 0z", f: "rgba(200,210,235,0.2)", s: "none", w: 0 }, { d: moonPath(mp0, 32, 32, 20) || "M0 0", f: "#F3EFDC", s: "none", w: 0 }];
+      }
       const icKey = (c, h) => {
         const k = c === "cloud" ? "cloudy" : c || "cloudy";
         return k === "clear" && h != null && (h < 6 || h >= 20) ? "night" : k;
       };
       const icOf = (c, h) => {
         const k = c === "cloud" ? "cloudy" : c;
-        if (k === "clear" && h != null && (h < 6 || h >= 20)) return IC.night;
+        const nt = h != null && (h < 6 || h >= 20);
+        if (k === "clear" && nt) return IC.night;
+        if (k === "cloudy" && nt) return IC.cloudyN;
         return IC[k] || IC.cloudy;
       };
       const ilay = C.idleLayout || "htc";
@@ -2496,7 +2618,8 @@ window.__AppComp = function() {
         }
       } else if (window.TCIdle && window.TCIdle.isOn()) window.TCIdle.hide();
       const NV = window.NAV || null;
-      const shell = !nar && (S.scr === "home" || S.scr === "trip" || S.scr === "rt");
+      if (S.scr === "trip") S.scr = "home";
+      const shell = !nar && (S.scr === "home" || S.scr === "rt");
       if (window.tcLangSync) window.tcLangSync(C.lang === "en" ? "en" : "vi");
       if (NV) {
         NV.cfg.engine = C.mapEngine || "gl";
@@ -2616,22 +2739,44 @@ window.__AppComp = function() {
       const nearTurn = !!(navAct && NV.st.toNext != null && NV.st.toNext < 200);
       const bnSize = C.navBanner === "big" ? "big" : C.navBanner === "hide" ? nearTurn ? "mini" : "tiny" : nearTurn ? "big" : "mini";
       const etaOpen = !!S.etaOpen;
+      const dropOpen = !!S.goOpen && S.scr === "home" && !navAct && !(S.nField === "go" && S.nRes && S.nRes.length);
+      const goAdd = !!S.goAdd && wpList.length > 0;
       const nv = {
+        boxTap: () => {
+          if (!S.goOpen) self.setState({ goOpen: true, goMenu: false, hjTab: S.hjTab === "log" ? "saved" : S.hjTab, last: Date.now() });
+        },
+        menuOn: !!S.goMenu,
+        menuTap: () => self.setState({ goMenu: !S.goMenu }),
+        openLog: () => self.setState({ goMenu: false, goOpen: true, hjTab: "log" }),
+        openPark: () => {
+          self.setState({ goMenu: false });
+          if (H0.park && NV) NV.flyTo([H0.park.lat, H0.park.lon], 17);
+          else self.toast("Ch\u01B0a ghi ch\u1ED7 \u0111\u1EADu xe n\xE0o \u2014 \u0111\u1EADu h\u01A1n 3 ph\xFAt l\xE0 app t\u1EF1 ghi");
+        },
+        openHomeSet: () => self.setState({ goMenu: false, dlg: "pe", peKind: "home", peQ: "", peRes: [] }),
+        addStop: () => self.setState({ goAdd: true, goOpen: true, nField: "go", nq: "", nRes: null }),
+        stopsOn: wpList.length > 1,
+        prevH: 560,
         mapOn: mapShow,
         boxOn: shell && S.scr === "home" && !navAct && !arrived && mapShow,
         q: S.nField === "go" ? S.nq || "" : "",
         qOn: S.nField === "go" && !!S.nq,
         lock: kbLk,
-        ph: kbLk ? '\u0110\u1EADu xe r\u1ED3i g\xF5 \u2014 ho\u1EB7c n\xF3i "Hey Tom, \u0111i t\u1EDBi\u2026"' : "\u0110i \u0111\xE2u? G\xF5 t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9",
+        ph: kbLk ? '\u0110\u1EADu xe r\u1ED3i g\xF5 \u2014 ho\u1EB7c n\xF3i "Hey Tom, \u0111i t\u1EDBi\u2026"' : goAdd ? "+ Th\xEAm \u0111i\u1EC3m d\u1EEBng \u2014 g\xF5 t\xEAn ch\u1ED7" : "\u0110i \u0111\xE2u? G\xF5 t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9",
         typeGo: typeIn("go"),
         clearQ: () => self.setState({ nq: "", nRes: null }),
         goFirst: () => {
           const r = S.nField === "go" && S.nRes && S.nRes[0];
-          if (r) planWp([toWp(r)], true);
-          else if (navV) NV.start();
+          if (r) {
+            self.setState({ goOpen: false, goAdd: false });
+            planWp(goAdd ? wpList.concat([toWp(r)]) : [toWp(r)], !goAdd);
+          } else if (navV) NV.start();
           else self.toast("G\xF5 ch\u1ED7 mu\u1ED1n t\u1EDBi tr\u01B0\u1EDBc nha");
         },
-        res: resFor("go", (p) => planWp([toWp(p)], false)),
+        res: resFor("go", (p) => {
+          self.setState({ goOpen: false, goAdd: false });
+          planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], false);
+        }),
         resOn: S.nField === "go" && !!(S.nRes && S.nRes.length) && S.scr === "home",
         micGo: () => {
           self.setState({ va: true, vaHeard: "", vaHint: "N\xF3i t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9\u2026 v\xED d\u1EE5 \u201C\u0111i t\u1EDBi Bunnings Sunshine\u201D" });
@@ -2646,7 +2791,7 @@ window.__AppComp = function() {
         navChips: qcKeys.slice(0, 6).map((k) => ({ l: QC[k][0], a: QC[k][1] + " d\u1ECDc \u0111\u01B0\u1EDDng", go: qcGo(k), on: S.qc === k })),
         navChipsOn: shell && navAct && mapShow,
         chips,
-        chipsOn: shell && S.scr === "home" && !navAct && !navV && !arrived && mapShow && !(S.nField === "go" && S.nRes && S.nRes.length),
+        chipsOn: shell && S.scr === "home" && !navAct && !navV && !arrived && mapShow && !dropOpen && !S.goMenu && !(S.nField === "go" && S.nRes && S.nRes.length),
         bannerOn: shell && navAct && mapShow && !waitGps && bnSize === "big",
         bnMini: shell && navAct && mapShow && !waitGps && bnSize === "mini",
         bnTiny: shell && navAct && mapShow && !waitGps && bnSize === "tiny",
@@ -2663,7 +2808,7 @@ window.__AppComp = function() {
         thenOn: !!(navV && navV.then),
         then: navV ? navV.then : "",
         thenDist: navV ? navV.thenDist : "",
-        prevOn: shell && !!navV && !navAct && !arrived && mapShow,
+        prevOn: shell && !!navV && !navAct && !arrived && mapShow && !dropOpen,
         dest: navV ? navV.dest : "",
         destLogo: navV ? navV.destLogo : "",
         destLogoOn: !!(navV && navV.destLogo),
@@ -2678,9 +2823,12 @@ window.__AppComp = function() {
         tollL: navV && navV.tolls.length ? "\u26A0 C\xF3 \u0111o\u1EA1n thu ph\xED: " + navV.tolls.slice(0, 2).join(", ") + (navV.noEx ? " (kh\xF4ng n\xE9 \u0111\u01B0\u1EE3c h\u1EBFt)" : "") : "",
         msg: navV ? navV.planning ? "\u0110ang t\xECm \u0111\u01B0\u1EDDng\u2026" : navV.err || "" : "",
         msgOn: !!(navV && (navV.planning || navV.err)),
-        start: () => NV && NV.start(),
+        start: () => {
+          self.setState({ goOpen: false, goAdd: false });
+          NV && NV.start();
+        },
         cancel: () => {
-          self.setState({ wp: [] });
+          self.setState({ wp: [], goAdd: false });
           NV && NV.cancel();
         },
         gmaps: extNav("gmaps"),
@@ -2738,8 +2886,8 @@ window.__AppComp = function() {
         refollowL: "B\u1EA3n \u0111\u1ED3 s\u1EBD t\u1EF1 theo xe sau 10 gi\xE2y"
       };
       const unread0 = APP ? (S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0) : 3;
-      const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: "", nRes: null, nField: "", ntOpen: scr === "rt" ? S.ntOpen : false });
-      const tabs = [["home", "M\xE0n H\xECnh Ch\xEDnh"], ["trip", "\u27A4 H\xE0nh Tr\xECnh"], ["rt", "\u{1F5FA} Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"]].map(([k, l]) => {
+      const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: "", nRes: null, nField: "", goOpen: false, goAdd: false, ntOpen: scr === "rt" ? S.ntOpen : false });
+      const tabs = [["home", "\u27A4 H\xE0nh Tr\xECnh"], ["rt", "\u{1F5FA} Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"]].map(([k, l]) => {
         const on = S.scr === k;
         return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "rgba(8,22,34,0.62)", fg: on ? "#2A1A00" : "#FFFFFF", ring: on ? "none" : "inset 0 0 0 1px rgba(255,255,255,0.22)", cls: on ? "" : "glt", badge: unread0, badgeOn: k === "contacts" && unread0 > 0, go: k === "contacts" ? () => {
           tabGo("contacts")();
@@ -2752,12 +2900,18 @@ window.__AppComp = function() {
       const togglePnl = () => self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { [S.scr]: !pnlMin }) });
       const dowS = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
       const hjTab = S.hjTab || "saved";
-      const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || "" }), () => planWp([toWp(p)], false)), { sub: kmTo(p), go: () => planWp([toWp(p)], true), act: act || (() => {
-      }), actL: actL || "", actOn: !!act, actA: actA || "", addStop: () => planWp(wpList.concat([toWp(p)]), false) });
+      const pickPl = (p, start) => {
+        self.setState({ goOpen: false, goAdd: false });
+        planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], start && !goAdd);
+      };
+      const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || "" }), () => pickPl(p, false)), { sub: kmTo(p), go: () => pickPl(p, true), act: act || (() => {
+      }), actL: actL || "", actOn: !!act, actA: actA || "", addStop: () => {
+        self.setState({ goOpen: false, goAdd: false });
+        planWp(wpList.concat([toWp(p)]), false);
+      } });
       let hjRows = [];
       if (hjTab === "saved") {
-        if (homeP) hjRows.push(placeRow(Object.assign({}, homeP, { name: "Nh\xE0", icon: "\u{1F3E0}" })));
-        (H0.saved || []).forEach((s, i) => hjRows.push(placeRow(Object.assign({ icon: s.icon || "\u2B50" }, s), () => NV.unstar(i), "\u2715", "B\u1ECF l\u01B0u " + s.name)));
+        (H0.saved || []).forEach((s, i) => s.role === "work" ? null : hjRows.push(placeRow(Object.assign({ icon: s.icon || "\u2B50" }, s), () => NV.unstar(i), "\u2715", "B\u1ECF l\u01B0u " + s.name)));
       } else if (hjTab === "freq") {
         hjRows = (NV ? NV.frequent() : []).map((p) => placeRow(Object.assign({ icon: "\u{1F4CD}" }, p), () => NV.star(p), "\u2B50", "L\u01B0u " + p.name));
       } else if (hjTab === "recent") {
@@ -2798,9 +2952,18 @@ window.__AppComp = function() {
       };
       const parkAgo = H0.park ? Math.max(0, Math.round((Date.now() - H0.park.t) / 6e4)) : 0;
       const hj = {
-        on: shell && S.scr === "trip" && !pnlMin,
-        min: shell && S.scr === "trip" && pnlMin,
+        on: false,
+        min: false,
         toggle: togglePnl,
+        dropOn: shell && dropOpen && mapShow,
+        dropH: 520,
+        dropTitle: hjTab === "log" ? "NH\u1EACT K\xDD CHUY\u1EBEN \u0110I" : goAdd ? "TH\xCAM \u0110I\u1EC2M D\u1EEANG" : "\u0110I \u0110\xC2U?",
+        dropClose: () => self.setState({ goOpen: false, goAdd: false, hjTab: hjTab === "log" ? "saved" : hjTab }),
+        quick: [
+          homeP ? { ic: "\u{1F3E0}", l: "Nh\xE0", sub: kmTo(homeP) || homeP.name || "", go: () => pickPl(Object.assign({}, homeP, { name: "Nh\xE0" }), false) } : { ic: "\u{1F3E0}", l: "Nh\xE0", sub: "Ch\u01B0a l\u01B0u \u2014 b\u1EA5m \u0111\u1EC3 \u0111\u1EB7t", go: () => self.setState({ dlg: "pe", peKind: "home", peQ: "", peRes: [] }) },
+          work ? { ic: "\u{1F4BC}", l: "Ch\u1ED7 L\xE0m", sub: kmTo(work) || work.name || "", go: () => pickPl(work, false) } : { ic: "\u{1F4BC}", l: "Ch\u1ED7 L\xE0m", sub: "Ch\u01B0a l\u01B0u \u2014 b\u1EA5m \u0111\u1EC3 \u0111\u1EB7t", go: () => self.setState({ dlg: "pe", peKind: "work", peQ: "", peRes: [] }) }
+        ],
+        quickOn: hjTab !== "log",
         habitOn: !!habit && !navV,
         habitL: habit ? "Gi\u1EDD n\xE0y Tom hay \u0111i " + habit.name : "",
         habitGo: () => habit && planWp([toWp(habit)], true),
@@ -2822,7 +2985,7 @@ window.__AppComp = function() {
         lock: kbLk,
         res: resFor("hj", (p) => planWp(wpList.concat([toWp(p)]), false)),
         resOn: S.nField === "hj" && !!(S.nRes && S.nRes.length),
-        tabs: [["saved", "\u0110\xE3 L\u01B0u"], ["freq", "Hay \u0110i"], ["recent", "G\u1EA7n \u0110\xE2y"], ["log", "Nh\u1EADt K\xFD"]].map(([k, l]) => {
+        tabs: (hjTab === "log" ? [["log", "\u{1F4D2} Nh\u1EADt K\xFD"], ["saved", "\u2190 Ch\u1ED7 \u0110\xE3 L\u01B0u"]] : [["saved", "\u2B50 \u0110\xE3 L\u01B0u"], ["freq", "Hay \u0110i"], ["recent", "G\u1EA7n \u0110\xE2y"]]).map(([k, l]) => {
           const on = hjTab === k;
           return { l, on: on ? "true" : "false", bg: on ? "#FBB040" : "rgba(255,255,255,0.06)", fg: on ? "#2A1A00" : "#CFE6EE", tap: () => self.setState({ hjTab: k }) };
         }),
@@ -2890,8 +3053,9 @@ window.__AppComp = function() {
         title: rt.title,
         legs: rt.legs,
         openTrips: rt.openTrips,
-        newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: "", nField: "", nRes: null }),
-        newL: S.ntOpen ? "\u2715 \u0110\xF3ng" : "+ Chuy\u1EBFn M\u1EDBi",
+        newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: "", nField: "", nRes: null, rtAdd: false, rtMore: false }),
+        newL: S.ntOpen ? "\u2715 \u0110\xF3ng" : "\uFF0B M\u1EDBi",
+        newA: S.ntOpen ? "\u0110\xF3ng t\u1EA1o chuy\u1EBFn" : "T\u1EA1o chuy\u1EBFn m\u1EDBi",
         formOn: !!S.ntOpen,
         from: S.ntFrom || "",
         fromPh: tp.fromPh,
@@ -2937,8 +3101,52 @@ window.__AppComp = function() {
         lockL: drive ? "Xe \u0111ang ch\u1EA1y \u2014 \u0111\u1EADu xe r\u1ED3i m\u1EDBi t\u1EA1o chuy\u1EBFn m\u1EDBi" : "",
         lock: kbLk,
         boxes: rt.boxes,
-        stops: rt.stops,
         count: list.length,
+        sumL: (() => {
+          const b = rt.boxes || [];
+          if (b.length < 3) return "";
+          return b[0].v + " \u2192 " + b[1].v + (/SA/.test(b[1].s) ? " gi\u1EDD SA" : "") + " \xB7 c\xF2n " + b[2].v.replace(" gi\u1EDD ", "g").replace(" ph", "") + " \xB7 " + b[2].s;
+        })(),
+        stops: (rt.stops || []).map((x, i) => Object.assign({}, x, {
+          num: String(i + 1),
+          numC: x.cls === "nxt" ? "#FBB040" : "#8FC3D3",
+          ring: x.cls === "nxt" ? "inset 0 0 0 2px #FBB040" : "none",
+          bg: x.cls === "nxt" ? "rgba(251,176,64,0.16)" : x.bg,
+          editOn: !!S.rtEdit,
+          infoOn: !S.rtEdit,
+          aria: x.name + " \u2014 b\u1EA5m \u0111\u1EC3 xem tr\xEAn b\u1EA3n \u0111\u1ED3",
+          etaS: (x.eta || "").replace("d\u1EF1 ki\u1EBFn ", "").replace(" gi\u1EDD SA", " SA"),
+          tap: () => {
+            if (self.__rtLong && Date.now() - self.__rtLong < 700) return;
+            if (S.rtEdit) {
+              x.open();
+              return;
+            }
+            const id = list[i] && list[i].id;
+            const ll = NV && NV.stopPos ? NV.stopPos(id) : null;
+            if (ll) {
+              NV.flyTo(ll, 14);
+              self.setState({ last: Date.now() });
+            } else x.open();
+          },
+          pdown: () => {
+            clearTimeout(self.__rtLP);
+            self.__rtLP = setTimeout(() => {
+              self.__rtLong = Date.now();
+              self.setState({ rtEdit: true });
+            }, 650);
+          },
+          pup: () => clearTimeout(self.__rtLP)
+        })),
+        editTap: () => self.setState({ rtEdit: !S.rtEdit, rtAdd: false, rtMore: false }),
+        editL: S.rtEdit ? "\u2713 Xong" : "S\u1EEDa",
+        editA: S.rtEdit ? "true" : "false",
+        editBg: S.rtEdit ? "#FBB040" : "rgba(255,255,255,0.06)",
+        editFg: S.rtEdit ? "#2A1A00" : "#E8F1F5",
+        addOpen: !!S.rtAdd,
+        addTap: () => self.setState({ rtAdd: !S.rtAdd, rtMore: false }),
+        moreOpen: !!S.rtMore,
+        moreTap: () => self.setState({ rtMore: !S.rtMore, rtAdd: false }),
         pct: Math.round(pos / TOTAL * 100),
         pctL: Math.round(pos / TOTAL * 100) + "% \xB7 " + pos + "/" + TOTAL + " km",
         nx: od.nx,
@@ -2987,10 +3195,20 @@ window.__AppComp = function() {
             self.toast(r.bad ? "\u0110\xE3 t\u1EA3i b\u1EA3n \u0111\u1ED3 offline (" + r.bad + " m\u1EA3nh l\u1ED7i)" : "\u0110\xE3 t\u1EA3i xong b\u1EA3n \u0111\u1ED3 offline cho chuy\u1EBFn n\xE0y");
           });
         },
-        addStop: () => self.setState({ dlg: "add" }),
-        pickStop: () => self.setState({ dlg: "pick" }),
+        addStop: () => self.setState({ dlg: "add", rtAdd: false }),
+        pickStop: () => self.setState({ dlg: "pick", rtAdd: false }),
         routeNote: !TRIP && !window.__rtRealPts ? "\u0110ang l\u1EA5y \u0111\u01B0\u1EDDng th\u1EADt t\u1EEB " + (SP ? SP.name : "Melbourne") + " t\u1EDBi Adelaide\u2026" : ""
       };
+      {
+        const nk = S.scr + ":" + S.tripId + ":" + leg + ":" + nextIdx + ":" + (S.pnlMin || {}).rt;
+        if (S.scr === "rt" && self.__rtNx !== nk) {
+          self.__rtNx = nk;
+          setTimeout(() => {
+            const L = document.querySelector(".rtlist"), n = L && L.querySelector(".nxt");
+            if (L && n) L.scrollTop = Math.max(0, n.offsetTop - L.offsetTop - 2);
+          }, 120);
+        }
+      }
       if (APP && NV && !TRIP && S.scr === "rt") {
         const st0 = SP || { lat: -37.8136, lon: 144.9631 };
         const rk = st0.lat.toFixed(3) + "," + st0.lon.toFixed(3);
@@ -3022,7 +3240,9 @@ window.__AppComp = function() {
           brg: LV.bearing || 0,
           spd: LV.speed || 0,
           drive,
-          padL: (S.scr === "trip" || S.scr === "rt") && !pnlMin ? 430 : S.scr === "home" ? 380 : 40,
+          padL: S.scr === "rt" && !pnlMin ? 430 : S.scr === "home" ? 380 : 40,
+          padR: S.scr === "home" && navV && !navAct ? 520 : 80,
+          // #131: the route sheet sits bottom-right
           rt: vis ? { sig: S.tripId + ":" + leg + ":" + rtPts.length + ":" + list.map((x) => x.id).join(",") + ":" + nextIdx, pts: rtPts, stops: rtStops, towns: (() => {
             const k = rtPts.length + ":" + (rtPts[0] || []).join();
             if (self.townK !== k) {
@@ -3033,8 +3253,8 @@ window.__AppComp = function() {
             return self.townL;
           })() } : null,
           satFast: C.satFast !== false,
-          places: (S.scr === "home" || S.scr === "trip") && S.qc ? qcPins : null,
-          park: S.scr === "trip" && H0.park ? H0.park : null
+          places: S.scr === "home" && S.qc ? qcPins : null,
+          park: S.scr === "home" && !navV && H0.park ? H0.park : null
         });
         if (S.qc) NV.onPlaceClick = (pp) => qcPick(pp.raw || pp);
       }
@@ -3153,6 +3373,161 @@ window.__AppComp = function() {
           { l: "M\u1EDF R\u1ED9ng", c: "#CFE6EE", ic: "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5", go: () => openFull("home") }
         ]
       };
+      const THU7 = ["Ch\u1EE7 Nh\u1EADt", "Th\u1EE9 Hai", "Th\u1EE9 Ba", "Th\u1EE9 T\u01B0", "Th\u1EE9 N\u0103m", "Th\u1EE9 S\xE1u", "Th\u1EE9 B\u1EA3y"];
+      const calY = S.calY != null ? S.calY : d.getFullYear(), calM = S.calM != null ? S.calM : d.getMonth(), calKey = calY + "-" + calM;
+      window.tcCal = (j) => {
+        try {
+          const o = typeof j === "string" ? JSON.parse(j) : j;
+          self.setState({ calEv: Object.assign({}, self.state.calEv || {}, { [o.key]: o.ev || [] }) });
+        } catch (e) {
+        }
+      };
+      const calPerm = !APP || !!(LV.perms && LV.perms.cal);
+      if (S.calOpen && APP && calPerm && !(S.calEv || {})[calKey] && self.__calAsk !== calKey) {
+        self.__calAsk = calKey;
+        tcn("cal", JSON.stringify({ key: calKey, from: new Date(calY, calM, 1).getTime() - 8 * 864e5, to: new Date(calY, calM + 1, 1).getTime() + 8 * 864e5 }));
+      }
+      const evList = APP ? (S.calEv || {})[calKey] || [] : [{ title: "L\u1EAFp camera \u2014 nh\xE0 kh\xE1ch Sunshine", start: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10, 30).getTime(), allDay: false, loc: "Sunshine" }, { title: "B\u1EA3o tr\xEC Alarm", start: new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3, 14, 0).getTime(), allDay: false, loc: "" }];
+      const evBy = {};
+      evList.forEach((e) => {
+        const k = ymd(new Date(e.start));
+        (evBy[k] = evBy[k] || []).push(e);
+      });
+      const todayK = ymd(d);
+      const lunCache = self.__lunC || (self.__lunC = {});
+      const lunOf = (t) => {
+        const k = ymd(t);
+        return lunCache[k] || (lunCache[k] = solar2lunar(t.getDate(), t.getMonth() + 1, t.getFullYear()));
+      };
+      const holOf = (t) => holidaysOf(t.getFullYear())[ymd(t)] || [];
+      const calGo = (dm) => () => {
+        if (Date.now() - (self.__calSw || 0) < 350) return;
+        const t = new Date(calY, calM + dm, 1);
+        self.setState({ calY: t.getFullYear(), calM: t.getMonth(), calSel: null, last: Date.now() });
+      };
+      const selK = S.calSel || (calY === d.getFullYear() && calM === d.getMonth() ? todayK : ymd(new Date(calY, calM, 1)));
+      const lead = (new Date(calY, calM, 1).getDay() + 6) % 7;
+      const calCells = [];
+      if (S.calOpen && !S.calYear) for (let i = 0; i < 42; i++) {
+        const t = new Date(calY, calM, 1 - lead + i), k = ymd(t), l = lunOf(t), hs = holOf(t), inM = t.getMonth() === calM, off = hs.some((h) => h.off) || t.getDay() === 0;
+        const ev = evBy[k] || [];
+        calCells.push({
+          n: t.getDate(),
+          lun: l[0] === 1 ? "1/" + l[1] + (l[3] ? "N" : "") : l[0] === 15 ? "R\u1EB1m" : String(l[0]),
+          lunC: l[0] === 1 || l[0] === 15 ? "#FFD08A" : "#8FC3D3",
+          hol: hs.length ? hs[0].name : "",
+          holOn: hs.length > 0,
+          holC: hs[0] && hs[0].kind === "vn" ? "#FF9A9E" : "#7BD88F",
+          numC: off ? "#FF8A8A" : "#FFFFFF",
+          op: inM ? 1 : 0.32,
+          evOn: ev.length > 0,
+          evN: ev.length > 1 ? ev.length : "",
+          bg: k === selK ? "rgba(251,176,64,0.22)" : "rgba(255,255,255,0.03)",
+          ring: k === todayK ? "inset 0 0 0 2px #FBB040" : k === selK ? "inset 0 0 0 1px rgba(251,176,64,0.6)" : "none",
+          pick: () => {
+            if (Date.now() - (self.__calSw || 0) < 350) return;
+            if (!inM) self.setState({ calY: t.getFullYear(), calM: t.getMonth(), calSel: k });
+            else self.setState({ calSel: k, last: Date.now() });
+          }
+        });
+      }
+      const selD = (() => {
+        const a = selK.split("-").map(Number);
+        return new Date(a[0], a[1] - 1, a[2]);
+      })();
+      const selL = lunOf(selD), selMp = moonPhase(new Date(selD.getFullYear(), selD.getMonth(), selD.getDate(), 21).getTime());
+      const selEv = (evBy[selK] || []).slice().sort((a, b) => a.start - b.start).map((e) => {
+        const t = new Date(e.start);
+        return { time: e.allDay ? "C\u1EA3 ng\xE0y" : p2(t.getHours()) + ":" + p2(t.getMinutes()), title: e.title, loc: e.loc || "", locOn: !!e.loc };
+      });
+      const yearMonths = S.calOpen && S.calYear ? Array.from({ length: 12 }, (_, m) => {
+        const ld = (new Date(calY, m, 1).getDay() + 6) % 7;
+        const days2 = [];
+        for (let i = 0; i < 42; i++) {
+          const t = new Date(calY, m, 1 - ld + i), inM = t.getMonth() === m, k = ymd(t), hs = inM ? holOf(t) : [];
+          days2.push({ n: inM ? t.getDate() : "", c: k === todayK && inM ? "#2A1A00" : hs.some((h) => h.off) || t.getDay() === 0 ? "#FF8A8A" : "#E8F1F5", bg: k === todayK && inM ? "#FBB040" : "transparent" });
+        }
+        return { name: "Th\xE1ng " + (m + 1), on: m === calM ? "inset 0 0 0 2px #FBB040" : "inset 0 0 0 1px rgba(255,255,255,0.12)", days: days2, pick: () => self.setState({ calYear: false, calM: m, calSel: null }) };
+      }) : [];
+      const cal = {
+        open: !!S.calOpen,
+        month: !S.calYear,
+        year: !!S.calYear,
+        title: "Th\xE1ng " + (calM + 1),
+        yearL: String(calY),
+        lunTitle: (() => {
+          const a = lunOf(new Date(calY, calM, 1)), b = lunOf(new Date(calY, calM + 1, 0));
+          return "\xC2m l\u1ECBch: th\xE1ng " + a[1] + (a[1] !== b[1] ? " \u2013 " + b[1] : "") + " n\u0103m " + canChi(b[2]);
+        })(),
+        wk: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((l) => ({ l })),
+        cells: calCells,
+        months: yearMonths,
+        prev: calGo(-1),
+        next: calGo(1),
+        prevY: () => self.setState({ calY: calY - 1 }),
+        nextY: () => self.setState({ calY: calY + 1 }),
+        today: () => self.setState({ calY: null, calM: null, calSel: null, calYear: false }),
+        yearTap: () => self.setState({ calYear: !S.calYear }),
+        close: () => self.setState({ calOpen: false }),
+        stop: () => {
+        },
+        down: (e) => {
+          self.__calX = e.clientX;
+          self.__calY0 = e.clientY;
+        },
+        up: (e) => {
+          if (self.__calX == null) return;
+          const dx2 = e.clientX - self.__calX, dy = e.clientY - (self.__calY0 || 0);
+          self.__calX = null;
+          if (Math.abs(dx2) > 60 && Math.abs(dx2) > Math.abs(dy) * 1.3) {
+            self.__calSw = 0;
+            calGo(dx2 < 0 ? S.calYear ? 12 : 1 : S.calYear ? -12 : -1)();
+            self.__calSw = Date.now();
+          }
+        },
+        selTitle: THU7[selD.getDay()] + ", " + selD.getDate() + " th\xE1ng " + (selD.getMonth() + 1) + ", " + selD.getFullYear(),
+        selLun: "\xC2m l\u1ECBch: " + selL[0] + " th\xE1ng " + selL[1] + (selL[3] ? " (nhu\u1EADn)" : "") + " n\u0103m " + canChi(selL[2]),
+        selMoon: moonPath(selMp, 14, 14, 11) || "M0 0",
+        selMoonL: moonName(selMp),
+        selHol: holOf(selD).map((h) => ({ name: h.name, tag: h.kind === "vn" ? "VN" : "\xDAC", c: h.kind === "vn" ? "#FF9A9E" : "#7BD88F", off: h.off ? "Ng\xE0y ngh\u1EC9" : "" })),
+        selHolOn: holOf(selD).length > 0,
+        selEv,
+        selEvOn: selEv.length > 0,
+        noEv: calPerm ? "Kh\xF4ng c\xF3 l\u1ECBch h\u1EB9n" : "Ch\u01B0a cho ph\xE9p \u0111\u1ECDc l\u1ECBch trong \u0111i\u1EC7n tho\u1EA1i",
+        noEvOn: !selEv.length,
+        permOn: !calPerm,
+        perm: () => tcn("perm", "cal")
+      };
+      const WXD7 = LV.wx && LV.wx.daily || (APP ? [] : [0, 1, 2, 3, 4, 5, 6].map((i) => ({ d: ymd(new Date(d.getFullYear(), d.getMonth(), d.getDate() + i)), hi: 20 + i * 3 % 7, lo: 9 + i % 4, code: ["cloudy", "clear", "rain", "cloudy", "storm", "clear", "fog"][i], rain: [20, 5, 70, 30, 80, 0, 10][i] })));
+      const lo7 = Math.min.apply(null, WXD7.map((x) => x.lo).concat([99])), hi7 = Math.max.apply(null, WXD7.map((x) => x.hi).concat([-99])), sp7 = Math.max(1, hi7 - lo7);
+      const WXH24 = APP ? WXH : Array.from({ length: 24 }, (_, i) => {
+        const t = new Date(d.getTime() + (i + 1) * 36e5);
+        t.setMinutes(0);
+        return { t: t.toISOString(), temp: 14 + 4 * Math.sin(i / 4), code: i % 7 === 3 ? "rain" : "cloudy", rain: i % 7 === 3 ? 60 : 10 };
+      });
+      const fcHours = [{ t: "B\xE2y gi\u1EDD", code: WX ? WX.code : "cloudy", temp: WX ? WX.temp : null, hr: d.getHours(), p: WX ? WX.rain : null }].concat(WXH24.filter((h) => new Date(h.t).getTime() > d.getTime()).slice(0, 23).map((h) => ({ t: p2(new Date(h.t).getHours()) + "h", code: h.code === "night" ? "clear" : h.code, temp: h.temp, hr: new Date(h.t).getHours(), p: h.rain }))).map((h) => ({ t: h.t, parts: icOf(h.code, h.hr), v: h.temp == null ? "--" : Math.round(h.temp) + "\xB0", p: h.p != null && h.p >= 10 ? Math.round(h.p) + "%" : "", pOn: h.p != null && h.p >= 10 }));
+      const fc = {
+        open: !!S.fcOpen,
+        close: () => self.setState({ fcOpen: false }),
+        stop: () => {
+        },
+        temp: wxT,
+        desc: WX ? WXVI[wk] || "" : "\u0110ang l\u1EA5y th\u1EDDi ti\u1EBFt\u2026",
+        place: LV.place && (LV.place.suburb || LV.place.street) || (APP ? "" : "Deanside"),
+        sub: WX ? ["C\u1EA3m gi\xE1c " + (WX.feels != null ? Math.round(WX.feels) + "\xB0" : "--"), WX.wind != null ? "Gi\xF3 " + Math.round(WX.wind) + " km/g" : "", WX.rain != null ? "M\u01B0a " + Math.round(WX.rain) + "%" : ""].filter(Boolean).join(" \xB7 ") : "",
+        hl: WX && WX.hi != null ? "\u2191" + Math.round(WX.hi) + "\xB0  \u2193" + Math.round(WX.lo) + "\xB0" : "",
+        parts: icOf(WX ? WX.code : "cloudy", d.getHours()),
+        placeL: [LV.place && (LV.place.suburb || LV.place.street) || (APP ? "" : "Deanside"), nightSky ? moonL : ""].filter(Boolean).join(" \xB7 "),
+        hours: fcHours,
+        hoursOn: fcHours.length > 1,
+        days: WXD7.slice(0, 7).map((x, i) => {
+          const t = /* @__PURE__ */ new Date(x.d + (String(x.d).length <= 10 ? "T12:00" : ""));
+          const dd = isNaN(t) ? new Date(d.getTime() + i * 864e5) : t;
+          return { name: i === 0 ? "H\xF4m nay" : THU[dd.getDay()] + " " + dd.getDate() + "/" + (dd.getMonth() + 1), parts: icOf(x.code, 12), lo: Math.round(x.lo) + "\xB0", hi: Math.round(x.hi) + "\xB0", l: Math.round((x.lo - lo7) / sp7 * 100), w: Math.max(6, Math.round((x.hi - x.lo) / sp7 * 100)), p: x.rain != null && x.rain >= 10 ? "\u{1F4A7}" + Math.round(x.rain) + "%" : "" };
+        }),
+        daysOn: WXD7.length > 0,
+        none: APP && !WX
+      };
       const wsHid = navAct || spd > 15 ? !S.wsOpen : !!C.wsCol;
       window.__mapTouched = () => {
         if (shell && self.state.scr === "home" && !self.state.qc && !wsHid) {
@@ -3168,6 +3543,8 @@ window.__AppComp = function() {
           tcn("mail", JSON.stringify({ subject: "G\xF3p \xDD Tom's Car " + v, body: "App v\u1EEBa b\u1ECB t\u1EAFt b\u1EA5t ng\u1EDD.\n\n" + S.crash }));
           self.setState({ crash: "" });
         },
+        cal,
+        fc,
         rootW: nar || APP ? "100%" : "1280px",
         rootH: nar || APP ? "100%" : "720px",
         verL: window.TC_VERSION || "0.9.x-beta",
@@ -3543,7 +3920,7 @@ window.__AppComp = function() {
         toastOn,
         toastText: S.toast,
         ct,
-        aboutNote: C.autoBoot ? "T\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh sau 4 gi\xE2y \u2014 kh\xF4ng c\u1EA7n b\u1EA5m" : "T\u1EF1 chuy\u1EC3n \u0111ang t\u1EAFt (C\xE0i \u0110\u1EB7t \u2192 Chung) \u2014 b\u1EA5m V\xE0o Ngay",
+        aboutNote: C.autoBoot ? "T\u1EF1 v\xE0o H\xE0nh Tr\xECnh sau 4 gi\xE2y \u2014 kh\xF4ng c\u1EA7n b\u1EA5m" : "T\u1EF1 chuy\u1EC3n \u0111ang t\u1EAFt (C\xE0i \u0110\u1EB7t \u2192 Chung) \u2014 b\u1EA5m V\xE0o Ngay",
         bootSplash: S.boot === "splash",
         bootDur: Math.max(0.6, (C.splashSec == null ? 3 : +C.splashSec) - 0.4),
         bootAbout: S.boot === "about",
@@ -3627,6 +4004,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
 .dimbox{transition:opacity .6s ease}
 .scrl{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(95,212,240,0.6) transparent}
 .scrl::-webkit-scrollbar{width:5px}.scrl::-webkit-scrollbar-thumb{background:rgba(95,212,240,0.6);border-radius:3px}
+.rtlist{scrollbar-width:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}.rtlist::-webkit-scrollbar{width:12px}.rtlist::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:6px}.rtlist::-webkit-scrollbar-thumb{background:rgba(251,176,64,0.75);border-radius:6px;min-height:40px}
 input[type=range]{accent-color:#FBB040}
 .tnum{font-variant-numeric:tabular-nums}
 .orb{animation:tf-orb 1.6s ease-in-out infinite}
@@ -3703,7 +4081,7 @@ input[type=range]{accent-color:#FBB040}
             <span style="font-size: 26px; font-weight: 300">{{wxT}}</span>
             <span style="font-size: 11px; white-space: nowrap">{{wxc.hl}}</span>
           </span>
-          <span style="position: relative; margin-left: auto; font-size: 11px; text-align: right; line-height: 1.2; max-width: 70px">{{wxc.desc}}</span>
+          <span style="position: relative; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; text-align: right; line-height: 1.2; max-width: 96px"><span style="font-size: 11px">{{wxc.desc}}</span><sc-if value="{{wxc.moonOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; color: #F3EFDC; opacity: 0.85">{{wxc.moonL}}</span></sc-if></span>
         </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
         <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" title="Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
@@ -3712,9 +4090,9 @@ input[type=range]{accent-color:#FBB040}
         <button onClick="{{openExit}}" aria-label="Tho\xE1t ch\u01B0\u01A1ng tr\xECnh" title="Tho\xE1t" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
       </header>
 
-      <!-- tab: M\xE0n H\xECnh Ch\xEDnh \xB7 H\xE0nh Tr\xECnh \xB7 Road Trip \xB7 Li\xEAn L\u1EA1c \xB7 T\xECm Ch\u1ED7 -->
+      <!-- tab: H\xE0nh Tr\xECnh \xB7 Road Trip \xB7 Li\xEAn L\u1EA1c \xB7 T\xECm Ch\u1ED7 -->
       <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
-        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- c\u1ED9t Workspace: tr\u1ED1ng l\u1EA7n \u0111\u1EA7u -->
@@ -3755,10 +4133,57 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{nv.boxOn}}" hint-placeholder-val="{{ false }}">
         <div class="pnl glb" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 54px; box-sizing: border-box; padding: 0 6px 0 14px; display: flex; align-items: center; gap: 8px; z-index: 7">
           <span aria-hidden="true" style="font-size: 20px; color: #FBB040">\u27A4</span>
-          <input type="text" aria-label="\u0110i \u0111\xE2u?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
+          <input type="text" aria-label="\u0110i \u0111\xE2u?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onClick="{{nv.boxTap}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
           <button onClick="{{nv.micGo}}" aria-label="N\xF3i \u0111\u1ECBa ch\u1EC9" class="btn" style="width: 42px; height: 42px; padding: 0; background: transparent; font-size: 20px">\u{1F3A4}</button><sc-if value="{{nv.qOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.clearQ}}" aria-label="Xo\xE1 ch\u1EEF" class="btn" style="width: 40px; height: 40px; padding: 0; background: transparent">\u2715</button></sc-if>
+          <button onClick="{{nv.menuTap}}" aria-label="Th\xEAm \u2014 Nh\u1EADt K\xFD chuy\u1EBFn \u0111i" aria-expanded="{{nv.menuOn}}" class="btn" style="width: 40px; height: 42px; padding: 0; background: transparent; font-size: 22px">\u22EF</button>
           <button onClick="{{nv.goFirst}}" class="btn btn-o" style="height: 42px; padding: 0 20px; font-size: 17px">\u0110i</button>
         </div>
+        <sc-if value="{{nv.menuOn}}" hint-placeholder-val="{{ false }}">
+          <div class="pnl" role="menu" style="position: absolute; right: 20px; top: 146px; width: 250px; padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 9; background: rgba(4,18,30,0.97); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+            <button onClick="{{nv.openLog}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F4D2} Nh\u1EADt K\xFD Chuy\u1EBFn \u0110i</button>
+            <button onClick="{{nv.openPark}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F17F} Ch\u1ED7 \u0110\u1EADu Xe</button>
+            <button onClick="{{nv.openHomeSet}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F3E0} \u0110\u1EB7t Nh\xE0 / Ch\u1ED7 L\xE0m</button>
+          </div>
+        </sc-if>
+      </sc-if>
+      <!-- 0.9.14 (#131): b\u1EA5m \xF4 "\u0110i \u0111\xE2u?" \u2192 Nh\xE0, Ch\u1ED7 L\xE0m, \u0110\xE3 L\u01B0u, Hay \u0110i, G\u1EA7n \u0110\xE2y (ph\u1EA7n c\u1EE7a H\xE0nh Tr\xECnh c\u0169) -->
+      <sc-if value="{{hj.dropOn}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="Ch\u1ED7 hay \u0111i" class="pnl fadein" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: {{hj.dropH}}px; box-sizing: border-box; padding: 10px; display: flex; flex-direction: column; gap: 7px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
+          <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">{{hj.dropTitle}}</span><button onClick="{{hj.dropClose}}" aria-label="\u0110\xF3ng" class="btn" style="width: 44px; height: 36px; padding: 0">\u25B4</button></div>
+          <sc-if value="{{hj.habitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.habitGo}}" style="flex-shrink: 0; border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; padding: 8px 12px; border-radius: 10px; background: rgba(251,176,64,0.14); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 14px">{{hj.habitL}}</span><span style="font-weight: 800; color: #FBB040">\u0110i \u27A4</span></button></sc-if>
+          <sc-if value="{{hj.quickOn}}" hint-placeholder-val="{{ true }}"><div style="flex-shrink: 0; display: flex; gap: 6px"><sc-for list="{{hj.quick}}" as="q" hint-placeholder-count="2"><button onClick="{{q.go}}" class="btn" style="flex: 1; height: 50px; font-size: 16px; justify-content: flex-start; padding: 0 12px; gap: 8px; overflow: hidden"><span style="font-size: 20px">{{q.ic}}</span><span style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0"><span style="font-weight: 800">{{q.l}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px">{{q.sub}}</span></span></button></sc-for></div></sc-if>
+          <sc-if value="{{hj.parkOn}}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink: 0; padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
+              <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">\u{1F17F} {{hj.parkL}}</button>
+              <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nh\u1EAFc h\u1EBFt gi\u1EDD:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <div role="tablist" style="flex-shrink: 0; display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="3"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 36px; padding: 0 4px; font-size: 14px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-if value="{{hj.emptyOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #8FC3D3; padding: 10px 4px; line-height: 1.45">{{hj.empty}}</span></sc-if>
+            <sc-if value="{{hj.workOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.workSet}}" class="btn" style="flex-shrink: 0; height: 36px; font-size: 13px">\u{1F4BC} L\u01B0u ch\u1ED7 \u0111ang \u0111\u1EADu l\xE0 Ch\u1ED7 L\xE0m</button></sc-if>
+            <sc-if value="{{hj.rowsOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.rows}}" as="r" hint-placeholder-count="4">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.04)">
+                  <span style="width: 38px; height: 38px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 32px; height: 32px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span>
+                  <button onClick="{{r.pick}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3">{{r.sub}}</span></button>
+                  <button onClick="{{r.addStop}}" aria-label="Th\xEAm l\xE0m \u0111i\u1EC3m d\u1EEBng" class="btn" style="width: 38px; height: 38px; padding: 0; font-size: 16px">\uFF0B</button>
+                  <sc-if value="{{r.actOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.act}}" aria-label="{{r.actA}}" class="btn" style="width: 38px; height: 38px; padding: 0">{{r.actL}}</button></sc-if>
+                  <button onClick="{{r.go}}" aria-label="\u0110i t\u1EDBi \u0111\xE2y" class="btn btn-o" style="width: 44px; height: 38px; padding: 0">\u27A4</button>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.logRows}}" as="l" hint-placeholder-count="3">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: {{l.bg}}">
+                  <button onClick="{{l.show}}" aria-pressed="{{l.on}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 11px; color: #8FC3D3">{{l.when}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{l.name}}</span><span style="font-size: 11px; color: #FFD08A">{{l.km}}</span></button>
+                  <button onClick="{{l.del}}" aria-label="Xo\xE1 chuy\u1EBFn n\xE0y" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">\u2715</button>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+          <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}"><div style="flex-shrink: 0; display: flex; gap: 6px; align-items: center"><span style="flex: 1; font-size: 11px; color: #8FC3D3">Ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y</span><button onClick="{{hj.logToggle}}" class="btn" style="height: 34px; font-size: 12px">{{hj.logOnL}}</button><button onClick="{{hj.clear}}" class="btn" style="height: 34px; font-size: 12px; color: #FF9A9E">{{hj.clearL}}</button></div></sc-if>
+        </section>
       </sc-if>
       <sc-if value="{{nv.resOn}}" hint-placeholder-val="{{ false }}">
         <div class="pnl fadein" role="listbox" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: 380px; box-sizing: border-box; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
@@ -3817,17 +4242,22 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- th\u1EBB t\xF3m t\u1EAFt chuy\u1EBFn (xem tr\u01B0\u1EDBc, ch\u01B0a ch\u1EA1y) -->
       <sc-if value="{{nv.prevOn}}" hint-placeholder-val="{{ false }}">
-        <div class="pnl glb fadein" role="dialog" aria-label="T\xF3m t\u1EAFt \u0111\u01B0\u1EDDng \u0111i" style="position: absolute; right: 84px; top: 150px; width: 406px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
+        <div class="pnl glb fadein" role="dialog" aria-label="T\xF3m t\u1EAFt \u0111\u01B0\u1EDDng \u0111i" style="position: absolute; right: 84px; bottom: 96px; width: 420px; max-height: {{nv.prevH}}px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
           <div style="display: flex; align-items: center; gap: 10px">
             <span style="width: 40px; height: 40px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; font-size: 20px"><sc-if value="{{nv.destLogoOn}}" hint-placeholder-val="{{ false }}"><img src="{{nv.destLogo}}" alt="" style="width: 34px; height: 34px; object-fit: contain"></sc-if><sc-if value="{{nv.destIcOn}}" hint-placeholder-val="{{ true }}"><span style="color: #D0202E">\u2691</span></sc-if></span>
             <div style="flex: 1; min-width: 0"><div style="font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.dest}}</div><div style="font-size: 13px; color: #CFE6EE">{{nv.sum}}</div></div>
             <button onClick="{{nv.cancel}}" aria-label="Hu\u1EF7 \u0111\u01B0\u1EDDng \u0111i" class="btn" style="width: 40px; height: 40px; padding: 0">\u2715</button>
           </div>
+          <sc-if value="{{nv.stopsOn}}" hint-placeholder-val="{{ false }}">
+            <div class="scrl" style="max-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; gap: 3px">
+              <sc-for list="{{hj.wps}}" as="w" hint-placeholder-count="2"><div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; min-height: 36px"><span style="width: 24px; height: 24px; border-radius: 12px; background: {{w.bg}}; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0; color: #FFFFFF; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{w.n}}</span><span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><button onClick="{{w.up}}" aria-label="L\xEAn" class="btn" style="width: 34px; height: 32px; padding: 0; font-size: 11px; opacity: {{w.upOp}}">\u25B2</button><button onClick="{{w.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 34px; height: 32px; padding: 0; font-size: 11px; opacity: {{w.downOp}}">\u25BC</button><button onClick="{{w.del}}" aria-label="B\u1ECF \u0111i\u1EC3m n\xE0y" class="btn" style="width: 34px; height: 32px; padding: 0; color: #FF9A9E">\u2715</button></div></sc-for>
+            </div>
+          </sc-if>
           <sc-for list="{{nv.alts}}" as="a" hint-placeholder-count="2"><button onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; background: {{a.bg}}; box-shadow: {{a.ring}}"><span style="font-size: 14px; font-weight: 700; flex: 1; text-align: left">{{a.label}}</span><span style="font-size: 12px; color: #FFD08A">{{a.toll}}</span><span class="tnum" style="font-size: 14px">{{a.info}}</span></button></sc-for>
           <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nv.avoid}}" as="v" hint-placeholder-count="3"><button onClick="{{v.tap}}" aria-pressed="{{v.on}}" class="pill" style="height: 32px; padding: 0 10px; font-size: 12px; background: {{v.bg}}; color: {{v.fg}}">{{v.l}}</button></sc-for></div>
           <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
           <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
-          <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">B\u1EAFt \u0110\u1EA7u</button>
+          <div style="display: flex; gap: 6px; flex-shrink: 0"><button onClick="{{nv.addStop}}" class="btn" style="height: 54px; font-size: 15px; padding: 0 14px">\uFF0B Th\xEAm Ch\u1EB7ng</button><sc-if value="{{hj.tidyOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.tidy}}" class="btn" style="height: 54px; font-size: 13px; padding: 0 10px">S\u1EAFp X\u1EBFp G\u1ECDn</button></sc-if><button onClick="{{nv.start}}" class="btn btn-o" style="flex: 1; height: 54px; font-size: 19px">\u0110i</button></div>
           <div style="display: flex; gap: 6px"><span style="font-size: 12px; color: #9FB6C2; align-self: center; white-space: nowrap">M\u1EDF b\u1EB1ng</span><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Waze</button><button onClick="{{nv.here}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">HERE WeGo</button></div>
           <div style="font-size: 11px; color: #8FC3D3">Th\u1EDDi gian \u01B0\u1EDBc t\xEDnh theo \u0111\u01B0\u1EDDng, ch\u01B0a t\xEDnh k\u1EB9t xe.</div>
         </div>
@@ -3939,11 +4369,10 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{rtp.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{rtp.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">\u{1F5FA} Road Trip \u25B8</button></sc-if>
       <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
-          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><button onClick="{{rtp.toggle}}" aria-label="Thu g\u1ECDn b\u1EA3ng" class="btn" style="width: 38px; height: 34px; padding: 0">\u25C0</button></div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap">
-            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 34px; padding: 0 12px; font-size: 13px; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 34px; font-size: 13px">C\xE1c Chuy\u1EBFn \u25BE</button>
-            <button onClick="{{rtp.newTrip}}" class="btn" style="height: 34px; font-size: 13px; color: #FFD08A">{{rtp.newL}}</button>
+          <div style="display: flex; gap: 5px; flex-wrap: nowrap; flex-shrink: 0">
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 11px; font-size: 13px; white-space: nowrap; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 10px; white-space: nowrap">C\xE1c Chuy\u1EBFn \u25BE</button>
+            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button><button onClick="{{rtp.toggle}}" aria-label="Thu g\u1ECDn b\u1EA3ng" class="btn" style="width: 36px; height: 36px; padding: 0; flex-shrink: 0">\u25C0</button>
           </div>
           <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
@@ -3957,31 +4386,45 @@ input[type=range]{accent-color:#FBB040}
             </div>
           </sc-if>
           <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
-          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
-            <sc-for list="{{rtp.boxes}}" as="b" hint-placeholder-count="3"><div style="border-radius: 8px; background: rgba(255,255,255,0.05); padding: 5px 4px; display: flex; flex-direction: column; align-items: center; text-align: center"><span class="lbl" style="font-size: 9px">{{b.l}}</span><span style="font-size: 16px; font-weight: 800; white-space: nowrap">{{b.v}}</span><span style="font-size: 10px; color: #8FC3D3; white-space: nowrap">{{b.s}}</span></div></sc-for>
-          </div>
-          <button onClick="{{rtp.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
-            <span style="display: block; width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span>
-            <span style="display: flex; gap: 8px; font-size: 12px; width: 100%"><span style="color: #CFE6EE; flex: 1">{{rtp.pctL}}</span><span style="color: #FFD08A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px">Ch\u1EB7ng k\u1EBF: {{rtp.nx}} \xB7 {{rtp.nxKm}}</span></span>
+          <!-- 0.9.14 (#132): g\u1ECDn ph\xEDa tr\xEAn, \xF4 C\xE1c Ch\u1EB7ng Gh\xE9 chi\u1EBFm h\u1EBFt ch\u1ED7 c\xF2n l\u1EA1i -->
+          <button onClick="{{rtp.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
+            <span style="font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.title}}</span>
+            <span class="tnum" style="font-size: 13px; font-weight: 700; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.sumL}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span><span class="tnum" style="font-size: 12px; color: #CFE6EE; white-space: nowrap">{{rtp.pctL}}</span></span>
           </button>
-          <div class="lbl" style="display: flex; align-items: center"><span style="flex: 1">C\xC1C CH\u1EB6NG GH\xC9 \xB7 {{rtp.count}}</span></div>
-          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
-            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="5">
-              <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
-                <div style="width: 28px; height: 28px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
-                <button onClick="{{s.open}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-decoration: {{s.strike}}">{{s.name}}</span><span style="font-size: 11px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #8FC3D3">{{s.eta}}</span></span></button>
-                <button onClick="{{s.up}}" aria-label="L\xEAn" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">\u25B2</button>
-                <button onClick="{{s.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">\u25BC</button>
-                <button onClick="{{s.skip}}" aria-label="B\u1ECF qua chuy\u1EBFn n\xE0y" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 11px">{{s.skipL}}</button>
-                <button onClick="{{s.del}}" aria-label="Xo\xE1 ch\u1EB7ng" class="btn" style="width: 28px; height: 26px; padding: 0; color: #FF9A9E; font-size: 11px">\u2715</button>
+          <div style="flex-shrink: 0; position: relative; display: flex; align-items: center; gap: 6px">
+            <span class="lbl" style="flex: 1">C\xC1C CH\u1EB6NG GH\xC9 \xB7 {{rtp.count}}</span>
+            <button onClick="{{rtp.editTap}}" aria-pressed="{{rtp.editA}}" class="btn" style="height: 32px; padding: 0 12px; font-size: 13px; background: {{rtp.editBg}}; color: {{rtp.editFg}}">{{rtp.editL}}</button>
+            <button onClick="{{rtp.addTap}}" aria-label="Th\xEAm ch\u1EB7ng" aria-expanded="{{rtp.addOpen}}" class="btn" style="width: 40px; height: 32px; padding: 0; font-size: 20px; color: #FFD08A">\uFF0B</button>
+            <button onClick="{{rtp.moreTap}}" aria-label="Th\xEAm l\u1EF1a ch\u1ECDn" aria-expanded="{{rtp.moreOpen}}" class="btn" style="width: 40px; height: 32px; padding: 0; font-size: 20px">\u22EF</button>
+            <sc-if value="{{rtp.addOpen}}" hint-placeholder-val="{{ false }}">
+              <div class="pnl" role="menu" style="position: absolute; right: 46px; top: 40px; width: 220px; padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 3; background: rgba(4,18,30,0.98); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+                <button onClick="{{rtp.addStop}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\uFF0B Th\xEAm Ch\u1EB7ng</button>
+                <button onClick="{{rtp.pickStop}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\uFF0B T\u1EEB Danh S\xE1ch</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{rtp.moreOpen}}" hint-placeholder-val="{{ false }}">
+              <div class="pnl" role="menu" style="position: absolute; right: 0; top: 40px; width: 270px; padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 3; background: rgba(4,18,30,0.98); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+                <button onClick="{{rtp.off}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 14px; color: #A9E3F2">{{rtp.offL}}</button>
+                <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px; font-size: 14px; color: #CFE6EE"><span class="tnum" style="flex: 1">Trip A <b style="color: #FFFFFF">{{rtp.a}}</b> km</span><button onClick="{{rtp.resetA}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip A" class="btn" style="height: 36px; font-size: 13px">\u21BA \u0110\u1EB7t l\u1EA1i</button></div>
+                <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px; font-size: 14px; color: #CFE6EE"><span class="tnum" style="flex: 1">Trip B <b style="color: #FFFFFF">{{rtp.b}}</b> km</span><button onClick="{{rtp.resetB}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip B" class="btn" style="height: 36px; font-size: 13px">\u21BA \u0110\u1EB7t l\u1EA1i</button></div>
+              </div>
+            </sc-if>
+          </div>
+          <div class="scrl rtlist" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 3px; padding-right: 4px">
+            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="6">
+              <div class="{{s.cls}}" onPointerDown="{{s.pdown}}" onPointerUp="{{s.pup}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 2px 8px; border-radius: 10px; background: {{s.bg}}; box-shadow: {{s.ring}}; opacity: {{s.op}}">
+                <span class="tnum" style="width: 22px; text-align: center; font-size: 14px; font-weight: 800; color: {{s.numC}}; flex-shrink: 0">{{s.num}}</span>
+                <div style="width: 28px; height: 28px; border-radius: 5px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="17" height="17" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
+                <button onClick="{{s.tap}}" aria-label="{{s.aria}}" style="flex: 1; min-width: 0; align-self: stretch; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: {{s.strike}}">{{s.name}}</span><sc-if value="{{s.infoOn}}" hint-placeholder-val="{{ true }}"><span style="flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15"><span class="tnum" style="font-size: 13px; color: {{s.distC}}; font-weight: 800; white-space: nowrap">{{s.dist}}</span><span class="tnum" style="font-size: 11px; color: #8FC3D3; white-space: nowrap">{{s.etaS}}</span></span></sc-if></button>
+                <sc-if value="{{s.editOn}}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{s.up}}" aria-label="L\xEAn" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 11px">\u25B2</button>
+                  <button onClick="{{s.down}}" aria-label="Xu\u1ED1ng" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 11px">\u25BC</button>
+                  <button onClick="{{s.skip}}" aria-label="B\u1ECF qua chuy\u1EBFn n\xE0y" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 13px">{{s.skipL}}</button>
+                  <button onClick="{{s.del}}" aria-label="Xo\xE1 ch\u1EB7ng" class="btn" style="width: 36px; height: 36px; padding: 0; color: #FF9A9E; font-size: 13px">\u2715</button>
+                </sc-if>
               </div>
             </sc-for>
-          </div>
-          <div style="display: flex; gap: 6px"><button onClick="{{rtp.addStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Th\xEAm Ch\u1EB7ng</button><button onClick="{{rtp.pickStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ T\u1EEB Danh S\xE1ch</button></div>
-          <div style="flex-shrink: 0; display: flex; gap: 4px; align-items: center; font-size: 12px; color: #CFE6EE">
-            <span class="tnum" style="white-space: nowrap">A <b style="color: #FFFFFF">{{rtp.a}}</b></span><button onClick="{{rtp.resetA}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip A" class="btn" style="width: 28px; height: 28px; padding: 0">\u21BA</button>
-            <span class="tnum" style="white-space: nowrap; margin-left: 4px">B <b style="color: #FFFFFF">{{rtp.b}}</b></span><button onClick="{{rtp.resetB}}" aria-label="\u0110\u1EB7t l\u1EA1i Trip B" class="btn" style="width: 28px; height: 28px; padding: 0">\u21BA</button>
-            <button onClick="{{rtp.off}}" class="btn" style="flex: 1; min-width: 0; height: 28px; font-size: 11px; color: #A9E3F2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.offL}}</button>
           </div>
           </sc-if>
           <button onClick="{{rtp.start}}" class="btn" style="height: 50px; font-size: 16px; font-weight: 800; background: {{rtp.startBg}}; color: {{rtp.startFg}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.startL}}</button>
@@ -4171,7 +4614,7 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; background: radial-gradient(ellipse at 70% 0%,rgba(95,212,240,0.12),transparent 60%),#03111C">
         <aside style="width: 300px; flex-shrink: 0; padding: 18px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid rgba(95,212,240,0.3)">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px">
-            <button onClick="{{goHome}}" aria-label="V\u1EC1 M\xE0n H\xECnh Ch\xEDnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+            <button onClick="{{goHome}}" aria-label="V\u1EC1 H\xE0nh Tr\xECnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
             <span style="font-size: 24px; font-weight: 700; color: #FBB040">C\xE0i \u0110\u1EB7t</span>
           </div>
           <sc-for list="{{groups}}" as="g" hint-placeholder-count="8">
@@ -4215,7 +4658,7 @@ input[type=range]{accent-color:#FBB040}
     <sc-if value="{{isTheme}}" hint-placeholder-val="{{ false }}">
       <div class="scrl" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow-y: auto; padding: 18px 24px 30px; box-sizing: border-box; background: radial-gradient(ellipse at 70% 0%,rgba(95,212,240,0.12),transparent 60%),#03111C">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px">
-          <button onClick="{{goHome}}" aria-label="V\u1EC1 M\xE0n H\xECnh Ch\xEDnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <button onClick="{{goHome}}" aria-label="V\u1EC1 H\xE0nh Tr\xECnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
           <span style="font-size: 24px; font-weight: 700; color: #FBB040">Giao Di\u1EC7n</span>
           <span style="flex: 1"></span>
           <span class="lbl">KI\u1EC2U V\u1EBC</span>
@@ -4450,7 +4893,7 @@ input[type=range]{accent-color:#FBB040}
     <!-- ========== 7. LI\xCAN L\u1EA0C (cu\u1ED9c g\u1ECDi + tin nh\u1EAFn) ========== -->
     <sc-if value="{{isContacts}}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; left: 20px; right: 20px; top: 14px; display: flex; align-items: center; gap: 10px">
-        <button onClick="{{goHome}}" aria-label="V\u1EC1 M\xE0n H\xECnh Ch\xEDnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+        <button onClick="{{goHome}}" aria-label="V\u1EC1 H\xE0nh Tr\xECnh" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
         <span style="font-size: 24px; font-weight: 700; color: #FBB040">Li\xEAn L\u1EA1c</span>
         <sc-for list="{{ct.tabs}}" as="t" hint-placeholder-count="2"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
         <span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px; font-weight: 700">S\u1ED0 LI\u1EC6U M\u1EAAU</span>
@@ -4567,6 +5010,90 @@ input[type=range]{accent-color:#FBB040}
             <button onClick="{{exitBg}}" class="btn" style="flex: 1; height: 56px; font-size: 16px">Ch\u1EA1y N\u1EC1n</button>
             <button onClick="{{closeExit}}" class="btn" style="flex: 1; height: 56px; font-size: 16px">H\u1EE7y</button>
           </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.14 (#130): l\u1ECBch th\xE1ng \u2014 b\u1EA5m \u0111\u1ED3ng h\u1ED3 ===== -->
+    <sc-if value="{{cal.open}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{cal.close}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
+        <div role="dialog" aria-label="L\u1ECBch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 1180px; height: 640px; box-sizing: border-box; padding: 18px; display: flex; gap: 18px; background: #06192A">
+          <div onPointerDown="{{cal.down}}" onPointerUp="{{cal.up}}" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; touch-action: pan-y">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Th\xE1ng tr\u01B0\u1EDBc" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u2039</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="N\u0103m tr\u01B0\u1EDBc" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u2039</button></sc-if>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center">
+                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 26px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem c\u1EA3 n\u0103m" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 24px; font-weight: 800">{{cal.yearL}} \u25BE</button></div>
+                <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #8FC3D3">{{cal.lunTitle}}</span></sc-if>
+              </div>
+              <button onClick="{{cal.today}}" class="btn" style="height: 50px; font-size: 15px">H\xF4m Nay</button>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Th\xE1ng sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u203A</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="N\u0103m sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u203A</button></sc-if>
+            </div>
+            <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px"><sc-for list="{{cal.wk}}" as="w" hint-placeholder-count="7"><span style="text-align: center; font-size: 13px; font-weight: 700; color: #8FC3D3">{{w.l}}</span></sc-for></div>
+              <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 4px">
+                <sc-for list="{{cal.cells}}" as="c" hint-placeholder-count="42"><button onClick="{{c.pick}}" style="position: relative; min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: {{c.bg}}; box-shadow: {{c.ring}}; opacity: {{c.op}}; padding: 4px 6px; display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left">
+                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 22px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 11px; color: {{c.lunC}}">{{c.lun}}</span></span>
+                  <sc-if value="{{c.holOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; line-height: 1.2; color: {{c.holC}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{c.hol}}</span></sc-if>
+                  <sc-if value="{{c.evOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 6px; bottom: 5px; display: flex; align-items: center; gap: 3px; font-size: 10px; color: #5FD4F0"><span style="width: 7px; height: 7px; border-radius: 4px; background: #5FD4F0"></span>{{c.evN}}</span></sc-if>
+                </button></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}">
+              <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px">
+                <sc-for list="{{cal.months}}" as="m" hint-placeholder-count="12"><button onClick="{{m.pick}}" style="min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: rgba(255,255,255,0.04); box-shadow: {{m.on}}; padding: 6px; display: flex; flex-direction: column; gap: 3px; overflow: hidden">
+                  <span style="font-size: 14px; font-weight: 800; color: #FFD08A">{{m.name}}</span>
+                  <span style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; width: 100%"><sc-for list="{{m.days}}" as="x" hint-placeholder-count="42"><span class="tnum" style="font-size: 10px; line-height: 14px; text-align: center; border-radius: 7px; color: {{x.c}}; background: {{x.bg}}">{{x.n}}</span></sc-for></span>
+                </button></sc-for>
+              </div>
+            </sc-if>
+            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vu\u1ED1t qua l\u1EA1i \u0111\u1EC3 \u0111\u1ED5i th\xE1ng \xB7 b\u1EA5m s\u1ED1 n\u0103m \u0111\u1EC3 xem c\u1EA3 n\u0103m \xB7 s\u1ED1 \u0111\u1ECF = ng\xE0y ngh\u1EC9 \xB7 ch\u1EEF xanh l\xE1 = l\u1EC5 \xDAc (Victoria) \xB7 ch\u1EEF h\u1ED3ng = l\u1EC5 Vi\u1EC7t Nam</span>
+          </div>
+          <div style="width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-left: 18px; border-left: 1px solid rgba(255,255,255,0.1)">
+            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 20px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="\u0110\xF3ng l\u1ECBch" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">\u2715</button></div>
+            <span style="font-size: 14px; color: #FFD08A">{{cal.selLun}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #CFE6EE"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="rgba(200,210,235,0.18)"></circle><path d="{{cal.selMoon}}" fill="#F3EFDC"></path></svg>{{cal.selMoonL}}</span>
+            <sc-if value="{{cal.selHolOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 6px"><sc-for list="{{cal.selHol}}" as="h" hint-placeholder-count="1"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.05)"><span style="font-size: 11px; font-weight: 800; color: #06192A; background: {{h.c}}; border-radius: 4px; padding: 1px 6px">{{h.tag}}</span><span style="flex: 1; font-size: 15px; font-weight: 700">{{h.name}}</span><span style="font-size: 11px; color: #FF8A8A">{{h.off}}</span></div></sc-for></div></sc-if>
+            <span class="lbl">L\u1ECACH H\u1EB8N</span>
+            <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px">
+              <sc-for list="{{cal.selEv}}" as="e" hint-placeholder-count="2"><div style="flex-shrink: 0; display: flex; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(95,212,240,0.1); box-shadow: inset 3px 0 0 #5FD4F0"><span class="tnum" style="font-size: 15px; font-weight: 800; color: #5FD4F0; white-space: nowrap">{{e.time}}</span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 15px; font-weight: 700">{{e.title}}</span><sc-if value="{{e.locOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #8FC3D3">\u{1F4CD} {{e.loc}}</span></sc-if></span></div></sc-for>
+              <sc-if value="{{cal.noEvOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 14px; color: #8FC3D3">{{cal.noEv}}</span></sc-if>
+              <sc-if value="{{cal.permOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.perm}}" class="btn btn-o" style="height: 46px">Cho Ph\xE9p \u0110\u1ECDc L\u1ECBch</button></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.14 (#130): d\u1EF1 b\xE1o th\u1EDDi ti\u1EBFt \u2014 b\u1EA5m \xF4 th\u1EDDi ti\u1EBFt ===== -->
+    <sc-if value="{{fc.open}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{fc.close}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
+        <div role="dialog" aria-label="D\u1EF1 b\xE1o th\u1EDDi ti\u1EBFt" onClick="{{fc.stop}}" class="pnl fadein" style="width: 1100px; max-height: 640px; box-sizing: border-box; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #06192A">
+          <div style="display: flex; align-items: center; gap: 16px">
+            <svg width="76" height="76" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{fc.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg>
+            <span class="tnum" style="font-size: 56px; font-weight: 300; line-height: 1">{{fc.temp}}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 22px; font-weight: 800">{{fc.desc}} <span style="font-size: 16px; font-weight: 600; color: #CFE6EE">{{fc.hl}}</span></span>
+              <span style="font-size: 14px; color: #CFE6EE">{{fc.sub}}</span>
+              <span style="font-size: 13px; color: #8FC3D3">{{fc.placeL}}</span>
+            </div>
+            <button onClick="{{fc.close}}" aria-label="\u0110\xF3ng d\u1EF1 b\xE1o" class="btn" style="width: 52px; height: 52px; padding: 0; font-size: 22px">\u2715</button>
+          </div>
+          <sc-if value="{{fc.none}}" hint-placeholder-val="{{ false }}"><span style="font-size: 15px; color: #FFD08A">Ch\u01B0a l\u1EA5y \u0111\u01B0\u1EE3c th\u1EDDi ti\u1EBFt \u2014 c\u1EA7n m\u1EA1ng v\xE0 v\u1ECB tr\xED GPS.</span></sc-if>
+          <sc-if value="{{fc.hoursOn}}" hint-placeholder-val="{{ true }}">
+            <span class="lbl">H\xD4M NAY \xB7 THEO GI\u1EDC</span>
+            <div class="scrl" style="display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 6px">
+              <sc-for list="{{fc.hours}}" as="h" hint-placeholder-count="12"><div style="flex-shrink: 0; width: 66px; border-radius: 12px; background: rgba(255,255,255,0.05); padding: 8px 0; display: flex; flex-direction: column; align-items: center; gap: 4px"><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap">{{h.t}}</span><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{h.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 18px; font-weight: 800">{{h.v}}</span><span style="font-size: 11px; color: #7FD0FF; height: 14px">{{h.p}}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{fc.daysOn}}" hint-placeholder-val="{{ true }}">
+            <span class="lbl">7 NG\xC0Y T\u1EDAI</span>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <sc-for list="{{fc.days}}" as="x" hint-placeholder-count="7"><div style="display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.04)"><span style="width: 110px; font-size: 16px; font-weight: 700">{{x.name}}</span><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{x.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span style="width: 70px; font-size: 13px; color: #7FD0FF">{{x.p}}</span><span class="tnum" style="width: 40px; text-align: right; font-size: 16px; color: #8FC3D3">{{x.lo}}</span><span style="flex: 1; position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08)"><span style="position: absolute; top: 0; bottom: 0; left: {{x.l}}%; width: {{x.w}}%; border-radius: 4px; background: linear-gradient(90deg, #5FD4F0, #FBB040)"></span></span><span class="tnum" style="width: 40px; font-size: 16px; font-weight: 800">{{x.hi}}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <span style="font-size: 11px; color: #6F94A6">D\u1EEF li\u1EC7u th\u1EDDi ti\u1EBFt: Open-Meteo.com</span>
         </div>
       </div>
     </sc-if>
@@ -4700,7 +5227,7 @@ input[type=range]{accent-color:#FBB040}
 
     <!-- ===== M\xE0n h\xECnh ch\xE0o (m\u1ED9t m\xE0n h\xECnh duy nh\u1EA5t, t\u1EF1 v\xE0o M\xE0n H\xECnh Ch\xEDnh, ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm) ===== -->
     <sc-if value="{{bootSplash}}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{skipBoot}}" aria-label="V\xE0o M\xE0n H\xECnh Ch\xEDnh" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+      <button onClick="{{skipBoot}}" aria-label="V\xE0o H\xE0nh Tr\xECnh" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
         <div style="font-size: 72px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 20px rgba(95,212,240,0.7)"><span style="color: #48B0C8">TOM'S</span> <span style="color: #FBB040">CAR</span></div>
         <div style="font-size: 16px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040; animation-duration: {{bootDur}}s"></div></div>

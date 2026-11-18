@@ -25,9 +25,16 @@
   NAV.setCfg = (k, v) => { NAV.cfg[k] = v; LS.set('tc-navcfg', NAV.cfg); redraw(); };
   // ---- 0.9.13: "Ghi chuyến đi" — every GPS fix + what the app made of it, kept in this phone until Tom sends it ----
   const REC = { t0: Date.now(), rows: [], ev: [] };
-  try { const prev = localStorage.getItem('tc-drive-cur'); if (prev) localStorage.setItem('tc-drive-prev', prev); localStorage.removeItem('tc-drive-cur'); } catch (e) {}
+  // 0.9.14 (#129): recordings live in IndexedDB, not localStorage — a long recording had filled the small localStorage
+  // space, so Settings (map style…) could no longer be saved and came back old after a restart
+  const recDb = new Promise((res) => { try { const r = indexedDB.open('tc-rec', 1); r.onupgradeneeded = () => r.result.createObjectStore('r'); r.onsuccess = () => res(r.result); r.onerror = () => res(null); } catch (e) { res(null); } });
+  const recGet = (k) => recDb.then((d) => d ? new Promise((res) => { try { const q = d.transaction('r').objectStore('r').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch (e) { res(null); } }) : null);
+  const recPut = (k, v) => recDb.then((d) => { if (d) try { d.transaction('r', 'readwrite').objectStore('r').put(v, k); } catch (e) {} });
+  let recPrev = null;
+  try { const old = localStorage.getItem('tc-drive-cur') || localStorage.getItem('tc-drive-prev'); localStorage.removeItem('tc-drive-cur'); localStorage.removeItem('tc-drive-prev'); if (old) recPut('cur', old); } catch (e) {}
+  recGet('cur').then((v) => { if (v) { recPrev = v; recPut('prev', v); } else recGet('prev').then((p) => { recPrev = p; }); });
   let recT = 0;
-  const recSave = (force) => { if (!force && Date.now() - recT < 30000) return; recT = Date.now(); try { localStorage.setItem('tc-drive-cur', JSON.stringify(REC)); } catch (e) { REC.rows = REC.rows.slice(-3600); } };
+  const recSave = (force) => { if (!force && Date.now() - recT < 30000) return; recT = Date.now(); recPut('cur', JSON.stringify(REC)); };
   const r1 = (x, k) => x == null || isNaN(x) ? null : Math.round(x * k) / k;
   NAV.logEvt = (k, v) => { if (!NAV.cfg.rec) return; REC.ev.push([r1((Date.now() - REC.t0) / 1000, 10), k, v == null ? '' : String(v).slice(0, 160)]); if (REC.ev.length > 4000) REC.ev.shift(); };
   NAV.recFix = (f) => {
@@ -37,7 +44,7 @@
     if (REC.rows.length > 4 * 3600) REC.rows.shift(); recSave();
   };
   NAV.recInfo = () => ({ min: Math.round(REC.rows.length / 60), ev: REC.ev.length });
-  NAV.recExport = (meta) => { recSave(true); let prev = null; try { prev = JSON.parse(localStorage.getItem('tc-drive-prev') || 'null'); } catch (e) {}
+  NAV.recExport = (meta) => { recSave(true); let prev = null; try { prev = recPrev ? JSON.parse(recPrev) : null; } catch (e) {}
     return JSON.stringify(Object.assign({ v: 1, t0: new Date(REC.t0).toISOString(), engine: NAV.engine, here: !!NAV.cfg.hereKey,
       cols: ['t', 'lat', 'lon', 'spd', 'gpsBrg', 'acc', 'nav', 'idx', 'along', 'off', 'rerouting', 'carBrg', 'mapBrg', 'follow', 'pitch', 'lowFx'], rows: REC.rows, ev: REC.ev, prev }, meta || {})); };
 
@@ -114,6 +121,7 @@
   const stopRun = () => { if (stopQ.length === 0 || stopRun.on) return; stopRun.on = true; const q = stopQ.shift();
     fetch('https://photon.komoot.io/api/?limit=1&lang=en&bbox=112.9,-43.8,153.7,-10.6&q=' + encodeURIComponent(q)).then((r) => r.json()).then((j) => { const f = j.features && j.features[0]; STOPLL[q] = f ? [f.geometry.coordinates[1], f.geometry.coordinates[0]] : 0; })
       .catch(() => { delete stopBusy[q]; }).then(() => { try { localStorage.setItem('tc-stopll', JSON.stringify(STOPLL)); } catch (e) {} lastSig = ''; stopRun.on = false; setTimeout(stopRun, 1100); }); };
+  const STOPPOS = {}; NAV.stopPos = (id) => STOPPOS[id] || null;   // 0.9.14 (#132): tap a stop in the list → the map flies there
   NAV.stopLL = (q) => { if (!q) return null; const c = STOPLL[q]; if (c) return { lat: c[0], lon: c[1] }; if (c === 0 || stopBusy[q]) return null; stopBusy[q] = 1; stopQ.push(q); stopRun(); return null; };
   const ptAtFrac = (pts, f) => { if (!pts || pts.length < 2) return null; const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + dist(pts[i - 1], pts[i])); const t = Math.max(0, Math.min(1, f)) * L[L.length - 1]; let i = 1; while (i < L.length - 1 && L[i] < t) i++; const k = (t - L[i - 1]) / ((L[i] - L[i - 1]) || 1); return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k]; };
   let map = null, layer = null, layerKey = '', box = null, wrap = null;
@@ -184,7 +192,7 @@
   NAV.zoomOut = () => { if (map) { map.zoomOut(1); follow = false; userAt = Date.now(); } };
   NAV.locate = () => { follow = true; userAt = 0; if (map && lastVan) map.setView(lastVan, NAV.st.active ? map.getZoom() : 15, { animate: true }); redraw(); };
   NAV.following = () => follow;
-  NAV.fitAll = () => { if (!map) return; const ls = [routeL, trailL].concat(altL).filter(Boolean); let b = null; ls.forEach((l) => { try { const lb = l.getBounds(); b = b ? b.extend(lb) : lb; } catch (e) {} }); marks.forEach((m) => { b = b ? b.extend(m.getLatLng()) : Lf.latLngBounds(m.getLatLng(), m.getLatLng()); }); if (lastVan) b = b ? b.extend(lastVan) : null; if (b && b.isValid()) { follow = false; userAt = Date.now(); map.fitBounds(b, { paddingTopLeft: [NAV.padL || 40, 150], paddingBottomRight: [80, 130], maxZoom: 15 }); } };
+  NAV.fitAll = () => { if (!map) return; const ls = [routeL, trailL].concat(altL).filter(Boolean); let b = null; ls.forEach((l) => { try { const lb = l.getBounds(); b = b ? b.extend(lb) : lb; } catch (e) {} }); marks.forEach((m) => { b = b ? b.extend(m.getLatLng()) : Lf.latLngBounds(m.getLatLng(), m.getLatLng()); }); if (lastVan) b = b ? b.extend(lastVan) : null; if (b && b.isValid()) { follow = false; userAt = Date.now(); map.fitBounds(b, { paddingTopLeft: [NAV.padL || 40, 150], paddingBottomRight: [NAV.padR || 80, 130], maxZoom: 15 }); } };
   NAV.flyTo = (ll, z) => { if (!map) return; follow = false; userAt = Date.now(); map.setView(ll, z || 15, { animate: true }); };
   const pin = (ll, html, z) => Lf.marker(ll, { icon: Lf.divIcon({ className: '', html, iconSize: [0, 0] }), keyboard: false, zIndexOffset: z || 0 });
   const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -196,7 +204,7 @@
     document.body.classList.toggle('map-on', !!o.show);
     if (!o.show) { NAV.__shown = false; return; }
     if (!ensure()) return;
-    NAV.padL = o.padL || 40;
+    NAV.padL = o.padL || 40; NAV.padR = o.padR || 80;
     let key = o.style === 'auto' || !TILES[o.style] ? (o.night ? 'dark' : 'light') : o.style;
     // #102: satellite photos are heavy — whole-trip view (zoomed out) and fast driving use the light map instead
     if (key === 'sat' && (map.getZoom() < 10 || (o.satFast !== false && (o.spd || 0) > 80))) key = o.night ? 'dark' : 'light';
@@ -236,6 +244,7 @@
           if (!ll && s.q) { const g = NAV.stopLL(s.q); if (g) ll = [g.lat, g.lon]; }
           if (!ll && s.frac != null) ll = ptAtFrac(s.rev ? o.rt.pts.slice().reverse() : o.rt.pts, s.frac);
           if (!ll) return;
+          if (s.id) STOPPOS[s.id] = ll;
           const lab = s.start || s.end || s.next || zoomed ? s.short : '';
           marks.push(pin(ll, dot(s.start ? '#14A05A' : s.end ? '#D0202E' : s.next ? '#FBB040' : '#F28A1A', s.start ? '●' : s.end ? '⚑' : String(s.n || ''), lab, s.logo), s.start || s.end ? 600 : s.next ? 500 : 400).on('click', () => { if (s.id && window.__ui) window.__ui.setState({ dlg: 'stop', stopId: s.id }); }).addTo(map)); });
         (o.rt.towns || []).forEach((t) => { if (!zoomed && !t.big) return; marks.push(pin([t.lat, t.lon], '<div style="transform:translate(-50%,-50%);font:700 12px Overpass,sans-serif;color:#fff;text-shadow:0 0 3px #000,0 0 6px #000;white-space:nowrap;pointer-events:none">' + t.name + '</div>', 50).addTo(map)); });

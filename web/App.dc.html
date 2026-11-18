@@ -74,6 +74,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
 .dimbox{transition:opacity .6s ease}
 .scrl{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(95,212,240,0.6) transparent}
 .scrl::-webkit-scrollbar{width:5px}.scrl::-webkit-scrollbar-thumb{background:rgba(95,212,240,0.6);border-radius:3px}
+.rtlist{scrollbar-width:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}.rtlist::-webkit-scrollbar{width:12px}.rtlist::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:6px}.rtlist::-webkit-scrollbar-thumb{background:rgba(251,176,64,0.75);border-radius:6px;min-height:40px}
 input[type=range]{accent-color:#FBB040}
 .tnum{font-variant-numeric:tabular-nums}
 .orb{animation:tf-orb 1.6s ease-in-out infinite}
@@ -150,7 +151,7 @@ input[type=range]{accent-color:#FBB040}
             <span style="font-size: 26px; font-weight: 300">{{wxT}}</span>
             <span style="font-size: 11px; white-space: nowrap">{{wxc.hl}}</span>
           </span>
-          <span style="position: relative; margin-left: auto; font-size: 11px; text-align: right; line-height: 1.2; max-width: 70px">{{wxc.desc}}</span>
+          <span style="position: relative; margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; text-align: right; line-height: 1.2; max-width: 96px"><span style="font-size: 11px">{{wxc.desc}}</span><sc-if value="{{wxc.moonOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; color: #F3EFDC; opacity: 0.85">{{wxc.moonL}}</span></sc-if></span>
         </button>
         <sc-if value="{{clk.appt}}" hint-placeholder-val="{{ false }}"><button onClick="{{clk.apptNav}}" class="pill" style="height: 44px; background: rgba(251,176,64,0.16); color: #FFE2A8; box-shadow: inset 0 0 0 1px #FBB040; white-space: nowrap">{{clk.apptL}}</button></sc-if>
         <button onClick="{{togglePrivacy}}" aria-pressed="{{privPressed}}" aria-label="Chế Độ Riêng Tư" title="Chế Độ Riêng Tư" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{privC}}; box-shadow: {{privRing}}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle><path d="{{privIcon}}"></path></svg></button>
@@ -159,9 +160,9 @@ input[type=range]{accent-color:#FBB040}
         <button onClick="{{openExit}}" aria-label="Thoát chương trình" title="Thoát" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: #FF9A9E"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"></path><path d="M18.4 6.6a9 9 0 1 1-12.8 0"></path></svg></button>
       </header>
 
-      <!-- tab: Màn Hình Chính · Hành Trình · Road Trip · Liên Lạc · Tìm Chỗ -->
+      <!-- tab: Hành Trình · Road Trip · Liên Lạc · Tìm Chỗ -->
       <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
-        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="5"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- cột Workspace: trống lần đầu -->
@@ -202,10 +203,57 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{nv.boxOn}}" hint-placeholder-val="{{ false }}">
         <div class="pnl glb" style="position: absolute; right: 20px; top: 88px; width: 470px; height: 54px; box-sizing: border-box; padding: 0 6px 0 14px; display: flex; align-items: center; gap: 8px; z-index: 7">
           <span aria-hidden="true" style="font-size: 20px; color: #FBB040">➤</span>
-          <input type="text" aria-label="Đi đâu?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
+          <input type="text" aria-label="Đi đâu?" value="{{nv.q}}" placeholder="{{nv.ph}}" disabled="{{nv.lock}}" onClick="{{nv.boxTap}}" onInput="{{nv.typeGo}}" style="flex: 1; min-width: 0; height: 42px; border: 0; background: transparent; color: #FFFFFF; font-family: inherit; font-size: 18px; outline: none">
           <button onClick="{{nv.micGo}}" aria-label="Nói địa chỉ" class="btn" style="width: 42px; height: 42px; padding: 0; background: transparent; font-size: 20px">🎤</button><sc-if value="{{nv.qOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.clearQ}}" aria-label="Xoá chữ" class="btn" style="width: 40px; height: 40px; padding: 0; background: transparent">✕</button></sc-if>
+          <button onClick="{{nv.menuTap}}" aria-label="Thêm — Nhật Ký chuyến đi" aria-expanded="{{nv.menuOn}}" class="btn" style="width: 40px; height: 42px; padding: 0; background: transparent; font-size: 22px">⋯</button>
           <button onClick="{{nv.goFirst}}" class="btn btn-o" style="height: 42px; padding: 0 20px; font-size: 17px">Đi</button>
         </div>
+        <sc-if value="{{nv.menuOn}}" hint-placeholder-val="{{ false }}">
+          <div class="pnl" role="menu" style="position: absolute; right: 20px; top: 146px; width: 250px; padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 9; background: rgba(4,18,30,0.97); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+            <button onClick="{{nv.openLog}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">📒 Nhật Ký Chuyến Đi</button>
+            <button onClick="{{nv.openPark}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">🅿 Chỗ Đậu Xe</button>
+            <button onClick="{{nv.openHomeSet}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">🏠 Đặt Nhà / Chỗ Làm</button>
+          </div>
+        </sc-if>
+      </sc-if>
+      <!-- 0.9.14 (#131): bấm ô "Đi đâu?" → Nhà, Chỗ Làm, Đã Lưu, Hay Đi, Gần Đây (phần của Hành Trình cũ) -->
+      <sc-if value="{{hj.dropOn}}" hint-placeholder-val="{{ false }}">
+        <section aria-label="Chỗ hay đi" class="pnl fadein" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: {{hj.dropH}}px; box-sizing: border-box; padding: 10px; display: flex; flex-direction: column; gap: 7px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
+          <div style="display: flex; align-items: center; gap: 8px"><span class="lbl" style="flex: 1">{{hj.dropTitle}}</span><button onClick="{{hj.dropClose}}" aria-label="Đóng" class="btn" style="width: 44px; height: 36px; padding: 0">▴</button></div>
+          <sc-if value="{{hj.habitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.habitGo}}" style="flex-shrink: 0; border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; padding: 8px 12px; border-radius: 10px; background: rgba(251,176,64,0.14); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 14px">{{hj.habitL}}</span><span style="font-weight: 800; color: #FBB040">Đi ➤</span></button></sc-if>
+          <sc-if value="{{hj.quickOn}}" hint-placeholder-val="{{ true }}"><div style="flex-shrink: 0; display: flex; gap: 6px"><sc-for list="{{hj.quick}}" as="q" hint-placeholder-count="2"><button onClick="{{q.go}}" class="btn" style="flex: 1; height: 50px; font-size: 16px; justify-content: flex-start; padding: 0 12px; gap: 8px; overflow: hidden"><span style="font-size: 20px">{{q.ic}}</span><span style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0"><span style="font-weight: 800">{{q.l}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px">{{q.sub}}</span></span></button></sc-for></div></sc-if>
+          <sc-if value="{{hj.parkOn}}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink: 0; padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
+              <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">🅿 {{hj.parkL}}</button>
+              <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nhắc hết giờ:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <div role="tablist" style="flex-shrink: 0; display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="3"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 36px; padding: 0 4px; font-size: 14px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
+          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-if value="{{hj.emptyOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #8FC3D3; padding: 10px 4px; line-height: 1.45">{{hj.empty}}</span></sc-if>
+            <sc-if value="{{hj.workOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.workSet}}" class="btn" style="flex-shrink: 0; height: 36px; font-size: 13px">💼 Lưu chỗ đang đậu là Chỗ Làm</button></sc-if>
+            <sc-if value="{{hj.rowsOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.rows}}" as="r" hint-placeholder-count="4">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,0.04)">
+                  <span style="width: 38px; height: 38px; border-radius: 8px; background: {{r.icBg}}; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; overflow: hidden"><sc-if value="{{r.logoOn}}" hint-placeholder-val="{{ false }}"><img src="{{r.logo}}" alt="" style="width: 32px; height: 32px; object-fit: contain"></sc-if><sc-if value="{{r.icOn}}" hint-placeholder-val="{{ true }}"><span>{{r.icon}}</span></sc-if></span>
+                  <button onClick="{{r.pick}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3">{{r.sub}}</span></button>
+                  <button onClick="{{r.addStop}}" aria-label="Thêm làm điểm dừng" class="btn" style="width: 38px; height: 38px; padding: 0; font-size: 16px">＋</button>
+                  <sc-if value="{{r.actOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.act}}" aria-label="{{r.actA}}" class="btn" style="width: 38px; height: 38px; padding: 0">{{r.actL}}</button></sc-if>
+                  <button onClick="{{r.go}}" aria-label="Đi tới đây" class="btn btn-o" style="width: 44px; height: 38px; padding: 0">➤</button>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{hj.logRows}}" as="l" hint-placeholder-count="3">
+                <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; background: {{l.bg}}">
+                  <button onClick="{{l.show}}" aria-pressed="{{l.on}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 11px; color: #8FC3D3">{{l.when}}</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{l.name}}</span><span style="font-size: 11px; color: #FFD08A">{{l.km}}</span></button>
+                  <button onClick="{{l.del}}" aria-label="Xoá chuyến này" class="btn" style="width: 34px; height: 34px; padding: 0; color: #FF9A9E">✕</button>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+          <sc-if value="{{hj.logOn}}" hint-placeholder-val="{{ false }}"><div style="flex-shrink: 0; display: flex; gap: 6px; align-items: center"><span style="flex: 1; font-size: 11px; color: #8FC3D3">Chỉ lưu trong máy này</span><button onClick="{{hj.logToggle}}" class="btn" style="height: 34px; font-size: 12px">{{hj.logOnL}}</button><button onClick="{{hj.clear}}" class="btn" style="height: 34px; font-size: 12px; color: #FF9A9E">{{hj.clearL}}</button></div></sc-if>
+        </section>
       </sc-if>
       <sc-if value="{{nv.resOn}}" hint-placeholder-val="{{ false }}">
         <div class="pnl fadein" role="listbox" style="position: absolute; right: 20px; top: 148px; width: 470px; max-height: 380px; box-sizing: border-box; padding: 6px; display: flex; flex-direction: column; gap: 2px; z-index: 8; background: rgba(4,18,30,0.96); box-shadow: 0 16px 40px rgba(0,0,0,0.6)">
@@ -264,17 +312,22 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- thẻ tóm tắt chuyến (xem trước, chưa chạy) -->
       <sc-if value="{{nv.prevOn}}" hint-placeholder-val="{{ false }}">
-        <div class="pnl glb fadein" role="dialog" aria-label="Tóm tắt đường đi" style="position: absolute; right: 84px; top: 150px; width: 406px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
+        <div class="pnl glb fadein" role="dialog" aria-label="Tóm tắt đường đi" style="position: absolute; right: 84px; bottom: 96px; width: 420px; max-height: {{nv.prevH}}px; box-sizing: border-box; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; z-index: 6">
           <div style="display: flex; align-items: center; gap: 10px">
             <span style="width: 40px; height: 40px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; font-size: 20px"><sc-if value="{{nv.destLogoOn}}" hint-placeholder-val="{{ false }}"><img src="{{nv.destLogo}}" alt="" style="width: 34px; height: 34px; object-fit: contain"></sc-if><sc-if value="{{nv.destIcOn}}" hint-placeholder-val="{{ true }}"><span style="color: #D0202E">⚑</span></sc-if></span>
             <div style="flex: 1; min-width: 0"><div style="font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nv.dest}}</div><div style="font-size: 13px; color: #CFE6EE">{{nv.sum}}</div></div>
             <button onClick="{{nv.cancel}}" aria-label="Huỷ đường đi" class="btn" style="width: 40px; height: 40px; padding: 0">✕</button>
           </div>
+          <sc-if value="{{nv.stopsOn}}" hint-placeholder-val="{{ false }}">
+            <div class="scrl" style="max-height: 150px; flex-shrink: 0; display: flex; flex-direction: column; gap: 3px">
+              <sc-for list="{{hj.wps}}" as="w" hint-placeholder-count="2"><div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; min-height: 36px"><span style="width: 24px; height: 24px; border-radius: 12px; background: {{w.bg}}; border: 2.5px solid #FFFFFF; box-sizing: border-box; flex-shrink: 0; color: #FFFFFF; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center">{{w.n}}</span><span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{w.name}}</span><button onClick="{{w.up}}" aria-label="Lên" class="btn" style="width: 34px; height: 32px; padding: 0; font-size: 11px; opacity: {{w.upOp}}">▲</button><button onClick="{{w.down}}" aria-label="Xuống" class="btn" style="width: 34px; height: 32px; padding: 0; font-size: 11px; opacity: {{w.downOp}}">▼</button><button onClick="{{w.del}}" aria-label="Bỏ điểm này" class="btn" style="width: 34px; height: 32px; padding: 0; color: #FF9A9E">✕</button></div></sc-for>
+            </div>
+          </sc-if>
           <sc-for list="{{nv.alts}}" as="a" hint-placeholder-count="2"><button onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 8px; background: {{a.bg}}; box-shadow: {{a.ring}}"><span style="font-size: 14px; font-weight: 700; flex: 1; text-align: left">{{a.label}}</span><span style="font-size: 12px; color: #FFD08A">{{a.toll}}</span><span class="tnum" style="font-size: 14px">{{a.info}}</span></button></sc-for>
           <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nv.avoid}}" as="v" hint-placeholder-count="3"><button onClick="{{v.tap}}" aria-pressed="{{v.on}}" class="pill" style="height: 32px; padding: 0 10px; font-size: 12px; background: {{v.bg}}; color: {{v.fg}}">{{v.l}}</button></sc-for></div>
           <sc-if value="{{nv.tollOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.tollL}}</div></sc-if>
           <sc-if value="{{nv.msgOn}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #FFD08A">{{nv.msg}}</div></sc-if>
-          <button onClick="{{nv.start}}" class="btn btn-o" style="height: 54px; font-size: 19px">Bắt Đầu</button>
+          <div style="display: flex; gap: 6px; flex-shrink: 0"><button onClick="{{nv.addStop}}" class="btn" style="height: 54px; font-size: 15px; padding: 0 14px">＋ Thêm Chặng</button><sc-if value="{{hj.tidyOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{hj.tidy}}" class="btn" style="height: 54px; font-size: 13px; padding: 0 10px">Sắp Xếp Gọn</button></sc-if><button onClick="{{nv.start}}" class="btn btn-o" style="flex: 1; height: 54px; font-size: 19px">Đi</button></div>
           <div style="display: flex; gap: 6px"><span style="font-size: 12px; color: #9FB6C2; align-self: center; white-space: nowrap">Mở bằng</span><button onClick="{{nv.gmaps}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Google Maps</button><button onClick="{{nv.waze}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">Waze</button><button onClick="{{nv.here}}" class="btn" style="flex: 1; height: 38px; font-size: 13px">HERE WeGo</button></div>
           <div style="font-size: 11px; color: #8FC3D3">Thời gian ước tính theo đường, chưa tính kẹt xe.</div>
         </div>
@@ -386,11 +439,10 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{rtp.min}}" hint-placeholder-val="{{ false }}"><button onClick="{{rtp.toggle}}" class="pill glb" style="position: absolute; left: 20px; top: 140px; height: 44px; z-index: 6; background: rgba(4,18,30,0.8); color: #FFD08A">🗺 Road Trip ▸</button></sc-if>
       <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
-          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><button onClick="{{rtp.toggle}}" aria-label="Thu gọn bảng" class="btn" style="width: 38px; height: 34px; padding: 0">◀</button></div>
-          <div style="display: flex; gap: 6px; flex-wrap: wrap">
-            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 34px; padding: 0 12px; font-size: 13px; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 34px; font-size: 13px">Các Chuyến ▾</button>
-            <button onClick="{{rtp.newTrip}}" class="btn" style="height: 34px; font-size: 13px; color: #FFD08A">{{rtp.newL}}</button>
+          <div style="display: flex; gap: 5px; flex-wrap: nowrap; flex-shrink: 0">
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 11px; font-size: 13px; white-space: nowrap; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 10px; white-space: nowrap">Các Chuyến ▾</button>
+            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button><button onClick="{{rtp.toggle}}" aria-label="Thu gọn bảng" class="btn" style="width: 36px; height: 36px; padding: 0; flex-shrink: 0">◀</button>
           </div>
           <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
@@ -404,31 +456,45 @@ input[type=range]{accent-color:#FBB040}
             </div>
           </sc-if>
           <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
-          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
-            <sc-for list="{{rtp.boxes}}" as="b" hint-placeholder-count="3"><div style="border-radius: 8px; background: rgba(255,255,255,0.05); padding: 5px 4px; display: flex; flex-direction: column; align-items: center; text-align: center"><span class="lbl" style="font-size: 9px">{{b.l}}</span><span style="font-size: 16px; font-weight: 800; white-space: nowrap">{{b.v}}</span><span style="font-size: 10px; color: #8FC3D3; white-space: nowrap">{{b.s}}</span></div></sc-for>
-          </div>
-          <button onClick="{{rtp.openLog}}" aria-label="Tiến độ chuyến — bấm xem nhật ký" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
-            <span style="display: block; width: 100%; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span>
-            <span style="display: flex; gap: 8px; font-size: 12px; width: 100%"><span style="color: #CFE6EE; flex: 1">{{rtp.pctL}}</span><span style="color: #FFD08A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px">Chặng kế: {{rtp.nx}} · {{rtp.nxKm}}</span></span>
+          <!-- 0.9.14 (#132): gọn phía trên, ô Các Chặng Ghé chiếm hết chỗ còn lại -->
+          <button onClick="{{rtp.openLog}}" aria-label="Tiến độ chuyến — bấm xem nhật ký" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
+            <span style="font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.title}}</span>
+            <span class="tnum" style="font-size: 13px; font-weight: 700; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.sumL}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span><span class="tnum" style="font-size: 12px; color: #CFE6EE; white-space: nowrap">{{rtp.pctL}}</span></span>
           </button>
-          <div class="lbl" style="display: flex; align-items: center"><span style="flex: 1">CÁC CHẶNG GHÉ · {{rtp.count}}</span></div>
-          <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px">
-            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="5">
-              <div class="{{s.cls}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 6px; border-radius: 8px; background: {{s.bg}}; opacity: {{s.op}}">
-                <div style="width: 28px; height: 28px; border-radius: 4px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="15" height="15" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
-                <button onClick="{{s.open}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-decoration: {{s.strike}}">{{s.name}}</span><span style="font-size: 11px"><span style="color: {{s.distC}}; font-weight: 700">{{s.dist}}</span> <span style="color: #8FC3D3">{{s.eta}}</span></span></button>
-                <button onClick="{{s.up}}" aria-label="Lên" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">▲</button>
-                <button onClick="{{s.down}}" aria-label="Xuống" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 10px">▼</button>
-                <button onClick="{{s.skip}}" aria-label="Bỏ qua chuyến này" class="btn" style="width: 28px; height: 26px; padding: 0; font-size: 11px">{{s.skipL}}</button>
-                <button onClick="{{s.del}}" aria-label="Xoá chặng" class="btn" style="width: 28px; height: 26px; padding: 0; color: #FF9A9E; font-size: 11px">✕</button>
+          <div style="flex-shrink: 0; position: relative; display: flex; align-items: center; gap: 6px">
+            <span class="lbl" style="flex: 1">CÁC CHẶNG GHÉ · {{rtp.count}}</span>
+            <button onClick="{{rtp.editTap}}" aria-pressed="{{rtp.editA}}" class="btn" style="height: 32px; padding: 0 12px; font-size: 13px; background: {{rtp.editBg}}; color: {{rtp.editFg}}">{{rtp.editL}}</button>
+            <button onClick="{{rtp.addTap}}" aria-label="Thêm chặng" aria-expanded="{{rtp.addOpen}}" class="btn" style="width: 40px; height: 32px; padding: 0; font-size: 20px; color: #FFD08A">＋</button>
+            <button onClick="{{rtp.moreTap}}" aria-label="Thêm lựa chọn" aria-expanded="{{rtp.moreOpen}}" class="btn" style="width: 40px; height: 32px; padding: 0; font-size: 20px">⋯</button>
+            <sc-if value="{{rtp.addOpen}}" hint-placeholder-val="{{ false }}">
+              <div class="pnl" role="menu" style="position: absolute; right: 46px; top: 40px; width: 220px; padding: 6px; display: flex; flex-direction: column; gap: 4px; z-index: 3; background: rgba(4,18,30,0.98); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+                <button onClick="{{rtp.addStop}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">＋ Thêm Chặng</button>
+                <button onClick="{{rtp.pickStop}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">＋ Từ Danh Sách</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{rtp.moreOpen}}" hint-placeholder-val="{{ false }}">
+              <div class="pnl" role="menu" style="position: absolute; right: 0; top: 40px; width: 270px; padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 3; background: rgba(4,18,30,0.98); box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+                <button onClick="{{rtp.off}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 14px; color: #A9E3F2">{{rtp.offL}}</button>
+                <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px; font-size: 14px; color: #CFE6EE"><span class="tnum" style="flex: 1">Trip A <b style="color: #FFFFFF">{{rtp.a}}</b> km</span><button onClick="{{rtp.resetA}}" aria-label="Đặt lại Trip A" class="btn" style="height: 36px; font-size: 13px">↺ Đặt lại</button></div>
+                <div style="display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 6px; font-size: 14px; color: #CFE6EE"><span class="tnum" style="flex: 1">Trip B <b style="color: #FFFFFF">{{rtp.b}}</b> km</span><button onClick="{{rtp.resetB}}" aria-label="Đặt lại Trip B" class="btn" style="height: 36px; font-size: 13px">↺ Đặt lại</button></div>
+              </div>
+            </sc-if>
+          </div>
+          <div class="scrl rtlist" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 3px; padding-right: 4px">
+            <sc-for list="{{rtp.stops}}" as="s" hint-placeholder-count="6">
+              <div class="{{s.cls}}" onPointerDown="{{s.pdown}}" onPointerUp="{{s.pup}}" style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 2px 8px; border-radius: 10px; background: {{s.bg}}; box-shadow: {{s.ring}}; opacity: {{s.op}}">
+                <span class="tnum" style="width: 22px; text-align: center; font-size: 14px; font-weight: 800; color: {{s.numC}}; flex-shrink: 0">{{s.num}}</span>
+                <div style="width: 28px; height: 28px; border-radius: 5px; background: {{s.sign}}; border: 2px solid #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="17" height="17" viewBox="0 0 24 24" fill="{{s.icF}}" stroke="{{s.icS}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.icon}}"></path></svg></div>
+                <button onClick="{{s.tap}}" aria-label="{{s.aria}}" style="flex: 1; min-width: 0; align-self: stretch; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 8px"><span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: {{s.strike}}">{{s.name}}</span><sc-if value="{{s.infoOn}}" hint-placeholder-val="{{ true }}"><span style="flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15"><span class="tnum" style="font-size: 13px; color: {{s.distC}}; font-weight: 800; white-space: nowrap">{{s.dist}}</span><span class="tnum" style="font-size: 11px; color: #8FC3D3; white-space: nowrap">{{s.etaS}}</span></span></sc-if></button>
+                <sc-if value="{{s.editOn}}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{s.up}}" aria-label="Lên" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 11px">▲</button>
+                  <button onClick="{{s.down}}" aria-label="Xuống" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 11px">▼</button>
+                  <button onClick="{{s.skip}}" aria-label="Bỏ qua chuyến này" class="btn" style="width: 36px; height: 36px; padding: 0; font-size: 13px">{{s.skipL}}</button>
+                  <button onClick="{{s.del}}" aria-label="Xoá chặng" class="btn" style="width: 36px; height: 36px; padding: 0; color: #FF9A9E; font-size: 13px">✕</button>
+                </sc-if>
               </div>
             </sc-for>
-          </div>
-          <div style="display: flex; gap: 6px"><button onClick="{{rtp.addStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Thêm Chặng</button><button onClick="{{rtp.pickStop}}" class="btn" style="flex: 1; height: 36px; font-size: 12px">+ Từ Danh Sách</button></div>
-          <div style="flex-shrink: 0; display: flex; gap: 4px; align-items: center; font-size: 12px; color: #CFE6EE">
-            <span class="tnum" style="white-space: nowrap">A <b style="color: #FFFFFF">{{rtp.a}}</b></span><button onClick="{{rtp.resetA}}" aria-label="Đặt lại Trip A" class="btn" style="width: 28px; height: 28px; padding: 0">↺</button>
-            <span class="tnum" style="white-space: nowrap; margin-left: 4px">B <b style="color: #FFFFFF">{{rtp.b}}</b></span><button onClick="{{rtp.resetB}}" aria-label="Đặt lại Trip B" class="btn" style="width: 28px; height: 28px; padding: 0">↺</button>
-            <button onClick="{{rtp.off}}" class="btn" style="flex: 1; min-width: 0; height: 28px; font-size: 11px; color: #A9E3F2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.offL}}</button>
           </div>
           </sc-if>
           <button onClick="{{rtp.start}}" class="btn" style="height: 50px; font-size: 16px; font-weight: 800; background: {{rtp.startBg}}; color: {{rtp.startFg}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.startL}}</button>
@@ -618,7 +684,7 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; inset: 0; display: flex; background: radial-gradient(ellipse at 70% 0%,rgba(95,212,240,0.12),transparent 60%),#03111C">
         <aside style="width: 300px; flex-shrink: 0; padding: 18px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid rgba(95,212,240,0.3)">
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px">
-            <button onClick="{{goHome}}" aria-label="Về Màn Hình Chính" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+            <button onClick="{{goHome}}" aria-label="Về Hành Trình" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
             <span style="font-size: 24px; font-weight: 700; color: #FBB040">Cài Đặt</span>
           </div>
           <sc-for list="{{groups}}" as="g" hint-placeholder-count="8">
@@ -662,7 +728,7 @@ input[type=range]{accent-color:#FBB040}
     <sc-if value="{{isTheme}}" hint-placeholder-val="{{ false }}">
       <div class="scrl" style="position: absolute; inset: 0; overflow-y: auto; padding: 18px 24px 30px; box-sizing: border-box; background: radial-gradient(ellipse at 70% 0%,rgba(95,212,240,0.12),transparent 60%),#03111C">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px">
-          <button onClick="{{goHome}}" aria-label="Về Màn Hình Chính" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+          <button onClick="{{goHome}}" aria-label="Về Hành Trình" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
           <span style="font-size: 24px; font-weight: 700; color: #FBB040">Giao Diện</span>
           <span style="flex: 1"></span>
           <span class="lbl">KIỂU VẼ</span>
@@ -897,7 +963,7 @@ input[type=range]{accent-color:#FBB040}
     <!-- ========== 7. LIÊN LẠC (cuộc gọi + tin nhắn) ========== -->
     <sc-if value="{{isContacts}}" hint-placeholder-val="{{ false }}">
       <div style="position: absolute; left: 20px; right: 20px; top: 14px; display: flex; align-items: center; gap: 10px">
-        <button onClick="{{goHome}}" aria-label="Về Màn Hình Chính" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+        <button onClick="{{goHome}}" aria-label="Về Hành Trình" class="btn" style="width: 44px; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
         <span style="font-size: 24px; font-weight: 700; color: #FBB040">Liên Lạc</span>
         <sc-for list="{{ct.tabs}}" as="t" hint-placeholder-count="2"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
         <span style="font-size: 11px; color: #2A1A00; background: #FBB040; border-radius: 4px; padding: 1px 6px; font-weight: 700">SỐ LIỆU MẪU</span>
@@ -1014,6 +1080,90 @@ input[type=range]{accent-color:#FBB040}
             <button onClick="{{exitBg}}" class="btn" style="flex: 1; height: 56px; font-size: 16px">Chạy Nền</button>
             <button onClick="{{closeExit}}" class="btn" style="flex: 1; height: 56px; font-size: 16px">Hủy</button>
           </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.14 (#130): lịch tháng — bấm đồng hồ ===== -->
+    <sc-if value="{{cal.open}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{cal.close}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
+        <div role="dialog" aria-label="Lịch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 1180px; height: 640px; box-sizing: border-box; padding: 18px; display: flex; gap: 18px; background: #06192A">
+          <div onPointerDown="{{cal.down}}" onPointerUp="{{cal.up}}" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; touch-action: pan-y">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Tháng trước" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">‹</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="Năm trước" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">‹</button></sc-if>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center">
+                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 26px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem cả năm" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 24px; font-weight: 800">{{cal.yearL}} ▾</button></div>
+                <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #8FC3D3">{{cal.lunTitle}}</span></sc-if>
+              </div>
+              <button onClick="{{cal.today}}" class="btn" style="height: 50px; font-size: 15px">Hôm Nay</button>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Tháng sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">›</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="Năm sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">›</button></sc-if>
+            </div>
+            <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px"><sc-for list="{{cal.wk}}" as="w" hint-placeholder-count="7"><span style="text-align: center; font-size: 13px; font-weight: 700; color: #8FC3D3">{{w.l}}</span></sc-for></div>
+              <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 4px">
+                <sc-for list="{{cal.cells}}" as="c" hint-placeholder-count="42"><button onClick="{{c.pick}}" style="position: relative; min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: {{c.bg}}; box-shadow: {{c.ring}}; opacity: {{c.op}}; padding: 4px 6px; display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left">
+                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 22px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 11px; color: {{c.lunC}}">{{c.lun}}</span></span>
+                  <sc-if value="{{c.holOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; line-height: 1.2; color: {{c.holC}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{c.hol}}</span></sc-if>
+                  <sc-if value="{{c.evOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 6px; bottom: 5px; display: flex; align-items: center; gap: 3px; font-size: 10px; color: #5FD4F0"><span style="width: 7px; height: 7px; border-radius: 4px; background: #5FD4F0"></span>{{c.evN}}</span></sc-if>
+                </button></sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}">
+              <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 8px">
+                <sc-for list="{{cal.months}}" as="m" hint-placeholder-count="12"><button onClick="{{m.pick}}" style="min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: rgba(255,255,255,0.04); box-shadow: {{m.on}}; padding: 6px; display: flex; flex-direction: column; gap: 3px; overflow: hidden">
+                  <span style="font-size: 14px; font-weight: 800; color: #FFD08A">{{m.name}}</span>
+                  <span style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 1px; width: 100%"><sc-for list="{{m.days}}" as="x" hint-placeholder-count="42"><span class="tnum" style="font-size: 10px; line-height: 14px; text-align: center; border-radius: 7px; color: {{x.c}}; background: {{x.bg}}">{{x.n}}</span></sc-for></span>
+                </button></sc-for>
+              </div>
+            </sc-if>
+            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vuốt qua lại để đổi tháng · bấm số năm để xem cả năm · số đỏ = ngày nghỉ · chữ xanh lá = lễ Úc (Victoria) · chữ hồng = lễ Việt Nam</span>
+          </div>
+          <div style="width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-left: 18px; border-left: 1px solid rgba(255,255,255,0.1)">
+            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 20px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="Đóng lịch" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">✕</button></div>
+            <span style="font-size: 14px; color: #FFD08A">{{cal.selLun}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #CFE6EE"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="rgba(200,210,235,0.18)"></circle><path d="{{cal.selMoon}}" fill="#F3EFDC"></path></svg>{{cal.selMoonL}}</span>
+            <sc-if value="{{cal.selHolOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 6px"><sc-for list="{{cal.selHol}}" as="h" hint-placeholder-count="1"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.05)"><span style="font-size: 11px; font-weight: 800; color: #06192A; background: {{h.c}}; border-radius: 4px; padding: 1px 6px">{{h.tag}}</span><span style="flex: 1; font-size: 15px; font-weight: 700">{{h.name}}</span><span style="font-size: 11px; color: #FF8A8A">{{h.off}}</span></div></sc-for></div></sc-if>
+            <span class="lbl">LỊCH HẸN</span>
+            <div class="scrl" style="flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px">
+              <sc-for list="{{cal.selEv}}" as="e" hint-placeholder-count="2"><div style="flex-shrink: 0; display: flex; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(95,212,240,0.1); box-shadow: inset 3px 0 0 #5FD4F0"><span class="tnum" style="font-size: 15px; font-weight: 800; color: #5FD4F0; white-space: nowrap">{{e.time}}</span><span style="display: flex; flex-direction: column; min-width: 0"><span style="font-size: 15px; font-weight: 700">{{e.title}}</span><sc-if value="{{e.locOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #8FC3D3">📍 {{e.loc}}</span></sc-if></span></div></sc-for>
+              <sc-if value="{{cal.noEvOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 14px; color: #8FC3D3">{{cal.noEv}}</span></sc-if>
+              <sc-if value="{{cal.permOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.perm}}" class="btn btn-o" style="height: 46px">Cho Phép Đọc Lịch</button></sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.14 (#130): dự báo thời tiết — bấm ô thời tiết ===== -->
+    <sc-if value="{{fc.open}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{fc.close}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
+        <div role="dialog" aria-label="Dự báo thời tiết" onClick="{{fc.stop}}" class="pnl fadein" style="width: 1100px; max-height: 640px; box-sizing: border-box; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #06192A">
+          <div style="display: flex; align-items: center; gap: 16px">
+            <svg width="76" height="76" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{fc.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg>
+            <span class="tnum" style="font-size: 56px; font-weight: 300; line-height: 1">{{fc.temp}}</span>
+            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+              <span style="font-size: 22px; font-weight: 800">{{fc.desc}} <span style="font-size: 16px; font-weight: 600; color: #CFE6EE">{{fc.hl}}</span></span>
+              <span style="font-size: 14px; color: #CFE6EE">{{fc.sub}}</span>
+              <span style="font-size: 13px; color: #8FC3D3">{{fc.placeL}}</span>
+            </div>
+            <button onClick="{{fc.close}}" aria-label="Đóng dự báo" class="btn" style="width: 52px; height: 52px; padding: 0; font-size: 22px">✕</button>
+          </div>
+          <sc-if value="{{fc.none}}" hint-placeholder-val="{{ false }}"><span style="font-size: 15px; color: #FFD08A">Chưa lấy được thời tiết — cần mạng và vị trí GPS.</span></sc-if>
+          <sc-if value="{{fc.hoursOn}}" hint-placeholder-val="{{ true }}">
+            <span class="lbl">HÔM NAY · THEO GIỜ</span>
+            <div class="scrl" style="display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding-bottom: 6px">
+              <sc-for list="{{fc.hours}}" as="h" hint-placeholder-count="12"><div style="flex-shrink: 0; width: 66px; border-radius: 12px; background: rgba(255,255,255,0.05); padding: 8px 0; display: flex; flex-direction: column; align-items: center; gap: 4px"><span style="font-size: 12px; color: #8FC3D3; white-space: nowrap">{{h.t}}</span><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{h.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span class="tnum" style="font-size: 18px; font-weight: 800">{{h.v}}</span><span style="font-size: 11px; color: #7FD0FF; height: 14px">{{h.p}}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{fc.daysOn}}" hint-placeholder-val="{{ true }}">
+            <span class="lbl">7 NGÀY TỚI</span>
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <sc-for list="{{fc.days}}" as="x" hint-placeholder-count="7"><div style="display: flex; align-items: center; gap: 14px; height: 40px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.04)"><span style="width: 110px; font-size: 16px; font-weight: 700">{{x.name}}</span><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><sc-for list="{{x.parts}}" as="pp" hint-placeholder-count="2"><path d="{{pp.d}}" fill="{{pp.f}}" stroke="{{pp.s}}" stroke-width="{{pp.w}}" stroke-linecap="round"></path></sc-for></svg><span style="width: 70px; font-size: 13px; color: #7FD0FF">{{x.p}}</span><span class="tnum" style="width: 40px; text-align: right; font-size: 16px; color: #8FC3D3">{{x.lo}}</span><span style="flex: 1; position: relative; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.08)"><span style="position: absolute; top: 0; bottom: 0; left: {{x.l}}%; width: {{x.w}}%; border-radius: 4px; background: linear-gradient(90deg, #5FD4F0, #FBB040)"></span></span><span class="tnum" style="width: 40px; font-size: 16px; font-weight: 800">{{x.hi}}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <span style="font-size: 11px; color: #6F94A6">Dữ liệu thời tiết: Open-Meteo.com</span>
         </div>
       </div>
     </sc-if>
@@ -1147,7 +1297,7 @@ input[type=range]{accent-color:#FBB040}
 
     <!-- ===== Màn hình chào (một màn hình duy nhất, tự vào Màn Hình Chính, chạm để vào sớm) ===== -->
     <sc-if value="{{bootSplash}}" hint-placeholder-val="{{ false }}">
-      <button onClick="{{skipBoot}}" aria-label="Vào Màn Hình Chính" style="position: absolute; inset: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
+      <button onClick="{{skipBoot}}" aria-label="Vào Hành Trình" style="position: absolute; inset: 0; z-index: 30; border: 0; padding: 0; cursor: pointer; color: inherit; font-family: inherit; background: radial-gradient(ellipse at 50% 45%,#0B2A3E,#020A12 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px">
         <div style="font-size: 72px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 20px rgba(95,212,240,0.7)"><span style="color: #48B0C8">TOM'S</span> <span style="color: #FBB040">CAR</span></div>
         <div style="font-size: 16px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         <div style="width: 320px; height: 4px; background: rgba(95,212,240,0.2); border-radius: 2px; overflow: hidden"><div class="bootbar" style="height: 100%; background: #FBB040; animation-duration: {{bootDur}}s"></div></div>
@@ -1223,6 +1373,53 @@ const getSunLong = (d) => INT(sunLong(d - 0.5 - TZV / 24) / Math.PI * 6);
 function lunarMonth11(yy) { const off = jdFromDate(31, 12, yy) - 2415021; const k = INT(off / 29.530588853); let nm = getNewMoonDay(k); if (getSunLong(nm) >= 9) nm = getNewMoonDay(k - 1); return nm; }
 function leapOffset(a11) { const k = INT((a11 - 2415021.076998695) / 29.530588853 + 0.5); let last, i = 1, arc = getSunLong(getNewMoonDay(k + i)); do { last = arc; i++; arc = getSunLong(getNewMoonDay(k + i)); } while (arc !== last && i < 14); return i - 1; }
 function solar2lunar(dd, mm, yy) { const dayNumber = jdFromDate(dd, mm, yy), k = INT((dayNumber - 2415021.076998695) / 29.530588853); let monthStart = getNewMoonDay(k + 1); if (monthStart > dayNumber) monthStart = getNewMoonDay(k); let a11 = lunarMonth11(yy), b11 = a11, lunarYear; if (a11 >= monthStart) { lunarYear = yy; a11 = lunarMonth11(yy - 1); } else { lunarYear = yy + 1; b11 = lunarMonth11(yy + 1); } const lunarDay = dayNumber - monthStart + 1, diff = INT((monthStart - a11) / 29); let lunarLeap = 0, lunarMonth = diff + 11; if (b11 - a11 > 365) { const ld = leapOffset(a11); if (diff >= ld) { lunarMonth = diff + 10; if (diff === ld) lunarLeap = 1; } } if (lunarMonth > 12) lunarMonth -= 12; if (lunarMonth >= 11 && diff < 4) lunarYear -= 1; return [lunarDay, lunarMonth, lunarYear, lunarLeap]; }
+// ---- 0.9.14 (#130): holidays — Victoria (Úc) and Việt Nam (dương lịch + âm lịch) ----
+const easterSun = (y) => { const a = y % 19, b = INT(y / 100), c = y % 100, d = INT(b / 4), e = b % 4, f = INT((b + 8) / 25), g = INT((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = INT(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = INT((a + 11 * h + 22 * l) / 451), mo = INT((h + l - 7 * m + 114) / 31), da = ((h + l - 7 * m + 114) % 31) + 1; return new Date(y, mo - 1, da); };
+const nthDow = (y, m, dow, n) => { const d1 = new Date(y, m, 1); return new Date(y, m, 1 + ((dow - d1.getDay() + 7) % 7) + (n - 1) * 7); };
+const ymd = (d) => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+const HOLI = {};
+function holidaysOf(y) {
+  if (HOLI[y]) return HOLI[y];
+  const H = {}; const add = (d, name, kind, off) => { const k = ymd(d); (H[k] = H[k] || []).push({ name, kind, off: !!off }); };
+  const D = (m, dd) => new Date(y, m - 1, dd);
+  const subst = (d, name) => { const w = d.getDay(); if (w === 6) add(new Date(y, d.getMonth(), d.getDate() + 2), name + ' (nghỉ bù)', 'au', true); if (w === 0) add(new Date(y, d.getMonth(), d.getDate() + 1), name + ' (nghỉ bù)', 'au', true); };
+  // Victoria public holidays
+  add(D(1, 1), "New Year's Day", 'au', true); subst(D(1, 1), "New Year's Day");
+  add(D(1, 26), 'Australia Day', 'au', true); subst(D(1, 26), 'Australia Day');
+  add(nthDow(y, 2, 1, 2), 'Labour Day (VIC)', 'au', true);
+  const es = easterSun(y), eo = (n) => new Date(es.getFullYear(), es.getMonth(), es.getDate() + n);
+  add(eo(-2), 'Good Friday', 'au', true); add(eo(-1), 'Easter Saturday', 'au', true); add(es, 'Easter Sunday', 'au', true); add(eo(1), 'Easter Monday', 'au', true);
+  add(D(4, 25), 'ANZAC Day', 'au', true);
+  add(nthDow(y, 4, 0, 2), "Mother's Day", 'au', false);
+  add(nthDow(y, 5, 1, 2), "King's Birthday", 'au', true);
+  add(nthDow(y, 8, 0, 1), "Father's Day", 'au', false);
+  add(nthDow(y, 10, 2, 1), 'Melbourne Cup (Melbourne)', 'au', true);
+  const xm = D(12, 25), bx = D(12, 26); add(xm, 'Christmas Day', 'au', true); add(bx, 'Boxing Day', 'au', true);
+  if (xm.getDay() === 6) { add(D(12, 27), 'Christmas Day (nghỉ bù)', 'au', true); add(D(12, 28), 'Boxing Day (nghỉ bù)', 'au', true); }
+  if (xm.getDay() === 0) add(D(12, 27), 'Christmas Day (nghỉ bù)', 'au', true);
+  if (bx.getDay() === 6) add(D(12, 28), 'Boxing Day (nghỉ bù)', 'au', true);
+  // Việt Nam — dương lịch
+  [[1, 1, 'Tết Dương Lịch', 1], [2, 3, 'Thành lập Đảng', 0], [3, 8, 'Quốc tế Phụ nữ', 0], [4, 30, 'Giải phóng miền Nam', 1], [5, 1, 'Quốc tế Lao động', 1], [6, 1, 'Quốc tế Thiếu nhi', 0], [9, 2, 'Quốc Khánh', 1], [10, 20, 'Phụ nữ Việt Nam', 0], [11, 20, 'Nhà giáo Việt Nam', 0]].forEach(([m, dd, n, o]) => add(D(m, dd), n, 'vn', !!o));
+  // Việt Nam — âm lịch (mỗi ngày trong năm dương lịch đổi sang âm lịch một lần)
+  const LUN = { '1/1': ['Tết Nguyên Đán · Mùng 1', 1], '2/1': ['Tết · Mùng 2', 1], '3/1': ['Tết · Mùng 3', 1], '15/1': ['Rằm Tháng Giêng', 0], '10/3': ['Giỗ Tổ Hùng Vương', 1], '15/4': ['Lễ Phật Đản', 0], '5/5': ['Tết Đoan Ngọ', 0], '15/7': ['Lễ Vu Lan', 0], '15/8': ['Tết Trung Thu', 0], '23/12': ['Ông Táo về trời', 0] };
+  for (let t = new Date(y, 0, 1); t.getFullYear() === y; t = new Date(y, t.getMonth(), t.getDate() + 1)) {
+    const l = solar2lunar(t.getDate(), t.getMonth() + 1, y); if (l[3]) continue; const v = LUN[l[0] + '/' + l[1]]; if (v) add(t, v[0], 'vn', !!v[1]);
+    const nx = new Date(y, t.getMonth(), t.getDate() + 1), l2 = solar2lunar(nx.getDate(), nx.getMonth() + 1, nx.getFullYear()); if (l2[0] === 1 && l2[1] === 1 && !l2[3]) add(t, 'Giao Thừa', 'vn', false);
+  }
+  HOLI[y] = H; return H;
+}
+const CAN = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'], CHI = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi'];
+const canChi = (ly) => CAN[ly % 10] + ' ' + CHI[ly % 12];
+// ---- 0.9.14 (#133): the real moon — phase from date/time, drawn as seen from Melbourne (southern hemisphere: waxing = lit on the LEFT) ----
+const moonPhase = (t) => { const jd = t / 86400000 + 2440587.5; let k = INT((jd - 2415021.076998695) / 29.530588853); if (newMoon(k) > jd) k--; if (newMoon(k + 1) <= jd) k++; const nm = newMoon(k), nx = newMoon(k + 1); return Math.max(0, Math.min(0.9999, (jd - nm) / (nx - nm))); };
+function moonPath(p, cx, cy, r) {
+  if (p < 0.025 || p > 0.975) return '';
+  if (Math.abs(p - 0.5) < 0.02) return 'M' + cx + ' ' + (cy - r) + 'a' + r + ' ' + r + ' 0 1 0 0.01 0z';
+  const litLeft = p < 0.5, k = Math.cos(2 * Math.PI * p), rx = Math.max(0.01, r * Math.abs(k)).toFixed(2), crescent = k > 0;
+  const limb = litLeft ? 0 : 1, term = crescent ? (litLeft ? 1 : 0) : (litLeft ? 0 : 1);
+  return 'M' + cx + ' ' + (cy - r) + ' A' + r + ' ' + r + ' 0 0 ' + limb + ' ' + cx + ' ' + (cy + r) + ' A' + rx + ' ' + r + ' 0 0 ' + term + ' ' + cx + ' ' + (cy - r) + ' Z';
+}
+const moonName = (p) => p < 0.03 || p > 0.97 ? 'Trăng non' : p < 0.22 ? 'Trăng lưỡi liềm' : p < 0.28 ? 'Trăng thượng huyền' : p < 0.47 ? 'Trăng khuyết' : p < 0.53 ? 'Trăng tròn' : p < 0.72 ? 'Trăng khuyết' : p < 0.78 ? 'Trăng hạ huyền' : 'Trăng lưỡi liềm';
 // time in another zone (Intl), "HH:MM"
 function tzTime(d, zone) { try { return new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: zone }).format(d); } catch (e) { return ''; } }
 const THU = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -1267,7 +1464,7 @@ const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rn
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
 const DEFAULTS = { vnVoice: 'doan', navVol: 80, mapEngine: 'gl', mapTilt: true, driveRec: true, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
-  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chime: 'soft', chimeVol: 60 };
+  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chimeSilent: true, chime: 'soft', chimeVol: 60 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
 const APPS = [
   ['waze', 'Waze', 'map', '#2D8FD6', 'W'], ['gmaps', 'Google Maps', 'map', '#3C8F5A', 'GM'], ['here', 'HERE WeGo', 'map', '#2A6F8F', 'H'],
@@ -1324,6 +1521,7 @@ class Component extends DCLogic {
     super(props);
     let sv = {};
     try { sv = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { sv = {}; }
+    try { const s1 = JSON.parse(window.localStorage.getItem(STORE + '-set') || 'null'); if (s1 && typeof s1 === 'object') sv.set = s1; } catch (e) {}
     this.state = {
       scr: 'home', boot: 'splash', drive: false, playing: false, perm: false, now: Date.now(), last: Date.now(),
       grp: 'chung', exitOpen: false, createOpen: false, rtCheck: false, listOpen: false,
@@ -1352,7 +1550,7 @@ class Component extends DCLogic {
     }, 1000);
     this.startBoot();
     // hand the saved choices to the Android side once the bridge is up
-    setTimeout(() => { const c0 = this.state.set || {}; if (APP && c0.chimeOn !== false) tcn('chime', JSON.stringify({ name: 'chime_' + (c0.chime || 'soft'), vol: c0.chimeVol == null ? 60 : c0.chimeVol })); }, 250);   // #56
+    setTimeout(() => { const c0 = this.state.set || {}; if (APP && c0.chimeOn !== false) tcn('chime', JSON.stringify({ name: 'chime_' + (c0.chime || 'soft'), vol: c0.chimeVol == null ? 60 : c0.chimeVol, silent: c0.chimeSilent !== false })); }, 250);   // #56
     setTimeout(() => { this.syncNative(this.state.set); if (APP && this.state.set.autoPlay) tcn('media', 'autoplay'); if (APP) { tcn('media', 'jbquery'); tcn('voice', 'report'); } }, 1500);
   }
   syncNative(C) {
@@ -1367,7 +1565,8 @@ class Component extends DCLogic {
     const C = this.state.set || {}; let k = C.startScr || 'home';
     if (k === 'last') { try { k = localStorage.getItem('tc-lastScr') || 'home'; } catch (e) { k = 'home'; } }
     if (k === 'ws') { const L = C.wsLastLaunch; k = 'home'; if (L && L.apps) { if (APP) tcn('launch', JSON.stringify(L.apps)); if (L.rt) k = 'rt'; } }
-    return ['home', 'trip', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(k) >= 0 ? k : 'home';
+    if (k === 'trip') k = 'home';   // 0.9.14 (#131): Hành Trình is now the main screen
+    return ['home', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(k) >= 0 ? k : 'home';
   }
   startBoot() {
     clearTimeout(this.b1); clearTimeout(this.b2);
@@ -1378,6 +1577,11 @@ class Component extends DCLogic {
   }
   save(patch) {
     const st = Object.assign({}, this.state, patch);
+    // 0.9.14 (#129): Settings are saved on their own first (small), so a full storage can never lose them;
+    // if the phone's web storage is full, old caches are cleared and it is tried again
+    const put = (k, v) => { try { window.localStorage.setItem(k, v); return true; } catch (e) { return false; } };
+    const setJ = JSON.stringify(st.set || {});
+    if (!put(STORE + '-set', setJ)) { ['tc-places', 'tc-logos2', 'tc-drive-cur', 'tc-drive-prev'].forEach((k) => { try { window.localStorage.removeItem(k); } catch (e) {} }); put(STORE + '-set', setJ); }
     try { window.localStorage.setItem(STORE, JSON.stringify({ set: st.set, goList: st.goList, backList: st.backList, skip: st.skip, wsList: st.wsList, custom: st.custom, photos: st.photos, savedPl: st.savedPl, trips: st.trips, tripId: st.tripId, melStore: st.melStore })); } catch (e) {}
     this.setState(patch);
   }
@@ -1416,8 +1620,8 @@ class Component extends DCLogic {
     let dk = { on: false }, mpPos = null;
 
     // ---- màn hình (Tìm Chỗ sau Workspace DeX) ----
-    if (!S.boot && S.scr !== self.__lastScr) { self.__lastScr = S.scr; if (['home', 'trip', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(S.scr) >= 0) { try { localStorage.setItem('tc-lastScr', S.scr); } catch (e) {} } }
-    const SCR = [['home', 'Màn Hình Chính'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ'], ['contacts', 'Liên Lạc']];
+    if (!S.boot && S.scr !== self.__lastScr) { self.__lastScr = S.scr; if (['home', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(S.scr) >= 0) { try { localStorage.setItem('tc-lastScr', S.scr); } catch (e) {} } }
+    const SCR = [['home', 'Hành Trình'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ'], ['contacts', 'Liên Lạc']];
     const scrBtns = SCR.map(([k, label]) => { const on = S.scr === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: go(k) }; });
 
     // ---- làm mờ ----
@@ -1482,12 +1686,13 @@ class Component extends DCLogic {
         ch('lang', 'Ngôn ngữ', 'Chữ trên mọi màn hình', [['vi', 'Tiếng Việt'], ['en', 'English']]),
         ch('clock', 'Kiểu giờ', 'Mặc định 24h', [['24', '24h'], ['12', '12h']]),
         ch('unit', 'Đơn vị tốc độ', 'Mặc định km/g', [['kmg', 'km/g'], ['mph', 'mph']]),
-        tg('chimeOn', 'Nhạc chào khi mở app', 'Khoảng 2 giây · không kêu khi máy để im lặng hoặc đang phát nhạc'),
+        tg('chimeOn', 'Nhạc chào khi mở app', 'Khoảng 2 giây · kêu khi mở app sau Thoát Hẳn (Chạy Nền rồi quay lại thì không kêu) · đang có nhạc thì nhạc nhỏ xuống một chút'),
+        tg('chimeSilent', 'Kêu cả khi máy để Rung / Im Lặng', 'Tắt thì máy để Rung hoặc Im Lặng sẽ không kêu'),
         Object.assign(ch('chime', 'Kiểu nhạc chào', 'Bấm là nghe thử', [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']]), { opts: [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']].map(([v, l]) => { const on = (C.chime || 'soft') === v; return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { self.setS('chime', v); tcn('chime', JSON.stringify({ name: 'chime_' + v, vol: C.chimeVol == null ? 60 : C.chimeVol, test: true })); } }; }) }),
         ch('chimeVol', 'Âm lượng nhạc chào', 'So với âm lượng nhạc của máy', [[30, 'Nhỏ'], [60, 'Vừa'], [100, 'Lớn']]),
-        ch('startScr', 'Mở app thì vào', 'Sau màn hình chào · app tự mở lại sau sự cố thì về đúng màn hình đang xem', [['home', 'Màn Hình Chính'], ['trip', 'Hành Trình'], ['rt', 'Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ'], ['ws', 'Workspace gần nhất'], ['last', 'Màn hình lúc tắt app']]),
+        ch('startScr', 'Mở app thì vào', 'Sau màn hình chào · app tự mở lại sau sự cố thì về đúng màn hình đang xem', [['home', 'Hành Trình'], ['rt', 'Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ'], ['ws', 'Workspace gần nhất'], ['last', 'Màn hình lúc tắt app']]),
         ch('splashSec', 'Màn hình chào', 'Logo + phiên bản · chạm để vào sớm', [[0, 'Tắt'], [1, '1 giây'], [3, '3 giây'], [5, '5 giây']]),
-        info('Mở app vào thẳng', 'Luôn vào tab này sau màn hình chào', 'Màn Hình Chính'),
+        info('Mở app vào thẳng', 'Luôn vào tab này sau màn hình chào', 'Hành Trình'),
         stt('Nhớ mọi lựa chọn khi thoát', 'Giao diện, tính năng, Workspace, chặng Road Trip…', true, 'Luôn nhớ', '', '', null),
         tg('privacy', 'Chế Độ Riêng Tư', 'Giấu tên người gọi, nội dung tin nhắn, thông tin khách'),
         info('Cuộc gọi đến', 'Không đọc tên ra loa — chỉ báo "Có cuộc gọi"', 'Chuông theo nhóm ▸'),
@@ -1505,7 +1710,7 @@ class Component extends DCLogic {
         tg('idleWxBg', 'Nền trời động', 'Mây trôi mượt khi đậu xe, đứng yên khi xe chạy'),
         tg('idleVN', 'Giờ Việt Nam', 'Hiện giờ Sài Gòn dưới ngày tháng'),
         tg('idleAppt', 'Lịch hẹn', 'Từ Google Calendar'),
-        ch('spStyle', 'Kiểu số tốc độ', 'Chọn là đổi ngay trên Màn Hình Chính', Object.keys(STY).map((k) => [k, STY[k].label])),
+        ch('spStyle', 'Kiểu số tốc độ', 'Chọn là đổi ngay trên màn hình Hành Trình', Object.keys(STY).map((k) => [k, STY[k].label])),
         ch('spSize', 'Cỡ số tốc độ', '', [['S', 'Nhỏ'], ['M', 'Vừa'], ['L', 'To']]),
         tg('spRing', 'Vòng cung giới hạn quanh số', 'Gần chạm giới hạn thì vòng gần kín'),
         tg('spAuto', 'Kiểu số tự đổi theo giao diện', 'Giao diện Úc → Biển Báo Úc, Synthwave → Neon…'),
@@ -1556,7 +1761,7 @@ class Component extends DCLogic {
         tg('placePhotos', 'Hình đại diện địa điểm', 'Hình bạn chụp → Wikimedia Commons → biển báo'),
         tg('limitEst', 'Giới hạn ước tính khi thiếu dữ liệu', '50 khu dân cư / 100 ngoài thị trấn — có chữ "ước tính" dưới biển'),
         ch('rest', 'Nhắc nghỉ chân mỗi', 'Theo giờ lái liên tục', [[1.5, '1,5 giờ'], [2, '2 giờ'], [3, '3 giờ']]),
-        tg('homeMap', 'Màn Hình Chính là bản đồ', 'Tắt thì nền là cảnh low-poly như cũ (đổi trong Giao Diện)'),
+        tg('homeMap', 'Màn hình Hành Trình là bản đồ', 'Tắt thì nền là cảnh low-poly như cũ (đổi trong Giao Diện)'),
         tg('autoMap', 'Tự hiện bản đồ khi xe chạy', 'Trên 10 km/g: nền low-poly đổi sang bản đồ, Tìm Chỗ / Liên Lạc tự về bản đồ'),
         tg('navVoice', 'Đọc chỉ đường', 'Quẹo trái, quẹo phải, bùng binh… bằng giọng Việt · tắt nhanh bằng nút 🔊 cạnh giờ tới'),
         ch('navVol', 'Âm lượng giọng chỉ đường', 'Nhạc tự nhỏ lại trong lúc giọng chỉ đường nói', [[60, 'Vừa'], [80, 'To'], [100, 'Rất to']]),
@@ -1571,7 +1776,7 @@ class Component extends DCLogic {
           const NV1 = window.NAV; if (!NV1) return; const v = window.TC_VERSION || ''; const d = new Date(); const nm = 'TomsCar-chuyen-di-' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2) + '-' + ('0' + d.getHours()).slice(-2) + ('0' + d.getMinutes()).slice(-2) + '.json';
           tcn('sharefile', JSON.stringify({ name: nm, subject: "Chuyến đi Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || '' }) })); }), { stC: '#8FC3D3' }),
         tg('tripLog', 'Nhật ký Hành Trình', 'Tự ghi chỗ đậu hơn 3 phút — chỉ lưu trong máy này, không gửi đi đâu'),
-        { isChoice: true, label: 'Nút tìm nhanh (Màn Hình Chính)', hint: 'Chạm để bật/tắt từng nút — kết quả hiện ngay trên bản đồ, đang chỉ đường thì tìm dọc đường', opts: Object.keys(QC).map((k) => { const cur = Array.isArray(C.qcList) && C.qcList.length ? C.qcList : QC_DEF; const on = cur.indexOf(k) >= 0; return { label: QC[k][0] + ' ' + QC[k][1], on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS('qcList', on ? cur.filter((x) => x !== k) : cur.concat([k])) }; }) },
+        { isChoice: true, label: 'Nút tìm nhanh (Hành Trình)', hint: 'Chạm để bật/tắt từng nút — kết quả hiện ngay trên bản đồ, đang chỉ đường thì tìm dọc đường', opts: Object.keys(QC).map((k) => { const cur = Array.isArray(C.qcList) && C.qcList.length ? C.qcList : QC_DEF; const on = cur.indexOf(k) >= 0; return { label: QC[k][0] + ' ' + QC[k][1], on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS('qcList', on ? cur.filter((x) => x !== k) : cur.concat([k])) }; }) },
         tg('satFast', 'Vệ Tinh nhẹ khi chạy nhanh', 'Đang dùng Vệ Tinh mà chạy trên 80 km/g hoặc xem cả tuyến thì tạm dùng bản đồ thường cho nhẹ máy'),
         ch('mapStyle', 'Kiểu bản đồ', 'Tự Động = Sáng ban ngày, Tối ban đêm (theo giờ mặt trời mọc/lặn)', [['auto', 'Tự Động'], ['dark', 'Tối'], ['light', 'Sáng'], ['topo', 'Địa Hình'], ['sat', 'Vệ Tinh']]),
         ch('mapBright', 'Độ sáng bản đồ', 'Bật Dịu Mắt thì tự giảm', [[70, '70%'], [85, '85%'], [100, '100%'], [115, '115%']]),
@@ -2013,7 +2218,7 @@ class Component extends DCLogic {
       { t: 'Nghe máy', re: /^(nghe|nghe máy|answer)$/, run: () => { tcn('call', 'answer'); self.setState({ va: false }); } },
       { t: 'Từ chối', re: /^(từ chối|decline|không nghe)/, run: () => { tcn('call', 'decline:' + (C.autoSms ? 1 : 0)); self.setState({ va: false }); } },
       { t: 'Gọi …', re: /^(gọi|call) (.+)$/, run: (m) => { const c = findContact(m[2]); if (c && c[5]) { self.setState({ va: false }); self.say('Dạ, đang gọi ' + (priv ? 'người đã chọn' : c[0]), true); tcn('call', 'dial:' + c[5]); } else { tcn('call', 'dialName:' + m[2]); sayV('Dạ, đang tìm ' + m[2] + ' trong danh bạ', true); } } },
-      { t: 'Xe tôi ở đâu?', re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park)|my car)/, run: () => { const pk = window.NAV && window.NAV.hist.park; self.setState({ va: false, scr: 'trip' }); if (pk) { window.NAV.flyTo([pk.lat, pk.lon], 17); sayV('Dạ, xe đậu ở ' + (pk.name || 'chỗ đánh dấu trên bản đồ')); } else sayV('Dạ, mình chưa ghi chỗ đậu xe nào'); } },
+      { t: 'Xe tôi ở đâu?', re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park)|my car)/, run: () => { const pk = window.NAV && window.NAV.hist.park; self.setState({ va: false, scr: 'home', goOpen: true }); if (pk) { window.NAV.flyTo([pk.lat, pk.lon], 17); sayV('Dạ, xe đậu ở ' + (pk.name || 'chỗ đánh dấu trên bản đồ')); } else sayV('Dạ, mình chưa ghi chỗ đậu xe nào'); } },
       { t: 'Chỉ đường tới …', re: /(chỉ đường|dẫn đường|đi tới|đi đến|navigate|take me|drive|directions|go)( tới| đến| to)? (.+)$/, run: (m) => {
         const q = m[3]; const NV2 = window.NAV, ll = LV.lat != null ? [LV.lat, LV.lon] : null;
         if (!NV2 || !ll) { tcn('nav', q); sayV('Dạ, đang chỉ đường tới ' + q); return; }
@@ -2104,12 +2309,19 @@ class Component extends DCLogic {
     };
     const SKYC = { day: 'linear-gradient(180deg,#3f8fd6,#86c1ea)', dawn: 'linear-gradient(180deg,#f19a6b,#f9d1a6)', dusk: 'linear-gradient(180deg,#d9734f,#f0b27f)', night: 'linear-gradient(180deg,#07112a,#22345e)' };
     const wxSky = wk === 'rain' ? 'linear-gradient(180deg,#3d4e5e,#6c7f8f)' : wk === 'storm' ? 'linear-gradient(180deg,#1f2833,#3b4756)' : wk === 'fog' ? 'linear-gradient(180deg,#8e9aa3,#c3cacf)' : wk === 'cloudy' && tod === 'day' ? 'linear-gradient(180deg,#5d7488,#93a6b4)' : SKYC[tod];
+    // #133: the real moon at night (phase from date/time, southern-hemisphere view) + its name and the lunar day
+    const mph = moonPhase(d.getTime()), nightSky = tod === 'night';
+    const lunNow = solar2lunar(d.getDate(), d.getMonth() + 1, d.getFullYear());
+    const moonL = moonName(mph) + ' · ' + lunNow[0] + ' ÂL';
+    const MOONP = (cx, cy, r) => [{ d: 'M' + cx + ' ' + (cy - r) + 'a' + r + ' ' + r + ' 0 1 0 0.01 0z', fill: 'rgba(200,210,235,0.22)', stroke: 'none', sw: 0, cls: '' }, { d: moonPath(mph, cx, cy, r) || 'M0 0', fill: '#F3EFDC', stroke: 'none', sw: 0, cls: '' }];
+    if (nightSky) { WP.night = MOONP(22, 24, 15).concat([{ d: 'M40 9l1 2 2 1-2 1-1 2-1-2-2-1 2-1z', fill: '#FFFFFF', stroke: 'none', sw: 0, cls: 'fl' }]); WP.cloudy = MOONP(30, 14, 8).concat([{ d: CLOUD, fill: '#E8F1F5', stroke: 'none', sw: 0, cls: 'cl' }]); }
     const wxc = {
+      moonOn: nightSky && (wk === 'night' || wk === 'cloudy'), moonL,
       parts: WP[wk] || WP.cloudy, sky: wxSky, cls: 'wx-anim' + (drive ? ' wx-calm' : ''),
       hl: WX && WX.hi != null ? '↑' + Math.round(WX.hi) + '°  ↓' + Math.round(WX.lo) + '°' : '',
       desc: WX ? (WXVI[wk] || '') + (WX.rain ? ' · ' + Math.round(WX.rain) + '%' : '') : 'Đang lấy…',
       aria: WX ? wxT + ' ' + (WXVI[wk] || '') : 'đang lấy',
-      open: () => self.setState({ idleOn: true, idleAt: Date.now() })
+      open: () => self.setState({ fcOpen: true, last: Date.now() })   // #130: the forecast, not the idle screen
     };
     window.__wxState = { kind: wk, tod: tod, calm: drive && !!C.calm, drive: drive };
 
@@ -2138,8 +2350,8 @@ class Component extends DCLogic {
       line1On: C.clkDate || !!lunTxt, line1: [C.clkDate ? THU[d.getDay()] + ' ' + d.getDate() + '/' + (d.getMonth() + 1) : '', lunTxt].filter(Boolean).join(' · '),
       line2On: !!line2, line2, line2C: '#FFD08A',
       op: night ? 0.82 : 1,
-      aria: 'Đồng hồ ' + hh + ':' + mm + ' — chạm để phóng to',
-      tap: () => self.setState({ clkBig: true }), closeBig: () => self.setState({ clkBig: false, parkedAt: S.now }),
+      aria: 'Đồng hồ ' + hh + ':' + mm + ' — chạm để xem lịch',
+      tap: () => self.setState({ calOpen: true, calY: null, calM: null, calSel: null, calYear: false, last: Date.now() }), closeBig: () => self.setState({ clkBig: false, parkedAt: S.now }),
       big: !nar && (S.clkBig || (APP && !drive && C.autoBig !== false && LV.parkedMin >= 10 && S.scr === 'home' && !(S.parkedAt && S.now - S.parkedAt < 600000))), bigCards: mkCards(true),
       bigDate: THU[d.getDay()] + ', ' + d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear() + (lunTxt ? '  ·  ' + lunTxt : ''), bigSub: (WX ? wxT + ' ' + (WXVI[wk] || '') : '') + (line2 ? '   ·   ' + line2 : ''),
       appt: !!AP && apMin > -15 && apMin < 180, apptL: AP ? 'Hẹn ' + p2(new Date(AP.start).getHours()) + ':' + p2(new Date(AP.start).getMinutes()) + (apMin > 0 ? ' · còn ' + apMin + ' ph' : ' · tới giờ') : '',
@@ -2274,8 +2486,9 @@ class Component extends DCLogic {
       storm: [{ d: 'M16 32h30a10 10 0 0 0 0-20 14 14 0 0 0-27-3A11 11 0 0 0 16 32z', f: '#D5DCE2', s: 'none', w: 0 }, { d: 'M34 34l-8 12h8l-5 10', f: 'none', s: '#FFE066', w: 3.5 }],
       fog: [{ d: 'M10 24h44M6 34h52M12 44h40', f: 'none', s: '#E8EEF2', w: 4 }]
     };
+    { const mp0 = moonPhase(Date.now()); IC.cloudyN = [{ d: 'M24 13a11 11 0 1 0 0.01 0z', f: 'rgba(200,210,235,0.2)', s: 'none', w: 0 }, { d: moonPath(mp0, 24, 24, 11) || 'M0 0', f: '#F3EFDC', s: 'none', w: 0 }, IC.cloudy[1]]; IC.night = [{ d: 'M32 12a20 20 0 1 0 0.01 0z', f: 'rgba(200,210,235,0.2)', s: 'none', w: 0 }, { d: moonPath(mp0, 32, 32, 20) || 'M0 0', f: '#F3EFDC', s: 'none', w: 0 }]; }   // #133
     const icKey = (c, h) => { const k = c === 'cloud' ? 'cloudy' : (c || 'cloudy'); return k === 'clear' && h != null && (h < 6 || h >= 20) ? 'night' : k; };
-    const icOf = (c, h) => { const k = c === 'cloud' ? 'cloudy' : c; if (k === 'clear' && h != null && (h < 6 || h >= 20)) return IC.night; return IC[k] || IC.cloudy; };
+    const icOf = (c, h) => { const k = c === 'cloud' ? 'cloudy' : c; const nt = h != null && (h < 6 || h >= 20); if (k === 'clear' && nt) return IC.night; if (k === 'cloudy' && nt) return IC.cloudyN; return IC[k] || IC.cloudy; };
     const ilay = C.idleLayout || 'htc';
     const sunT = window.__sun || null;
     const hm = (t) => { if (!t) return '--:--'; const x = new Date(t); return p2(x.getHours()) + ':' + p2(x.getMinutes()); };
@@ -2346,7 +2559,8 @@ class Component extends DCLogic {
 
     // ---- 0.9.9: bản đồ toàn màn hình + chỉ đường + Hành Trình (nav.js) ----
     const NV = window.NAV || null;
-    const shell = !nar && (S.scr === 'home' || S.scr === 'trip' || S.scr === 'rt');
+    if (S.scr === 'trip') S.scr = 'home';   // 0.9.14 (#131)
+    const shell = !nar && (S.scr === 'home' || S.scr === 'rt');
     if (window.tcLangSync) window.tcLangSync(C.lang === 'en' ? 'en' : 'vi');
     if (NV) { NV.cfg.engine = C.mapEngine || 'gl'; NV.cfg.tilt = C.mapTilt !== false; NV.cfg.hereKey = C.hereKey || ''; NV.cfg.rec = !!C.driveRec; NV.cfg.rotate = C.navHeading !== false; NV.cfg.cams = C.navCams !== false; NV.cfg.histOff = C.tripLog === false; NV.cfg.mute = C.navVoice === false; NV.cfg.clip = C.vnVoice === 'doan' || C.vnVoice === 'son'; }
     const navV = NV && NV.st.route ? NV.navView() : null;
@@ -2404,26 +2618,36 @@ class Component extends DCLogic {
     const nearTurn = !!(navAct && NV.st.toNext != null && NV.st.toNext < 200);
     const bnSize = C.navBanner === 'big' ? 'big' : C.navBanner === 'hide' ? (nearTurn ? 'mini' : 'tiny') : (nearTurn ? 'big' : 'mini');
     const etaOpen = !!S.etaOpen;
+    // 0.9.14 (#131): the "Đi đâu?" list (Nhà, Chỗ Làm, Đã Lưu…) opens under the box; "+ Thêm Chặng" reuses the box
+    const dropOpen = !!S.goOpen && S.scr === 'home' && !navAct && !(S.nField === 'go' && S.nRes && S.nRes.length);
+    const goAdd = !!S.goAdd && wpList.length > 0;
     const nv = {
+      boxTap: () => { if (!S.goOpen) self.setState({ goOpen: true, goMenu: false, hjTab: S.hjTab === 'log' ? 'saved' : S.hjTab, last: Date.now() }); },
+      menuOn: !!S.goMenu, menuTap: () => self.setState({ goMenu: !S.goMenu }),
+      openLog: () => self.setState({ goMenu: false, goOpen: true, hjTab: 'log' }),
+      openPark: () => { self.setState({ goMenu: false }); if (H0.park && NV) NV.flyTo([H0.park.lat, H0.park.lon], 17); else self.toast('Chưa ghi chỗ đậu xe nào — đậu hơn 3 phút là app tự ghi'); },
+      openHomeSet: () => self.setState({ goMenu: false, dlg: 'pe', peKind: 'home', peQ: '', peRes: [] }),
+      addStop: () => self.setState({ goAdd: true, goOpen: true, nField: 'go', nq: '', nRes: null }),
+      stopsOn: wpList.length > 1, prevH: 560,
       mapOn: mapShow, boxOn: shell && S.scr === 'home' && !navAct && !arrived && mapShow, q: S.nField === 'go' ? (S.nq || '') : '', qOn: S.nField === 'go' && !!S.nq, lock: kbLk,
-      ph: kbLk ? 'Đậu xe rồi gõ — hoặc nói "Hey Tom, đi tới…"' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ', typeGo: typeIn('go'), clearQ: () => self.setState({ nq: '', nRes: null }),
-      goFirst: () => { const r = S.nField === 'go' && S.nRes && S.nRes[0]; if (r) planWp([toWp(r)], true); else if (navV) NV.start(); else self.toast('Gõ chỗ muốn tới trước nha'); },
-      res: resFor('go', (p) => planWp([toWp(p)], false)), resOn: S.nField === 'go' && !!(S.nRes && S.nRes.length) && S.scr === 'home',
+      ph: kbLk ? 'Đậu xe rồi gõ — hoặc nói "Hey Tom, đi tới…"' : (goAdd ? '+ Thêm điểm dừng — gõ tên chỗ' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ'), typeGo: typeIn('go'), clearQ: () => self.setState({ nq: '', nRes: null }),
+      goFirst: () => { const r = S.nField === 'go' && S.nRes && S.nRes[0]; if (r) { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(r)]) : [toWp(r)], !goAdd); } else if (navV) NV.start(); else self.toast('Gõ chỗ muốn tới trước nha'); },
+      res: resFor('go', (p) => { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], false); }), resOn: S.nField === 'go' && !!(S.nRes && S.nRes.length) && S.scr === 'home',
       micGo: () => { self.setState({ va: true, vaHeard: '', vaHint: 'Nói tên chỗ hoặc địa chỉ… ví dụ “đi tới Bunnings Sunshine”' }); tcn('voice', 'start'); },
       qcOn: shell && !!S.qc && (S.scr === 'home' || navAct), qcRows, qcEmpty: !!S.qc && !qcRows.length, qcMsg: S.placesBusy ? (S.placesMsg || 'Đang tìm…') : (qcRows.length ? (navAct ? 'Dọc đường đi · chạm để thêm điểm dừng' : (S.placesMsg || '')) : (S.placesMsg || 'Không thấy chỗ nào')), qcTitle: S.qc && QC[S.qc] ? QC[S.qc][0] + ' ' + QC[S.qc][1] : '', qcClose: () => self.setState({ qc: null }),
       navChips: qcKeys.slice(0, 6).map((k) => ({ l: QC[k][0], a: QC[k][1] + ' dọc đường', go: qcGo(k), on: S.qc === k })), navChipsOn: shell && navAct && mapShow,
-      chips, chipsOn: shell && S.scr === 'home' && !navAct && !navV && !arrived && mapShow && !(S.nField === 'go' && S.nRes && S.nRes.length),
+      chips, chipsOn: shell && S.scr === 'home' && !navAct && !navV && !arrived && mapShow && !dropOpen && !S.goMenu && !(S.nField === 'go' && S.nRes && S.nRes.length),
       bannerOn: shell && navAct && mapShow && !waitGps && bnSize === 'big', bnMini: shell && navAct && mapShow && !waitGps && bnSize === 'mini', bnTiny: shell && navAct && mapShow && !waitGps && bnSize === 'tiny', waitGps: shell && navAct && mapShow && waitGps,
       bnTap: () => self.setS('navBanner', C.navBanner === 'big' ? 'hide' : C.navBanner === 'hide' ? 'auto' : 'big'), shortText: navV ? shortRd(navV.text) : '', thenShort: navV && navV.then ? shortRd(navV.then).replace(/^(Rẽ|Chếch|Giữ|Đi|Ra|Vô)[^ ]* [^ ]* (vô |theo )?/, '') : '', bar: navV && NV.st.toNext != null ? Math.max(4, Math.min(100, 100 - NV.st.toNext / 2)) : 0, thenIcoD: navV ? (MAN[navV.thenIco] || '') : '', thenIcoOn: !!(navV && navV.then),
       icoD: navV ? (MAN[navV.ico] || MAN.straight) : '', dist: navV ? navV.dist : '', text: navV ? navV.text : '',
       thenOn: !!(navV && navV.then), then: navV ? navV.then : '', thenDist: navV ? navV.thenDist : '',
-      prevOn: shell && !!navV && !navAct && !arrived && mapShow, dest: navV ? navV.dest : '', destLogo: navV ? navV.destLogo : '', destLogoOn: !!(navV && navV.destLogo), destIcOn: !(navV && navV.destLogo),
+      prevOn: shell && !!navV && !navAct && !arrived && mapShow && !dropOpen, dest: navV ? navV.dest : '', destLogo: navV ? navV.destLogo : '', destLogoOn: !!(navV && navV.destLogo), destIcOn: !(navV && navV.destLogo),
       sum: navV ? navV.left + ' · ' + navV.km + ' · tới ' + navV.eta : '',
       alts: navV ? navV.alts.map((a) => ({ label: a.label, info: a.min + ' · ' + a.km, toll: a.toll ? '💲 thu phí' : '', on: a.on ? 'true' : 'false', bg: a.on ? 'rgba(47,208,245,0.18)' : 'rgba(255,255,255,0.04)', ring: a.on ? 'inset 0 0 0 2px #2FD0F5' : 'inset 0 0 0 1px rgba(255,255,255,0.12)', pick: a.pick })) : [],
       avoid: [['toll', 'Tránh thu phí'], ['motorway', 'Tránh cao tốc'], ['ferry', 'Tránh phà']].map(([k, l]) => { const on = AV.indexOf(k) >= 0; return { l: (on ? '✓ ' : '') + l, on: on ? 'true' : 'false', bg: on ? 'rgba(123,216,143,0.2)' : 'rgba(255,255,255,0.05)', fg: on ? '#7BD88F' : '#CFE6EE', tap: avoidT(k) }; }),
       tollOn: !!(navV && navV.tolls.length), tollL: navV && navV.tolls.length ? '⚠ Có đoạn thu phí: ' + navV.tolls.slice(0, 2).join(', ') + (navV.noEx ? ' (không né được hết)' : '') : '',
       msg: navV ? (navV.planning ? 'Đang tìm đường…' : navV.err || '') : '', msgOn: !!(navV && (navV.planning || navV.err)),
-      start: () => NV && NV.start(), cancel: () => { self.setState({ wp: [] }); NV && NV.cancel(); }, gmaps: extNav('gmaps'), waze: extNav('waze'), here: extNav('here'),
+      start: () => { self.setState({ goOpen: false, goAdd: false }); NV && NV.start(); }, cancel: () => { self.setState({ wp: [], goAdd: false }); NV && NV.cancel(); }, gmaps: extNav('gmaps'), waze: extNav('waze'), here: extNav('here'),
       etaOn: shell && navAct && mapShow && etaOpen, etaMini: shell && navAct && mapShow && !etaOpen, etaTap: () => self.setState({ etaOpen: !etaOpen }), eta: navV ? navV.eta : '', left: navV ? navV.left : '', km: navV ? navV.km : '',
       voiceIc: C.navVoice === false ? '🔇' : '🔊', voiceA: C.navVoice === false ? 'Bật đọc chỉ đường' : 'Tắt đọc chỉ đường', voice: () => self.setS('navVoice', C.navVoice === false),
       share: () => { if (!navV) return; tcn('share', 'Tom đang trên đường tới ' + navV.dest + ', dự kiến tới lúc ' + navV.eta + ' (còn ' + navV.left + ').'); },
@@ -2436,19 +2660,19 @@ class Component extends DCLogic {
       rot: () => self.setS('navHeading', C.navHeading === false), compass: () => { if (NV && NV.compass() === 'toggle') self.setS('navHeading', !(C.navHeading !== false)); },
       followOff: shell && mapShow && NV && !NV.following() && (navAct || drive), refollowL: 'Bản đồ sẽ tự theo xe sau 10 giây'
     };
-    // tab row on the map screens: Màn Hình Chính · ➤ Hành Trình · 🗺 Road Trip · Liên Lạc · Tìm Chỗ
+    // tab row on the map screens (0.9.14 #131: Màn Hình Chính + Hành Trình merged): ➤ Hành Trình · 🗺 Road Trip · Liên Lạc · Tìm Chỗ
     const unread0 = APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3;
-    const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: '', nRes: null, nField: '', ntOpen: scr === 'rt' ? S.ntOpen : false });
-    const tabs = [['home', 'Màn Hình Chính'], ['trip', '➤ Hành Trình'], ['rt', '🗺 Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ']].map(([k, l]) => { const on = S.scr === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(8,22,34,0.62)', fg: on ? '#2A1A00' : '#FFFFFF', ring: on ? 'none' : 'inset 0 0 0 1px rgba(255,255,255,0.22)', cls: on ? '' : 'glt', badge: unread0, badgeOn: k === 'contacts' && unread0 > 0, go: k === 'contacts' ? () => { tabGo('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } } : tabGo(k) }; });
+    const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: '', nRes: null, nField: '', goOpen: false, goAdd: false, ntOpen: scr === 'rt' ? S.ntOpen : false });
+    const tabs = [['home', '➤ Hành Trình'], ['rt', '🗺 Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ']].map(([k, l]) => { const on = S.scr === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(8,22,34,0.62)', fg: on ? '#2A1A00' : '#FFFFFF', ring: on ? 'none' : 'inset 0 0 0 1px rgba(255,255,255,0.22)', cls: on ? '' : 'glt', badge: unread0, badgeOn: k === 'contacts' && unread0 > 0, go: k === 'contacts' ? () => { tabGo('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } } : tabGo(k) }; });
     const togglePnl = () => self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { [S.scr]: !pnlMin }) });
     // ---- Hành Trình panel (#63, #66) ----
     const dowS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
     const hjTab = S.hjTab || 'saved';
-    const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || '' }), () => planWp([toWp(p)], false)), { sub: kmTo(p), go: () => planWp([toWp(p)], true), act: act || (() => {}), actL: actL || '', actOn: !!act, actA: actA || '', addStop: () => planWp(wpList.concat([toWp(p)]), false) });
+    const pickPl = (p, start) => { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], start && !goAdd); };
+    const placeRow = (p, act, actL, actA) => Object.assign(resRow(Object.assign({}, p, { km: null, sub: p.sub || '' }), () => pickPl(p, false)), { sub: kmTo(p), go: () => pickPl(p, true), act: act || (() => {}), actL: actL || '', actOn: !!act, actA: actA || '', addStop: () => { self.setState({ goOpen: false, goAdd: false }); planWp(wpList.concat([toWp(p)]), false); } });
     let hjRows = [];
     if (hjTab === 'saved') {
-      if (homeP) hjRows.push(placeRow(Object.assign({}, homeP, { name: 'Nhà', icon: '🏠' })));
-      (H0.saved || []).forEach((s, i) => hjRows.push(placeRow(Object.assign({ icon: s.icon || '⭐' }, s), () => NV.unstar(i), '✕', 'Bỏ lưu ' + s.name)));
+      (H0.saved || []).forEach((s, i) => s.role === 'work' ? null : hjRows.push(placeRow(Object.assign({ icon: s.icon || '⭐' }, s), () => NV.unstar(i), '✕', 'Bỏ lưu ' + s.name)));
     } else if (hjTab === 'freq') {
       hjRows = (NV ? NV.frequent() : []).map((p) => placeRow(Object.assign({ icon: '📍' }, p), () => NV.star(p), '⭐', 'Lưu ' + p.name));
     } else if (hjTab === 'recent') {
@@ -2459,7 +2683,12 @@ class Component extends DCLogic {
     const tidyWp = () => { if (wpList.length < 3 || !hereLL) return; const last = wpList[wpList.length - 1], rest = wpList.slice(0, -1), out = []; let cur = hereLL; while (rest.length) { let bi = 0, bd = 1e12; rest.forEach((w, i) => { const dd = NV.dist(cur, [w.lat, w.lon]); if (dd < bd) { bd = dd; bi = i; } }); const w = rest.splice(bi, 1)[0]; out.push(w); cur = [w.lat, w.lon]; } out.push(last); planWp(out, false); self.toast('Đã sắp xếp các điểm dừng cho gọn đường'); };
     const parkAgo = H0.park ? Math.max(0, Math.round((Date.now() - H0.park.t) / 60000)) : 0;
     const hj = {
-      on: shell && S.scr === 'trip' && !pnlMin, min: shell && S.scr === 'trip' && pnlMin, toggle: togglePnl,
+      on: false, min: false, toggle: togglePnl,
+      dropOn: shell && dropOpen && mapShow, dropH: 520, dropTitle: hjTab === 'log' ? 'NHẬT KÝ CHUYẾN ĐI' : (goAdd ? 'THÊM ĐIỂM DỪNG' : 'ĐI ĐÂU?'),
+      dropClose: () => self.setState({ goOpen: false, goAdd: false, hjTab: hjTab === 'log' ? 'saved' : hjTab }),
+      quick: [homeP ? { ic: '🏠', l: 'Nhà', sub: kmTo(homeP) || homeP.name || '', go: () => pickPl(Object.assign({}, homeP, { name: 'Nhà' }), false) } : { ic: '🏠', l: 'Nhà', sub: 'Chưa lưu — bấm để đặt', go: () => self.setState({ dlg: 'pe', peKind: 'home', peQ: '', peRes: [] }) },
+        work ? { ic: '💼', l: 'Chỗ Làm', sub: kmTo(work) || work.name || '', go: () => pickPl(work, false) } : { ic: '💼', l: 'Chỗ Làm', sub: 'Chưa lưu — bấm để đặt', go: () => self.setState({ dlg: 'pe', peKind: 'work', peQ: '', peRes: [] }) }],
+      quickOn: hjTab !== 'log',
       habitOn: !!habit && !navV, habitL: habit ? 'Giờ này Tom hay đi ' + habit.name : '', habitGo: () => habit && planWp([toWp(habit)], true),
       parkOn: !!H0.park && !drive, parkL: H0.park ? 'Xe đậu ở ' + (H0.park.name || 'đây') + ' · ' + (parkAgo < 60 ? parkAgo + ' phút trước' : Math.floor(parkAgo / 60) + ' giờ trước') : '', parkSee: () => H0.park && NV.flyTo([H0.park.lat, H0.park.lon], 17),
       parkR: H0.park && H0.park.until ? '⏰ Nhắc lúc ' + NV.hhmm(H0.park.until - 600000) : '', parkRemind: [[60, '1P'], [120, '2P'], [240, '4P']].map(([m, l]) => ({ l, on: H0.park && H0.park.limit === m ? 'true' : 'false', bg: H0.park && H0.park.limit === m ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: H0.park && H0.park.limit === m ? '#2A1A00' : '#CFE6EE', tap: () => NV.parkRemind(m) })),
@@ -2467,7 +2696,7 @@ class Component extends DCLogic {
       wpOn: wpList.length > 0, tidyOn: wpList.length >= 3, tidy: tidyWp,
       q: S.nField === 'hj' ? (S.nq || '') : '', ph: kbLk ? 'Đậu xe rồi gõ nha' : (wpList.length ? '+ Thêm điểm dừng' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ'), type: typeIn('hj'), lock: kbLk,
       res: resFor('hj', (p) => planWp(wpList.concat([toWp(p)]), false)), resOn: S.nField === 'hj' && !!(S.nRes && S.nRes.length),
-      tabs: [['saved', 'Đã Lưu'], ['freq', 'Hay Đi'], ['recent', 'Gần Đây'], ['log', 'Nhật Ký']].map(([k, l]) => { const on = hjTab === k; return { l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: on ? '#2A1A00' : '#CFE6EE', tap: () => self.setState({ hjTab: k }) }; }),
+      tabs: (hjTab === 'log' ? [['log', '📒 Nhật Ký'], ['saved', '← Chỗ Đã Lưu']] : [['saved', '⭐ Đã Lưu'], ['freq', 'Hay Đi'], ['recent', 'Gần Đây']]).map(([k, l]) => { const on = hjTab === k; return { l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: on ? '#2A1A00' : '#CFE6EE', tap: () => self.setState({ hjTab: k }) }; }),
       rows: hjRows, rowsOn: hjTab !== 'log' && hjRows.length > 0, logOn: hjTab === 'log', logRows, logAny: logRows.length > 0,
       empty: hjTab === 'log' ? (C.tripLog === false ? 'Nhật ký đang tắt.' : 'Chưa có chuyến nào — chạy xe rồi đậu hơn 3 phút là app tự ghi.') : hjTab === 'saved' ? 'Chưa lưu chỗ nào — bấm ⭐ ở Hay Đi / Gần Đây để lưu.' : hjTab === 'freq' ? 'Chạy vài bữa là app biết Tom hay đi đâu.' : 'Chưa có chỗ nào trong 8 ngày qua.',
       emptyOn: hjTab === 'log' ? !logRows.length : !hjRows.length,
@@ -2494,7 +2723,7 @@ class Component extends DCLogic {
     const offDone = (() => { try { return localStorage.getItem(offKey); } catch (e) { return null; } })();
     const rtp = {
       on: shell && S.scr === 'rt' && !pnlMin, min: shell && S.scr === 'rt' && pnlMin, toggle: togglePnl,
-      title: rt.title, legs: rt.legs, openTrips: rt.openTrips, newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: '', nField: '', nRes: null }), newL: S.ntOpen ? '✕ Đóng' : '+ Chuyến Mới', formOn: !!S.ntOpen,
+      title: rt.title, legs: rt.legs, openTrips: rt.openTrips, newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: '', nField: '', nRes: null, rtAdd: false, rtMore: false }), newL: S.ntOpen ? '✕ Đóng' : '＋ Mới', newA: S.ntOpen ? 'Đóng tạo chuyến' : 'Tạo chuyến mới', formOn: !!S.ntOpen,
       from: S.ntFrom || '', fromPh: tp.fromPh, to: S.ntTo || '', typeFrom: typeIn('from'), typeTo: typeIn('to'), focusFrom: () => { if (S.nField !== 'from') self.setState({ nField: 'from', nRes: null }); },
       resFrom: fromRows.concat(resFor('from', pickFrom)), resFromOn: S.nField === 'from', resTo: resFor('to', pickTo), resToOn: S.nField === 'to' && !!(S.nRes && S.nRes.length),
       name: S.ntName || '', namePh: 'Tên chuyến (tự đặt theo nơi đi - nơi tới)', setName: (e) => self.setState({ ntName: e.target.value, ntNameTouched: true }),
@@ -2507,7 +2736,15 @@ class Component extends DCLogic {
         window.tcPlanTrip(f, t2, { name: (S.ntName || '').trim() }).then((trip) => { const trips = (self.state.trips || []).concat([trip]); self.save({ trips, ntBusy: false, ntFrom: '', ntTo: '', ntFromP: null, ntToP: null, ntName: '', ntNameTouched: false, ntOpen: false }); setTimeout(() => { self.switchTripExt && self.switchTripExt(trip.id); NV && setTimeout(NV.fitAll, 400); }, 60); self.toast('Đã tạo chuyến ' + trip.name + ' · ' + trip.km + ' km'); }).catch(() => self.setState({ ntBusy: false }));
       },
       mainOn: !S.ntOpen, busy: !!S.ntBusy, createL: S.ntBusy ? 'Đang tạo…' : 'Tạo Chuyến', msg: S.ntMsg || '', lockL: drive ? 'Xe đang chạy — đậu xe rồi mới tạo chuyến mới' : '', lock: kbLk,
-      boxes: rt.boxes, stops: rt.stops, count: list.length,
+      boxes: rt.boxes, count: list.length,
+      sumL: (() => { const b = rt.boxes || []; if (b.length < 3) return ''; return b[0].v + ' → ' + b[1].v + (/SA/.test(b[1].s) ? ' giờ SA' : '') + ' · còn ' + b[2].v.replace(' giờ ', 'g').replace(' ph', '') + ' · ' + b[2].s; })(),
+      stops: (rt.stops || []).map((x, i) => Object.assign({}, x, { num: String(i + 1), numC: x.cls === 'nxt' ? '#FBB040' : '#8FC3D3', ring: x.cls === 'nxt' ? 'inset 0 0 0 2px #FBB040' : 'none', bg: x.cls === 'nxt' ? 'rgba(251,176,64,0.16)' : x.bg,
+        editOn: !!S.rtEdit, infoOn: !S.rtEdit, aria: x.name + ' — bấm để xem trên bản đồ', etaS: (x.eta || '').replace('dự kiến ', '').replace(' giờ SA', ' SA'),
+        tap: () => { if (self.__rtLong && Date.now() - self.__rtLong < 700) return; if (S.rtEdit) { x.open(); return; } const id = list[i] && list[i].id; const ll = NV && NV.stopPos ? NV.stopPos(id) : null; if (ll) { NV.flyTo(ll, 14); self.setState({ last: Date.now() }); } else x.open(); },
+        pdown: () => { clearTimeout(self.__rtLP); self.__rtLP = setTimeout(() => { self.__rtLong = Date.now(); self.setState({ rtEdit: true }); }, 650); },
+        pup: () => clearTimeout(self.__rtLP) })),
+      editTap: () => self.setState({ rtEdit: !S.rtEdit, rtAdd: false, rtMore: false }), editL: S.rtEdit ? '✓ Xong' : 'Sửa', editA: S.rtEdit ? 'true' : 'false', editBg: S.rtEdit ? '#FBB040' : 'rgba(255,255,255,0.06)', editFg: S.rtEdit ? '#2A1A00' : '#E8F1F5',
+      addOpen: !!S.rtAdd, addTap: () => self.setState({ rtAdd: !S.rtAdd, rtMore: false }), moreOpen: !!S.rtMore, moreTap: () => self.setState({ rtMore: !S.rtMore, rtAdd: false }),
       pct: Math.round(pos / TOTAL * 100), pctL: Math.round(pos / TOTAL * 100) + '% · ' + pos + '/' + TOTAL + ' km', nx: od.nx, nxKm: od.nxKm,
       a: (Math.round((+OD0.a || 0) * 10) / 10).toString().replace('.', ','), b: (Math.round((+OD0.b || 0) * 10) / 10).toString().replace('.', ','), resetA: od.resetA, resetB: od.resetB, openLog: od.openLog,
       startL: navAct ? 'Dừng Chỉ Đường' : (nxS2 ? 'Bắt Đầu · tới ' + od.nx : 'Bắt Đầu'), startBg: navAct ? '#E5484D' : '#FBB040', startFg: navAct ? '#FFFFFF' : '#2A1A00',
@@ -2520,9 +2757,10 @@ class Component extends DCLogic {
         self.setState({ offAsk: null, offProg: '0%' });
         NV.prefetch(pts, (dn, tot) => self.setState({ offProg: Math.round(dn / tot * 100) + '%' })).then((r) => { try { localStorage.setItem(offKey, String(Date.now())); } catch (e) {} self.setState({ offProg: null }); self.toast(r.bad ? 'Đã tải bản đồ offline (' + r.bad + ' mảnh lỗi)' : 'Đã tải xong bản đồ offline cho chuyến này'); });
       },
-      addStop: () => self.setState({ dlg: 'add' }), pickStop: () => self.setState({ dlg: 'pick' }),
+      addStop: () => self.setState({ dlg: 'add', rtAdd: false }), pickStop: () => self.setState({ dlg: 'pick', rtAdd: false }),
       routeNote: !TRIP && !window.__rtRealPts ? 'Đang lấy đường thật từ ' + (SP ? SP.name : 'Melbourne') + ' tới Adelaide…' : ''
     };
+    { const nk = S.scr + ':' + S.tripId + ':' + leg + ':' + nextIdx + ':' + (S.pnlMin || {}).rt; if (S.scr === 'rt' && self.__rtNx !== nk) { self.__rtNx = nk; setTimeout(() => { const L = document.querySelector('.rtlist'), n = L && L.querySelector('.nxt'); if (L && n) L.scrollTop = Math.max(0, n.offsetTop - L.offsetTop - 2); }, 120); } }   // #132
     // #67: the built-in Melbourne ⇄ Adelaide trip follows real roads from home / the GPS start
     if (APP && NV && !TRIP && S.scr === 'rt') {
       const st0 = SP || { lat: -37.8136, lon: 144.9631 }; const rk = st0.lat.toFixed(3) + ',' + st0.lon.toFixed(3);
@@ -2537,11 +2775,12 @@ class Component extends DCLogic {
       const vis = S.scr === 'rt' && rtPts;
       NV.onPlaceClick = null;
       NV.sync({ show: mapShow, night: night0, style: C.mapStyle || 'auto', bright: C.calm ? Math.min(C.mapBright || 100, 85) : (C.mapBright || 100), van: hereLL, brg: LV.bearing || 0, spd: LV.speed || 0, drive,
-        padL: (S.scr === 'trip' || S.scr === 'rt') && !pnlMin ? 430 : (S.scr === 'home' ? 380 : 40),
+        padL: S.scr === 'rt' && !pnlMin ? 430 : (S.scr === 'home' ? 380 : 40),
+        padR: S.scr === 'home' && navV && !navAct ? 520 : 80,   // #131: the route sheet sits bottom-right
         rt: vis ? { sig: S.tripId + ':' + leg + ':' + rtPts.length + ':' + list.map((x) => x.id).join(',') + ':' + nextIdx, pts: rtPts, stops: rtStops, towns: (() => { const k = rtPts.length + ':' + (rtPts[0] || []).join(); if (self.townK !== k) { self.townK = k; const smp = rtPts.filter((_, j) => j % 3 === 0); self.townL = TOWNS.filter((t) => smp.some((q) => Math.abs(q[0] - t[1]) < 0.045 && Math.abs(q[1] - t[2]) < 0.055)).map((t) => ({ name: t[0], lat: t[1], lon: t[2], big: !!t[3] })); } return self.townL; })() } : null,
         satFast: C.satFast !== false,
-        places: (S.scr === 'home' || S.scr === 'trip') && S.qc ? qcPins : null,
-        park: S.scr === 'trip' && H0.park ? H0.park : null });
+        places: S.scr === 'home' && S.qc ? qcPins : null,
+        park: S.scr === 'home' && !navV && H0.park ? H0.park : null });
       if (S.qc) NV.onPlaceClick = (pp) => qcPick(pp.raw || pp);
     }
     const peHome = S.peKind !== 'work';
@@ -2574,10 +2813,66 @@ class Component extends DCLogic {
         { l: 'Tìm Chỗ', c: '#7BD88F', ic: 'M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14zM20 20l-4-4', go: () => openFull('search') },
         { l: 'Mở Rộng', c: '#CFE6EE', ic: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', go: () => openFull('home') }
       ] };
+    // ---- 0.9.14 (#130): bấm đồng hồ → lịch tháng (âm lịch, lễ Úc + Việt, lịch hẹn); bấm thời tiết → dự báo ----
+    const THU7 = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+    const calY = S.calY != null ? S.calY : d.getFullYear(), calM = S.calM != null ? S.calM : d.getMonth(), calKey = calY + '-' + calM;
+    window.tcCal = (j) => { try { const o = typeof j === 'string' ? JSON.parse(j) : j; self.setState({ calEv: Object.assign({}, self.state.calEv || {}, { [o.key]: o.ev || [] }) }); } catch (e) {} };
+    const calPerm = !APP || !!(LV.perms && LV.perms.cal);
+    if (S.calOpen && APP && calPerm && !(S.calEv || {})[calKey] && self.__calAsk !== calKey) { self.__calAsk = calKey; tcn('cal', JSON.stringify({ key: calKey, from: new Date(calY, calM, 1).getTime() - 8 * 864e5, to: new Date(calY, calM + 1, 1).getTime() + 8 * 864e5 })); }
+    const evList = APP ? ((S.calEv || {})[calKey] || []) : [{ title: 'Lắp camera — nhà khách Sunshine', start: new Date(d.getFullYear(), d.getMonth(), d.getDate(), 10, 30).getTime(), allDay: false, loc: 'Sunshine' }, { title: 'Bảo trì Alarm', start: new Date(d.getFullYear(), d.getMonth(), d.getDate() + 3, 14, 0).getTime(), allDay: false, loc: '' }];
+    const evBy = {}; evList.forEach((e) => { const k = ymd(new Date(e.start)); (evBy[k] = evBy[k] || []).push(e); });
+    const todayK = ymd(d);
+    const lunCache = self.__lunC || (self.__lunC = {});
+    const lunOf = (t) => { const k = ymd(t); return lunCache[k] || (lunCache[k] = solar2lunar(t.getDate(), t.getMonth() + 1, t.getFullYear())); };
+    const holOf = (t) => (holidaysOf(t.getFullYear())[ymd(t)] || []);
+    const calGo = (dm) => () => { if (Date.now() - (self.__calSw || 0) < 350) return; const t = new Date(calY, calM + dm, 1); self.setState({ calY: t.getFullYear(), calM: t.getMonth(), calSel: null, last: Date.now() }); };
+    const selK = S.calSel || (calY === d.getFullYear() && calM === d.getMonth() ? todayK : ymd(new Date(calY, calM, 1)));
+    const lead = (new Date(calY, calM, 1).getDay() + 6) % 7;
+    const calCells = [];
+    if (S.calOpen && !S.calYear) for (let i = 0; i < 42; i++) {
+      const t = new Date(calY, calM, 1 - lead + i), k = ymd(t), l = lunOf(t), hs = holOf(t), inM = t.getMonth() === calM, off = hs.some((h) => h.off) || t.getDay() === 0;
+      const ev = evBy[k] || [];
+      calCells.push({ n: t.getDate(), lun: l[0] === 1 ? '1/' + l[1] + (l[3] ? 'N' : '') : (l[0] === 15 ? 'Rằm' : String(l[0])), lunC: l[0] === 1 || l[0] === 15 ? '#FFD08A' : '#8FC3D3',
+        hol: hs.length ? hs[0].name : '', holOn: hs.length > 0, holC: hs[0] && hs[0].kind === 'vn' ? '#FF9A9E' : '#7BD88F',
+        numC: off ? '#FF8A8A' : '#FFFFFF', op: inM ? 1 : 0.32, evOn: ev.length > 0, evN: ev.length > 1 ? ev.length : '',
+        bg: k === selK ? 'rgba(251,176,64,0.22)' : 'rgba(255,255,255,0.03)', ring: k === todayK ? 'inset 0 0 0 2px #FBB040' : (k === selK ? 'inset 0 0 0 1px rgba(251,176,64,0.6)' : 'none'),
+        pick: () => { if (Date.now() - (self.__calSw || 0) < 350) return; if (!inM) self.setState({ calY: t.getFullYear(), calM: t.getMonth(), calSel: k }); else self.setState({ calSel: k, last: Date.now() }); } });
+    }
+    const selD = (() => { const a = selK.split('-').map(Number); return new Date(a[0], a[1] - 1, a[2]); })();
+    const selL = lunOf(selD), selMp = moonPhase(new Date(selD.getFullYear(), selD.getMonth(), selD.getDate(), 21).getTime());
+    const selEv = (evBy[selK] || []).slice().sort((a, b) => a.start - b.start).map((e) => { const t = new Date(e.start); return { time: e.allDay ? 'Cả ngày' : p2(t.getHours()) + ':' + p2(t.getMinutes()), title: e.title, loc: e.loc || '', locOn: !!e.loc }; });
+    const yearMonths = S.calOpen && S.calYear ? Array.from({ length: 12 }, (_, m) => { const ld = (new Date(calY, m, 1).getDay() + 6) % 7; const days = []; for (let i = 0; i < 42; i++) { const t = new Date(calY, m, 1 - ld + i), inM = t.getMonth() === m, k = ymd(t), hs = inM ? holOf(t) : []; days.push({ n: inM ? t.getDate() : '', c: k === todayK && inM ? '#2A1A00' : (hs.some((h) => h.off) || t.getDay() === 0 ? '#FF8A8A' : '#E8F1F5'), bg: k === todayK && inM ? '#FBB040' : 'transparent' }); } return { name: 'Tháng ' + (m + 1), on: m === calM ? 'inset 0 0 0 2px #FBB040' : 'inset 0 0 0 1px rgba(255,255,255,0.12)', days, pick: () => self.setState({ calYear: false, calM: m, calSel: null }) }; }) : [];
+    const cal = { open: !!S.calOpen, month: !S.calYear, year: !!S.calYear,
+      title: 'Tháng ' + (calM + 1), yearL: String(calY), lunTitle: (() => { const a = lunOf(new Date(calY, calM, 1)), b = lunOf(new Date(calY, calM + 1, 0)); return 'Âm lịch: tháng ' + a[1] + (a[1] !== b[1] ? ' – ' + b[1] : '') + ' năm ' + canChi(b[2]); })(),
+      wk: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((l) => ({ l })), cells: calCells, months: yearMonths,
+      prev: calGo(-1), next: calGo(1), prevY: () => self.setState({ calY: calY - 1 }), nextY: () => self.setState({ calY: calY + 1 }),
+      today: () => self.setState({ calY: null, calM: null, calSel: null, calYear: false }), yearTap: () => self.setState({ calYear: !S.calYear }),
+      close: () => self.setState({ calOpen: false }), stop: () => {},
+      down: (e) => { self.__calX = e.clientX; self.__calY0 = e.clientY; },
+      up: (e) => { if (self.__calX == null) return; const dx = e.clientX - self.__calX, dy = e.clientY - (self.__calY0 || 0); self.__calX = null; if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.3) { self.__calSw = 0; calGo(dx < 0 ? (S.calYear ? 12 : 1) : (S.calYear ? -12 : -1))(); self.__calSw = Date.now(); } },
+      selTitle: THU7[selD.getDay()] + ', ' + selD.getDate() + ' tháng ' + (selD.getMonth() + 1) + ', ' + selD.getFullYear(),
+      selLun: 'Âm lịch: ' + selL[0] + ' tháng ' + selL[1] + (selL[3] ? ' (nhuận)' : '') + ' năm ' + canChi(selL[2]),
+      selMoon: moonPath(selMp, 14, 14, 11) || 'M0 0', selMoonL: moonName(selMp),
+      selHol: holOf(selD).map((h) => ({ name: h.name, tag: h.kind === 'vn' ? 'VN' : 'ÚC', c: h.kind === 'vn' ? '#FF9A9E' : '#7BD88F', off: h.off ? 'Ngày nghỉ' : '' })), selHolOn: holOf(selD).length > 0,
+      selEv, selEvOn: selEv.length > 0, noEv: calPerm ? 'Không có lịch hẹn' : 'Chưa cho phép đọc lịch trong điện thoại', noEvOn: !selEv.length, permOn: !calPerm, perm: () => tcn('perm', 'cal') };
+    const WXD7 = (LV.wx && LV.wx.daily) || (APP ? [] : [0, 1, 2, 3, 4, 5, 6].map((i) => ({ d: ymd(new Date(d.getFullYear(), d.getMonth(), d.getDate() + i)), hi: 20 + (i * 3) % 7, lo: 9 + i % 4, code: ['cloudy', 'clear', 'rain', 'cloudy', 'storm', 'clear', 'fog'][i], rain: [20, 5, 70, 30, 80, 0, 10][i] })));
+    const lo7 = Math.min.apply(null, WXD7.map((x) => x.lo).concat([99])), hi7 = Math.max.apply(null, WXD7.map((x) => x.hi).concat([-99])), sp7 = Math.max(1, hi7 - lo7);
+    const WXH24 = APP ? WXH : Array.from({ length: 24 }, (_, i) => { const t = new Date(d.getTime() + (i + 1) * 3600000); t.setMinutes(0); return { t: t.toISOString(), temp: 14 + 4 * Math.sin(i / 4), code: i % 7 === 3 ? 'rain' : 'cloudy', rain: i % 7 === 3 ? 60 : 10 }; });
+    const fcHours = [{ t: 'Bây giờ', code: WX ? WX.code : 'cloudy', temp: WX ? WX.temp : null, hr: d.getHours(), p: WX ? WX.rain : null }].concat(WXH24.filter((h) => new Date(h.t).getTime() > d.getTime()).slice(0, 23).map((h) => ({ t: p2(new Date(h.t).getHours()) + 'h', code: h.code === 'night' ? 'clear' : h.code, temp: h.temp, hr: new Date(h.t).getHours(), p: h.rain })))
+      .map((h) => ({ t: h.t, parts: icOf(h.code, h.hr), v: h.temp == null ? '--' : Math.round(h.temp) + '°', p: h.p != null && h.p >= 10 ? Math.round(h.p) + '%' : '', pOn: h.p != null && h.p >= 10 }));
+    const fc = { open: !!S.fcOpen, close: () => self.setState({ fcOpen: false }), stop: () => {},
+      temp: wxT, desc: WX ? (WXVI[wk] || '') : 'Đang lấy thời tiết…', place: (LV.place && (LV.place.suburb || LV.place.street)) || (APP ? '' : 'Deanside'),
+      sub: WX ? ['Cảm giác ' + (WX.feels != null ? Math.round(WX.feels) + '°' : '--'), WX.wind != null ? 'Gió ' + Math.round(WX.wind) + ' km/g' : '', WX.rain != null ? 'Mưa ' + Math.round(WX.rain) + '%' : ''].filter(Boolean).join(' · ') : '',
+      hl: WX && WX.hi != null ? '↑' + Math.round(WX.hi) + '°  ↓' + Math.round(WX.lo) + '°' : '', parts: icOf(WX ? WX.code : 'cloudy', d.getHours()),
+      placeL: [(LV.place && (LV.place.suburb || LV.place.street)) || (APP ? '' : 'Deanside'), nightSky ? moonL : ''].filter(Boolean).join(' · '),
+      hours: fcHours, hoursOn: fcHours.length > 1,
+      days: WXD7.slice(0, 7).map((x, i) => { const t = new Date(x.d + (String(x.d).length <= 10 ? 'T12:00' : '')); const dd = isNaN(t) ? new Date(d.getTime() + i * 864e5) : t; return { name: i === 0 ? 'Hôm nay' : THU[dd.getDay()] + ' ' + dd.getDate() + '/' + (dd.getMonth() + 1), parts: icOf(x.code, 12), lo: Math.round(x.lo) + '°', hi: Math.round(x.hi) + '°', l: Math.round((x.lo - lo7) / sp7 * 100), w: Math.max(6, Math.round((x.hi - x.lo) / sp7 * 100)), p: x.rain != null && x.rain >= 10 ? '💧' + Math.round(x.rain) + '%' : '' }; }),
+      daysOn: WXD7.length > 0, none: APP && !WX };
     const wsHid = (navAct || spd > 15) ? !S.wsOpen : !!C.wsCol;
     window.__mapTouched = () => { if (shell && self.state.scr === 'home' && !self.state.qc && !wsHid) { if (navAct || spd > 15) self.setState({ wsOpen: false }); else self.setS('wsCol', true); } };
     return {
       crashOn: !!S.crash, crashClose: () => self.setState({ crash: '' }), crashSend: () => { const v = window.TC_VERSION || '0.9.x-beta'; tcn('mail', JSON.stringify({ subject: "Góp Ý Tom's Car " + v, body: 'App vừa bị tắt bất ngờ.\n\n' + S.crash })); self.setState({ crash: '' }); },
+      cal, fc,
       rootW: nar || APP ? '100%' : '1280px', rootH: nar || APP ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || !shell), nv, tabs, hj, rtp, lf, pe, wsShow: shell && S.scr === 'home' && !S.qc && !wsHid, wsGuide: !C.wsGuideOff, wsLater: () => self.setS('wsGuideOff', true), wsHide: () => (navAct || spd > 15) ? self.setState({ wsOpen: false }) : self.setS('wsCol', true), upCardOn: drive && !navAct, wsPill: shell && S.scr === 'home' && !S.qc && wsHid, wsTog: () => (navAct || spd > 15) ? self.setState({ wsOpen: true }) : (self.setS('wsCol', false), self.setState({ wsOpen: false })), rtDlgOn: shell, kbLk, clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, obdHint, obdHintOn: !!obdHint, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
       unreadN: APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3,
       wsTitle: S.wsEdit != null ? 'Sửa Workspace' : 'Tạo Workspace', wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
@@ -2649,7 +2944,7 @@ class Component extends DCLogic {
       dx, dexApps: () => self.setState({ dexTwo: !S.dexTwo }), dexTask: () => self.setState({ dexTask: !S.dexTask }),
       cb, simCall: () => self.setState({ call: 'ring', mute: false }), toastOn, toastText: S.toast,
       ct,
-      aboutNote: C.autoBoot ? 'Tự vào Màn Hình Chính sau 4 giây — không cần bấm' : 'Tự chuyển đang tắt (Cài Đặt → Chung) — bấm Vào Ngay',
+      aboutNote: C.autoBoot ? 'Tự vào Hành Trình sau 4 giây — không cần bấm' : 'Tự chuyển đang tắt (Cài Đặt → Chung) — bấm Vào Ngay',
       bootSplash: S.boot === 'splash', bootDur: Math.max(0.6, (C.splashSec == null ? 3 : +C.splashSec) - 0.4), bootAbout: S.boot === 'about', skipBoot: () => { clearTimeout(self.b2); self.setState({ boot: null, scr: S.boot === 'about' ? S.scr : self.startScr(), last: Date.now() }); }, restart: () => self.startBoot(),
       listOpen: S.listOpen, openList: () => self.setState({ listOpen: true }), closeList: () => self.setState({ listOpen: false }), items
     };

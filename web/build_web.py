@@ -178,7 +178,8 @@ body.app [data-ui]{{display:none!important}}
 #lp{{display:none}}
 body.lp-on #lp{{display:block}}
 body.lp-on #scene{{display:none}}
-#tcmap{{display:none;overflow:hidden;background:#0b1620}}
+#tcmap{{display:none;overflow:hidden;background:#0b1620;z-index:0;isolation:isolate}}
+#ui{{z-index:1}}
 #tcmap .leaflet-container{{background:#0b1620}}
 body.map-on #tcmap{{display:block}}
 body.map-on #scene,body.map-on #lp{{display:none!important}}

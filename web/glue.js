@@ -59,13 +59,13 @@
     if (wxBusy || Date.now() - wxAt < 15 * 60 * 1000) return;
     wxBusy = true;
     const u = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat.toFixed(3) + '&longitude=' + lon.toFixed(3) +
-      '&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=6';
+      '&current=temperature_2m,apparent_temperature,weather_code,precipitation_probability,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,precipitation_probability_max&timezone=auto&forecast_days=7';
     fetch(u).then((r) => r.json()).then((j) => {
       wxAt = Date.now();
       const nowH = new Date(); nowH.setMinutes(0, 0, 0);
       const hourly = []; const ht = (j.hourly && j.hourly.time) || [];
-      for (let i = 0; i < ht.length && hourly.length < 12; i++) { const t = new Date(ht[i]); if (t >= nowH) { const hr = t.getHours(); let c = wxCode(j.hourly.weather_code[i]); if (c === 'clear' && (hr < 6 || hr >= 20)) c = 'night'; hourly.push({ t: ht[i], temp: j.hourly.temperature_2m[i], code: c, rain: j.hourly.precipitation_probability ? j.hourly.precipitation_probability[i] : null }); } }
-      const daily = ((j.daily && j.daily.time) || []).map((d, i) => ({ d: d, hi: j.daily.temperature_2m_max[i], lo: j.daily.temperature_2m_min[i], code: wxCode(j.daily.weather_code[i]) }));
+      for (let i = 0; i < ht.length && hourly.length < 25; i++) { const t = new Date(ht[i]); if (t >= nowH) { const hr = t.getHours(); let c = wxCode(j.hourly.weather_code[i]); if (c === 'clear' && (hr < 6 || hr >= 20)) c = 'night'; hourly.push({ t: ht[i], temp: j.hourly.temperature_2m[i], code: c, rain: j.hourly.precipitation_probability ? j.hourly.precipitation_probability[i] : null }); } }
+      const daily = ((j.daily && j.daily.time) || []).map((d, i) => ({ d: d, hi: j.daily.temperature_2m_max[i], lo: j.daily.temperature_2m_min[i], code: wxCode(j.daily.weather_code[i]), rain: j.daily.precipitation_probability_max ? j.daily.precipitation_probability_max[i] : null }));
       const sun = j.daily && j.daily.sunrise ? { rise: j.daily.sunrise[0], set: j.daily.sunset[0] } : null;
       window.__sun = sun; window.__sunDays = j.daily ? { rise: j.daily.sunrise, set: j.daily.sunset } : null;
       push({ wx: { temp: j.current.temperature_2m, feels: j.current.apparent_temperature, code: wxCode(j.current.weather_code), rain: j.current.precipitation_probability || 0, wind: j.current.wind_speed_10m, hi: j.daily.temperature_2m_max[0], lo: j.daily.temperature_2m_min[0], hourly: hourly, daily: daily, sun: sun } });
@@ -549,8 +549,7 @@
   const drawCtl = (o) => {
     ctl.innerHTML = '';
     const set = (k, v) => window.__ui && window.__ui.setS(k, v);
-    [['auto', 'Tự Động'], ['dark', 'Tối'], ['light', 'Sáng'], ['topo', 'Địa Hình'], ['sat', 'Vệ Tinh']].forEach(([k, l]) => ctl.appendChild(btn(l, o.style === k, () => set('mapStyle', k))));
-    ctl.appendChild(btn(o.night ? '🌙' : '☀', false, () => set('mapStyle', o.night ? 'light' : 'dark')));
+    // 0.9.14 (#129): the map style is chosen in one place only (the layers button on the map / Settings)
     const r = document.createElement('input'); r.type = 'range'; r.min = 40; r.max = 120; r.value = o.bright; r.setAttribute('aria-label', 'Độ sáng bản đồ'); r.style.cssText = 'width:80px'; r.onchange = () => set('mapBright', +r.value); ctl.appendChild(r);
     const f = document.createElement('button'); f.textContent = '⤢'; f.setAttribute('aria-label', 'Cả chuyến'); f.style.cssText = 'height:30px;width:30px;border:0;border-radius:15px;background:rgba(3,17,28,0.88);color:#CFE6EE;cursor:pointer'; f.onclick = () => { if (routeL) map.fitBounds(routeL.getBounds(), { padding: [20, 20] }); }; ctl.appendChild(f);
   };

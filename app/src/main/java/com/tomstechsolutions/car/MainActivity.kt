@@ -86,8 +86,11 @@ class MainActivity : Activity() {
 
     // ---------------------------------------------------------------- lifecycle
     @SuppressLint("SetJavaScriptEnabled")
-    /** #56: the start-up sound — once per app start, not when the phone is on silent/vibrate or something is already playing.
-     *  arg = {"name":"chime_soft","vol":60, "test":false}; test = the "Nghe Thử" button in Settings (plays whatever the state). */
+    /** #56 / #127: the start-up sound — once per real start (after Thoát Hẳn or the app being swiped away), not when
+     *  coming back from Chạy Nền. Plays on vibrate/silent too unless "silent":false; ducks music instead of skipping;
+     *  waits up to ~3 s for car Bluetooth audio that is still connecting.
+     *  arg = {"name":"chime_soft","vol":60,"silent":true,"test":false}; test = the "Nghe Thử" button in Settings. */
+    private var chimePlayer: android.media.MediaPlayer? = null
     private fun chime(arg: String) {
         try {
             val o = org.json.JSONObject(arg); val test = o.optBoolean("test")
@@ -95,16 +98,33 @@ class MainActivity : Activity() {
             if (!test) {
                 if (TomsCarApp.chimed) return
                 TomsCarApp.chimed = true
-                if (am.ringerMode != AudioManager.RINGER_MODE_NORMAL || am.isMusicActive) return
+                if (am.ringerMode != AudioManager.RINGER_MODE_NORMAL && !o.optBoolean("silent", true)) return
             }
             val name = o.optString("name", "chime_soft").replace(Regex("[^a-z_]"), "")
-            val afd = assets.openFd("web/sounds/$name.ogg")
-            val mp = android.media.MediaPlayer()
-            mp.setAudioAttributes(android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
-            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length); afd.close()
             val v = (o.optInt("vol", 60).coerceIn(0, 100)) / 100f
+            if (test) { playChime(am, name, v); return }
+            // wait for a car Bluetooth link that is still connecting (max ~3 s), then play
+            var tries = 0
+            val tick = object : Runnable { override fun run() {
+                val connecting = try { val ad = (getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)?.adapter
+                    ad != null && ad.isEnabled && ad.getProfileConnectionState(android.bluetooth.BluetoothProfile.A2DP) == android.bluetooth.BluetoothProfile.STATE_CONNECTING } catch (_: Exception) { false }
+                if (connecting && tries++ < 10) main.postDelayed(this, 300) else main.postDelayed({ playChime(am, name, v) }, if (tries > 0) 700L else 150L)
+            } }
+            tick.run()
+        } catch (_: Exception) { }
+    }
+    private fun playChime(am: AudioManager, name: String, v: Float) {
+        try {
+            chimePlayer?.let { try { it.release() } catch (_: Exception) {} }
+            val attrs = android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+            val focus = if (Build.VERSION.SDK_INT >= 26) android.media.AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK).setAudioAttributes(attrs).build() else null
+            if (focus != null) am.requestAudioFocus(focus)
+            val afd = assets.openFd("web/sounds/$name.ogg")
+            val mp = android.media.MediaPlayer(); chimePlayer = mp
+            mp.setAudioAttributes(attrs)
+            mp.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length); afd.close()
             mp.setVolume(v, v)
-            mp.setOnCompletionListener { it.release() }
+            mp.setOnCompletionListener { it.release(); if (chimePlayer === it) chimePlayer = null; if (focus != null) am.abandonAudioFocusRequest(focus) }
             mp.prepare(); mp.start()
         } catch (_: Exception) { }
     }
@@ -174,6 +194,8 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // #127: a fresh start (not a rotation / DeX switch / return from Chạy Nền) plays the start-up sound again
+        if (savedInstanceState == null) TomsCarApp.chimed = false
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         val loader = WebViewAssetLoader.Builder()
@@ -736,6 +758,23 @@ class MainActivity : Activity() {
         return out
     }
 
+    /** 0.9.14 (#130): appointments for the calendar month view — {"from":ms,"to":ms} → [{title,start,end,allDay,loc}] */
+    @SuppressLint("MissingPermission")
+    private fun monthAppts(arg: String): org.json.JSONArray {
+        val out = org.json.JSONArray()
+        if (!has(Manifest.permission.READ_CALENDAR)) return out
+        try {
+            val o = JSONObject(arg)
+            val b = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            android.content.ContentUris.appendId(b, o.optLong("from")); android.content.ContentUris.appendId(b, o.optLong("to"))
+            contentResolver.query(b.build(), arrayOf(CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.ALL_DAY, CalendarContract.Instances.EVENT_LOCATION),
+                null, null, CalendarContract.Instances.BEGIN + " ASC")?.use { c ->
+                while (c.moveToNext() && out.length() < 400) out.put(JSONObject().put("title", c.getString(0) ?: "Lịch hẹn").put("start", c.getLong(1)).put("end", c.getLong(2)).put("allDay", c.getInt(3) == 1).put("loc", c.getString(4) ?: ""))
+            }
+        } catch (_: Exception) {}
+        return out
+    }
+
     /** Next appointment today (Google Calendar) for the chip next to the clock. */
     @SuppressLint("MissingPermission")
     private fun nextAppt(): JSONObject? {
@@ -771,6 +810,7 @@ class MainActivity : Activity() {
                     }
                     "settings" -> settings()
                     "chime" -> chime(arg)
+                    "cal" -> bg.execute { val j = monthAppts(arg); main.post { js("tcCal", JSONObject().put("key", try { JSONObject(arg).optString("key") } catch (_: Exception) { "" }).put("ev", j).toString()) } }
                     "media" -> mediaAction(arg)
                     "launch" -> { Launcher.workspace(this@MainActivity, arg); Bubble.askOnce(this@MainActivity) }
                     "bubble" -> { Bubble.enabled = arg != "off"; if (!Bubble.enabled) Bubble.hide() }

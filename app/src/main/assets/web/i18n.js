@@ -37,7 +37,7 @@ H\xECnh \u0111\u1ECBa danh l\xE0m n\u1EC1n|Place photo background
 L\u1EA5y h\xECnh c\u1EE7a n\u01A1i \u0111\xF3 t\u1EEB Wikipedia / Wikimedia Commons (c\u1EA7n m\u1EA1ng)|Photo of the place from Wikipedia / Wikimedia Commons (needs internet)
 Hi\u1EC7n ng\xE0y \xE2m l\u1ECBch, R\u1EB1m, m\xF9ng 1, T\u1EBFt \u2014 c\u1EA3 ti\u1EBFng Vi\u1EC7t l\u1EABn ti\u1EBFng Anh|Show the lunar date, full moon, new moon, Lunar New Year \u2014 in both languages
 Ki\u1EC3u s\u1ED1 t\u1ED1c \u0111\u1ED9|Speed number style
-Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay tr\xEAn M\xE0n H\xECnh Ch\xEDnh|Changes right away on Home
+Ch\u1ECDn l\xE0 \u0111\u1ED5i ngay tr\xEAn m\xE0n h\xECnh H\xE0nh Tr\xECnh|Changes right away on the Drive screen
 C\u1EE1 s\u1ED1 t\u1ED1c \u0111\u1ED9|Speed number size
 V\xF2ng cung gi\u1EDBi h\u1EA1n quanh s\u1ED1|Limit arc around the number
 G\u1EA7n ch\u1EA1m gi\u1EDBi h\u1EA1n th\xEC v\xF2ng g\u1EA7n k\xEDn|The ring nearly closes near the limit
@@ -238,9 +238,9 @@ Road Trip + B\u1EA3n \u0110\u1ED3|Road Trip + Map
 \u0110i\u1EC7n tho\u1EA1i --|Phone --
 Gh\xE9|Stop
 M\xE0n H\xECnh Ch\xEDnh|Home
-\u27A4 H\xE0nh Tr\xECnh|\u27A4 Journeys
+\u27A4 H\xE0nh Tr\xECnh|\u27A4 Drive
 \u27A4 H\xE0nh Tr\xECnh \u25B8|\u27A4 Journeys \u25B8
-H\xE0nh Tr\xECnh|Journeys
+H\xE0nh Tr\xECnh|Drive
 H\xC0NH TR\xCCNH|JOURNEYS
 \u{1F5FA} Road Trip|\u{1F5FA} Road Trip
 Li\xEAn L\u1EA1c|Contacts
@@ -514,14 +514,14 @@ Gi\u1ECDng Ti\u1EBFng Vi\u1EC7t|Vietnamese voice
 Gi\u1ECDng Ti\u1EBFng Vi\u1EC7t cho tr\u1EE3 l\xFD|Vietnamese voice for the assistant
 T\u1EA3i Gi\u1ECDng Vi\u1EC7t|Download Vietnamese voice
 B\u1EA3n \u0110\u1ED3 & Road Trip|Map & Road Trip
-M\xE0n H\xECnh Ch\xEDnh l\xE0 b\u1EA3n \u0111\u1ED3|Home screen is a map
+M\xE0n h\xECnh H\xE0nh Tr\xECnh l\xE0 b\u1EA3n \u0111\u1ED3|Drive screen is a map
 T\u1EF1 hi\u1EC7n b\u1EA3n \u0111\u1ED3 khi xe ch\u1EA1y|Show the map when driving
 B\u1EA3n \u0111\u1ED3 n\u1EB1m b\xEAn|Map side
 Tr\xE1i|Left
 Ph\u1EA3i|Right
 \u0110\u1ED9 s\xE1ng b\u1EA3n \u0111\u1ED3|Map brightness
 H\u01B0\u1EDBng b\u1EA3n \u0111\u1ED3 khi ch\u1EC9 \u0111\u01B0\u1EDDng|Map orientation while navigating
-N\xFAt t\xECm nhanh (M\xE0n H\xECnh Ch\xEDnh)|Quick-search buttons (Home)
+N\xFAt t\xECm nhanh (H\xE0nh Tr\xECnh)|Quick-search buttons (Drive screen)
 Ch\u1EA1m \u0111\u1EC3 b\u1EADt/t\u1EAFt t\u1EEBng n\xFAt \u2014 k\u1EBFt qu\u1EA3 hi\u1EC7n ngay tr\xEAn b\u1EA3n \u0111\u1ED3, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng th\xEC t\xECm d\u1ECDc \u0111\u01B0\u1EDDng|Tap to turn each button on/off \u2014 results show on the map; while navigating it searches along the route
 T\u1EF1 \u0110\u1ED9ng = S\xE1ng ban ng\xE0y, T\u1ED1i ban \u0111\xEAm (theo gi\u1EDD m\u1EB7t tr\u1EDDi m\u1ECDc/l\u1EB7n)|Auto = light by day, dark at night (by sunrise/sunset)
 Kho\xE1 b\xE0n ph\xEDm khi xe ch\u1EA1y|Lock keyboard while driving
