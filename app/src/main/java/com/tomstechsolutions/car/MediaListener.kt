@@ -18,6 +18,7 @@ import org.json.JSONObject
 class MediaListener : NotificationListenerService() {
 
     companion object {
+        @JvmStatic var onNew: ((JSONObject) -> Unit)? = null
         val APPS = mapOf(
             "com.whatsapp" to "wa", "com.whatsapp.w4b" to "wa",
             "com.facebook.orca" to "msgr", "com.facebook.mlite" to "msgr",
@@ -79,6 +80,8 @@ class MediaListener : NotificationListenerService() {
             out.put(r)
         }
         val row = JSONArray().put(title).put("Bạn Bè").put(app).put(text).put(System.currentTimeMillis()).put(unread).put(key)
+        // 0.9.15 (#149): tell Tom's Car right away (the banner shows only who sent it, never the text)
+        try { onNew?.invoke(JSONObject().put("who", title).put("app", app).put("text", text).put("key", key).put("at", System.currentTimeMillis())) } catch (_: Exception) {}
         val res = JSONArray().put(row)
         for (i in 0 until minOf(out.length(), 60)) res.put(out.get(i))
         store(c).edit().putString("rows", res.toString()).apply()

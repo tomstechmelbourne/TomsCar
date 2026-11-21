@@ -17,7 +17,9 @@
     const dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy; let t = l2 ? -(ax * dx + ay * dy) / l2 : 0; t = Math.max(0, Math.min(1, t));
     return { d: Math.hypot(ax + t * dx, ay + t * dy), t };
   };
-  const stepSay = (st) => (NAV.cfg && NAV.cfg.clip && !EN() && st.plain) ? st.plain : st.text;
+  // 0.9.15 (#145): "Quẹo trái vô§Taylors Road" — the part before § is the Southern voice (clips or Vietnamese TTS),
+  // the road name after it is read by an English voice (Australian names read badly in Vietnamese)
+  const stepSay = (st) => { if (EN()) return st.text; if (st.road && st.pre) return st.pre + '§' + st.road; return (NAV.cfg && NAV.cfg.clip && st.plain) ? st.plain : st.text; };
   const say = (t) => { if (NAV.logEvt) NAV.logEvt('say', t); try { if (window.TCN && !(NAV.cfg && NAV.cfg.mute)) window.TCN.call('say', t); } catch (e) {} };
   const toast = (t) => { if (window.__ui && window.__ui.toast) window.__ui.toast(t); };
   const redraw = () => { if (window.__ui) window.__ui.setState({ navAt: Date.now() }); };
@@ -466,7 +468,9 @@
       // one roundabout = one instruction: drop "exit roundabout" and a second roundabout step a few metres later (#121)
       const rb = /roundabout|rotary/.test(s.maneuver.type), prev = steps[steps.length - 1];
       if (/^exit (roundabout|rotary)$/.test(s.maneuver.type) || (rb && prev && prev.rb && (cum[startIdx] || 0) - prev.at < 45)) { legI = li; return; }
-      steps.push({ rb, at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: '', ref: '', destinations: '', exits: '' }), ''), text: viText(s, isWp ? (wps[li + 1] && wps[li + 1].name) : (s.maneuver.type === 'arrive' ? (wps[wps.length - 1] && wps[wps.length - 1].name) : '')), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === 'arrive' });
+      const rd = nm(s), tx0 = viText0(s, isWp ? (wps[li + 1] && wps[li + 1].name) : (s.maneuver.type === 'arrive' ? (wps[wps.length - 1] && wps[wps.length - 1].name) : ''));
+      const cut = rd && !/^(arrive|off ramp)$/.test(s.maneuver.type) ? Math.max(tx0.lastIndexOf(' vô ' + rd), tx0.lastIndexOf(' theo ' + rd)) : -1;
+      steps.push({ road: cut > 0 ? rd.replace(/\s*\(.*\)$/, '') : '', pre: cut > 0 ? tx0.slice(0, cut) + (tx0.indexOf(' theo ' + rd, cut) === cut ? ' theo' : ' vô') : '', rb, idx: startIdx, at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: '', ref: '', destinations: '', exits: '' }), ''), text: viText(s, isWp ? (wps[li + 1] && wps[li + 1].name) : (s.maneuver.type === 'arrive' ? (wps[wps.length - 1] && wps[wps.length - 1].name) : '')), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === 'arrive' });
       (s.intersections || []).forEach((x) => { if ((x.classes || []).indexOf('toll') >= 0 && s.name && tolls.indexOf(s.name) < 0) tolls.push(s.name); });
       legI = li;
     }));
@@ -573,7 +577,7 @@
   NAV.cancel = () => { const S = NAV.st; S.active = false; S.route = null; S.alts = []; S.wps = []; S.dest = null; S.err = ''; fittedSig = ''; redraw(); };
   NAV.start = () => {
     const S = NAV.st; if (!S.route) return;
-    S.active = true; S.idx = 0; S.along = null; S.moved = false; S.fixedStart = false; S.said = {}; S.off = 0; S.offRoute = false; S.rerouting = false; S.snap = null; Car.headInit = false; S.startAt = Date.now(); S.alts = [S.route]; S.next = 1; S.toNext = S.route.steps[1] ? S.route.steps[1].at : S.route.dist;
+    S.active = true; S.idx = 0; S.along = null; S.moved = false; S.fixedStart = false; S.said = { 1: { far: 1 } }; S.saidPts = []; S.startFix = null; S.off = 0; S.offRoute = false; S.rerouting = false; S.snap = null; Car.headInit = false; S.startAt = Date.now(); S.alts = [S.route]; S.next = 1; S.toNext = S.route.steps[1] ? S.route.steps[1].at : S.route.dist;
     S.remain = S.route.dist; S.remainDur = S.route.dur; follow = true; userAt = 0;
     const first = S.route.steps[1];
     if (EN()) say('Starting directions to ' + (S.dest ? S.dest.name : 'your destination') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' In ' + sayDist(first.at) + ', ' + first.text.toLowerCase() + '.' : '')); else if (NAV.cfg.clip) say('Bắt đầu chỉ đường.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + stepSay(first).toLowerCase() + '.' : '')); else say('Bắt đầu chỉ đường tới ' + (S.dest ? S.dest.name : 'nơi đến') + '. ' + fmtDur(S.route.dur) + ', ' + sayDist(S.route.dist) + '.' + (first ? ' ' + sayDist(first.at) + ' nữa, ' + first.text.toLowerCase() + '.' : ''));
@@ -595,9 +599,10 @@
     histTick(f); camTick(f);
     const S = NAV.st, R = S.route; if (!S.active || !R) return;
     const p = [f.lat, f.lon], spd0 = f.spd || 0, slow = spd0 < 10;
-    if (spd0 >= 10) S.moved = true;
+    if (!S.startFix && (f.acc || 99) <= 25) S.startFix = p;
+    if ((spd0 >= 10 && (f.acc || 99) <= 35) || (S.startFix && (f.acc || 99) <= 25 && dist(p, S.startFix) > 30)) S.moved = true;
     // 0.9.13 (#120): right after "Đi", once GPS is accurate, start the route from the car's real spot (quietly, once)
-    if (!S.moved && !S.fixedStart && (f.acc || 99) <= 30 && R.pts.length > 1 && dist(p, R.pts[0]) > 60 && !S.rerouting) { S.fixedStart = true; reroute(p, null, true); return; }
+    if (!S.moved && !S.fixedStart && (f.acc || 99) <= 40 && R.pts.length > 1 && dist(p, R.pts[0]) > 40 && !S.rerouting) { S.fixedStart = true; reroute(p, null, true); return; }
     // search a little back too, so one bad GPS fix cannot push "đã chạy qua" (grey) forward for good
     let best = 1e9, bi = S.idx || 0, bt = 0; const a = Math.max(0, (S.idx || 0) - 40), b = Math.min(R.pts.length - 1, (S.idx || 0) + 600);
     for (let i = a; i < b; i++) { const q = segProj(p, R.pts[i], R.pts[i + 1]); if (q.d < best) { best = q.d; bi = i; bt = q.t; } }
@@ -620,10 +625,14 @@
     S.remain = Math.max(0, R.dist - along); S.remainDur = R.dur * (S.remain / (R.dist || 1));
     let n = 1; while (n < R.steps.length - 1 && R.steps[n].at <= along + 4) n++;
     S.next = n; S.toNext = Math.max(0, R.steps[n].at - along);
-    const st = R.steps[n], spd = f.spd || 0, said = S.said[n] || (S.said[n] = {});
+    const st = R.steps[n], spd = f.spd || 0;
+    // 0.9.15 (#137): after a new route, a turn already announced is not announced again (matched by where the turn is)
+    if (!S.said[n]) { const at = R.pts[Math.min(R.pts.length - 1, st.idx || 0)], old = at && (S.saidPts || []).find((q) => dist(q.p, at) < 35); S.said[n] = old ? { far: old.far, near: old.near } : {}; }
+    const said = S.said[n];
+    const markSaid = () => { const at = R.pts[Math.min(R.pts.length - 1, st.idx || 0)]; if (at) { S.saidPts = (S.saidPts || []).filter((q) => dist(q.p, at) >= 35).concat([{ p: at, far: said.far, near: said.near }]).slice(-20); } };
     const far = spd > 75 ? 1500 : spd > 45 ? 600 : 350, near = spd > 75 ? 350 : spd > 45 ? 160 : 70;
-    if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && (R.steps[n].at - R.steps[n - 1].at) > near * 2) { said.far = 1; say(EN() ? 'In ' + sayDist(S.toNext) + ', ' + st.text.toLowerCase() : sayDist(S.toNext) + ' nữa, ' + stepSay(st).toLowerCase()); }
-    if (!said.near && S.toNext <= near) { said.near = 1; say(stepSay(st)); if (st.wp && n < R.steps.length - 1) toast(st.text); }
+    if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && (R.steps[n].at - R.steps[n - 1].at) > near * 2) { said.far = 1; markSaid(); say(EN() ? 'In ' + sayDist(S.toNext) + ', ' + st.text.toLowerCase() : sayDist(S.toNext) + ' nữa, ' + stepSay(st).toLowerCase()); }
+    if (!said.near && S.toNext <= near) { said.near = 1; markSaid(); say(stepSay(st)); if (st.wp && n < R.steps.length - 1) toast(st.text); }
     if (n === R.steps.length - 1 && S.toNext < 25) arrive();
     redraw();
   };

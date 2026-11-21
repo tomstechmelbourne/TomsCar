@@ -17,8 +17,8 @@ android {
         applicationId = "com.tomstechsolutions.car"
         minSdk = 26
         targetSdk = tcSdk
-        versionCode = 9140
-        versionName = "0.9.14-beta"
+        versionCode = 9150
+        versionName = "0.9.15-beta"
         ndk { abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64") }
     }
 
@@ -54,4 +54,9 @@ dependencies {
     implementation("androidx.webkit:webkit:1.14.0")
     implementation("com.alphacephei:vosk-android:0.3.47@aar")
     implementation("net.java.dev.jna:jna:5.13.0@aar")
+    // 0.9.15 (#138): the music player built into Tom's Car (background playback, car / headset buttons, lock screen)
+    val media3 = "1.8.0"
+    implementation("androidx.media3:media3-exoplayer:$media3")
+    implementation("androidx.media3:media3-exoplayer-hls:$media3")
+    implementation("androidx.media3:media3-session:$media3")
 }

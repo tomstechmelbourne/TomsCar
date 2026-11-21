@@ -73,6 +73,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
 @keyframes tf-fade{from{opacity:0}to{opacity:1}}
 .dimbox{transition:opacity .6s ease}
 .scrl{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(95,212,240,0.6) transparent}
+@keyframes spbl{50%{transform:scale(1.07);filter:brightness(1.25)}}.spblink{animation:spbl 1s steps(1) infinite}
 .scrl::-webkit-scrollbar{width:5px}.scrl::-webkit-scrollbar-thumb{background:rgba(95,212,240,0.6);border-radius:3px}
 .rtlist{scrollbar-width:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}.rtlist::-webkit-scrollbar{width:12px}.rtlist::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:6px}.rtlist::-webkit-scrollbar-thumb{background:rgba(251,176,64,0.75);border-radius:6px;min-height:40px}
 input[type=range]{accent-color:#FBB040}
@@ -131,7 +132,7 @@ input[type=range]{accent-color:#FBB040}
           <div style="font-size: 28px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 12px rgba(95,212,240,0.6)"><span style="color: #48B0C8">TOM'S</span> <span style="position: relative; display: inline-block; color: #FBB040">CAR<svg aria-hidden="true" viewBox="0 10 300 90" style="position: absolute; left: -0.5em; top: -0.56em; width: 2.7em; height: 1.1em; overflow: visible; pointer-events: none"><path d="M12 74 C60 46 104 22 160 20 C204 18 232 30 262 54 C236 36 206 28 162 30 C110 32 66 52 12 74 Z" fill="#FBB040"></path><path d="M96 58 C120 40 150 34 178 34 C204 34 222 42 236 54 C214 48 190 46 166 46 C140 46 118 50 96 58 Z" fill="#FBB040"></path><path d="M176 58 C214 54 256 56 290 64 C296 66 296 71 290 71 C254 63 216 60 176 58 Z" fill="#FBB040"></path><path d="M296 76 C292 82 286 86 276 88 C282 84 288 80 296 76 Z M200 86 C176 90 150 90 128 87 C150 87 176 87 200 86 Z M54 86 C40 86 26 82 16 76 C28 80 40 83 54 86 Z" fill="#FBB040"></path><path d="M58 86 C62 70 76 62 92 62 C108 62 120 72 124 86 C116 76 106 70 92 70 C78 70 66 76 58 86 Z" fill="#FBB040"></path><path d="M206 86 C210 70 224 62 240 62 C256 62 268 72 272 86 C264 76 254 70 240 70 C226 70 214 76 206 86 Z" fill="#FBB040"></path><path d="M281 63 L291 66 L282 67 Z" fill="#FFE9A8"></path></svg></span></div>
           <div style="font-size: 11px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         </div>
-        <div class="pnl gl" style="height: 58px; padding: 0 22px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 260px">
+        <div onClick="{{dev.open}}" role="button" aria-label="Thiết bị đang kết nối" class="pnl gl" style="height: 58px; padding: 0 22px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 260px; cursor: pointer">
           <span class="lbl">ĐANG CHẠY TRÊN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
           <span role="group" aria-label="Pin thiết bị" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
@@ -162,7 +163,7 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- tab: Hành Trình · Road Trip · Liên Lạc · Tìm Chỗ -->
       <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
-        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- cột Workspace: trống lần đầu -->
@@ -213,6 +214,7 @@ input[type=range]{accent-color:#FBB040}
             <button onClick="{{nv.openLog}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">📒 Nhật Ký Chuyến Đi</button>
             <button onClick="{{nv.openPark}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">🅿 Chỗ Đậu Xe</button>
             <button onClick="{{nv.openHomeSet}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">🏠 Đặt Nhà / Chỗ Làm</button>
+            <button onClick="{{nv.shClear}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px; color: #FF9A9E">🕘 Xoá Lịch Sử Tìm</button>
           </div>
         </sc-if>
       </sc-if>
@@ -226,6 +228,12 @@ input[type=range]{accent-color:#FBB040}
             <div style="flex-shrink: 0; padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
               <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">🅿 {{hj.parkL}}</button>
               <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nhắc hết giờ:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{hj.shOn}}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 2px">
+              <span class="lbl">🕘 TÌM GẦN ĐÂY</span>
+              <sc-for list="{{hj.sh}}" as="h" hint-placeholder-count="3"><div style="display: flex; align-items: center; gap: 6px"><button onClick="{{h.pick}}" style="flex: 1; min-width: 0; border: 0; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 7px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 8px"><span style="color: #8FC3D3">🕘</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.sub}}</span></span></button><button onClick="{{h.del}}" aria-label="Xoá khỏi lịch sử" class="btn" style="width: 36px; height: 36px; padding: 0; color: #8FC3D3">✕</button></div></sc-for>
             </div>
           </sc-if>
           <div role="tablist" style="flex-shrink: 0; display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="3"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 36px; padding: 0 4px; font-size: 14px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
@@ -307,7 +315,15 @@ input[type=range]{accent-color:#FBB040}
         </button>
       </sc-if>
       <sc-if value="{{nv.waitGps}}" hint-placeholder-val="{{ false }}">
-        <div class="pnl" role="status" style="position: absolute; right: 20px; top: 88px; height: 52px; box-sizing: border-box; padding: 0 18px; display: flex; align-items: center; gap: 10px; background: rgba(60,72,82,0.92); z-index: 7; border-radius: 26px; color: #E8F1F5; font-size: 16px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #FFC46B; animation: tw 1s steps(1) infinite alternate"></span>Đang chờ GPS…</div>
+        <div class="pnl" role="status" style="position: absolute; right: 20px; top: {{nv.gpsTop}}px; height: 34px; box-sizing: border-box; padding: 0 12px; display: flex; align-items: center; gap: 8px; background: rgba(60,72,82,0.92); z-index: 7; border-radius: 17px; color: #E8F1F5; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #FFC46B; animation: tw 1s steps(1) infinite alternate"></span>{{nv.gpsL}}</div>
+      </sc-if>
+      <sc-if value="{{nv.stopOn}}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{nv.stopNo}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.5); display: flex; align-items: center; justify-content: center; z-index: 22">
+          <div role="dialog" aria-label="Dừng chỉ đường?" class="pnl fadein" style="width: 460px; box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #06192A">
+            <span style="font-size: 22px; font-weight: 800">Dừng chỉ đường?</span>
+            <div style="display: flex; gap: 10px"><button onClick="{{nv.stopNo}}" class="btn" style="flex: 1; height: 58px; font-size: 18px">Chạy Tiếp</button><button onClick="{{nv.stopYes}}" class="btn btn-r" style="flex: 1; height: 58px; font-size: 18px">Dừng</button></div>
+          </div>
+        </div>
       </sc-if>
 
       <!-- thẻ tóm tắt chuyến (xem trước, chưa chạy) -->
@@ -334,7 +350,7 @@ input[type=range]{accent-color:#FBB040}
       </sc-if>
 
       <sc-if value="{{nv.etaMini}}" hint-placeholder-val="{{ false }}">
-        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Giờ tới — chạm để hiện nút" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">· {{nv.left}} · {{nv.km}}</span></button></div>
+        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Giờ tới — chạm để hiện nút" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">· {{nv.left}} · {{nv.km}}</span></button><button onClick="{{nv.stopAsk}}" aria-label="Dừng chỉ đường" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; color: #FF9A9E">✕</button></div>
       </sc-if>
       <!-- thẻ giờ tới (đang chạy) -->
       <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
@@ -355,18 +371,39 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- nút bản đồ: + − vị trí, cả chuyến, hướng -->
       <sc-if value="{{nv.ctlOn}}" hint-placeholder-val="{{ false }}">
-        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; gap: 8px; z-index: 5">
-          <button onClick="{{nv.zin}}" aria-label="Phóng to" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">+</button>
-          <button onClick="{{nv.zout}}" aria-label="Thu nhỏ" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">−</button>
-          <button onClick="{{nv.loc}}" aria-label="Về vị trí xe" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
-          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem cả chuyến" title="Xem cả chuyến" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
-          <button onClick="{{nv.lyTap}}" aria-label="Kiểu bản đồ: {{nv.lyName}}" aria-expanded="{{nv.lyOpen}}" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CFF6FF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z"></path><path d="m2 12 10 5 10-5"></path><path d="m2 16 10 5 10-5"></path></svg></button>
+        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; align-items: flex-end; gap: {{nv.cbG}}px; z-index: 5">
+          <sc-if value="{{nv.zoomOn}}" hint-placeholder-val="{{ true }}"><button onClick="{{nv.zin}}" aria-label="Phóng to" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; font-size: 28px">+</button>
+          <button onClick="{{nv.zout}}" aria-label="Thu nhỏ" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; font-size: 28px">−</button></sc-if>
+          <button onClick="{{nv.loc}}" aria-label="Về vị trí xe" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
+          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem cả chuyến" title="Xem cả chuyến" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
+          <button onClick="{{nv.lyTap}}" aria-label="Kiểu bản đồ: {{nv.lyName}}" aria-expanded="{{nv.lyOpen}}" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CFF6FF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z"></path><path d="m2 12 10 5 10-5"></path><path d="m2 16 10 5 10-5"></path></svg></button>
           <sc-if value="{{nv.lyOpen}}" hint-placeholder-val="{{ false }}">
             <div class="pnl glb" role="menu" aria-label="Kiểu bản đồ" style="position: absolute; right: 64px; top: 0; width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 8">
               <sc-for list="{{nv.lyOpts}}" as="o" hint-placeholder-count="5"><button onClick="{{o.pick}}" role="menuitemradio" aria-checked="{{o.on}}" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 16px; color: {{o.fg}}; background: {{o.bg}}">{{o.ic}} {{o.label}}</button></sc-for>
             </div>
           </sc-if>
-          <button onClick="{{nv.compass}}" aria-label="La bàn — về vị trí xe, theo hướng xe chạy" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg id="tccompassN" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="transition: transform 0.15s linear"><path d="M17 3 L22 17 L12 17 Z" fill="#FF5A4E"></path><path d="M17 31 L12 17 L22 17 Z" fill="#E8F1F5"></path><text x="17" y="12.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Overpass, sans-serif">N</text></svg></button>
+          <button onClick="{{nv.compass}}" aria-label="La bàn — về vị trí xe, theo hướng xe chạy" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg id="tccompassN" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="transition: transform 0.15s linear"><path d="M17 3 L22 17 L12 17 Z" fill="#FF5A4E"></path><path d="M17 31 L12 17 L22 17 Z" fill="#E8F1F5"></path><text x="17" y="12.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Overpass, sans-serif">N</text></svg></button>
+          <!-- 0.9.15 (#146): bảng tốc độ dưới La Bàn — 3 kiểu (bấm để đổi kiểu) -->
+          <sc-if value="{{spp.a}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 116px; border-radius: 18px; overflow: hidden; background: #FFFFFF; box-shadow: 0 8px 22px rgba(0,0,0,0.45); display: flex; flex-direction: column; align-items: center">
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="padding: 9px 0 7px"><span style="width: 80px; height: 80px; border-radius: 40px; border: 9px solid #D6202A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: #111111; font-family: Overpass, sans-serif">{{spp.lim}}</span></span></sc-if>
+              <span style="width: 100%; padding: 6px 0 9px; background: {{spp.bg}}; color: #FFFFFF; display: flex; flex-direction: column; align-items: center"><span class="tnum" style="font-size: 40px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; opacity: 0.85">km/g</span></span>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.b}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="position: relative; border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 140px; height: 140px; background: transparent">
+              <svg width="140" height="140" viewBox="0 0 120 120" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="60" cy="60" r="52" fill="rgba(8,22,32,0.92)"></circle><path d="M24.6 95.4A50 50 0 1 1 95.4 95.4" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="9" stroke-linecap="round"></path><path d="M24.6 95.4A50 50 0 1 1 95.4 95.4" fill="none" stroke="{{spp.arcC}}" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="{{spp.arc}} 100"></path></svg>
+              <span style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: {{spp.numC}}"><span class="tnum" style="font-size: 44px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; color: #CFE6EE">km/g</span></span>
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="position: absolute; right: -6px; top: -6px; width: 50px; height: 50px; border-radius: 25px; background: #FFFFFF; border: 6px solid #D6202A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: #111111">{{spp.lim}}</span></sc-if>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.c}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="position: relative; border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 136px; height: 136px; border-radius: 68px; box-sizing: border-box; border: 13px solid {{spp.cRing}}; background: {{spp.cBg}}; color: {{spp.cFg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(0,0,0,0.45)">
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="position: absolute; top: -13px; background: {{spp.cRing}}; color: {{spp.cTag}}; font-size: 13px; font-weight: 800; padding: 0 8px; border-radius: 7px">{{spp.lim}}</span></sc-if>
+              <span class="tnum" style="font-size: 44px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; opacity: 0.75">km/g</span>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.aheadOn}}" hint-placeholder-val="{{ false }}"><span class="pnl glb" style="padding: 4px 10px; font-size: 13px; color: #FFD08A; white-space: nowrap">300 m nữa: {{spp.ahead}}</span></sc-if>
         </div>
       </sc-if>
 
@@ -440,9 +477,9 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
           <div style="display: flex; gap: 5px; flex-wrap: nowrap; flex-shrink: 0">
-            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 11px; font-size: 13px; white-space: nowrap; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 10px; white-space: nowrap">Các Chuyến ▾</button>
-            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button><button onClick="{{rtp.toggle}}" aria-label="Thu gọn bảng" class="btn" style="width: 36px; height: 36px; padding: 0; flex-shrink: 0">◀</button>
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 9px; font-size: 13px; white-space: nowrap; flex-shrink: 1; min-width: 0; overflow: hidden; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 8px; white-space: nowrap; flex-shrink: 1; min-width: 0">Chuyến ▾</button>
+            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button>
           </div>
           <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
@@ -458,7 +495,7 @@ input[type=range]{accent-color:#FBB040}
           <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
           <!-- 0.9.14 (#132): gọn phía trên, ô Các Chặng Ghé chiếm hết chỗ còn lại -->
           <button onClick="{{rtp.openLog}}" aria-label="Tiến độ chuyến — bấm xem nhật ký" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
-            <span style="font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.title}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><span onClick="{{rtp.toggleStop}}" role="button" aria-label="Thu gọn bảng" style="flex-shrink: 0; width: 44px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 16px">◀</span></span>
             <span class="tnum" style="font-size: 13px; font-weight: 700; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.sumL}}</span>
             <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span><span class="tnum" style="font-size: 12px; color: #CFE6EE; white-space: nowrap">{{rtp.pctL}}</span></span>
           </button>
@@ -570,29 +607,31 @@ input[type=range]{accent-color:#FBB040}
           <svg width="110" height="110" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; inset: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
           <span style="text-align: center; position: relative"><span class="tnum" style="display: block; font-size: 38px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.85; margin-top: 2px">{{dk.unit}}</span></span>
         </button>
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><button onClick="{{sb.limTap}}" aria-label="{{sb.limAria}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></button></sc-if>
+        <sc-if value="{{sb.limBottom}}" hint-placeholder-val="{{ true }}"><button onClick="{{sb.limTap}}" aria-label="{{sb.limAria}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></button></sc-if>
         <div style="position: absolute; left: 640px; bottom: 128px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none">
+          <sc-if value="{{sb.roadOn}}" hint-placeholder-val="{{ false }}"><div class="pnl glb" style="padding: 4px 12px; font-size: 13px; font-weight: 700; color: #E8F1F5; white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis">{{sb.road}}</div></sc-if>
           <sc-if value="{{sb.ahead}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 6px 14px; font-size: 14px; color: #FFD08A; text-align: center; white-space: nowrap">Phía trước 300 m: {{sb.aheadL}}</div></sc-if>
           <sc-if value="{{sb.statsOpen}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center; white-space: nowrap">{{sb.stats}}</div></sc-if>
         </div>
       </sc-if>
       <!-- thanh nhạc: viên thuốc kiểu Tom's Jukebox (đĩa than trái, tên giữa, ⏮ ▶ ⏭ bên phải, thanh thời gian trong viên thuốc, sóng lụa ở mép dưới) -->
       <div class="pnl dimbox jbpill {{mpCls}}" style="position: absolute; left: {{mpL}}; right: {{mpR}}; bottom: {{mpB}}px; width: {{mpW}}px; height: {{mpH}}px; padding: 0 12px 0 8px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
-        <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 26px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.55"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.45"></path></svg>
+        <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: {{jb.waveH}}px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.75"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.6"></path></svg>
         <button onClick="{{togglePanel}}" aria-label="Danh sách bài và đài" style="position: relative; width: 60px; height: 60px; border: 0; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer; background: transparent">
           <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true" class="{{jb.discCls}}"><circle cx="30" cy="30" r="29" fill="#1A1A1A"></circle><circle cx="30" cy="30" r="22" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="17" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="11" fill="#FBB040"></circle><circle cx="30" cy="30" r="3" fill="#2A1A00"></circle></svg>
         </button>
-        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; align-items: center">
-          <span style="max-width: 100%; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songTitle}}</span>
-          <span style="max-width: 100%; font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songSub}}</span>
+        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; align-items: center">
+          <span style="max-width: 100%; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songTitle}}</span>
+          <span role="group" aria-label="Chọn nguồn nghe" style="display: flex; gap: 8px; font-size: 10px; letter-spacing: 0.5px"><sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="border: 0; padding: 0 2px; background: transparent; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: {{o.fw}}; color: {{o.tc}}; text-decoration: {{o.ul}}">{{o.label}}</button></sc-for></span>
+          <span style="max-width: 100%; font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songSub}}</span>
           <div style="width: 100%; display: flex; align-items: center; gap: 8px; font-size: 11px; color: #CFE6EE" class="tnum">
             <span>{{jb.posL}}</span>
             <span style="position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.45)"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: {{prog}}%; border-radius: 2px; background: {{jb.bar}}"></span><span style="position: absolute; top: -4px; left: calc({{prog}}% - 6px); width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF"></span></span>
             <span>{{jb.durL}}</span>
           </div>
         </div>
-        <button onClick="{{srcMenuTap}}" aria-label="Chọn nguồn nghe: nhạc, radio, podcast" aria-expanded="{{srcMenuOn}}" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}} ▾</button>
-        <button onClick="{{vo.tap}}" aria-label="{{vo.aria}}" aria-expanded="{{vo.onA}}" class="jbbtn" style="width: 40px; height: 40px; flex-shrink: 0; font-size: 18px; line-height: 1">{{vo.icon}}</button>
+        
+        <button onClick="{{vo.tap}}" aria-label="{{vo.aria}}" aria-expanded="{{vo.onA}}" class="jbbtn" style="position: relative; width: 30px; height: 30px; flex-shrink: 0; font-size: 13px; line-height: 1">{{vo.icon}}</button>
         <sc-if value="{{needPerm}}" hint-placeholder-val="{{ false }}">
           <button onClick="{{grantPerm}}" class="btn" style="position: relative; height: 34px; font-size: 11px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040; flex-shrink: 0">⚠ Cấp quyền</button>
         </sc-if>
@@ -609,16 +648,16 @@ input[type=range]{accent-color:#FBB040}
 
 
       <sc-if value="{{vo.on}}" hint-placeholder-val="{{ false }}">
-        <div class="glc fadein" role="group" aria-label="Âm lượng nhạc" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
-          <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 52px; height: 52px; font-size: 24px; line-height: 1">{{vo.icon}}</button>
-          <button onClick="{{vo.down}}" aria-label="Nhỏ lại 10%" class="pill" style="width: 58px; height: 52px; font-size: 30px; font-weight: 700; background: #0D2C40; color: #FBB040">−</button>
-          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="Kéo để chỉnh âm lượng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 320px; height: 64px; touch-action: none; cursor: pointer">
-            <span style="position: absolute; left: 0; right: 0; top: 28px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
-            <span style="position: absolute; left: 0; top: 28px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
-            <span style="position: absolute; top: 15px; left: calc({{vo.p}}% - 17px); width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
+        <div class="glc fadein" role="group" aria-label="Âm lượng nhạc" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 6px 10px; display: flex; align-items: center; gap: 8px">
+          <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 38px; height: 38px; font-size: 17px; line-height: 1">{{vo.icon}}</button>
+          <button onClick="{{vo.down}}" aria-label="Nhỏ lại 10%" class="pill" style="width: 40px; height: 38px; font-size: 22px; font-weight: 700; background: #0D2C40; color: #FBB040">−</button>
+          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="Kéo để chỉnh âm lượng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 220px; height: 44px; touch-action: none; cursor: pointer">
+            <span style="position: absolute; left: 0; right: 0; top: 19px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.5)"></span>
+            <span style="position: absolute; left: 0; top: 19px; height: 6px; width: {{vo.p}}%; border-radius: 3px; background: #FBB040"></span>
+            <span style="position: absolute; top: 10px; left: calc({{vo.p}}% - 12px); width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
           </div>
-          <button onClick="{{vo.up}}" aria-label="To lên 10%" class="pill" style="width: 58px; height: 52px; font-size: 28px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
-          <span class="tnum" style="min-width: 58px; text-align: right; font-size: 20px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
+          <button onClick="{{vo.up}}" aria-label="To lên 10%" class="pill" style="width: 40px; height: 38px; font-size: 20px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
+          <span class="tnum" style="min-width: 44px; text-align: right; font-size: 15px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
         </div>
       </sc-if>
       <sc-if value="{{srcMenuOn}}" hint-placeholder-val="{{ false }}">
@@ -626,35 +665,44 @@ input[type=range]{accent-color:#FBB040}
           <sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" role="menuitem" aria-pressed="{{o.on}}" class="pill" style="height: 48px; padding: 0 18px; font-size: 15px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
       </sc-if>
-      <!-- bảng chọn bài / đài (trượt lên từ thanh nhạc) -->
+      <!-- bảng chọn bài / đài (trượt lên từ thanh nhạc) — 0.9.15 (#141): nhỏ gọn, chỉnh độ mờ, bấm ra ngoài là đóng -->
       <sc-if value="{{mp.open}}" hint-placeholder-val="{{ false }}">
-        <section aria-label="Chọn bài và đài" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: 640px; height: 400px; z-index: 8; display: flex; flex-direction: column; background: #06192A">
-          <div style="padding: 12px 14px 8px; display: flex; align-items: center; gap: 6px">
-            <sc-for list="{{mp.srcs}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 32px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
-            <span style="margin-left: auto; font-size: 11px; color: #8FC3D3">{{mp.srcNote}}</span>
-            <button onClick="{{mp.close}}" aria-label="Đóng" class="btn" style="width: 36px; height: 36px; padding: 0">✕</button>
+        <section aria-label="Chọn bài và đài" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: {{mp.w}}px; height: {{mp.h}}px; z-index: 8; display: flex; flex-direction: column; background: rgba(6,25,42,{{mp.alpha}}); backdrop-filter: blur(8px)">
+          <div style="padding: 8px 10px 6px; display: flex; align-items: center; gap: 5px">
+            <sc-for list="{{mp.srcs}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+            <label title="Độ mờ bảng" style="margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 11px; color: #8FC3D3">◐<input type="range" min="30" max="100" value="{{mp.alphaV}}" onInput="{{mp.setAlpha}}" aria-label="Độ mờ bảng" style="width: 70px"></label>
+            <button onClick="{{mp.close}}" aria-label="Đóng" class="btn" style="width: 30px; height: 30px; padding: 0">✕</button>
           </div>
-          <div style="padding: 0 14px 8px; display: flex; align-items: center; gap: 6px">
-            <sc-for list="{{mp.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="height: 30px; font-size: 12px; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
-            <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">Tìm</span><input type="text" value="{{mp.q}}" onInput="{{mp.setQ}}" placeholder="{{mp.searchPh}}" disabled="{{kbLk}}" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
+          <div style="padding: 0 10px 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px">
+            <sc-for list="{{mp.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="height: 26px; padding: 0 9px; font-size: 11px; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
           </div>
-          <sc-if value="{{mp.regionOn}}" hint-placeholder-val="{{ false }}">
-            <div style="margin: 0 14px 8px; padding: 6px 10px; border-radius: 6px; background: rgba(123,216,143,0.12); font-size: 12px; color: #BFF0CA">{{mp.regionL}}</div>
+          <sc-if value="{{mp.backOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 10px 6px; display: flex; align-items: center; gap: 6px">
+              <sc-if value="{{mp.backShow}}" hint-placeholder-val="{{ true }}"><button onClick="{{mp.back}}" class="btn" style="max-width: 180px; height: 28px; padding: 0 10px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">◀ {{mp.backL}}</button></sc-if>
+              <sc-for list="{{mp.acts}}" as="x" hint-placeholder-count="1"><button onClick="{{x.run}}" class="btn" style="height: 28px; padding: 0 10px; font-size: 12px; color: #FFD08A">{{x.label}}</button></sc-for>
+            </div>
           </sc-if>
-          <div class="scrl" style="flex: 1; min-height: 0; padding: 0 10px 0 14px; display: flex; flex-direction: column; gap: 6px">
+          <sc-if value="{{mp.searchOn}}" hint-placeholder-val="{{ true }}">
+            <label style="padding: 0 10px 6px; display: flex"><span style="position: absolute; left: -9999px">Tìm</span><input type="text" value="{{mp.q}}" onInput="{{mp.setQ}}" placeholder="{{mp.searchPh}}" disabled="{{kbLk}}" style="flex: 1; min-width: 0; height: 30px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
+          </sc-if>
+          <sc-if value="{{mp.regionOn}}" hint-placeholder-val="{{ false }}">
+            <div style="margin: 0 10px 6px; padding: 4px 8px; border-radius: 6px; background: rgba(123,216,143,0.12); font-size: 11px; color: #BFF0CA">{{mp.regionL}}</div>
+          </sc-if>
+          <div class="scrl" style="flex: 1; min-height: 0; padding: 0 6px 6px 10px; display: flex; flex-direction: column; gap: 4px">
             <sc-for list="{{mp.rows}}" as="r" hint-placeholder-count="6">
-              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: {{mp.rowPad}}; border-radius: 8px; background: {{r.bg}}">
-                <span aria-hidden="true" style="width: 38px; height: 38px; border-radius: {{r.rad}}; background: {{r.tile}}; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">{{r.letter}}</span>
-                <button onClick="{{r.play}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left">
-                  <span style="display: block; font-size: {{mp.fs}}px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.t}}</span>
-                  <span style="display: block; font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.s}}</span>
+              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: {{mp.rowPad}}; border-radius: 8px; background: {{r.bg}}">
+                <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: {{r.rad}}; background: {{r.tile}}; color: #FFFFFF; font-size: 12px; font-weight: 700; display: {{r.tileShow}}; align-items: center; justify-content: center; flex-shrink: 0">{{r.letter}}</span>
+                <button onClick="{{r.play}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: {{r.fg}}; text-align: {{r.align}}">
+                  <span style="display: block; font-size: {{mp.fs}}px; font-weight: 700; white-space: {{r.ws}}; overflow: hidden; text-overflow: ellipsis">{{r.t}}</span>
+                  <span style="display: block; font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.s}}</span>
                 </button>
-                <sc-if value="{{r.isRadio}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.fav}}" aria-label="Yêu thích" aria-pressed="{{r.favOn}}" class="btn" style="width: 38px; height: 38px; padding: 0; color: {{r.favC}}">★</button></sc-if>
-                <span style="font-size: 12px; font-weight: 700; color: {{r.stC}}; white-space: nowrap">{{r.st}}</span>
+                <sc-if value="{{r.isRadio}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.fav}}" aria-label="Yêu thích" aria-pressed="{{r.favOn}}" class="btn" style="width: 32px; height: 32px; padding: 0; color: {{r.favC}}">★</button></sc-if>
+                <sc-if value="{{r.a2On}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.a2}}" class="btn" style="height: 30px; padding: 0 8px; font-size: 11px; color: {{r.a2C}}">{{r.a2L}}</button></sc-if>
+                <span style="font-size: 11px; font-weight: 700; color: {{r.stC}}; white-space: nowrap">{{r.st}}</span>
               </div>
             </sc-for>
           </div>
-          <div style="padding: 8px 14px 12px; font-size: 11px; color: #8FC3D3; line-height: 1.45">{{mp.foot}}</div>
+          <sc-if value="{{mp.footOn}}" hint-placeholder-val="{{ false }}"><div style="padding: 4px 10px 8px; font-size: 10px; color: #8FC3D3; line-height: 1.4">{{mp.foot}}</div></sc-if>
         </section>
       </sc-if>
 
@@ -709,6 +757,9 @@ input[type=range]{accent-color:#FBB040}
                   <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 560px">
                     <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
                   </div>
+                </sc-if>
+                <sc-if value="{{r.isSlider}}" hint-placeholder-val="{{ false }}">
+                  <label style="display: flex; align-items: center; gap: 10px"><input type="range" min="{{r.min}}" max="{{r.max}}" step="1" value="{{r.val}}" onInput="{{r.slide}}" aria-label="{{r.label}}" style="width: 260px"><span class="tnum" style="min-width: 54px; text-align: right; font-size: 14px; font-weight: 700; color: #FFD08A">{{r.valL}}</span></label>
                 </sc-if>
                 <sc-if value="{{r.isStatus}}" hint-placeholder-val="{{ false }}">
                   <span style="font-size: 14px; font-weight: 700; color: {{r.stC}}">{{r.stL}}</span>
@@ -991,23 +1042,60 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; left: 20px; right: 20px; bottom: 16px; font-size: 12px; color: #8FC3D3; line-height: 1.5">{{ct.note}}</div>
     </sc-if>
 
-    <!-- ===== thanh cuộc gọi mỏng (nằm trên mọi màn hình) ===== -->
-    <sc-if value="{{cb.on}}" hint-placeholder-val="{{ false }}">
-      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; height: 60px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 0 12px 0 16px; border-radius: 12px; background: #0B2A1E; box-shadow: 0 6px 24px rgba(0,0,0,0.55), inset 0 0 0 1px #7BD88F">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7BD88F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg>
-        <div style="min-width: 0; flex: 1">
-          <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 17px; font-weight: 700">{{cb.name}}</span><span style="font-size: 11px; color: #2A1A00; background: #FFD08A; border-radius: 4px; padding: 0 6px">{{cb.group}}</span><span style="font-size: 12px; color: #BFF0CA">{{cb.state}}</span></div>
-          <div style="font-size: 12px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.sub}}</div>
+    <!-- ===== 0.9.15 (#149): băng cuộc gọi tới — 5 kiểu (Cài Đặt › Cuộc Gọi), giấu khi ra khỏi xe ===== -->
+    <sc-if value="{{cb.ringA}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; z-index: 26; border-radius: 14px; padding: 10px; background: #111A20; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <div style="text-align: center; margin-bottom: 8px"><span style="font-size: 20px; font-weight: 800">{{cb.name}}</span> <span style="font-size: 13px; color: #A9B0B8">· {{cb.subS}}</span></div>
+        <div style="display: flex; gap: 10px"><button onClick="{{cb.decline}}" class="btn" style="flex: 1; height: 64px; font-size: 20px; background: #C8343A; color: #FFFFFF; box-shadow: none">✕ Từ Chối</button><button onClick="{{cb.answer}}" class="btn" style="flex: 1; height: 64px; font-size: 20px; background: #2F9E5B; color: #FFFFFF; box-shadow: none">📞 Nghe</button></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringB}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 10px; width: 600px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 12px; border-radius: 999px; background: #16191D; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <span style="width: 54px; height: 54px; border-radius: 27px; background: #4F7CFF; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0">{{cb.ini}}</span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 19px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span><span style="font-size: 13px; color: #A9B0B8">{{cb.subS}}</span></span>
+        <button onClick="{{cb.decline}}" aria-label="Từ chối" style="width: 60px; height: 60px; border-radius: 30px; border: 0; background: #FF4B4B; color: #FFFFFF; font-size: 24px; cursor: pointer">✕</button>
+        <button onClick="{{cb.answer}}" aria-label="Nghe" style="width: 60px; height: 60px; border-radius: 30px; border: 0; background: #2FBF5B; color: #FFFFFF; font-size: 24px; cursor: pointer">📞</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringC}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; top: 10px; width: 640px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; background: #0D2C40; border-left: 7px solid #FBB040; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <span style="width: 52px; height: 52px; border-radius: 12px; background: #FBB040; color: #2A1A00; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0">📞</span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 12px; color: #48B0C8; font-weight: 800; letter-spacing: 1px">CUỘC GỌI ĐẾN</span><span style="font-size: 20px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span></span>
+        <button onClick="{{cb.decline}}" class="btn btn-r" style="height: 56px; width: 130px; font-size: 18px">Từ Chối</button>
+        <button onClick="{{cb.answer}}" class="btn" style="height: 56px; width: 130px; font-size: 18px; background: #2F9E5B; color: #FFFFFF; box-shadow: none">Nghe</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringD}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; z-index: 26; display: flex; align-items: center; gap: 12px; padding: 6px 7px 6px 18px; border-radius: 999px; background: #000000; box-shadow: 0 10px 26px rgba(0,0,0,0.55)">
+        <span style="color: #2FBF5B; font-size: 18px">📞</span><span style="font-size: 17px; font-weight: 700; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span>
+        <button onClick="{{cb.decline}}" aria-label="Từ chối" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #FF4B4B; color: #FFFFFF; font-size: 20px; cursor: pointer">✕</button>
+        <button onClick="{{cb.answer}}" aria-label="Nghe" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #2FBF5B; color: #FFFFFF; font-size: 20px; cursor: pointer">📞</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringE}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; z-index: 26; border-radius: 12px; overflow: hidden; border: 1px solid #000000; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <div style="background: #3B3B3B; padding: 10px 14px 6px; text-align: center"><div style="font-size: 21px; font-weight: 700">{{cb.name}}</div><div style="font-size: 13px; color: #CFCFCF">{{cb.subS}}</div></div>
+        <div style="background: #1C1C1C; padding: 10px 12px; display: flex; gap: 12px; align-items: center">
+          <button onClick="{{cb.decline}}" style="height: 54px; width: 160px; border-radius: 10px; border: 2px solid #D9D9D9; background: #C8302C; color: #FFFFFF; font-size: 18px; font-family: inherit; cursor: pointer">Từ Chối</button>
+          <div onPointerDown="{{cb.slDown}}" onPointerUp="{{cb.slUp}}" style="flex: 1; height: 54px; border-radius: 10px; background: #0D0D0D; border: 1px solid #555555; display: flex; align-items: center; padding: 4px; gap: 14px; box-sizing: border-box; touch-action: none"><span style="width: 84px; height: 44px; border-radius: 8px; background: #D9D9D9; color: #2A8F2A; display: flex; align-items: center; justify-content: center; font-size: 22px">📞</span><span style="color: #9A9A9A; font-size: 17px">trượt để nghe</span></div>
+          <button onClick="{{cb.answer}}" aria-label="Nghe" style="height: 54px; width: 100px; border-radius: 10px; border: 2px solid #D9D9D9; background: #2A8F2A; color: #FFFFFF; font-size: 18px; font-family: inherit; cursor: pointer">Nghe</button>
         </div>
-        <sc-if value="{{cb.ring}}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{cb.decline}}" class="btn btn-r" style="height: 46px; width: 120px; font-size: 16px">Từ Chối</button>
-          <button onClick="{{cb.answer}}" class="btn" style="height: 46px; width: 120px; font-size: 16px; background: #1E8E4A; color: #FFFFFF; box-shadow: none">Nghe</button>
-        </sc-if>
-        <sc-if value="{{cb.talk}}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{cb.mute}}" aria-pressed="{{cb.muteOn}}" class="btn" style="height: 46px; color: {{cb.muteC}}">{{cb.muteL}}</button>
-          <button onClick="{{cb.spk}}" class="btn" style="height: 46px">{{cb.spkL}}</button>
-          <button onClick="{{cb.hang}}" class="btn btn-r" style="height: 46px; width: 120px; font-size: 16px">Gác Máy</button>
-        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.talkOn}}" hint-placeholder-val="{{ false }}">
+      <div role="status" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; z-index: 26; display: flex; align-items: center; gap: 12px; padding: 6px 8px 6px 18px; border-radius: 999px; background: rgba(10,30,20,0.96); box-shadow: 0 10px 26px rgba(0,0,0,0.5)">
+        <span style="color: #7BD88F; font-size: 16px">📞</span><span style="font-size: 16px; font-weight: 700; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span><span class="tnum" style="font-size: 15px; color: #9FE3B0">{{cb.state}}</span>
+        <button onClick="{{cb.mute}}" aria-pressed="{{cb.muteOn}}" class="btn" style="height: 44px; color: {{cb.muteC}}">{{cb.muteL}}</button>
+        <button onClick="{{cb.spk}}" class="btn" style="height: 44px">{{cb.spkL}}</button>
+        <button onClick="{{cb.hang}}" class="btn btn-r" style="height: 44px; width: 110px">Gác Máy</button>
+      </div>
+    </sc-if>
+    <!-- 0.9.15 (#149): tin nhắn mới — chỉ tên người gửi, không nội dung; 🔊 Đọc, ↩ Trả lời nhanh -->
+    <sc-if value="{{nm.on}}" hint-placeholder-val="{{ false }}">
+      <div role="status" onPointerDown="{{nm.touch}}" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 10px; z-index: 25; width: 560px; box-sizing: border-box; padding: 10px 12px; border-radius: 16px; background: rgba(10,22,32,0.97); box-shadow: 0 12px 30px rgba(0,0,0,0.55); display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px">💬</span><span style="flex: 1; min-width: 0; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nm.title}}</span>
+          <button onClick="{{nm.read}}" class="btn" style="height: 46px; font-size: 15px">🔊 Đọc</button><button onClick="{{nm.replyTap}}" aria-expanded="{{nm.repOn}}" class="btn" style="height: 46px; font-size: 15px">↩ Trả Lời</button><button onClick="{{nm.close}}" aria-label="Đóng" class="btn" style="width: 46px; height: 46px; padding: 0">✕</button></div>
+        <sc-if value="{{nm.repOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nm.quick}}" as="q" hint-placeholder-count="3"><button onClick="{{q.send}}" class="btn" style="height: 44px; font-size: 14px">{{q.t}}</button></sc-for></div></sc-if>
       </div>
     </sc-if>
     <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
@@ -1086,25 +1174,25 @@ input[type=range]{accent-color:#FBB040}
 
     <!-- ===== 0.9.14 (#130): lịch tháng — bấm đồng hồ ===== -->
     <sc-if value="{{cal.open}}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{cal.close}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
-        <div role="dialog" aria-label="Lịch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 1180px; height: 640px; box-sizing: border-box; padding: 18px; display: flex; gap: 18px; background: #06192A">
+      <div onClick="{{cal.close}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.28); display: flex; align-items: flex-start; justify-content: center; padding-top: 92px; box-sizing: border-box; z-index: 20">
+        <div role="dialog" aria-label="Lịch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 860px; height: 500px; box-sizing: border-box; padding: 12px; display: flex; gap: 12px; background: rgba(6,25,42,0.97); box-shadow: 0 18px 50px rgba(0,0,0,0.6)">
           <div onPointerDown="{{cal.down}}" onPointerUp="{{cal.up}}" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; touch-action: pan-y">
             <div style="display: flex; align-items: center; gap: 10px">
-              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Tháng trước" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">‹</button></sc-if>
-              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="Năm trước" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">‹</button></sc-if>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Tháng trước" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">‹</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="Năm trước" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">‹</button></sc-if>
               <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center">
-                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 26px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem cả năm" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 24px; font-weight: 800">{{cal.yearL}} ▾</button></div>
+                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 20px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem cả năm" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: 800">{{cal.yearL}} ▾</button></div>
                 <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #8FC3D3">{{cal.lunTitle}}</span></sc-if>
               </div>
-              <button onClick="{{cal.today}}" class="btn" style="height: 50px; font-size: 15px">Hôm Nay</button>
-              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Tháng sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">›</button></sc-if>
-              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="Năm sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">›</button></sc-if>
+              <button onClick="{{cal.today}}" class="btn" style="height: 42px; font-size: 14px">Hôm Nay</button>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Tháng sau" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">›</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="Năm sau" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">›</button></sc-if>
             </div>
             <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}">
               <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px"><sc-for list="{{cal.wk}}" as="w" hint-placeholder-count="7"><span style="text-align: center; font-size: 13px; font-weight: 700; color: #8FC3D3">{{w.l}}</span></sc-for></div>
               <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 4px">
                 <sc-for list="{{cal.cells}}" as="c" hint-placeholder-count="42"><button onClick="{{c.pick}}" style="position: relative; min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: {{c.bg}}; box-shadow: {{c.ring}}; opacity: {{c.op}}; padding: 4px 6px; display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left">
-                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 22px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 11px; color: {{c.lunC}}">{{c.lun}}</span></span>
+                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 17px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 10px; color: {{c.lunC}}">{{c.lun}}</span></span>
                   <sc-if value="{{c.holOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; line-height: 1.2; color: {{c.holC}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{c.hol}}</span></sc-if>
                   <sc-if value="{{c.evOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 6px; bottom: 5px; display: flex; align-items: center; gap: 3px; font-size: 10px; color: #5FD4F0"><span style="width: 7px; height: 7px; border-radius: 4px; background: #5FD4F0"></span>{{c.evN}}</span></sc-if>
                 </button></sc-for>
@@ -1118,10 +1206,10 @@ input[type=range]{accent-color:#FBB040}
                 </button></sc-for>
               </div>
             </sc-if>
-            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vuốt qua lại để đổi tháng · bấm số năm để xem cả năm · số đỏ = ngày nghỉ · chữ xanh lá = lễ Úc (Victoria) · chữ hồng = lễ Việt Nam</span>
+            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vuốt để đổi tháng · số đỏ = ngày nghỉ · xanh lá = lễ Úc · hồng = lễ Việt</span>
           </div>
-          <div style="width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-left: 18px; border-left: 1px solid rgba(255,255,255,0.1)">
-            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 20px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="Đóng lịch" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">✕</button></div>
+          <div style="width: 250px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.1)">
+            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 16px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="Đóng lịch" class="btn" style="width: 42px; height: 42px; padding: 0; font-size: 18px">✕</button></div>
             <span style="font-size: 14px; color: #FFD08A">{{cal.selLun}}</span>
             <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #CFE6EE"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="rgba(200,210,235,0.18)"></circle><path d="{{cal.selMoon}}" fill="#F3EFDC"></path></svg>{{cal.selMoonL}}</span>
             <sc-if value="{{cal.selHolOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 6px"><sc-for list="{{cal.selHol}}" as="h" hint-placeholder-count="1"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.05)"><span style="font-size: 11px; font-weight: 800; color: #06192A; background: {{h.c}}; border-radius: 4px; padding: 1px 6px">{{h.tag}}</span><span style="flex: 1; font-size: 15px; font-weight: 700">{{h.name}}</span><span style="font-size: 11px; color: #FF8A8A">{{h.off}}</span></div></sc-for></div></sc-if>
@@ -1132,6 +1220,34 @@ input[type=range]{accent-color:#FBB040}
               <sc-if value="{{cal.permOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.perm}}" class="btn btn-o" style="height: 46px">Cho Phép Đọc Lịch</button></sc-if>
             </div>
           </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.15 (#149): sửa câu trả lời nhanh ===== -->
+    <sc-if value="{{qr.on}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; inset: 0; background: rgba(1,6,10,0.6); display: flex; align-items: center; justify-content: center; z-index: 30">
+        <div role="dialog" aria-label="Trả lời nhanh" class="pnl fadein" style="width: 560px; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #06192A">
+          <span style="font-size: 18px; font-weight: 800">Câu Trả Lời Nhanh</span>
+          <sc-for list="{{qr.rows}}" as="q" hint-placeholder-count="4"><input type="text" value="{{q.v}}" onInput="{{q.set}}" placeholder="Để trống nếu không cần" aria-label="Câu {{q.n}}" style="height: 46px; border-radius: 10px; border: 1px solid #2B4252; background: #0A1E2C; color: #E8F1F5; padding: 0 12px; font-size: 15px; font-family: inherit"></sc-for>
+          <div style="display: flex; gap: 8px; justify-content: flex-end"><button onClick="{{qr.cancel}}" class="btn" style="height: 46px">Huỷ</button><button onClick="{{qr.save}}" class="btn btn-o" style="height: 46px">Lưu</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.15 (#136): Thiết Bị Đang Kết Nối — bấm "Đang Chạy Trên" ===== -->
+    <sc-if value="{{dev.on}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{dev.close}}" style="position: absolute; inset: 0; background: rgba(1,6,10,0.28); z-index: 20">
+        <div role="dialog" aria-label="Thiết bị đang kết nối" onClick="{{dev.stop}}" class="pnl fadein" style="position: absolute; left: 220px; top: 92px; width: 440px; box-sizing: border-box; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: rgba(6,25,42,0.97); box-shadow: 0 18px 50px rgba(0,0,0,0.6)">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 18px; font-weight: 800">Thiết Bị Đang Kết Nối</span><button onClick="{{dev.close}}" aria-label="Đóng" class="btn" style="width: 42px; height: 42px; padding: 0; font-size: 18px">✕</button></div>
+          <sc-for list="{{dev.rows}}" as="r" hint-placeholder-count="3">
+            <button onClick="{{r.tap}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05)">
+              <span style="width: 40px; height: 40px; border-radius: 10px; background: rgba(72,176,200,0.18); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0">{{r.ic}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3">{{r.sub}}</span></span>
+              <sc-if value="{{r.lvOn}}" hint-placeholder-val="{{ false }}"><span style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0"><span class="tnum" style="font-size: 18px; font-weight: 800; color: {{r.c}}">{{r.lv}}</span><span style="width: 56px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden"><span style="display: block; height: 100%; width: {{r.pct}}%; background: {{r.c}}"></span></span></span></sc-if>
+            </button>
+          </sc-for>
+          <span style="font-size: 11px; color: #6F94A6">Bấm vô thiết bị Bluetooth để mở phần Bluetooth của máy</span>
         </div>
       </div>
     </sc-if>
@@ -1464,7 +1580,7 @@ const GLASS = Array.from({ length: 12 }, (_, i) => { const s = Math.round(6 + rn
 const WAVE = Array.from({ length: 48 }, (_, i) => ({ h: Math.round(5 + rnd(i + 700) * 13), del: (-rnd(i + 800) * 1.1).toFixed(2) }));
 const DEFAULTS = { vnVoice: 'doan', navVol: 80, mapEngine: 'gl', mapTilt: true, driveRec: true, startScr: 'home', splashSec: 3, idlePlace: true, idlePhoto: false, spWarn: true, navBanner: 'auto', navHeading: true, kbLock: false, bubbleOn: true, homeMap: true, autoMap: true, navVoice: true, navCams: true, navRotate: false, tripLog: true, lang: 'vi', clock: '24', unit: 'kmg', autoBoot: true, rainFx: true, calm: true, dimBottom: 70, dimMusic: 85, autoDim: true, edge: false, wave: 'tt', src: 'jukebox', shrink: true, obd: 'veepeak', tyre: true, oil: true, mapApp: 'waze', mapSide: 'left', rtView: 'road', rest: 2, offline: false, places: 'osm', dexFull: true, strip: 'right', hideTask: false, forceRes: false, reopen: true,
   privacy: false, autoPrivacy: true, autoSms: true, msgKeep: 30, spStyle: 'neon', spSize: 'M', spRing: true, spAuto: false, spSrc: 'gps', kmUnder: true, kmSeg: true, kmPost: true, limitEst: true, placePhotos: true, clkStyle: 'neon', clkDate: true, clkLunar: true, clkVN: false, clkDual: true, clkBlink: true, clkAuto: false, mapApp2: 'waze',
-  musicApp: 'jukebox', musicAppName: "Tom's Jukebox", autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, chimeOn: true, chimeSilent: true, chime: 'soft', chimeVol: 100 };
+  musicApp: 'builtin', musicAppName: "Tom's Car", mpAlpha: 88, barAlpha: 90, waveOp: 90, waveH: 34, autoPlay: false, jbFollow: false, vizOn: true, lpTheme: 'lp_au', drawStyle: 'poly', cockpit2: 'lowpoly', gaugeAuto: true, gaugeManual: 'classic', autoScene: true, sceneMove: 'still', idleOn: true, wsCol: false, wsGuideOff: false, idleMin: 3, idleClock: 'min', idleWxBg: true, idleHourly: true, idle3d: true, idleAppt: true, idleVN: false, ttsRate: 1, ttsPitch: 1, ttsVoice: '', hotSens: 1, hotMuteMusic: false, hotOn: true, cockpitAuto: false, mapStyle: 'auto', mapBright: 100, dashLayout: 'wheel', idleLayout: 'htc', odoOn: true, stateRules: true, spPanel: 'a', spTol: 0, callSty: 'big', awayHide: true, quickReplies: ['Đang lái xe, lát gọi lại nha', 'Mình sắp tới rồi', 'OK, cảm ơn'], chimeOn: true, chimeSilent: true, chime: 'soft', chimeVol: 100 };
 // app mẫu trong máy (ô chữ cái chỉ là hình mẫu, không phải logo)
 const APPS = [
   ['waze', 'Waze', 'map', '#2D8FD6', 'W'], ['gmaps', 'Google Maps', 'map', '#3C8F5A', 'GM'], ['here', 'HERE WeGo', 'map', '#2A6F8F', 'H'],
@@ -1523,6 +1639,7 @@ class Component extends DCLogic {
     try { sv = JSON.parse(window.localStorage.getItem(STORE) || '{}') || {}; } catch (e) { sv = {}; }
     try { const s1 = JSON.parse(window.localStorage.getItem(STORE + '-set') || 'null'); if (s1 && typeof s1 === 'object') sv.set = s1; } catch (e) {}
     if (sv.set && !sv.set.v14) { if (sv.set.chimeVol === 60) sv.set.chimeVol = 100; sv.set.v14 = true; }   // 0.9.14 (#127): start-up sound louder by default
+    if (sv.set && !sv.set.v15) { sv.set.musicApp = 'builtin'; sv.set.musicAppName = "Tom's Car"; sv.set.v15 = true; }   // 0.9.15 (#138): music now built into Tom's Car
     this.state = {
       scr: 'home', boot: 'splash', drive: false, playing: false, perm: false, now: Date.now(), last: Date.now(),
       grp: 'chung', exitOpen: false, createOpen: false, rtCheck: false, listOpen: false,
@@ -1566,7 +1683,7 @@ class Component extends DCLogic {
     const C = this.state.set || {}; let k = C.startScr || 'home';
     if (k === 'last') { try { k = localStorage.getItem('tc-lastScr') || 'home'; } catch (e) { k = 'home'; } }
     if (k === 'ws') { const L = C.wsLastLaunch; k = 'home'; if (L && L.apps) { if (APP) tcn('launch', JSON.stringify(L.apps)); if (L.rt) k = 'rt'; } }
-    if (k === 'trip') k = 'home';   // 0.9.14 (#131): Hành Trình is now the main screen
+    if (k === 'trip' || k === 'contacts') k = 'home';   // 0.9.14 (#131) / 0.9.15 (#149: no Liên Lạc tab)
     return ['home', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(k) >= 0 ? k : 'home';
   }
   startBoot() {
@@ -1622,7 +1739,7 @@ class Component extends DCLogic {
 
     // ---- màn hình (Tìm Chỗ sau Workspace DeX) ----
     if (!S.boot && S.scr !== self.__lastScr) { self.__lastScr = S.scr; if (['home', 'rt', 'contacts', 'search', 'split', 'dex'].indexOf(S.scr) >= 0) { try { localStorage.setItem('tc-lastScr', S.scr); } catch (e) {} } }
-    const SCR = [['home', 'Hành Trình'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ'], ['contacts', 'Liên Lạc']];
+    const SCR = [['home', 'Hành Trình'], ['settings', 'Cài Đặt'], ['rt', 'Road Trip'], ['split', 'Road Trip + Bản Đồ'], ['dex', 'Workspace DeX'], ['search', 'Tìm Chỗ']];
     const scrBtns = SCR.map(([k, label]) => { const on = S.scr === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: go(k) }; });
 
     // ---- làm mờ ----
@@ -1634,7 +1751,8 @@ class Component extends DCLogic {
     const CALL = APP ? (LV.call && LV.call.state ? LV.call : null) : (S.call ? { state: S.call, since: S.callAt } : null);
     const inCall = !!CALL;
     const MD = LV.media || null;
-    const playing = APP ? (S.src === 'radio' ? !!(LV.radio && LV.radio.playing) : !!(MD && MD.playing)) : S.playing;
+    const BI0 = (C.musicApp || 'builtin') === 'builtin';
+    const playing = APP ? (S.src === 'radio' && !BI0 ? !!(LV.radio && LV.radio.playing) : !!(MD && MD.playing)) : S.playing;
     const showWave = playing && C.wave !== 'off' && !drive && !inCall && S.src === 'music';
     const waveBars = WAVE.map((w, i) => ({ h: C.wave === 'tt' ? w.h : 6 + (i % 4) * 3, del: w.del, cls: 'wv', c: i < 20 ? '#FBB040' : 'rgba(95,212,240,0.75)' }));
     const wxCode0 = APP ? (LV.wx && LV.wx.code) : 'rain';
@@ -1646,7 +1764,8 @@ class Component extends DCLogic {
     const zinfo = [LM ? LM.v : 0, LM ? (LM.label || '') : ''], lim = LM ? LM.v : 999, est = !!(LM && LM.est);
     // #89/#90: the number comes from the chosen source, falling back to the other; "– –" only when neither has a value
     const spdRaw = !APP ? (drive ? S.speed : 0) : (C.spSrc === 'obd' ? (LV.obdSpeed != null ? LV.obdSpeed : LV.gpsSpeed) : (LV.gpsSpeed != null ? LV.gpsSpeed : LV.obdSpeed));
-    const spd0 = spdRaw != null ? spdRaw : (APP && LV.fresh ? 0 : null);
+    // 0.9.15 (#139): a few km/h from a shaky GPS while standing still shows 0
+    const spd0 = spdRaw != null ? ((spdRaw < 5 && C.spSrc !== 'obd' && LV.obdSpeed == null && (LV.acc == null || LV.acc > 12)) || spdRaw < 3 ? 0 : spdRaw) : (APP && LV.fresh ? 0 : null);
     const lost = APP ? spd0 == null : (drive && S.noGps);
     const spd = Math.round(spd0 || 0);
     const styKey = C.spAuto ? 'neon' : C.spStyle;
@@ -1666,7 +1785,7 @@ class Component extends DCLogic {
       arcBg: arcPath(1, 90), arc: arcPath(lost ? 0 : spd / lim, 90), ticks: DIALT, nx: needle[0].toFixed(1), ny: needle[1].toFixed(1), barW: Math.min(100, Math.round(spd / 160 * 100)),
       parked, tap: () => { if (!drive) self.setState({ statsOpen: !S.statsOpen }); }, statsOpen: S.statsOpen && parked,
       aria: 'Tốc độ ' + (lost ? 'mất GPS' : spd + ' km/g'),
-      limShow: !!LM && !(est && !C.limitEst), lim: LM ? LM.v : '', limAria: 'Giới hạn ' + lim + (est ? ' (ước tính)' : ''), limBorder: '0',
+      limShow: !!LM && !(est && !C.limitEst), limBottom: !!LM && !(est && !C.limitEst) && (C.spPanel || 'a') === 'off', roadOn: (C.spPanel || 'a') !== 'off' && !!(zinfo[1] && !est), road: zinfo[1], lim: LM ? LM.v : '', limAria: 'Giới hạn ' + lim + (est ? ' (ước tính)' : ''), limBorder: '0',
       limNote: est ? 'ước tính' : (LM && LM.school) ? 'School Zone · giờ học' : zinfo[1], limNoteC: est ? '#9AAAB2' : '#CFE6EE',
       pop: !!(LM && LM.at && S.now - LM.at < 3200), zoneL: (est ? 'Ước tính · ' : 'Vào vùng mới · ') + zinfo[1],
       ahead: !!(LM && LM.ahead), aheadL: LM && LM.ahead ? LM.ahead + '' : '',
@@ -1674,9 +1793,22 @@ class Component extends DCLogic {
     };
     const zones = Object.keys(ZONES).map((k) => { const on = (S.pendZone || S.zone) === k; return { label: ZONES[k][1] + ' ' + ZONES[k][0], on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (k !== S.zone) self.setState({ pendZone: k, pendAt: Date.now() }); } }; });
 
+    // ---- 0.9.15 (#146): bảng tốc độ dưới La Bàn ----
+    const shl0 = !nar && (S.scr === 'home' || S.scr === 'rt'), sppK = C.spPanel || 'a', limOk = !!LM && !(est && !C.limitEst), tolr = C.spTol || 0;
+    const overP = limOk && !lost && spd > lim + tolr, nearP = limOk && !lost && !overP && spd >= lim - 5;
+    if (APP && overP && !self.__overWas && C.spWarn !== false && S.now - (self.__tingAt || 0) > 20000) { self.__tingAt = S.now; tcn('ting'); }
+    self.__overWas = overP;
+    const spp = { a: sppK === 'a' && shl0, b: sppK === 'b' && shl0, c: sppK === 'c' && shl0, limOn: limOk, lim: limOk ? lim : '', v: lost ? '––' : String(spd),
+      bg: overP ? '#D6202A' : nearP ? '#B37A00' : '#0E1C24', blink: overP ? 'spblink' : '',
+      arc: Math.min(100, Math.round((lost ? 0 : spd) / Math.max(lim < 999 ? lim * 1.5 : 160, 60) * 100)), arcC: overP ? '#FF3B3B' : nearP ? '#F5B301' : '#3ECF8E', numC: overP ? '#FF6B6B' : '#FFFFFF',
+      cRing: overP ? '#FFFFFF' : '#D6202A', cBg: overP ? '#D6202A' : '#FFFFFF', cFg: overP ? '#FFFFFF' : '#111111', cTag: overP ? '#D6202A' : '#FFFFFF',
+      aheadOn: !!(LM && LM.ahead) && sppK !== 'off' && shl0, ahead: LM && LM.ahead ? LM.ahead + ' km/g' : '',
+      aria: 'Tốc độ ' + (lost ? 'mất GPS' : spd + ' km/g') + (limOk ? ', giới hạn ' + lim : '') + ' — chạm để đổi kiểu bảng',
+      cycle: () => self.setS('spPanel', sppK === 'a' ? 'b' : sppK === 'b' ? 'c' : 'a') };
     // ---- Cài Đặt ----
     const VS = window.__voiceState || {};
     const tg = (k, label, hint) => ({ isToggle: true, label, hint, on: C[k] ? 'true' : 'false', trackBg: C[k] ? '#FBB040' : '#2B4252', knobX: C[k] ? 32 : 4, tick: C[k] ? '✓' : '', stateL: C[k] ? 'Mở' : 'Tắt', stateC: C[k] ? '#FFD08A' : '#8FC3D3', toggle: () => self.setS(k, !C[k]), rowTap: () => self.setS(k, !C[k]), rowCur: 'pointer' });
+    const sld = (k, label, hint, min, max, def, unit) => { const v = C[k] != null ? C[k] : def; return { isSlider: true, label, hint, min, max, val: v, valL: v + unit, slide: (e) => self.setS(k, +e.target.value) }; };
     const ch = (k, label, hint, opts) => ({ isChoice: true, label, hint, opts: opts.map(([v, l]) => { const on = C[k] === v; return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS(k, v) }; }) });
     const stt = (label, hint, ok, okL, badL, actL, act) => ({ isStatus: true, label, hint, stL: ok ? '✓ ' + okL : '⚠ ' + badL, stC: ok ? '#7BD88F' : '#FFD08A', hasAct: !ok && !!actL, actL, act });
     const info = (label, hint, val) => ({ isInfo: true, label, hint, val });
@@ -1691,12 +1823,14 @@ class Component extends DCLogic {
         tg('chimeSilent', 'Kêu cả khi máy để Rung / Im Lặng', 'Tắt thì máy để Rung hoặc Im Lặng sẽ không kêu'),
         Object.assign(ch('chime', 'Kiểu nhạc chào', 'Bấm là nghe thử', [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']]), { opts: [['soft', 'Nhẹ Nhàng'], ['modern', 'Hiện Đại'], ['engine', 'Nổ Máy']].map(([v, l]) => { const on = (C.chime || 'soft') === v; return { label: l, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { self.setS('chime', v); tcn('chime', JSON.stringify({ name: 'chime_' + v, vol: C.chimeVol == null ? 60 : C.chimeVol, test: true })); } }; }) }),
         ch('chimeVol', 'Âm lượng nhạc chào', 'So với âm lượng nhạc của máy', [[30, 'Nhỏ'], [60, 'Vừa'], [100, 'Lớn']]),
-        ch('startScr', 'Mở app thì vào', 'Sau màn hình chào · app tự mở lại sau sự cố thì về đúng màn hình đang xem', [['home', 'Hành Trình'], ['rt', 'Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ'], ['ws', 'Workspace gần nhất'], ['last', 'Màn hình lúc tắt app']]),
+        ch('startScr', 'Mở app thì vào', 'Sau màn hình chào · app tự mở lại sau sự cố thì về đúng màn hình đang xem', [['home', 'Hành Trình'], ['rt', 'Road Trip'], ['search', 'Tìm Chỗ'], ['ws', 'Workspace gần nhất'], ['last', 'Màn hình lúc tắt app']]),
         ch('splashSec', 'Màn hình chào', 'Logo + phiên bản · chạm để vào sớm', [[0, 'Tắt'], [1, '1 giây'], [3, '3 giây'], [5, '5 giây']]),
         info('Mở app vào thẳng', 'Luôn vào tab này sau màn hình chào', 'Hành Trình'),
         stt('Nhớ mọi lựa chọn khi thoát', 'Giao diện, tính năng, Workspace, chặng Road Trip…', true, 'Luôn nhớ', '', '', null),
-        tg('privacy', 'Chế Độ Riêng Tư', 'Giấu tên người gọi, nội dung tin nhắn, thông tin khách'),
-        info('Cuộc gọi đến', 'Không đọc tên ra loa — chỉ báo "Có cuộc gọi"', 'Chuông theo nhóm ▸'),
+        tg('privacy', 'Chế Độ Riêng Tư', 'Băng gọi chỉ ghi "Cuộc gọi đến", tin nhắn chỉ ghi "Tin nhắn mới" — không hiện tên'),
+        ch('callSty', 'Kiểu băng cuộc gọi tới', 'Tin nhắn mới dùng cùng kiểu', [['big', 'Nút Lớn'], ['oneui', 'One UI 9'], ['tom', "Tom's Car"], ['island', 'Đảo Nhỏ'], ['ios6', 'iOS 6']]),
+        tg('awayHide', 'Ra khỏi xe là giấu hết', 'Không nối Bluetooth xe, không cắm DeX → không hiện cuộc gọi, tin nhắn'),
+        stt('Trả lời nhanh', 'Các câu có sẵn khi bấm ↩ Trả Lời trên băng tin nhắn', false, '', (C.quickReplies || []).length + ' câu', 'Sửa', () => self.setState({ dlg: 'qr', qrEdit: (C.quickReplies || []).concat(['', '', '', '']).slice(0, 4) })),
         tg('autoSms', 'Từ chối thì tự nhắn lại', '"Mình đang lái xe, lát gọi lại nha"'),
         ch('msgKeep', 'Tự xoá tin nhắn đã lưu (WhatsApp, Messenger…)', 'Tin bắt từ thông báo', [[7, '7 ngày'], [30, '30 ngày'], [0, 'Không xoá']])] },
       gd: { label: 'Giao Diện', icon: 'M12 3a9 9 0 1 0 0 18c1 0 1.5-.7 1.5-1.5 0-.4-.2-.8-.4-1.1-.3-.3-.4-.6-.4-1 0-.8.7-1.5 1.5-1.5H16a5 5 0 0 0 5-5c0-4.4-4-7.9-9-7.9zM7.5 11.5h.01M10.5 7.5h.01M15.5 7.5h.01', desc: 'Kiểu màn hình, số tốc độ, mưa, làm mờ, dịu mắt', rows: [
@@ -1728,10 +1862,13 @@ class Component extends DCLogic {
         tg('clkVN', 'Thêm giờ Việt Nam', ''),
         tg('clkBlink', 'Dấu ":" nhấp nháy', 'Xe chạy thì tự đứng yên')] },
       nhac: { label: 'Nhạc', icon: 'M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z', desc: 'App nhạc mặc định, thanh nhạc kiểu Tom’s Jukebox', rows: [
-        ch('musicApp', 'App nhạc mặc định', 'Bấm ▶ khi chưa có nhạc là phát app này (không cần thoát ra)', [['jukebox', "Tom's Jukebox"], ['com.spotify.music', 'Spotify'], ['com.google.android.apps.youtube.music', 'YouTube Music']]),
-        tg('autoPlay', 'Tự phát nhạc khi mở Tom’s Car', 'Phát tiếp bài đang nghe dở'),
+        ch('musicApp', 'Nguồn nhạc', 'Tom’s Car: nhạc trong máy, radio, podcast có sẵn trong app · hoặc điều khiển app nhạc khác', [['builtin', "Tom's Car (có sẵn)"], ['jukebox', "Tom's Jukebox"], ['com.spotify.music', 'Spotify'], ['com.google.android.apps.youtube.music', 'YouTube Music']]),
+        tg('autoPlay', 'Tự phát tiếp khi lên xe', 'Mở Tom’s Car là phát tiếp bài / đài / tập podcast đang nghe dở (mặc định tắt)'),
         tg('jbFollow', 'Theo Tom’s Jukebox', 'Màu thanh thời gian, sóng nhạc, nút… lấy theo giao diện đang chọn bên Tom’s Jukebox'),
-        tg('vizOn', 'Sóng nhạc trên viên thuốc', 'Xe chạy thì sóng tự dịu lại'),
+        tg('vizOn', 'Sóng nhạc trên viên thuốc', 'Xe chạy thì sóng tự dịu lại · màu sóng theo hình bìa album'),
+        sld('barAlpha', 'Độ trong suốt thanh nhạc', 'Kéo qua trái cho thanh nhạc trong hơn, thấy bản đồ phía sau', 30, 100, 90, '%'),
+        sld('waveOp', 'Độ đậm sóng nhạc', 'Sóng ở mép dưới thanh nhạc', 20, 100, 90, '%'),
+        sld('waveH', 'Độ cao sóng nhạc', 'Sóng thấp hay cao lên trong thanh nhạc', 12, 70, 34, ' px'),
         info("Tom's Jukebox", 'Cần bản 0.9.5 trở lên để Tom’s Car phát ngầm và xem thư viện', window.__jbLook ? 'Đã nối ✓' : (APP ? 'Chưa thấy' : 'Bản mẫu')),
         stt('Quyền đọc bài đang phát', 'Để hiện tên bài, thời gian', APP ? !!PM.notif : S.perm, 'Đã cấp', 'Chưa cấp', 'Cấp Quyền', () => { if (APP) tcn('perm', 'notif'); else self.setState({ perm: true }); })] },
       tl: { label: 'Trợ Lý', icon: 'M9 3h6v11a3 3 0 0 1-6 0zM5 11a7 7 0 0 0 14 0M12 18v3', desc: 'Giọng nói tiếng Việt, "Hey Tom", độ nhạy', rows: [
@@ -1748,6 +1885,8 @@ class Component extends DCLogic {
       xe: { label: 'Xe & OBD-II', icon: 'M5 17h14M6 17V9l2-4h8l2 4v8M7 17v2M17 17v2M8 12h.01M16 12h.01', desc: 'Cục OBD-II, hồ sơ xe, nguồn tốc độ, nhắc bảo dưỡng', rows: [
         stt('Cục OBD-II', LV.obd ? 'Đã nối · ' + (LV.obd.protocol || '') : 'Veepeak OBDCheck BLE (Bluetooth)', !!LV.obd, 'Đã nối', 'Chưa nối', 'Chọn Cục OBD', () => tcn('settings')),
         tg('kbLock', 'Khoá bàn phím khi xe chạy', 'Tắt = gõ địa chỉ lúc nào cũng được (mặc định)'), tg('spWarn', 'Nhắc khi chạy quá tốc độ', 'Chỉ nhắc khi biết chắc số giới hạn, quá 3 km/g, mỗi đoạn đường 1 lần'),
+        ch('spPanel', 'Bảng tốc độ (dưới La Bàn)', 'Chạm vào bảng trên bản đồ cũng đổi kiểu', [['a', 'A · 2 ô'], ['b', 'B · Vòng cung'], ['c', 'C · Số trong biển'], ['off', 'Tắt']]),
+        ch('spTol', 'Vượt bao nhiêu mới báo', 'Bảng đỏ + tiếng ting khi vượt quá mức này', [[0, '0 km/g'], [3, '3 km/g'], [5, '5 km/g']]),
         ch('navBanner', 'Băng chỉ đường', 'Chạm vào băng khi đang chạy cũng đổi được', [['auto', 'Gọn, tự to khi gần chỗ rẽ'], ['big', 'Luôn lớn'], ['hide', 'Ẩn, chỉ đọc giọng']]),
         ch('spSrc', 'Nguồn tốc độ', 'Đồng hồ taplô thường chỉ cao hơn thực tế vài km/g', [['gps', 'GPS (mặc định)'], ['obd', 'OBD-II']]),
         info('Hồ sơ xe', 'Máy dầu · cổng OBD 16 chân', 'Toyota HiAce 200 · 04/2006'),
@@ -1813,7 +1952,7 @@ class Component extends DCLogic {
     const warnOf = (g) => GRP[g].rows.some((r) => r.isStatus && r.stL.charAt(0) === '⚠');
     const groups = Object.keys(GRP).map((k) => { const on = S.grp === k, w = warnOf(k); return { label: GRP[k].label, icon: GRP[k].icon, on: on ? 'true' : 'false', bg: on ? 'rgba(251,176,64,0.16)' : 'transparent', fg: on ? '#FFE2A8' : '#CFE6EE', ring: on ? 'inset 0 0 0 1px #FBB040' : 'none', mark: w ? '⚠' : '✓', markC: w ? '#FFD08A' : '#7BD88F', pick: () => self.setState({ grp: k }) }; });
     const G = GRP[S.grp];
-    const rows = G.rows.map((r) => Object.assign({ isToggle: false, isChoice: false, isStatus: false, isInfo: false, hint: '', opts: [], hasAct: false, on: 'false', trackBg: '', knobX: 0, stateL: '', stateC: '', toggle: () => {}, stL: '', stC: '', actL: '', val: '' }, r, { act: r.act || (() => {}) }));
+    const rows = G.rows.map((r) => Object.assign({ isToggle: false, isChoice: false, isSlider: false, min: 0, max: 100, valL: '', slide: () => {}, isStatus: false, isInfo: false, hint: '', opts: [], hasAct: false, on: 'false', trackBg: '', knobX: 0, stateL: '', stateC: '', toggle: () => {}, stL: '', stC: '', actL: '', val: '' }, r, { act: r.act || (() => {}) }));
 
     // ---- Road Trip ----
     const LT = LV.trip || null;
@@ -2098,9 +2237,17 @@ class Component extends DCLogic {
 
     // ---- cuộc gọi ----
     const callSec = CALL && CALL.state === 'talk' ? Math.floor((S.now - (CALL.since || S.now)) / 1000) : 0;
+    // 0.9.15 (#149): away from the car (no car Bluetooth, no DeX) the screen shows no call or message at all
+    const inCar = !APP || !C.awayHide || !!LV.bt || !!LV.dex;
+    const ringNow = !!CALL && CALL.state === 'ring' && inCar, csty = C.callSty || 'big';
+    const cnm = priv ? 'Cuộc gọi đến' : (APP ? (CALL && (CALL.name || CALL.number) || 'Số lạ') : 'Anh Minh (mẫu)');
     const cb = {
+      ringA: ringNow && csty === 'big', ringB: ringNow && csty === 'oneui', ringC: ringNow && csty === 'tom', ringD: ringNow && csty === 'island', ringE: ringNow && csty === 'ios6',
+      talkOn: !!CALL && CALL.state === 'talk' && inCar,
+      subS: priv ? 'đang gọi tới' : 'cuộc gọi đến' + (APP && CALL && CALL.name && CALL.number ? ' · ' + CALL.number : ''), ini: priv ? '?' : (cnm.split(' ').filter(Boolean).slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join('') || '?'),
+      slDown: (e) => { self.__slX = e.clientX; }, slUp: (e) => { if (self.__slX != null && e.clientX - self.__slX > 80) { if (APP) tcn('call', 'answer'); else self.setState({ call: 'talk', callAt: Date.now() }); } self.__slX = null; },
       on: !!CALL, ring: !!CALL && CALL.state === 'ring', talk: !!CALL && CALL.state === 'talk',
-      name: priv ? 'Có cuộc gọi' : (APP ? (CALL && (CALL.name || CALL.number) || 'Số lạ') : 'Anh Minh (mẫu)'), group: APP ? (CALL && CALL.group || 'Số Lạ') : 'Khách Hàng',
+      name: cnm, group: APP ? (CALL && CALL.group || 'Số Lạ') : 'Khách Hàng',
       state: CALL && CALL.state === 'ring' ? 'đang gọi tới · chuông nhóm Khách Hàng' : p2(Math.floor(callSec / 60)) + ':' + p2(callSec % 60),
       sub: priv ? 'Chế Độ Riêng Tư: đã giấu tên và thông tin khách · không đọc tên ra loa' : (APP ? (CALL && CALL.number ? CALL.number + ' · ' : '') + 'không đọc tên ra loa, chỉ báo "Có cuộc gọi"' : "Tom's Shield: Lắp camera – Tarneit (mẫu) · không đọc tên ra loa, chỉ báo \"Có cuộc gọi\""),
       answer: () => { if (APP) tcn('call', 'answer'); else self.setState({ call: 'talk', callAt: Date.now() }); },
@@ -2110,6 +2257,15 @@ class Component extends DCLogic {
       spk: () => { if (APP) tcn('call', S.spkCar ? 'phone' : 'speaker'); self.setState({ spkCar: !S.spkCar }); }, spkL: S.spkCar ? 'Loa Xe' : 'Điện Thoại'
     };
     const toastOn = !!S.toast && S.now - S.toastAt < 4000;
+    // ---- 0.9.15 (#149): tin nhắn mới ----
+    window.tcNewMsg = (j) => { try { const o = typeof j === 'string' ? JSON.parse(j) : j; self.setState({ nmsg: o, nmsgAt: Date.now(), nmRep: false }); if (APP) tcn('msgs'); } catch (e) {} };
+    const NMG = S.nmsg, nmLive = !!NMG && inCar && (S.now - (S.nmsgAt || 0) < (S.nmRep ? 25000 : 5000) || S.nmRep);
+    const QR = (C.quickReplies && C.quickReplies.length ? C.quickReplies : ['Đang lái xe, lát gọi lại nha', 'Mình sắp tới rồi', 'OK, cảm ơn']);
+    const nm = { on: nmLive && !(NMG && S.nmClosed === NMG.at), title: NMG ? (priv ? 'Tin nhắn mới' : 'Tin nhắn mới từ ' + NMG.who) : '',
+      touch: () => self.setState({ nmsgAt: Date.now() }), close: () => self.setState({ nmClosed: NMG && NMG.at, nmRep: false }),
+      read: () => { if (NMG) tcn('say', (priv ? 'Tin nhắn mới: ' : NMG.who + ' nhắn: ') + NMG.text); self.setState({ nmsgAt: Date.now() }); },
+      repOn: !!S.nmRep, replyTap: () => self.setState({ nmRep: !S.nmRep, nmsgAt: Date.now() }),
+      quick: QR.map((t) => ({ t, send: () => { if (NMG) tcn('reply', JSON.stringify({ key: NMG.key, text: t })); self.setState({ nmClosed: NMG && NMG.at, nmRep: false }); self.toast('Đã trả lời: "' + t + '"'); } })) };
 
     // ---- Liên Lạc ----
     const MAPP = { sms: ['SMS', '#1F5FAE', 'S'], wa: ['WhatsApp', '#1E8E5A', 'W'], msgr: ['Messenger', '#6B4BD8', 'M'], signal: ['Signal', '#2D6FD6', 'Si'], tg: ['Telegram', '#2A9BD6', 'T'] };
@@ -2181,22 +2337,102 @@ class Component extends DCLogic {
       if (tabOk === 'lists') rowsRaw = [['Đi Adelaide', '24 bài'], ['Nhạc Xưa', '58 bài'], ['Lái Đêm', '31 bài'], ['Yêu Thích', '120 bài']].map(([t, sub]) => ({ t, s: sub, letter: '≡', tile: '#1B3A52', rad: '6px' }));
       if (tabOk === 'albums') rowsRaw = ['A', 'B', 'C', 'D', 'E'].map((x) => ({ t: 'Album mẫu ' + x, s: 'Nghệ sĩ mẫu', letter: x, tile: '#2A2440', rad: '6px' }));
     }
+    // ---- 0.9.15 (#138): nhạc có sẵn trong Tom's Car (nhạc trong máy, radio Úc/VN, podcast, thâu radio, lời bài hát) ----
+    const BI = (C.musicApp || 'builtin') === 'builtin';
+    const ML = S.musL || {};
+    const musReq = (o) => { const k = JSON.stringify(o); if (APP && !(k in ML)) { self.__musPend = self.__musPend || {}; if (!self.__musPend[k] || Date.now() - self.__musPend[k] > 20000) { self.__musPend[k] = Date.now(); tcn('mus', JSON.stringify(Object.assign({}, o, { req: k }))); } } return ML[k]; };
+    const musDrop = (o) => { const k = JSON.stringify(o); const n = Object.assign({}, self.state.musL || {}); delete n[k]; if (self.__musPend) delete self.__musPend[k]; self.setState({ musL: n }); };
+    window.tcMus = (j) => { try { const o = typeof j === 'string' ? JSON.parse(j) : j; if (o.say) self.say(o.say); if (o.req && o.req.charAt(0) === '{') self.setState({ musL: Object.assign({}, self.state.musL || {}, { [o.req]: o.items || o }) }); } catch (e) {} };
+    window.tcMusMsg = (j) => { try { self.toast((typeof j === 'string' ? JSON.parse(j) : j).t); } catch (e) {} };
+    const ST_CODE = { 'Victoria': 'VIC', 'New South Wales': 'NSW', 'Queensland': 'QLD', 'South Australia': 'SA', 'Western Australia': 'WA', 'Tasmania': 'TAS', 'Northern Territory': 'NT', 'Australian Capital Territory': 'ACT' };
+    const auSt = ST_CODE[(LV.place && LV.place.state) || ''] || (LV.place && /^[A-Z]{2,3}$/.test(LV.place.state || '') ? LV.place.state : '') || 'VIC';
+    if (APP && BI && self.__musSt !== auSt) { if (self.__musSt) tcn('mus', JSON.stringify({ cmd: 'radioState', state: auSt })); self.__musSt = auSt; }
+    let biTabs = null, biBack = null, biActs = [], biSearch = true, biFoot = '';
+    if (BI) {
+      const pg = APP ? (musReq({ cmd: 'podGroups' }) || []) : [{ k: 'follow', t: '⭐ Theo Dõi' }, { k: 'vnnews', t: 'Tin Tức Việt Nam' }];
+      biTabs = { music: [['songs', 'Bài Hát'], ['albums', 'Album'], ['artists', 'Nghệ Sĩ'], ['folders', 'Thư Mục'], ['favs', 'Yêu Thích'], ['queue', 'Đang Phát'], ['lyr', 'Lời Bài Hát']],
+        radio: [['near', 'Gần Đây'], ['fav', 'Yêu Thích'], ['au', 'Úc'], ['vn', 'Việt Nam'], ['recs', 'Thâu Radio']],
+        podcast: [['follow', 'Theo Dõi']].concat(pg.filter((g) => g.k !== 'follow').map((g) => [g.k, g.t]), [['psearch', 'Tìm'], ['dl', 'Đã Tải']]) };
+    }
+    const biTab = BI ? (biTabs[S.src].some((t) => t[0] === S.mpTab) ? S.mpTab : biTabs[S.src][0][0]) : '';
+    if (BI && APP) {
+      const fld = (t) => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd'); const q = (S.mpQ || '').trim(); const fq = fld(q);
+      const flt = (arr) => !fq ? arr : arr.filter((r) => fld((r.t || '') + ' ' + (r.s || '')).indexOf(fq) >= 0);
+      const wait = (L, empty) => L == null ? [{ t: 'Đang tải…', s: '', letter: '…', tile: '#2B2B2B', rad: '50%' }] : (L.length ? null : [{ t: empty, s: '', letter: '–', tile: '#2B2B2B', rad: '50%' }]);
+      const curTitle = MD && MD.builtin ? MD.title : '';
+      const D = S.musDrill, P = S.musPod;
+      if (S.src === 'music' && D && biTab === D.tab) {
+        const o = { cmd: 'lib', view: D.view, key: D.key }; const L = musReq(o);
+        biBack = { label: D.t, run: () => self.setState({ musDrill: null, panelAt: Date.now() }) };
+        biActs = [{ label: '▶ Phát Hết', run: () => tcn('mus', JSON.stringify({ cmd: 'playLib', view: D.view, key: D.key })) }, { label: '⤮ Trộn', run: () => tcn('mus', JSON.stringify({ cmd: 'playLib', view: D.view, key: D.key, shuffle: true })) }];
+        rowsRaw = wait(L, 'Không có bài') || flt(L).map((r) => ({ t: r.t, s: r.s + (r.d ? ' · ' + r.d : ''), letter: '♪', tile: '#3A2A10', rad: '6px', cur: r.t === curTitle, run: () => tcn('mus', JSON.stringify({ cmd: 'playLib', view: D.view, key: D.key, id: r.id })) }));
+      } else if (S.src === 'music' && biTab === 'queue') {
+        const L = musReq({ cmd: 'queue', at: S.musQAt || 0 });
+        rowsRaw = wait(L, 'Chưa phát bài nào — chọn bài ở tab Bài Hát') || flt(L).map((r) => ({ t: r.t, s: r.s, letter: String(r.i + 1), tile: '#3A2A10', rad: '6px', cur: r.on, run: () => tcn('mus', JSON.stringify({ cmd: 'jump', i: r.i })) }));
+        biSearch = false;
+      } else if (S.src === 'music' && biTab === 'lyr') {
+        const L = musReq({ cmd: 'lyrics', t: curTitle });
+        biSearch = false;
+        const lines = (L && L.lines) || []; if (MD && self.__mdPos !== MD.pos) { self.__mdPos = MD.pos; self.__mdAt = Date.now(); } const pos = (MD && MD.pos || 0) + (MD && MD.playing && self.__mdAt ? Date.now() - self.__mdAt : 0);
+        let curI = -1; lines.forEach((l, i) => { if (l.ms >= 0 && l.ms <= pos + 300) curI = i; });
+        rowsRaw = L == null ? [{ t: 'Đang tìm lời bài hát…', s: '', lyr: true }] : !lines.length ? [{ t: L.note || 'Chưa có lời', s: '', lyr: true }] : lines.slice(Math.max(0, curI - 2), curI < 0 ? 60 : curI + 12).map((l, i2) => ({ t: l.t || '♪', s: '', lyr: true, cur: lines.indexOf(l) === curI }));
+        biFoot = 'Lời từ LRCLIB · tự cuộn theo bài';
+      } else if (S.src === 'music') {
+        const isGrp = /^(albums|artists|folders)$/.test(biTab);
+        const L = musReq({ cmd: 'lib', view: biTab });
+        if (!isGrp) biActs = [{ label: '⤮ Trộn Tất Cả', run: () => tcn('mus', JSON.stringify({ cmd: 'playLib', view: biTab, shuffle: true })) }];
+        rowsRaw = wait(L, biTab === 'favs' ? 'Chưa có bài yêu thích — bấm ★ bên cạnh bài' : 'Chưa thấy nhạc trong máy (cần cho phép đọc nhạc)') || flt(L).slice(0, 300).map((r) => isGrp
+          ? { t: r.t, s: r.s, letter: (r.t || '?').charAt(0), tile: biTab === 'albums' ? '#2A2440' : biTab === 'artists' ? '#24402A' : '#1B3A52', rad: biTab === 'artists' ? '50%' : '6px', run: () => self.setState({ musDrill: { tab: biTab, view: r.kind, key: r.key, t: r.t }, mpQ: '', panelAt: Date.now() }) }
+          : { t: r.t, s: r.s + (r.d ? ' · ' + r.d : ''), letter: '♪', tile: '#3A2A10', rad: '6px', cur: r.t === curTitle, run: () => tcn('mus', JSON.stringify({ cmd: 'playLib', view: biTab, id: r.id })),
+              a2L: r.fav ? '★' : '☆', a2C: r.fav ? '#FBB040' : '#5E8496', a2: () => { tcn('mus', JSON.stringify({ cmd: 'fav', id: String(r.id) })); musDrop({ cmd: 'lib', view: biTab }); musDrop({ cmd: 'lib', view: 'favs' }); } });
+        if (!isGrp && L) biFoot = L.length + ' bài trong máy';
+      } else if (S.src === 'radio' && biTab === 'recs') {
+        const o = { cmd: 'recs' }; const L = musReq(o);
+        rowsRaw = wait(L, 'Chưa có bản thâu — đang nghe radio thì bấm ⏺ trên thanh nhạc') || flt(L.filter((r) => r.type !== 'pod')).map((r) => ({ t: r.t, s: r.s, letter: '⏺', tile: '#5A1A1A', rad: '50%', run: () => tcn('mus', JSON.stringify({ cmd: 'playFile', path: r.path, t: r.t })), a2L: '🗑', a2C: '#FF9A9E', a2: () => { tcn('mus', JSON.stringify({ cmd: 'delFile', path: r.path, req: JSON.stringify(o) })); } }));
+      } else if (S.src === 'radio') {
+        const o = q ? { cmd: 'radioList', tab: 'search', q } : { cmd: 'radioList', tab: biTab, state: auSt }; const L = musReq(o);
+        const curSt = MD && MD.builtin && MD.kind === 'radio' ? MD.station : '';
+        rowsRaw = wait(L, biTab === 'fav' ? 'Chưa có đài yêu thích — bấm ★' : 'Không thấy đài') || L.map((r) => ({ id: 'r:' + r.n, t: r.t, s: r.s, letter: (r.t || '?').charAt(0), tile: '#2B2B2B', rad: '50%', cur: r.n === curSt, run: () => tcn('mus', JSON.stringify({ cmd: 'radioPlay', name: r.n })),
+          a2L: r.fav ? '★' : '☆', a2C: r.fav ? '#FBB040' : '#5E8496', a2: () => { tcn('mus', JSON.stringify({ cmd: 'radioFav', name: r.n })); musDrop(o); musDrop({ cmd: 'radioList', tab: 'fav', state: auSt }); } }));
+        biFoot = biTab === 'near' ? 'Đang ở bang ' + auSt + ' · đi Road Trip qua bang khác app tự đổi qua đài cùng loại' : 'Radio qua mạng · ~30–60 MB/giờ';
+      } else if (S.src === 'podcast' && P) {
+        const o = { cmd: 'podEps', feed: P.feed, id: P.id }; const L = musReq(o);
+        const fl = musReq({ cmd: 'podList', group: 'follow' }) || []; const isF = fl.some((x) => x.feed === P.feed);
+        biBack = { label: P.t, run: () => self.setState({ musPod: null, panelAt: Date.now() }) };
+        biActs = [{ label: '⬇ Tải Tất Cả', run: () => { tcn('mus', JSON.stringify({ cmd: 'dlAll', feed: P.feed, id: P.id, pod: P.t })); self.toast('Đang tải 10 tập mới nhất của ' + P.t + '…'); } },
+          { label: isF ? '★ Đang Theo Dõi' : '☆ Theo Dõi', run: () => { tcn('mus', JSON.stringify({ cmd: 'podFollow', feed: P.feed, id: P.id, t: P.t, s: P.s || '', img: P.img || '' })); setTimeout(() => musDrop({ cmd: 'podList', group: 'follow' }), 300); } }];
+        rowsRaw = wait(L, 'Chưa lấy được danh sách tập') || flt(L).map((r) => ({ t: r.t, s: [r.date, r.dur, r.dl ? 'đã tải' : ''].filter(Boolean).join(' · '), letter: r.dl ? '✓' : 'P', tile: r.dl ? '#1E5A3A' : '#7A4BB5', rad: '8px', cur: MD && MD.podUrl === r.url, run: () => tcn('mus', JSON.stringify({ cmd: 'podPlay', url: r.url, t: r.t, pod: P.t })),
+          a2L: r.dl ? '✓' : '⬇ Tải', a2C: r.dl ? '#7BD88F' : '#FFD08A', a2: () => { if (r.dl) return; tcn('mus', JSON.stringify({ cmd: 'dl', url: r.url, t: r.t, pod: P.t })); setTimeout(() => musDrop(o), 15000); } }));
+        biFoot = 'Tập đã tải tự xoá sau 3 ngày · ⏮ lùi 15 giây · ⏭ tới 30 giây';
+      } else if (S.src === 'podcast' && biTab === 'dl') {
+        const o = { cmd: 'recs' }; const L = musReq(o);
+        rowsRaw = wait(L, 'Chưa tải tập nào') || flt(L.filter((r) => r.type === 'pod')).map((r) => ({ t: r.t, s: r.s, letter: '✓', tile: '#1E5A3A', rad: '8px', run: () => tcn('mus', JSON.stringify({ cmd: 'playFile', path: r.path, t: r.t, type: 'pod' })), a2L: '🗑', a2C: '#FF9A9E', a2: () => tcn('mus', JSON.stringify({ cmd: 'delFile', path: r.path, req: JSON.stringify(o) })) }));
+      } else if (S.src === 'podcast') {
+        const o = biTab === 'psearch' ? { cmd: 'podList', group: 'search', q } : { cmd: 'podList', group: biTab }; const L = biTab === 'psearch' && !q ? [] : musReq(o);
+        rowsRaw = wait(L, biTab === 'psearch' ? 'Gõ tên kênh podcast để tìm' : biTab === 'follow' ? 'Chưa theo dõi kênh nào — mở một kênh rồi bấm ☆ Theo Dõi' : 'Không tải được danh mục — kiểm tra mạng') || (biTab === 'psearch' ? L : flt(L)).map((r) => ({ t: r.t, s: r.s, letter: (r.t || 'P').charAt(0), tile: '#7A4BB5', rad: '8px', run: () => self.setState({ musPod: r, mpQ: '', panelAt: Date.now() }) }));
+      }
+    }
     const radioRows = (arr) => arr.map(([id, t, sub, letter, tile]) => ({ id, t, s: sub, letter, tile, rad: '50%', isRadio: true }));
     if (!APP && S.src === 'radio') rowsRaw = radioRows(tabOk === 'near' ? NEAR : tabOk === 'fav' ? allRadio.filter((r) => S.favs[r[0]]) : RADIO[tabOk] || []);
     if (!APP && S.src === 'podcast') rowsRaw = [1, 2, 3, 4, 5].map((i) => ({ t: 'Podcast mẫu ' + i, s: tabOk === 'pnew' ? 'Tập mới · ' + (20 + i * 7) + ' ph' : 'Đã theo dõi', letter: 'P', tile: '#7A4BB5', rad: '8px' }));
     const maxRows = drive ? 6 : 99;
     const curT = APP ? (S.src === 'radio' ? (LV.radio && LV.radio.name) : (MD && MD.title)) : (S.nowT || DEF_NOW[S.src][0]);
     const mpOpen = S.mpOpen && !(drive && S.now - S.panelAt > 8000);
+    const mpA = C.mpAlpha != null ? C.mpAlpha : 88;
+    if (!self.__mpOut && typeof document !== 'undefined') { self.__mpOut = 1; document.addEventListener('pointerdown', (e) => { if (self.state.mpOpen && e.target && e.target.closest && !e.target.closest('section[aria-label="Chọn bài và đài"], .jbpill')) self.setState({ mpOpen: false }); }, true); }   // #141: tap outside closes the list
     const mp = {
       open: mpOpen, touch: () => self.setState({ panelAt: Date.now() }), close: () => self.setState({ mpOpen: false }),
-      srcs: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, label]) => { const on = S.src === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (APP && k === 'podcast') tcn('media', 'jbquery'); self.setState({ src: k, mpTab: TABS[k][0][0], nowT: '', nowS: '', mpQ: '', panelAt: Date.now() }); } }; }),
+      w: drive ? 470 : 440, h: drive ? 350 : 340, alpha: (mpA / 100).toFixed(2), alphaV: mpA, setAlpha: (e) => self.setS('mpAlpha', +e.target.value),
+      backOn: !!biBack || biActs.length > 0, backL: biBack ? biBack.label : '', back: biBack ? biBack.run : () => {}, backShow: !!biBack, acts: biBack || biActs.length ? biActs : [], searchOn: BI ? biSearch : true, footOn: !drive,
+      srcs: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, label]) => { const on = S.src === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (APP && k === 'podcast' && !BI) tcn('media', 'jbquery'); self.setState({ src: k, mpTab: (BI ? biTabs : TABS)[k][0][0], nowT: '', nowS: '', mpQ: '', musDrill: null, musPod: null, panelAt: Date.now() }); } }; }),
       srcNote: S.src === 'music' ? (APP ? 'Nguồn: ' + ((MD && MD.app) || 'app nhạc đang phát') : "Nguồn: Tom's Jukebox") : S.src === 'radio' ? 'Radio qua mạng · ~30–60 MB/giờ' : 'Podcast',
-      tabs: TABS[S.src].map(([k, label]) => { const on = tabOk === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (k === 'radio') self.setState({ src: 'radio', mpTab: 'near', panelAt: Date.now() }); else self.setState({ mpTab: k, panelAt: Date.now() }); } }; }),
+      tabs: BI ? biTabs[S.src].map(([k, label]) => { const on = biTab === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (k === 'recs' || k === 'dl') musDrop({ cmd: 'recs' }); self.setState({ mpTab: k, musDrill: null, musPod: null, mpQ: '', musQAt: k === 'queue' ? Date.now() : S.musQAt, panelAt: Date.now() }); } }; })
+        : TABS[S.src].map(([k, label]) => { const on = tabOk === k; return { label, on: on ? 'true' : 'false', bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => { if (k === 'radio') self.setState({ src: 'radio', mpTab: 'near', panelAt: Date.now() }); else self.setState({ mpTab: k, panelAt: Date.now() }); } }; }),
       searchPh: drive ? 'Khoá gõ khi xe chạy — nói "Hey Tom, phát…"' : (S.src === 'radio' ? 'Tìm đài' : S.src === 'podcast' ? 'Tìm podcast' : 'Tìm bài, nghệ sĩ'), q: S.mpQ || '', setQ: (e) => self.setState({ mpQ: e.target.value, panelAt: Date.now() }), searchBg: drive ? '#0A1822' : '#0D2C40',
-      regionOn: S.src === 'radio' && tabOk === 'near', regionL: APP ? ('Vùng hiện tại: ' + ((S.radioLists && S.radioLists.region) || (LV.place && LV.place.suburb) || '…') + ' (theo GPS) · Tự đổi đài theo vùng: Mở') : 'Vùng hiện tại: ' + regName + ' (theo GPS · mẫu) · Tự đổi đài theo vùng: Mở',
-      rows: rowsRaw.slice(0, maxRows).map((r) => { const cur = playing && r.t === curT; return Object.assign({ isRadio: false, id: '' }, r, { bg: r.hdr ? 'transparent' : cur ? 'rgba(251,176,64,0.14)' : 'rgba(13,44,64,0.55)', st: cur ? 'ĐANG PHÁT' : '', stC: '#FFD08A', play: r.hdr ? () => {} : r.retry ? () => { tcn('media', 'jbquery'); self.toast('Đang hỏi lại Tom’s Jukebox…'); self.setState({ panelAt: Date.now() }); } : r.jb ? () => { tcn('media', 'jb:' + JSON.stringify(r.jb)); self.setState({ panelAt: Date.now() }); } : r.open ? () => tcn(S.src === 'podcast' ? 'openApp' : 'openMedia', S.src === 'podcast' ? 'podcast' : '') : r.qid != null ? () => tcn('media', 'queue:' + r.qid) : play(r.t, r.isRadio ? 'Radio · trực tiếp' : r.s, r.isRadio ? 'radio' : S.src, r.url), favOn: S.favs[r.id] ? 'true' : 'false', favC: S.favs[r.id] ? '#FBB040' : '#5E8496', fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) }); }),
+      regionOn: !BI && S.src === 'radio' && tabOk === 'near', regionL: APP ? ('Vùng hiện tại: ' + ((S.radioLists && S.radioLists.region) || (LV.place && LV.place.suburb) || '…') + ' (theo GPS) · Tự đổi đài theo vùng: Mở') : 'Vùng hiện tại: ' + regName + ' (theo GPS · mẫu) · Tự đổi đài theo vùng: Mở',
+      rows: rowsRaw.slice(0, (BI && S.mpTab === 'lyr') ? 99 : maxRows).map((r) => { const cur = r.cur != null ? (r.lyr ? r.cur : r.cur && playing) : (playing && r.t === curT); return Object.assign({ isRadio: false, id: '' }, r, { tileShow: r.lyr ? 'none' : 'flex', fg: r.lyr ? (cur ? '#FBB040' : '#CFE6EE') : '#E8F1F5', align: r.lyr ? 'center' : 'left', ws: r.lyr ? 'normal' : 'nowrap', a2On: !!r.a2, isRadio: BI ? false : !!r.isRadio, bg: r.hdr || r.lyr ? 'transparent' : cur ? 'rgba(251,176,64,0.14)' : 'rgba(13,44,64,0.55)', st: cur && !r.lyr ? 'ĐANG PHÁT' : '', stC: '#FFD08A', play: r.run ? () => { r.run(); self.setState({ panelAt: Date.now() }); } : r.hdr ? () => {} : r.retry ? () => { tcn('media', 'jbquery'); self.toast('Đang hỏi lại Tom’s Jukebox…'); self.setState({ panelAt: Date.now() }); } : r.jb ? () => { tcn('media', 'jb:' + JSON.stringify(r.jb)); self.setState({ panelAt: Date.now() }); } : r.open ? () => tcn(S.src === 'podcast' ? 'openApp' : 'openMedia', S.src === 'podcast' ? 'podcast' : '') : r.qid != null ? () => tcn('media', 'queue:' + r.qid) : play(r.t, r.isRadio ? 'Radio · trực tiếp' : r.s, r.isRadio ? 'radio' : S.src, r.url), favOn: S.favs[r.id] ? 'true' : 'false', favC: S.favs[r.id] ? '#FBB040' : '#5E8496', fav: () => self.setState({ favs: Object.assign({}, S.favs, { [r.id]: !S.favs[r.id] }), panelAt: Date.now() }) }); }),
       fs: drive ? 18 : 15, rowPad: drive ? '10px 8px' : '6px 8px',
-      foot: drive ? 'Xe đang chạy: chữ to, tối đa 6 dòng, tự đóng sau 8 giây không đụng.' : (S.src === 'music' ? "Tom's Jukebox: đủ 4 tab. Spotify / YouTube Music: chỉ thấy hàng chờ nếu app cho phép, còn lại có nút \"Mở trong …\"." : S.src === 'radio' ? 'Mất sóng (vd Kaniva → Keith) app sẽ hỏi: "Chuyển sang nhạc trong máy?"' : 'Podcast lấy từ Tom’s Jukebox · ⏮ lùi 15 giây · ⏭ tới 30 giây.')
+      foot: BI ? (biFoot || (S.src === 'music' ? 'Nhạc trong máy · nút trên vô lăng, tai nghe và màn hình khoá đều điều khiển được' : S.src === 'podcast' ? 'Bấm vô kênh để xem tập · ⬇ Tải từng tập hoặc ⬇ Tải Tất Cả (10 tập mới nhất) · tự xoá sau 3 ngày' : 'Radio qua mạng')) : drive ? 'Xe đang chạy: chữ to, tối đa 6 dòng, tự đóng sau 8 giây không đụng.' : (S.src === 'music' ? "Tom's Jukebox: đủ 4 tab. Spotify / YouTube Music: chỉ thấy hàng chờ nếu app cho phép, còn lại có nút \"Mở trong …\"." : S.src === 'radio' ? 'Mất sóng (vd Kaniva → Keith) app sẽ hỏi: "Chuyển sang nhạc trong máy?"' : 'Podcast lấy từ Tom’s Jukebox · ⏮ lùi 15 giây · ⏭ tới 30 giây.')
     };
     const sayV = (t, sens) => { self.setState({ va: false }); self.say(t, sens); };
     const findContact = (name) => { const all = (S.calls || []).concat(S.msgs || []); const n = (name || '').trim().toLowerCase(); return all.find((r) => (r[0] || '').toLowerCase().indexOf(n) >= 0); };
@@ -2208,15 +2444,19 @@ class Component extends DCLogic {
       { t: 'Bài trước', re: /(bài trước|lùi bài|quay lại bài|previous)/, run: () => { tcn('media', 'prev'); sayV('Dạ'); } },
       { t: 'Lớn tiếng', re: /(lớn tiếng|to lên|lớn lên|tăng âm|vặn to|volume up|louder|turn it up)/, run: () => { tcn('media', 'volup'); tcn('media', 'volup'); sayV('Dạ'); } },
       { t: 'Nhỏ tiếng', re: /(nhỏ tiếng|nhỏ lại|nhỏ xuống|giảm âm|vặn nhỏ|volume down|quieter|turn it down)/, run: () => { tcn('media', 'voldown'); tcn('media', 'voldown'); sayV('Dạ'); } },
-      { t: 'Tắt nhạc', re: /((tắt|dừng|ngưng|ngừng|thôi) ?(nhạc|bài|hát|đài|radio|phát)|^(tắt|dừng|ngưng|ngừng|pause|stop)$|stop (the )?music|pause music)/, run: () => { if (S.src === 'radio') tcn('radio', 'stop'); else tcn('media', 'pause'); sayV('Dạ, đã tắt'); } },
-      { t: 'Bật playlist …', re: /(bật|mở|phát|cho (?:mình |tui |tôi |em )?nghe|nghe|chơi) (playlist|danh sách|album|ca sĩ|nghệ sĩ|nhạc của|bài hát|bài) (.+)$/, run: (m) => { if (/^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim())) { self.setState({ src: 'music' }); tcn('media', 'play'); return sayV('Dạ, phát nhạc nè'); } const k = /playlist|danh sách/.test(m[2]) ? 'playlist' : /album/.test(m[2]) ? 'album' : /ca sĩ|nghệ sĩ|nhạc của/.test(m[2]) ? 'artist' : 'search'; self.setState({ src: 'music' }); tcn('media', 'jb:' + JSON.stringify({ kind: k, name: m[3] })); sayV('Dạ, đang mở ' + m[3]); } },
-      { t: 'Trộn bài', re: /(trộn bài|ngẫu nhiên|shuffle)/, run: () => { self.setState({ src: 'music' }); tcn('media', 'jb:' + JSON.stringify({ kind: 'shuffle', name: '' })); sayV('Dạ, phát ngẫu nhiên'); } },
+      { t: 'Tắt nhạc', re: /((tắt|dừng|ngưng|ngừng|thôi) ?(nhạc|bài|hát|đài|radio|phát)|^(tắt|dừng|ngưng|ngừng|pause|stop)$|stop (the )?music|pause music)/, run: () => { if (BI) tcn('media', 'pause'); else if (S.src === 'radio') tcn('radio', 'stop'); else tcn('media', 'pause'); sayV('Dạ, đã tắt'); } },
+      { t: 'Bật playlist …', re: /(bật|mở|phát|cho (?:mình |tui |tôi |em )?nghe|nghe|chơi) (playlist|danh sách|album|ca sĩ|nghệ sĩ|nhạc của|bài hát|bài) (.+)$/, run: (m) => { if (BI) { self.setState({ va: false, src: 'music' }); tcn('mus', JSON.stringify({ cmd: 'voice', kind: 'music', q: /^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim()) ? '' : m[3].trim(), req: 'v' })); return; } if (/^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim())) { self.setState({ src: 'music' }); tcn('media', 'play'); return sayV('Dạ, phát nhạc nè'); } const k = /playlist|danh sách/.test(m[2]) ? 'playlist' : /album/.test(m[2]) ? 'album' : /ca sĩ|nghệ sĩ|nhạc của/.test(m[2]) ? 'artist' : 'search'; self.setState({ src: 'music' }); tcn('media', 'jb:' + JSON.stringify({ kind: k, name: m[3] })); sayV('Dạ, đang mở ' + m[3]); } },
+      { t: 'Trộn bài', re: /(trộn bài|ngẫu nhiên|shuffle)/, run: () => { self.setState({ src: 'music' }); if (BI) tcn('mus', JSON.stringify({ cmd: 'playLib', view: 'songs', shuffle: true })); else tcn('media', 'jb:' + JSON.stringify({ kind: 'shuffle', name: '' })); sayV('Dạ, phát ngẫu nhiên'); } },
       { t: 'Bật nhạc', re: /((bật|mở|phát|chơi|cho (?:mình |tui |tôi |em )?nghe|nghe) ?(nhạc|bài hát|bài|music)|^play|play music|resume|tiếp tục (phát|nghe|nhạc)|^(bật|mở) lên$)/, run: () => { self.setState({ src: 'music' }); tcn('media', 'play'); sayV('Dạ, phát nhạc nè'); } },
-      { t: 'Nghe đài vùng này', re: /(đài|radio|ra đi ô)/, run: () => { self.setState({ va: false, src: 'radio', mpOpen: true, mpTab: 'near', panelAt: Date.now() }); const n = (S.radioLists && S.radioLists.near && S.radioLists.near[0]) || null; if (APP && n) tcn('radio', JSON.stringify({ url: n.url, name: n.name })); self.say(n ? 'Dạ, đang mở ' + n.name : 'Dạ, mở danh sách đài vùng này'); } },
+      { t: 'Nghe podcast …', re: /(nghe|mở|bật|phát) ?(podcast|pót ?cát|bót ?cát)(?: (?:của |kênh )?(.+))?$/, run: (m) => { if (!BI) { self.setState({ va: false, src: 'podcast', mpOpen: true, panelAt: Date.now() }); return self.say('Dạ, mở danh sách podcast'); } self.setState({ va: false, src: 'podcast' }); tcn('mus', JSON.stringify({ cmd: 'voice', kind: 'podcast', q: ((m[3] || '').replace(/(mới nhất|tập mới)/g, '')).trim(), req: 'v' })); } },
+      { t: 'Mở đài …', re: /(mở|bật|nghe|phát) (đài|radio|kênh) (?!vùng này|gần đây|địa phương)(.+)$/, run: (m) => { if (!BI) return CMDS.find((x) => x.t === 'Nghe đài vùng này').run(m); self.setState({ va: false, src: 'radio' }); tcn('mus', JSON.stringify({ cmd: 'voice', kind: 'radio', q: m[3].trim(), req: 'v' })); } },
+      { t: 'Thâu đài', re: /(thâu|ghi âm|thu âm) (đài|radio)/, run: () => { if (BI) { tcn('mus', JSON.stringify({ cmd: 'rec' })); sayV('Dạ'); } else sayV('Dạ, chỉ thâu được khi nghe radio trong Tom’s Car'); } },
+      { t: 'Nghe đài vùng này', re: /(đài|radio|ra đi ô)/, run: () => { if (BI) { self.setState({ va: false, src: 'radio', mpOpen: true, mpTab: 'near', panelAt: Date.now() }); const L = (self.state.musL || {})[JSON.stringify({ cmd: 'radioList', tab: 'near', state: auSt })]; const n = L && L[0]; if (n) tcn('mus', JSON.stringify({ cmd: 'radioPlay', name: n.n })); return self.say(n ? 'Dạ, đang mở ' + n.n : 'Dạ, mở danh sách đài vùng này'); } self.setState({ va: false, src: 'radio', mpOpen: true, mpTab: 'near', panelAt: Date.now() }); const n = (S.radioLists && S.radioLists.near && S.radioLists.near[0]) || null; if (APP && n) tcn('radio', JSON.stringify({ url: n.url, name: n.name })); self.say(n ? 'Dạ, đang mở ' + n.name : 'Dạ, mở danh sách đài vùng này'); } },
       { t: 'Bật riêng tư', re: /(riêng tư|privacy)/, run: () => { self.setS('privacy', !/tắt/.test(S.vaHeard || '')); sayV('Dạ, đã ' + (/tắt/.test(S.vaHeard || '') ? 'tắt' : 'bật') + ' Chế Độ Riêng Tư'); } },
       { t: 'Dịu mắt', re: /(dịu mắt|tối màn hình|calm mode|dim)/, run: () => { self.setS('calm', true); sayV('Dạ, đã bật Dịu Mắt'); } },
-      { t: 'Đọc tin nhắn', re: /(đọc tin|tin nhắn|read message)/, run: () => { if (priv) return sayV('Đang bật Riêng Tư nên không đọc tin nhắn'); const m = (S.msgs || [])[0]; sayV(m ? m[0] + ' nhắn: ' + m[3] : 'Dạ, không có tin nhắn mới', true); } },
-      { t: 'Nghe máy', re: /^(nghe|nghe máy|answer)$/, run: () => { tcn('call', 'answer'); self.setState({ va: false }); } },
+      { t: 'Đọc tin nhắn', re: /(đọc tin|tin nhắn|read message)/, run: () => { if (priv) return sayV('Đang bật Riêng Tư nên không đọc tin nhắn'); const n0 = S.nmsg, m = (S.msgs || [])[0]; sayV(n0 && (!m || n0.at >= (m[4] || 0)) ? (priv ? 'Tin nhắn mới: ' : n0.who + ' nhắn: ') + n0.text : (m ? (priv ? 'Tin nhắn mới: ' : m[0] + ' nhắn: ') + m[3] : 'Dạ, không có tin nhắn mới'), true); } },
+      { t: 'Dừng chỉ đường', re: /(dừng|tắt|thôi|huỷ|hủy|ngưng) (chỉ đường|dẫn đường|đường đi|lộ trình)|stop navigation/, run: () => { self.setState({ va: false, wp: [] }); if (NV) NV.stop(); } },
+      { t: 'Nghe máy', re: /^(nghe|nghe máy|nghe máy đi|bắt máy|answer)$/, run: () => { tcn('call', 'answer'); self.setState({ va: false }); } },
       { t: 'Từ chối', re: /^(từ chối|decline|không nghe)/, run: () => { tcn('call', 'decline:' + (C.autoSms ? 1 : 0)); self.setState({ va: false }); } },
       { t: 'Gọi …', re: /^(gọi|call) (.+)$/, run: (m) => { const c = findContact(m[2]); if (c && c[5]) { self.setState({ va: false }); self.say('Dạ, đang gọi ' + (priv ? 'người đã chọn' : c[0]), true); tcn('call', 'dial:' + c[5]); } else { tcn('call', 'dialName:' + m[2]); sayV('Dạ, đang tìm ' + m[2] + ' trong danh bạ', true); } } },
       { t: 'Xe tôi ở đâu?', re: /(xe (tôi|tui|mình|em) (ở|đậu|nằm) đâu|đậu xe ở đâu|where.*(car|park)|my car)/, run: () => { const pk = window.NAV && window.NAV.hist.park; self.setState({ va: false, scr: 'home', goOpen: true }); if (pk) { window.NAV.flyTo([pk.lat, pk.lon], 17); sayV('Dạ, xe đậu ở ' + (pk.name || 'chỗ đánh dấu trên bản đồ')); } else sayV('Dạ, mình chưa ghi chỗ đậu xe nào'); } },
@@ -2264,7 +2504,6 @@ class Component extends DCLogic {
       ['Thanh trên cùng: Tìm Chỗ sau Workspace DeX', 'Thanh bản mẫu', 'search'],
       ['Tìm Chỗ: logo từng hãng (tự lấy, nhớ sẵn)', 'Tìm Chỗ', 'search'],
       ['Cuộc gọi đến: thanh mỏng, không đọc tên, riêng tư', 'Bấm "Gọi Thử"', 'call'],
-      ['Tab Liên Lạc: lịch sử cuộc gọi + tin nhắn các app', 'Liên Lạc', 'contacts'],
       ['Số tốc độ: màu theo giới hạn, vòng cung, 7 kiểu, cỡ số', 'Màn Hình Chính / Cài Đặt → Giao Diện', 'home'],
       ['Canh giữa con số trong đồng hồ tốc độ', 'Màn Hình Chính', 'home'],
       ['Giới hạn tốc độ theo vùng + báo trước + biển to khi đổi', 'Màn Hình Chính → ô Bản Mẫu', 'home'],
@@ -2322,7 +2561,7 @@ class Component extends DCLogic {
       hl: WX && WX.hi != null ? '↑' + Math.round(WX.hi) + '°  ↓' + Math.round(WX.lo) + '°' : '',
       desc: WX ? (WXVI[wk] || '') + (WX.rain ? ' · ' + Math.round(WX.rain) + '%' : '') : 'Đang lấy…',
       aria: WX ? wxT + ' ' + (WXVI[wk] || '') : 'đang lấy',
-      open: () => self.setState({ fcOpen: true, last: Date.now() })   // #130: the forecast, not the idle screen
+      open: () => self.setState({ idleOn: true, idleAt: Date.now() })   // 0.9.15 (#135): the weather opens the idle screen again
     };
     window.__wxState = { kind: wk, tod: tod, calm: drive && !!C.calm, drive: drive };
 
@@ -2449,12 +2688,16 @@ class Component extends DCLogic {
     const silk = (amp, ph) => { let d = 'M0 40 L0 ' + (24 - amp * Math.sin(ph)).toFixed(1); for (let x = 0; x <= 600; x += 25) d += ' L' + x + ' ' + (24 - amp * Math.sin(ph + x / 200 * 6.2832)).toFixed(1); return d + ' L600 40 Z'; };
     const JL = window.__jbLook || {};
     const jbBar = C.jbFollow && JL.barColour ? JL.barColour : '#FBB040';
+    // 0.9.15 (#144): thanh nhạc mờ được, sóng đậm hơn, màu sóng theo hình bìa album
+    const barA = (C.barAlpha != null ? C.barAlpha : 90) / 100;
+    const artC = MD && /^#[0-9a-f]{6}$/i.test(MD.col || '') ? MD.col : '';
+    const artC2 = artC ? (() => { const n = parseInt(artC.slice(1), 16); const mix = (v) => Math.round(v + (255 - v) * 0.45); return 'rgb(' + mix(n >> 16) + ',' + mix((n >> 8) & 255) + ',' + mix(n & 255) + ')'; })() : '';
     const jb = {
       posL: fmtT(MD && MD.pos), durL: fmtT(MD && MD.dur),
-      ring: '#FBB040', bg: 'linear-gradient(180deg, rgba(40,62,80,0.88), rgba(9,26,38,0.92))',
-      w1: silk(8, 0), w2: silk(6, 2.1), wc1: '#5FD4F0', wc2: '#FBB040', waveOp: (C.vizOn === false) ? 0 : (drive ? 0.35 : 0.8),
+      ring: '#FBB040', bg: 'linear-gradient(180deg, rgba(40,62,80,' + barA.toFixed(2) + '), rgba(9,26,38,' + Math.min(1, barA + 0.04).toFixed(2) + '))',
+      w1: silk(11, 0), w2: silk(8, 2.1), wc1: artC || '#5FD4F0', wc2: artC ? artC2 : '#FBB040', waveOp: (C.vizOn === false) ? 0 : ((C.waveOp != null ? C.waveOp : 90) / 100) * (drive ? 0.6 : 1), waveH: C.waveH != null ? C.waveH : 34,
       discCls: playing && !drive ? 'disc-on' : '', bar: jbBar,
-      rec: APP && playing && !!MD && MD.pkg === 'com.tomstechsolutions.jukebox' && /radio|trực tiếp|live/i.test((MD.artist || '') + ' ' + (MD.title || '')), recTap: () => { if (APP) tcn('media', 'jb:' + JSON.stringify({ kind: 'record', name: '' })); }
+      rec: APP && BI && !!MD && MD.builtin && MD.kind === 'radio' && playing || APP && playing && !!MD && MD.pkg === 'com.tomstechsolutions.jukebox' && /radio|trực tiếp|live/i.test((MD.artist || '') + ' ' + (MD.title || '')), recTap: () => { if (!APP) return; if (BI && MD && MD.builtin) { tcn('mus', JSON.stringify({ cmd: 'rec' })); self.toast(MD.rec ? 'Đã dừng thâu' : 'Bắt đầu thâu đài ' + (MD.station || '')); } else tcn('media', 'jb:' + JSON.stringify({ kind: 'record', name: '' })); }, recOn: !!(MD && MD.rec)
     };
 
     // ---- màn hình chờ (mục 20): kiểu đồng hồ chọn được, chỉ khi đậu xe, chống in hình ----
@@ -2560,7 +2803,7 @@ class Component extends DCLogic {
 
     // ---- 0.9.9: bản đồ toàn màn hình + chỉ đường + Hành Trình (nav.js) ----
     const NV = window.NAV || null;
-    if (S.scr === 'trip') S.scr = 'home';   // 0.9.14 (#131)
+    if (S.scr === 'trip' || S.scr === 'contacts') S.scr = 'home';   // 0.9.14 (#131), 0.9.15 (#149)
     const shell = !nar && (S.scr === 'home' || S.scr === 'rt');
     if (window.tcLangSync) window.tcLangSync(C.lang === 'en' ? 'en' : 'vi');
     if (NV) { NV.cfg.engine = C.mapEngine || 'gl'; NV.cfg.tilt = C.mapTilt !== false; NV.cfg.hereKey = C.hereKey || ''; NV.cfg.rec = !!C.driveRec; NV.cfg.rotate = C.navHeading !== false; NV.cfg.cams = C.navCams !== false; NV.cfg.histOff = C.tripLog === false; NV.cfg.mute = C.navVoice === false; NV.cfg.clip = C.vnVoice === 'doan' || C.vnVoice === 'son'; }
@@ -2574,7 +2817,13 @@ class Component extends DCLogic {
     const night0 = sun0 && sun0.rise ? !(nowT0 > new Date(sun0.rise).getTime() && nowT0 < new Date(sun0.set).getTime()) : (d.getHours() < 6 || d.getHours() >= 19);
     const toWp = (p) => ({ name: p.name, lat: p.lat, lon: p.lon, logo: p.logo || (NV ? NV.logoOf(p.name) : ''), st: p.st || '' });
     const wpList = S.wp || [];
+    // 0.9.15 (#148): Lịch Sử Tìm — every place Tom picks is remembered (50 newest, only in this phone)
+    const SH = (() => { if (!self.__sh) { try { self.__sh = JSON.parse(localStorage.getItem('tc-shist') || '[]'); } catch (e) { self.__sh = []; } } return self.__sh; })();
+    const shSave = (a) => { self.__sh = a; try { localStorage.setItem('tc-shist', JSON.stringify(a)); } catch (e) {} self.setState({ shAt: Date.now() }); };
+    const shAdd = (p) => { if (!p || p.lat == null || !p.name || /^Vị trí của Tom$/.test(p.name)) return; shSave([{ name: p.name, sub: p.sub || p.st || '', lat: p.lat, lon: p.lon, logo: p.logo || '', at: Date.now() }].concat(SH.filter((x) => !(x.name === p.name && Math.abs(x.lat - p.lat) < 0.0005))).slice(0, 50)); };
+    const fold = (t) => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
     const planWp = (wp, start) => {
+      if (wp.length) shAdd(wp[wp.length - 1]);
       self.setState({ wp, nq: '', nRes: null, nField: '' });
       if (!NV) return;
       if (!wp.length) { NV.cancel(); return; }
@@ -2616,11 +2865,12 @@ class Component extends DCLogic {
     const ctlTop = (navAct && (C.navBanner === 'big' || ((C.navBanner || 'auto') === 'auto' && NV.st.toNext != null && NV.st.toNext < 200))) ? 214 : (navAct ? 160 : (S.scr === 'home' ? 200 : 138));
     const shortRd = (t) => (t || '').replace(/\bAvenue\b/g, 'Ave').replace(/\bBoulevard\b/g, 'Blvd').replace(/\bRoad\b/g, 'Rd').replace(/\bDrive\b/g, 'Dr').replace(/\bStreet\b/g, 'St').replace(/\bHighway\b/g, 'Hwy').replace(/\bFreeway\b/g, 'Fwy').replace(/\bCourt\b/g, 'Ct').replace(/\bCrescent\b/g, 'Cres').replace(/\bParade\b/g, 'Pde').replace(/\bService Road\b/g, 'Service Rd');
     const waitGps = !!(APP && navAct && (!LV.fresh || Date.now() - ((NV && NV.st.fixAt) || 0) > 8000));
+    if (waitGps && !self.__gpsWait) self.__gpsWait = Date.now(); else if (!waitGps) self.__gpsWait = 0;
     const nearTurn = !!(navAct && NV.st.toNext != null && NV.st.toNext < 200);
     const bnSize = C.navBanner === 'big' ? 'big' : C.navBanner === 'hide' ? (nearTurn ? 'mini' : 'tiny') : (nearTurn ? 'big' : 'mini');
     const etaOpen = !!S.etaOpen;
     // 0.9.14 (#131): the "Đi đâu?" list (Nhà, Chỗ Làm, Đã Lưu…) opens under the box; "+ Thêm Chặng" reuses the box
-    const dropOpen = !!S.goOpen && S.scr === 'home' && !navAct && !(S.nField === 'go' && S.nRes && S.nRes.length);
+    const dropOpen = !!S.goOpen && S.scr === 'home' && !navAct && !(S.nField === 'go' && ((S.nRes && S.nRes.length) || (S.nq || '').trim()));
     const goAdd = !!S.goAdd && wpList.length > 0;
     const nv = {
       boxTap: () => { if (!S.goOpen) self.setState({ goOpen: true, goMenu: false, hjTab: S.hjTab === 'log' ? 'saved' : S.hjTab, last: Date.now() }); },
@@ -2628,17 +2878,21 @@ class Component extends DCLogic {
       openLog: () => self.setState({ goMenu: false, goOpen: true, hjTab: 'log' }),
       openPark: () => { self.setState({ goMenu: false }); if (H0.park && NV) NV.flyTo([H0.park.lat, H0.park.lon], 17); else self.toast('Chưa ghi chỗ đậu xe nào — đậu hơn 3 phút là app tự ghi'); },
       openHomeSet: () => self.setState({ goMenu: false, dlg: 'pe', peKind: 'home', peQ: '', peRes: [] }),
+      shClear: () => { shSave([]); self.setState({ goMenu: false }); self.toast('Đã xoá lịch sử tìm'); },
       addStop: () => self.setState({ goAdd: true, goOpen: true, nField: 'go', nq: '', nRes: null }),
       stopsOn: wpList.length > 1, prevH: 560,
       mapOn: mapShow, boxOn: shell && S.scr === 'home' && !navAct && !arrived && mapShow, q: S.nField === 'go' ? (S.nq || '') : '', qOn: S.nField === 'go' && !!S.nq, lock: kbLk,
       ph: kbLk ? 'Đậu xe rồi gõ — hoặc nói "Hey Tom, đi tới…"' : (goAdd ? '+ Thêm điểm dừng — gõ tên chỗ' : 'Đi đâu? Gõ tên chỗ hoặc địa chỉ'), typeGo: typeIn('go'), clearQ: () => self.setState({ nq: '', nRes: null }),
       goFirst: () => { const r = S.nField === 'go' && S.nRes && S.nRes[0]; if (r) { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(r)]) : [toWp(r)], !goAdd); } else if (navV) NV.start(); else self.toast('Gõ chỗ muốn tới trước nha'); },
-      res: resFor('go', (p) => { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], false); }), resOn: S.nField === 'go' && !!(S.nRes && S.nRes.length) && S.scr === 'home',
+      res: (S.nField === 'go' && (S.nq || '').trim() ? SH.filter((x) => fold(x.name + ' ' + x.sub).indexOf(fold(S.nq.trim())) >= 0).slice(0, 4).map((x) => Object.assign(resRow(Object.assign({}, x, { sub: '🕘 ' + (x.sub || 'Đã tìm trước đây') }), () => { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(x)]) : [toWp(x)], false); }))) : [])
+        .concat(resFor('go', (p) => { self.setState({ goOpen: false, goAdd: false }); planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], false); }).filter((r) => !SH.some((x) => x.name === r.name && (S.nq || '').trim() && fold(x.name).indexOf(fold(S.nq.trim())) >= 0))), resOn: (S.nField === 'go' && (S.nq || '').trim() && SH.some((x) => fold(x.name + ' ' + x.sub).indexOf(fold(S.nq.trim())) >= 0)) || S.nField === 'go' && !!(S.nRes && S.nRes.length) && S.scr === 'home',
       micGo: () => { self.setState({ va: true, vaHeard: '', vaHint: 'Nói tên chỗ hoặc địa chỉ… ví dụ “đi tới Bunnings Sunshine”' }); tcn('voice', 'start'); },
       qcOn: shell && !!S.qc && (S.scr === 'home' || navAct), qcRows, qcEmpty: !!S.qc && !qcRows.length, qcMsg: S.placesBusy ? (S.placesMsg || 'Đang tìm…') : (qcRows.length ? (navAct ? 'Dọc đường đi · chạm để thêm điểm dừng' : (S.placesMsg || '')) : (S.placesMsg || 'Không thấy chỗ nào')), qcTitle: S.qc && QC[S.qc] ? QC[S.qc][0] + ' ' + QC[S.qc][1] : '', qcClose: () => self.setState({ qc: null }),
       navChips: qcKeys.slice(0, 6).map((k) => ({ l: QC[k][0], a: QC[k][1] + ' dọc đường', go: qcGo(k), on: S.qc === k })), navChipsOn: shell && navAct && mapShow,
       chips, chipsOn: shell && S.scr === 'home' && !navAct && !navV && !arrived && mapShow && !dropOpen && !S.goMenu && !(S.nField === 'go' && S.nRes && S.nRes.length),
-      bannerOn: shell && navAct && mapShow && !waitGps && bnSize === 'big', bnMini: shell && navAct && mapShow && !waitGps && bnSize === 'mini', bnTiny: shell && navAct && mapShow && !waitGps && bnSize === 'tiny', waitGps: shell && navAct && mapShow && waitGps,
+      bannerOn: shell && navAct && mapShow && bnSize === 'big', bnMini: shell && navAct && mapShow && bnSize === 'mini', bnTiny: shell && navAct && mapShow && bnSize === 'tiny', waitGps: shell && navAct && mapShow && waitGps, gpsTop: ctlTop - 44,
+      cbS: (C.spPanel || 'a') !== 'off' ? 48 : 54, cbG: (C.spPanel || 'a') !== 'off' ? 6 : 8, zoomOn: !navAct || (C.spPanel || 'a') === 'off', gpsL: (S.now - (self.__gpsWait || S.now)) > 30000 ? 'GPS yếu — ra chỗ thoáng trời' : 'Đang chờ GPS…',
+      stopAsk: () => self.setState({ stopAsk: true }), stopOn: !!S.stopAsk && navAct, stopNo: () => self.setState({ stopAsk: false }), stopYes: () => { self.setState({ stopAsk: false, wp: [] }); NV && NV.stop(); },
       bnTap: () => self.setS('navBanner', C.navBanner === 'big' ? 'hide' : C.navBanner === 'hide' ? 'auto' : 'big'), shortText: navV ? shortRd(navV.text) : '', thenShort: navV && navV.then ? shortRd(navV.then).replace(/^(Rẽ|Chếch|Giữ|Đi|Ra|Vô)[^ ]* [^ ]* (vô |theo )?/, '') : '', bar: navV && NV.st.toNext != null ? Math.max(4, Math.min(100, 100 - NV.st.toNext / 2)) : 0, thenIcoD: navV ? (MAN[navV.thenIco] || '') : '', thenIcoOn: !!(navV && navV.then),
       icoD: navV ? (MAN[navV.ico] || MAN.straight) : '', dist: navV ? navV.dist : '', text: navV ? navV.text : '',
       thenOn: !!(navV && navV.then), then: navV ? navV.then : '', thenDist: navV ? navV.thenDist : '',
@@ -2663,8 +2917,8 @@ class Component extends DCLogic {
     };
     // tab row on the map screens (0.9.14 #131: Màn Hình Chính + Hành Trình merged): ➤ Hành Trình · 🗺 Road Trip · Liên Lạc · Tìm Chỗ
     const unread0 = APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3;
-    const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: '', nRes: null, nField: '', goOpen: false, goAdd: false, ntOpen: scr === 'rt' ? S.ntOpen : false });
-    const tabs = [['home', '➤ Hành Trình'], ['rt', '🗺 Road Trip'], ['contacts', 'Liên Lạc'], ['search', 'Tìm Chỗ']].map(([k, l]) => { const on = S.scr === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(8,22,34,0.62)', fg: on ? '#2A1A00' : '#FFFFFF', ring: on ? 'none' : 'inset 0 0 0 1px rgba(255,255,255,0.22)', cls: on ? '' : 'glt', badge: unread0, badgeOn: k === 'contacts' && unread0 > 0, go: k === 'contacts' ? () => { tabGo('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } } : tabGo(k) }; });
+    const tabGo = (scr) => () => (S.scr === scr && scr === 'rt') ? self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { rt: !(S.pnlMin || {}).rt }) }) : self.setState({ scr, dlg: null, nq: '', nRes: null, nField: '', goOpen: false, goAdd: false, ntOpen: scr === 'rt' ? S.ntOpen : false });
+    const tabs = [['home', '➤ Hành Trình'], ['rt', '🗺 Road Trip'], ['search', 'Tìm Chỗ']].map(([k, l]) => { const on = S.scr === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : 'rgba(8,22,34,0.62)', fg: on ? '#2A1A00' : '#FFFFFF', ring: on ? 'none' : 'inset 0 0 0 1px rgba(255,255,255,0.22)', cls: on ? '' : 'glt', badge: unread0, badgeOn: k === 'contacts' && unread0 > 0, go: k === 'contacts' ? () => { tabGo('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } } : tabGo(k) }; });
     const togglePnl = () => self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { [S.scr]: !pnlMin }) });
     // ---- Hành Trình panel (#63, #66) ----
     const dowS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -2690,6 +2944,7 @@ class Component extends DCLogic {
       quick: [homeP ? { ic: '🏠', l: 'Nhà', sub: kmTo(homeP) || homeP.name || '', go: () => pickPl(Object.assign({}, homeP, { name: 'Nhà' }), false) } : { ic: '🏠', l: 'Nhà', sub: 'Chưa lưu — bấm để đặt', go: () => self.setState({ dlg: 'pe', peKind: 'home', peQ: '', peRes: [] }) },
         work ? { ic: '💼', l: 'Chỗ Làm', sub: kmTo(work) || work.name || '', go: () => pickPl(work, false) } : { ic: '💼', l: 'Chỗ Làm', sub: 'Chưa lưu — bấm để đặt', go: () => self.setState({ dlg: 'pe', peKind: 'work', peQ: '', peRes: [] }) }],
       quickOn: hjTab !== 'log',
+      shOn: hjTab !== 'log' && SH.length > 0, sh: SH.slice(0, 6).map((x, i) => ({ name: x.name, sub: x.sub || kmTo(x), pick: () => pickPl(x, false), del: () => shSave(SH.filter((_, k) => k !== i)) })),
       habitOn: !!habit && !navV, habitL: habit ? 'Giờ này Tom hay đi ' + habit.name : '', habitGo: () => habit && planWp([toWp(habit)], true),
       parkOn: !!H0.park && !drive, parkL: H0.park ? 'Xe đậu ở ' + (H0.park.name || 'đây') + ' · ' + (parkAgo < 60 ? parkAgo + ' phút trước' : Math.floor(parkAgo / 60) + ' giờ trước') : '', parkSee: () => H0.park && NV.flyTo([H0.park.lat, H0.park.lon], 17),
       parkR: H0.park && H0.park.until ? '⏰ Nhắc lúc ' + NV.hhmm(H0.park.until - 600000) : '', parkRemind: [[60, '1P'], [120, '2P'], [240, '4P']].map(([m, l]) => ({ l, on: H0.park && H0.park.limit === m ? 'true' : 'false', bg: H0.park && H0.park.limit === m ? '#FBB040' : 'rgba(255,255,255,0.06)', fg: H0.park && H0.park.limit === m ? '#2A1A00' : '#CFE6EE', tap: () => NV.parkRemind(m) })),
@@ -2723,7 +2978,7 @@ class Component extends DCLogic {
     const offKey = 'tc-off-' + S.tripId;
     const offDone = (() => { try { return localStorage.getItem(offKey); } catch (e) { return null; } })();
     const rtp = {
-      on: shell && S.scr === 'rt' && !pnlMin, min: shell && S.scr === 'rt' && pnlMin, toggle: togglePnl,
+      on: shell && S.scr === 'rt' && !pnlMin, min: shell && S.scr === 'rt' && pnlMin, toggle: togglePnl, toggleStop: togglePnl,
       title: rt.title, legs: rt.legs, openTrips: rt.openTrips, newTrip: () => self.setState({ ntOpen: !S.ntOpen, ntMsg: '', nField: '', nRes: null, rtAdd: false, rtMore: false }), newL: S.ntOpen ? '✕ Đóng' : '＋ Mới', newA: S.ntOpen ? 'Đóng tạo chuyến' : 'Tạo chuyến mới', formOn: !!S.ntOpen,
       from: S.ntFrom || '', fromPh: tp.fromPh, to: S.ntTo || '', typeFrom: typeIn('from'), typeTo: typeIn('to'), focusFrom: () => { if (S.nField !== 'from') self.setState({ nField: 'from', nRes: null }); },
       resFrom: fromRows.concat(resFor('from', pickFrom)), resFromOn: S.nField === 'from', resTo: resFor('to', pickTo), resToOn: S.nField === 'to' && !!(S.nRes && S.nRes.length),
@@ -2869,11 +3124,27 @@ class Component extends DCLogic {
       hours: fcHours, hoursOn: fcHours.length > 1,
       days: WXD7.slice(0, 7).map((x, i) => { const t = new Date(x.d + (String(x.d).length <= 10 ? 'T12:00' : '')); const dd = isNaN(t) ? new Date(d.getTime() + i * 864e5) : t; return { name: i === 0 ? 'Hôm nay' : THU[dd.getDay()] + ' ' + dd.getDate() + '/' + (dd.getMonth() + 1), parts: icOf(x.code, 12), lo: Math.round(x.lo) + '°', hi: Math.round(x.hi) + '°', l: Math.round((x.lo - lo7) / sp7 * 100), w: Math.max(6, Math.round((x.hi - x.lo) / sp7 * 100)), p: x.rain != null && x.rain >= 10 ? '💧' + Math.round(x.rain) + '%' : '' }; }),
       daysOn: WXD7.length > 0, none: APP && !WX };
+    // ---- 0.9.15 (#136): bảng Thiết Bị Đang Kết Nối ----
+    const lvC = (v) => v == null || v < 0 ? '#8FC3D3' : v < 20 ? '#FF8A8A' : v < 40 ? '#FFC46B' : '#7BD88F';
+    const B0 = LV.bat || (APP ? {} : { level: 71, charging: true, temp: 33.5, left: 48, src: 'usb' });
+    const devRows = [{ ic: '📱', name: 'Điện thoại' + (LV.device ? ' · ' + LV.device : ''),
+      sub: [B0.charging ? '⚡ Đang sạc' + (B0.src === 'wireless' ? ' không dây' : '') + (B0.left > 0 ? ' · đầy sau ~' + (B0.left >= 60 ? Math.floor(B0.left / 60) + ' giờ ' : '') + (B0.left % 60) + ' phút' : '') : 'Không sạc', B0.temp ? 'Pin ' + Math.round(B0.temp) + '°C' + (B0.hot ? ' — nóng!' : '') : ''].filter(Boolean).join(' · '),
+      lvOn: B0.level != null, lv: (B0.level != null ? B0.level : '--') + '%', pct: B0.level || 0, c: B0.hot ? '#FF8A8A' : lvC(B0.level), tap: () => {} }]
+      .concat((LV.devs || (APP ? [] : [{ name: 'Galaxy Buds2 Pro', type: 'audio', level: 64 }, { name: 'XAV-AX3200', type: 'audio', level: -1 }])).map((d) => ({ ic: d.type === 'watch' ? '⌚' : d.type === 'speaker' ? '🔊' : d.type === 'audio' ? '🎧' : '🔵', name: d.name,
+        sub: (d.type === 'watch' ? 'Đồng hồ' : d.type === 'speaker' ? 'Loa Bluetooth' : d.type === 'audio' ? 'Tai nghe / âm thanh xe' : 'Thiết bị Bluetooth') + (d.level >= 0 ? '' : ' · không báo pin'),
+        lvOn: d.level >= 0, lv: d.level + '%', pct: d.level, c: lvC(d.level), tap: () => tcn('btset') })))
+      .concat([LV.obd ? { ic: '🔧', name: 'OBD-II · đã nối', sub: (LV.obd.protocol || '') + (LV.obd.volt ? ' · Bình điện ' + Number(LV.obd.volt).toFixed(1) + ' V' : ''), lvOn: false, tap: () => {} }
+        : { ic: '🔧', name: 'OBD-II', sub: LV.obdSt === 'wait' ? 'Chưa nối — mở máy xe để nối' : 'Chưa thấy cục OBD', lvOn: false, tap: () => {} }])
+      .concat(LV.dex ? [{ ic: '🖥', name: 'Samsung DeX', sub: 'Đang chạy trên màn hình ngoài', lvOn: false, tap: () => {} }] : [])
+      .concat((LV.usb || []).map((u) => ({ ic: '🔌', name: u.name || 'Thiết bị USB', sub: 'USB' + (u.maker ? ' · ' + u.maker : ''), lvOn: false, tap: () => {} })));
+    const qr = { on: S.dlg === 'qr', rows: (S.qrEdit || []).map((v, i) => ({ n: i + 1, v, set: (e) => { const a = (self.state.qrEdit || []).slice(); a[i] = e.target.value; self.setState({ qrEdit: a }); } })),
+      cancel: () => self.setState({ dlg: null }), save: () => { self.setS('quickReplies', (S.qrEdit || []).map((x) => x.trim()).filter(Boolean)); self.setState({ dlg: null }); } };
+    const dev = { on: !!S.devOpen, open: () => self.setState({ devOpen: true, last: Date.now() }), close: () => self.setState({ devOpen: false }), stop: () => {}, rows: devRows };
     const wsHid = (navAct || spd > 15) ? !S.wsOpen : !!C.wsCol;
     window.__mapTouched = () => { if (shell && self.state.scr === 'home' && !self.state.qc && !wsHid) { if (navAct || spd > 15) self.setState({ wsOpen: false }); else self.setS('wsCol', true); } };
     return {
       crashOn: !!S.crash, crashClose: () => self.setState({ crash: '' }), crashSend: () => { const v = window.TC_VERSION || '0.9.x-beta'; tcn('mail', JSON.stringify({ subject: "Góp Ý Tom's Car " + v, body: 'App vừa bị tắt bất ngờ.\n\n' + S.crash })); self.setState({ crash: '' }); },
-      cal, fc,
+      cal, fc, dev, nm, qr, spp,
       rootW: nar || APP ? '100%' : '1280px', rootH: nar || APP ? '100%' : '720px', verL: window.TC_VERSION || '0.9.x-beta', ph, rootBg: APP ? 'transparent' : '#03111C', opaqueBg: APP && (nar || !shell), nv, tabs, hj, rtp, lf, pe, wsShow: shell && S.scr === 'home' && !S.qc && !wsHid, wsGuide: !C.wsGuideOff, wsLater: () => self.setS('wsGuideOff', true), wsHide: () => (navAct || spd > 15) ? self.setState({ wsOpen: false }) : self.setS('wsCol', true), upCardOn: drive && !navAct, wsPill: shell && S.scr === 'home' && !S.qc && wsHid, wsTog: () => (navAct || spd > 15) ? self.setState({ wsOpen: true }) : (self.setS('wsCol', false), self.setState({ wsOpen: false })), rtDlgOn: shell, kbLk, clock, scrBtns, zones, sb, mp, va, clk, idl, openTheme, street, devList, wxi, wxc, wxT, wxL1, wxL2, engT, voltT, obdHint, obdHintOn: !!obdHint, upL, upMain, cp, searchNote, searchRetry, doRetry, searchQ: S.searchQ || '', setSearchQ: (e) => self.setState({ searchQ: e.target.value }), doSearchQ: () => { const q = (S.searchQ || '').trim(); if (!q) return; self.setState({ cat: 'q:' + q }); if (APP && window.tcFindPlaces) window.tcFindPlaces('q:' + q); }, fuelNote,
       unreadN: APP ? ((S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0)) : 3,
       wsTitle: S.wsEdit != null ? 'Sửa Workspace' : 'Tạo Workspace', wsAny: S.wsList.length > 0, wsEmpty: !S.wsList.length, wsCards, wsName: S.wsName, setWsName: (e) => self.setState({ wsName: e.target.value }), saveWs,
@@ -2905,7 +3176,7 @@ class Component extends DCLogic {
       // 0.9.13 (#122): ear button — turn listening for "Hey Tom" off/on right from Màn Hình Chính (the mic button still works)
       earOn: C.hotOn === false ? 'false' : 'true', earC: C.hotOn === false ? '#8A9AA6' : '#5FD4F0', earSlash: C.hotOn === false ? 1 : 0, earL: C.hotOn === false ? 'TẮT' : 'HEY TOM', earA: C.hotOn === false ? 'Bật nghe Hey Tom' : 'Tắt nghe Hey Tom',
       earTap: () => { const on = C.hotOn === false; self.setS('hotOn', on); self.toast(on ? 'Đã bật nghe "Hey Tom"' : 'Đã tắt nghe "Hey Tom" — bấm nút mic để gọi trợ lý'); }, micBg: (APP && PM.mic === false) ? '#5E6B73' : '#FBB040', micW: (APP && PM.mic === false) ? '#5E6B73' : S.va ? '#FBB040' : '#5FD4F0', micA: (APP && PM.mic === false) ? 'chưa cấp quyền micro' : S.va ? 'đang nghe' : 'sẵn sàng',
-      isHome: shell, isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: false, tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', pick: () => (APP && k === 'podcast' && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', mpTab: k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
+      isHome: shell, isSettings: !nar && S.scr === 'settings', isTheme: !nar && S.scr === 'theme', th, isRt: false, tp, od, dk, spdDisp: 'none', mpL: mpPos ? mpPos.L : 'auto', mpR: mpPos ? mpPos.R : '20px', mpW: mpPos ? mpPos.W : (drive ? 600 : 660), mpH: mpPos ? 72 : 80, mpB: mpPos ? 16 : 10, mpCls: mpPos ? 'gl' : '', srcMenuOn: !!S.srcMenu, srcMenuX: 760, srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }), srcMenu: [['music', 'Nhạc'], ['radio', 'Radio'], ['podcast', 'Podcast']].map(([k, l]) => { const on = S.src === k; return { label: l, on: on ? 'true' : 'false', bg: on ? '#FBB040' : '#0D2C40', fg: on ? '#2A1A00' : '#E8F1F5', fw: on ? 700 : 400, tc: on ? '#FFD08A' : '#8FC3D3', ul: on ? 'underline' : 'none', pick: () => (APP && k === 'podcast' && !BI && tcn('media', 'jbquery'), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: '', musDrill: null, musPod: null, mpTab: BI ? biTabs[k][0][0] : (k === 'radio' ? 'near' : (k === 'music' ? 'lists' : self.state.mpTab)), panelAt: Date.now() })) }; }), townOn: !!(S.townSign && S.now - S.townSign.at < 6000 && S.scr === 'home'), townL: S.townSign ? S.townSign.name : '', isSplit: !nar && S.scr === 'split', isSearch: !nar && S.scr === 'search', isDex: !nar && S.scr === 'dex', isContacts: !nar && S.scr === 'contacts', isCompact: nar,
       appTop: APP ? 0 : 40, appW: nar || APP ? '100%' : '1280px', appH: nar || APP ? '100%' : '680px', appBg: APP ? 'transparent' : 'linear-gradient(180deg,#020A12 0%,#06192A 55%,#0B2436 100%)',
       touch: () => { if (!S.dragging && !S.panning) self.setState({ last: Date.now() }); },
       drive: drive, drivePressed: drive ? 'true' : 'false', driveBg: drive ? '#7BD88F' : '#0D2C40', driveFg: drive ? '#03111C' : '#CFF6FF', driveLabel: drive ? 'Đang Chạy' : 'Đậu Xe',
@@ -2915,12 +3186,12 @@ class Component extends DCLogic {
       tint: drive && C.rainFx && !nv.mapOn ? 'rgba(10,40,70,0.35)' : 'transparent', rainOn, drops: DROPS, glass: GLASS,
       opBottom, opMusic, dimmedAny: idle, dimHint: idle && (() => { try { if (!window.__dimHintUntil) { if (localStorage.getItem('tc-dimhint')) { window.__dimHintUntil = 1; } else { localStorage.setItem('tc-dimhint', '1'); window.__dimHintUntil = Date.now() + 6000; } } } catch (e) { window.__dimHintUntil = 1; } return Date.now() < window.__dimHintUntil; })(), jb,
       musicW: drive ? 600 : 660,
-      togglePlay: () => { if (APP) { if (S.src === 'radio') tcn('radio', playing ? 'stop' : JSON.stringify({ url: (LV.radio && LV.radio.url) || '', name: (LV.radio && LV.radio.name) || '' })); else tcn('media', playing ? 'pause' : 'play'); } else self.setState({ playing: !S.playing, perm: S.playing ? S.perm : true }); }, playLabel: playing ? 'Dừng' : 'Phát',
-      prevF: () => { if (!APP) return; if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '-15000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'prev'); }, nextF: () => { if (!APP) return; if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '30000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'next'); },
+      togglePlay: () => { if (APP) { if (BI) tcn('media', 'toggle'); else if (S.src === 'radio') tcn('radio', playing ? 'stop' : JSON.stringify({ url: (LV.radio && LV.radio.url) || '', name: (LV.radio && LV.radio.name) || '' })); else tcn('media', playing ? 'pause' : 'play'); } else self.setState({ playing: !S.playing, perm: S.playing ? S.perm : true }); }, playLabel: playing ? 'Dừng' : 'Phát',
+      prevF: () => { if (!APP) return; if (BI) { if (MD && MD.kind === 'podcast') tcn('mus', JSON.stringify({ cmd: 'skip', ms: -15000 })); else tcn('media', 'prev'); return; } if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '-15000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'prev'); }, nextF: () => { if (!APP) return; if (BI) { if (MD && MD.kind === 'podcast') tcn('mus', JSON.stringify({ cmd: 'skip', ms: 30000 })); else tcn('media', 'next'); return; } if (S.src === 'podcast') tcn('media', 'jb:' + JSON.stringify({ kind: 'seek', name: '30000' })); else tcn(S.src === 'radio' ? 'radio' : 'media', 'next'); },
       prevLabel: S.src === 'podcast' ? 'Lùi 15 giây' : S.src === 'radio' ? 'Đài trước' : 'Bài trước', nextLabel: S.src === 'podcast' ? 'Tới 30 giây' : S.src === 'radio' ? 'Đài kế' : 'Bài kế',
       playIcon: playing && !inCall ? 'M7 5h4v14H7zM13 5h4v14h-4z' : 'M8 5l11 7-11 7z',
-      songTitle: APP ? (S.src === 'radio' ? ((LV.radio && LV.radio.name) || DEF_NOW.radio[2]) : (MD && MD.title) || DEF_NOW.music[2]) : (S.playing ? (S.nowT || DEF_NOW[S.src][0]) : DEF_NOW[S.src][2]),
-      songSub: inCall && playing ? 'Tạm dừng vì có cuộc gọi' : APP ? (S.src === 'radio' ? (playing ? 'Radio · trực tiếp' : (LV.radio && LV.radio.err) || '') : MD ? [MD.artist, MD.app].filter(Boolean).join(' · ') : 'Bấm ▶ để phát ' + (({ 'com.spotify.music': 'Spotify', 'com.google.android.apps.youtube.music': 'YouTube Music' })[C.musicApp] || "Tom's Jukebox")) : (S.playing ? (S.nowS || DEF_NOW[S.src][1]) : (S.perm ? 'Bấm ▶ để phát' : '')),
+      songTitle: APP ? (BI ? ((MD && MD.title) || 'Tom’s Car · Nhạc') : S.src === 'radio' ? ((LV.radio && LV.radio.name) || DEF_NOW.radio[2]) : (MD && MD.title) || DEF_NOW.music[2]) : (S.playing ? (S.nowT || DEF_NOW[S.src][0]) : DEF_NOW[S.src][2]),
+      songSub: inCall && playing ? 'Tạm dừng vì có cuộc gọi' : APP && BI ? (MD ? (MD.buffering ? 'Đang tải…' : MD.rec ? '⏺ Đang thâu · ' + fmtT(MD.recSec * 1000) : MD.err || [MD.artist, MD.kind === 'radio' ? 'Radio · trực tiếp' : MD.kind === 'podcast' ? 'Podcast' : ''].filter(Boolean).join(' · ')) : 'Bấm ▶ để phát nhạc trong máy') : APP ? (S.src === 'radio' ? (playing ? 'Radio · trực tiếp' : (LV.radio && LV.radio.err) || '') : MD ? [MD.artist, MD.app].filter(Boolean).join(' · ') : 'Bấm ▶ để phát ' + (({ 'com.spotify.music': 'Spotify', 'com.google.android.apps.youtube.music': 'YouTube Music' })[C.musicApp] || "Tom's Jukebox")) : (S.playing ? (S.nowS || DEF_NOW[S.src][1]) : (S.perm ? 'Bấm ▶ để phát' : '')),
       showWave, waveBars, prog: APP ? ((MD && MD.pos != null && MD.dur) ? Math.round(MD.pos / MD.dur * 100) : 0) : 38, needPerm: APP ? (S.src === 'music' && !PM.notif) : (!S.perm && !S.playing), showSkip: playing,
       grantPerm: () => { if (APP) tcn('perm', 'notif'); else self.setState({ perm: true }); },
       goSettings: go('settings'), goHome: go('home'), goRt: go('rt'), goSplit: () => { go('split')(); if (APP) tcn('split', JSON.stringify({ frac: S.split, side: C.mapSide, map: C.mapApp })); }, goSearch: go('search'), goContacts: () => { go('contacts')(); if (APP) { tcn('calllog'); tcn('msgs'); } },

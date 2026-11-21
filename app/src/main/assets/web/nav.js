@@ -32,7 +32,11 @@
     t = Math.max(0, Math.min(1, t));
     return { d: Math.hypot(ax + t * dx, ay + t * dy), t };
   };
-  const stepSay = (st) => NAV.cfg && NAV.cfg.clip && !EN() && st.plain ? st.plain : st.text;
+  const stepSay = (st) => {
+    if (EN()) return st.text;
+    if (st.road && st.pre) return st.pre + "\xA7" + st.road;
+    return NAV.cfg && NAV.cfg.clip && st.plain ? st.plain : st.text;
+  };
   const say = (t) => {
     if (NAV.logEvt) NAV.logEvt("say", t);
     try {
@@ -1180,7 +1184,9 @@
         legI = li;
         return;
       }
-      steps.push({ rb, at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: "", ref: "", destinations: "", exits: "" }), ""), text: viText(s, isWp ? wps[li + 1] && wps[li + 1].name : s.maneuver.type === "arrive" ? wps[wps.length - 1] && wps[wps.length - 1].name : ""), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === "arrive" });
+      const rd = nm(s), tx0 = viText0(s, isWp ? wps[li + 1] && wps[li + 1].name : s.maneuver.type === "arrive" ? wps[wps.length - 1] && wps[wps.length - 1].name : "");
+      const cut = rd && !/^(arrive|off ramp)$/.test(s.maneuver.type) ? Math.max(tx0.lastIndexOf(" v\xF4 " + rd), tx0.lastIndexOf(" theo " + rd)) : -1;
+      steps.push({ road: cut > 0 ? rd.replace(/\s*\(.*\)$/, "") : "", pre: cut > 0 ? tx0.slice(0, cut) + (tx0.indexOf(" theo " + rd, cut) === cut ? " theo" : " v\xF4") : "", rb, idx: startIdx, at: cum[startIdx] || 0, plain: viText0(Object.assign({}, s, { name: "", ref: "", destinations: "", exits: "" }), ""), text: viText(s, isWp ? wps[li + 1] && wps[li + 1].name : s.maneuver.type === "arrive" ? wps[wps.length - 1] && wps[wps.length - 1].name : ""), ico: iconKey(s), name: nm(s), dist: s.distance, leg: li, wp: s.maneuver.type === "arrive" });
       (s.intersections || []).forEach((x) => {
         if ((x.classes || []).indexOf("toll") >= 0 && s.name && tolls.indexOf(s.name) < 0) tolls.push(s.name);
       });
@@ -1394,7 +1400,9 @@
     S.along = null;
     S.moved = false;
     S.fixedStart = false;
-    S.said = {};
+    S.said = { 1: { far: 1 } };
+    S.saidPts = [];
+    S.startFix = null;
     S.off = 0;
     S.offRoute = false;
     S.rerouting = false;
@@ -1441,8 +1449,9 @@
     const S = NAV.st, R = S.route;
     if (!S.active || !R) return;
     const p = [f.lat, f.lon], spd0 = f.spd || 0, slow = spd0 < 10;
-    if (spd0 >= 10) S.moved = true;
-    if (!S.moved && !S.fixedStart && (f.acc || 99) <= 30 && R.pts.length > 1 && dist(p, R.pts[0]) > 60 && !S.rerouting) {
+    if (!S.startFix && (f.acc || 99) <= 25) S.startFix = p;
+    if (spd0 >= 10 && (f.acc || 99) <= 35 || S.startFix && (f.acc || 99) <= 25 && dist(p, S.startFix) > 30) S.moved = true;
+    if (!S.moved && !S.fixedStart && (f.acc || 99) <= 40 && R.pts.length > 1 && dist(p, R.pts[0]) > 40 && !S.rerouting) {
       S.fixedStart = true;
       reroute(p, null, true);
       return;
@@ -1492,14 +1501,27 @@
     while (n < R.steps.length - 1 && R.steps[n].at <= along2 + 4) n++;
     S.next = n;
     S.toNext = Math.max(0, R.steps[n].at - along2);
-    const st = R.steps[n], spd = f.spd || 0, said = S.said[n] || (S.said[n] = {});
+    const st = R.steps[n], spd = f.spd || 0;
+    if (!S.said[n]) {
+      const at = R.pts[Math.min(R.pts.length - 1, st.idx || 0)], old = at && (S.saidPts || []).find((q) => dist(q.p, at) < 35);
+      S.said[n] = old ? { far: old.far, near: old.near } : {};
+    }
+    const said = S.said[n];
+    const markSaid = () => {
+      const at = R.pts[Math.min(R.pts.length - 1, st.idx || 0)];
+      if (at) {
+        S.saidPts = (S.saidPts || []).filter((q) => dist(q.p, at) >= 35).concat([{ p: at, far: said.far, near: said.near }]).slice(-20);
+      }
+    };
     const far = spd > 75 ? 1500 : spd > 45 ? 600 : 350, near = spd > 75 ? 350 : spd > 45 ? 160 : 70;
     if (!said.far && S.toNext <= far && S.toNext > near * 1.6 && R.steps[n].at - R.steps[n - 1].at > near * 2) {
       said.far = 1;
+      markSaid();
       say(EN() ? "In " + sayDist(S.toNext) + ", " + st.text.toLowerCase() : sayDist(S.toNext) + " n\u1EEFa, " + stepSay(st).toLowerCase());
     }
     if (!said.near && S.toNext <= near) {
       said.near = 1;
+      markSaid();
       say(stepSay(st));
       if (st.wp && n < R.steps.length - 1) toast(st.text);
     }

@@ -312,8 +312,18 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ if (floorFrom < 0) { am.setStreamVolume(AudioManager.STREAM_MUSIC, f, 0); android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({ if (floorFrom < 0) Vol.lifting = false }, 300) } }, 400)
     }
     private var ttsCbSet = false
+    /** 0.9.15 (#145): a road name to read in English after the Vietnamese part ("Quẹo trái vô§Taylors Road") */
+    private var tail: String? = null
+    private fun sayTail(): Boolean {
+        val n = tail ?: return false; tail = null
+        val t = tts ?: return false
+        if (!ttsOk) return false
+        try { t.setLanguage(Locale("en", "AU")) } catch (_: Exception) {}
+        val b = Bundle(); b.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC)
+        ensureCb(); floorOn(); t.speak(n, TextToSpeech.QUEUE_FLUSH, b, "tcEn"); return true
+    }
     private fun playClips(ids: List<Int>, i: Int = 0) {
-        if (i >= ids.size) { clipPlayer?.release(); clipPlayer = null; floorOff(); return }
+        if (i >= ids.size) { clipPlayer?.release(); clipPlayer = null; if (!sayTail()) floorOff(); return }
         if (i == 0) floorOn()
         try {
             val fd = a.assets.openFd("voice/$clipVoice/${ids[i]}.mp3")
@@ -325,21 +335,30 @@ class Voice(private val a: Activity, private val emit: (JSONObject) -> Unit) {
         } catch (_: Exception) { clipPlayer = null; floorOff() }
     }
 
-    fun say(text: String) {
+    fun say(text0: String) {
+        val cut = text0.indexOf('§')
+        tail = if (cut >= 0) text0.substring(cut + 1).trim().ifBlank { null } else null
+        val text = if (cut >= 0) text0.substring(0, cut).trim() else text0
+        if (text.isBlank()) { if (!sayTail()) floorOff(); return }
         val plan = clipPlan(text)
         if (plan != null) { tts?.stop(); playClips(plan); return }
         if (!ttsOk) return
         if (!viReady) { emit(JSONObject().put("state", "tts").put("ok", true).put("vi", false).put("google", hasGoogleTts())); return }
         val b = Bundle(); b.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC)
-        if (!ttsCbSet) { ttsCbSet = true; tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
-            override fun onStart(id: String?) {}
-            override fun onDone(id: String?) { if (id == "tc") floorOff() }
-            @Deprecated("old api") override fun onError(id: String?) { if (id == "tc") floorOff() }
-            override fun onStop(id: String?, interrupted: Boolean) { if (id == "tc") floorOff() }
-        }) }
+        ensureCb()
         floorOn()
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, b, "tc")
     }
+
+    private fun ensureCb() {
+        if (!ttsCbSet) { ttsCbSet = true; tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+            override fun onStart(id: String?) {}
+            override fun onDone(id: String?) { if (id == "tc") { if (!sayTail()) floorOff() } else if (id == "tcEn") { backToVi(); floorOff() } }
+            @Deprecated("old api") override fun onError(id: String?) { if (id == "tc" || id == "tcEn") { if (id == "tcEn") backToVi(); tail = null; floorOff() } }
+            override fun onStop(id: String?, interrupted: Boolean) { if (id == "tc" || id == "tcEn") { if (id == "tcEn") backToVi(); floorOff() } }
+        }) }
+    }
+    private fun backToVi() { if (lang != "en") try { tts?.setLanguage(Locale("vi", "VN")) } catch (_: Exception) {} }
 
     fun pause(p: Boolean) { paused = p; if (p) { stopHotword(); cancel() } else startHotword() }
 

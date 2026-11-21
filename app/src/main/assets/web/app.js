@@ -368,8 +368,12 @@ window.__AppComp = function() {
     clkBlink: true,
     clkAuto: false,
     mapApp2: "waze",
-    musicApp: "jukebox",
-    musicAppName: "Tom's Jukebox",
+    musicApp: "builtin",
+    musicAppName: "Tom's Car",
+    mpAlpha: 88,
+    barAlpha: 90,
+    waveOp: 90,
+    waveH: 34,
     autoPlay: false,
     jbFollow: false,
     vizOn: true,
@@ -403,6 +407,11 @@ window.__AppComp = function() {
     idleLayout: "htc",
     odoOn: true,
     stateRules: true,
+    spPanel: "a",
+    spTol: 0,
+    callSty: "big",
+    awayHide: true,
+    quickReplies: ["\u0110ang l\xE1i xe, l\xE1t g\u1ECDi l\u1EA1i nha", "M\xECnh s\u1EAFp t\u1EDBi r\u1ED3i", "OK, c\u1EA3m \u01A1n"],
     chimeOn: true,
     chimeSilent: true,
     chime: "soft",
@@ -501,6 +510,11 @@ window.__AppComp = function() {
       if (sv.set && !sv.set.v14) {
         if (sv.set.chimeVol === 60) sv.set.chimeVol = 100;
         sv.set.v14 = true;
+      }
+      if (sv.set && !sv.set.v15) {
+        sv.set.musicApp = "builtin";
+        sv.set.musicAppName = "Tom's Car";
+        sv.set.v15 = true;
       }
       this.state = {
         scr: "home",
@@ -654,7 +668,7 @@ window.__AppComp = function() {
           if (L.rt) k = "rt";
         }
       }
-      if (k === "trip") k = "home";
+      if (k === "trip" || k === "contacts") k = "home";
       return ["home", "rt", "contacts", "search", "split", "dex"].indexOf(k) >= 0 ? k : "home";
     }
     startBoot() {
@@ -768,7 +782,7 @@ window.__AppComp = function() {
           }
         }
       }
-      const SCR = [["home", "H\xE0nh Tr\xECnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"], ["contacts", "Li\xEAn L\u1EA1c"]];
+      const SCR = [["home", "H\xE0nh Tr\xECnh"], ["settings", "C\xE0i \u0110\u1EB7t"], ["rt", "Road Trip"], ["split", "Road Trip + B\u1EA3n \u0110\u1ED3"], ["dex", "Workspace DeX"], ["search", "T\xECm Ch\u1ED7"]];
       const scrBtns = SCR.map(([k, label]) => {
         const on = S.scr === k;
         return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: go(k) };
@@ -779,7 +793,8 @@ window.__AppComp = function() {
       const CALL = APP ? LV.call && LV.call.state ? LV.call : null : S.call ? { state: S.call, since: S.callAt } : null;
       const inCall = !!CALL;
       const MD = LV.media || null;
-      const playing = APP ? S.src === "radio" ? !!(LV.radio && LV.radio.playing) : !!(MD && MD.playing) : S.playing;
+      const BI0 = (C.musicApp || "builtin") === "builtin";
+      const playing = APP ? S.src === "radio" && !BI0 ? !!(LV.radio && LV.radio.playing) : !!(MD && MD.playing) : S.playing;
       const showWave = playing && C.wave !== "off" && !drive && !inCall && S.src === "music";
       const waveBars = WAVE.map((w, i) => ({ h: C.wave === "tt" ? w.h : 6 + i % 4 * 3, del: w.del, cls: "wv", c: i < 20 ? "#FBB040" : "rgba(95,212,240,0.75)" }));
       const wxCode0 = APP ? LV.wx && LV.wx.code : "rain";
@@ -788,7 +803,7 @@ window.__AppComp = function() {
       const LM = APP ? LV.limit : { v: ZONES[S.zone][0], est: S.zone === "none", school: S.zone === "school", label: ZONES[S.zone][1], at: S.popAt, ahead: S.pendZone ? ZONES[S.pendZone][0] : null };
       const zinfo = [LM ? LM.v : 0, LM ? LM.label || "" : ""], lim = LM ? LM.v : 999, est = !!(LM && LM.est);
       const spdRaw = !APP ? drive ? S.speed : 0 : C.spSrc === "obd" ? LV.obdSpeed != null ? LV.obdSpeed : LV.gpsSpeed : LV.gpsSpeed != null ? LV.gpsSpeed : LV.obdSpeed;
-      const spd0 = spdRaw != null ? spdRaw : APP && LV.fresh ? 0 : null;
+      const spd0 = spdRaw != null ? spdRaw < 5 && C.spSrc !== "obd" && LV.obdSpeed == null && (LV.acc == null || LV.acc > 12) || spdRaw < 3 ? 0 : spdRaw : APP && LV.fresh ? 0 : null;
       const lost = APP ? spd0 == null : drive && S.noGps;
       const spd = Math.round(spd0 || 0);
       const styKey = C.spAuto ? "neon" : C.spStyle;
@@ -830,6 +845,9 @@ window.__AppComp = function() {
         statsOpen: S.statsOpen && parked,
         aria: "T\u1ED1c \u0111\u1ED9 " + (lost ? "m\u1EA5t GPS" : spd + " km/g"),
         limShow: !!LM && !(est && !C.limitEst),
+        limBottom: !!LM && !(est && !C.limitEst) && (C.spPanel || "a") === "off",
+        roadOn: (C.spPanel || "a") !== "off" && !!(zinfo[1] && !est),
+        road: zinfo[1],
         lim: LM ? LM.v : "",
         limAria: "Gi\u1EDBi h\u1EA1n " + lim + (est ? " (\u01B0\u1EDBc t\xEDnh)" : ""),
         limBorder: "0",
@@ -847,8 +865,40 @@ window.__AppComp = function() {
           if (k !== S.zone) self.setState({ pendZone: k, pendAt: Date.now() });
         } };
       });
+      const shl0 = !nar && (S.scr === "home" || S.scr === "rt"), sppK = C.spPanel || "a", limOk = !!LM && !(est && !C.limitEst), tolr = C.spTol || 0;
+      const overP = limOk && !lost && spd > lim + tolr, nearP = limOk && !lost && !overP && spd >= lim - 5;
+      if (APP && overP && !self.__overWas && C.spWarn !== false && S.now - (self.__tingAt || 0) > 2e4) {
+        self.__tingAt = S.now;
+        tcn("ting");
+      }
+      self.__overWas = overP;
+      const spp = {
+        a: sppK === "a" && shl0,
+        b: sppK === "b" && shl0,
+        c: sppK === "c" && shl0,
+        limOn: limOk,
+        lim: limOk ? lim : "",
+        v: lost ? "\u2013\u2013" : String(spd),
+        bg: overP ? "#D6202A" : nearP ? "#B37A00" : "#0E1C24",
+        blink: overP ? "spblink" : "",
+        arc: Math.min(100, Math.round((lost ? 0 : spd) / Math.max(lim < 999 ? lim * 1.5 : 160, 60) * 100)),
+        arcC: overP ? "#FF3B3B" : nearP ? "#F5B301" : "#3ECF8E",
+        numC: overP ? "#FF6B6B" : "#FFFFFF",
+        cRing: overP ? "#FFFFFF" : "#D6202A",
+        cBg: overP ? "#D6202A" : "#FFFFFF",
+        cFg: overP ? "#FFFFFF" : "#111111",
+        cTag: overP ? "#D6202A" : "#FFFFFF",
+        aheadOn: !!(LM && LM.ahead) && sppK !== "off" && shl0,
+        ahead: LM && LM.ahead ? LM.ahead + " km/g" : "",
+        aria: "T\u1ED1c \u0111\u1ED9 " + (lost ? "m\u1EA5t GPS" : spd + " km/g") + (limOk ? ", gi\u1EDBi h\u1EA1n " + lim : "") + " \u2014 ch\u1EA1m \u0111\u1EC3 \u0111\u1ED5i ki\u1EC3u b\u1EA3ng",
+        cycle: () => self.setS("spPanel", sppK === "a" ? "b" : sppK === "b" ? "c" : "a")
+      };
       const VS = window.__voiceState || {};
       const tg = (k, label, hint) => ({ isToggle: true, label, hint, on: C[k] ? "true" : "false", trackBg: C[k] ? "#FBB040" : "#2B4252", knobX: C[k] ? 32 : 4, tick: C[k] ? "\u2713" : "", stateL: C[k] ? "M\u1EDF" : "T\u1EAFt", stateC: C[k] ? "#FFD08A" : "#8FC3D3", toggle: () => self.setS(k, !C[k]), rowTap: () => self.setS(k, !C[k]), rowCur: "pointer" });
+      const sld = (k, label, hint, min, max, def, unit) => {
+        const v = C[k] != null ? C[k] : def;
+        return { isSlider: true, label, hint, min, max, val: v, valL: v + unit, slide: (e) => self.setS(k, +e.target.value) };
+      };
       const ch = (k, label, hint, opts) => ({ isChoice: true, label, hint, opts: opts.map(([v, l]) => {
         const on = C[k] === v;
         return { label: l, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => self.setS(k, v) };
@@ -872,12 +922,14 @@ window.__AppComp = function() {
             } };
           }) }),
           ch("chimeVol", "\xC2m l\u01B0\u1EE3ng nh\u1EA1c ch\xE0o", "So v\u1EDBi \xE2m l\u01B0\u1EE3ng nh\u1EA1c c\u1EE7a m\xE1y", [[30, "Nh\u1ECF"], [60, "V\u1EEBa"], [100, "L\u1EDBn"]]),
-          ch("startScr", "M\u1EDF app th\xEC v\xE0o", "Sau m\xE0n h\xECnh ch\xE0o \xB7 app t\u1EF1 m\u1EDF l\u1EA1i sau s\u1EF1 c\u1ED1 th\xEC v\u1EC1 \u0111\xFAng m\xE0n h\xECnh \u0111ang xem", [["home", "H\xE0nh Tr\xECnh"], ["rt", "Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"], ["ws", "Workspace g\u1EA7n nh\u1EA5t"], ["last", "M\xE0n h\xECnh l\xFAc t\u1EAFt app"]]),
+          ch("startScr", "M\u1EDF app th\xEC v\xE0o", "Sau m\xE0n h\xECnh ch\xE0o \xB7 app t\u1EF1 m\u1EDF l\u1EA1i sau s\u1EF1 c\u1ED1 th\xEC v\u1EC1 \u0111\xFAng m\xE0n h\xECnh \u0111ang xem", [["home", "H\xE0nh Tr\xECnh"], ["rt", "Road Trip"], ["search", "T\xECm Ch\u1ED7"], ["ws", "Workspace g\u1EA7n nh\u1EA5t"], ["last", "M\xE0n h\xECnh l\xFAc t\u1EAFt app"]]),
           ch("splashSec", "M\xE0n h\xECnh ch\xE0o", "Logo + phi\xEAn b\u1EA3n \xB7 ch\u1EA1m \u0111\u1EC3 v\xE0o s\u1EDBm", [[0, "T\u1EAFt"], [1, "1 gi\xE2y"], [3, "3 gi\xE2y"], [5, "5 gi\xE2y"]]),
           info("M\u1EDF app v\xE0o th\u1EB3ng", "Lu\xF4n v\xE0o tab n\xE0y sau m\xE0n h\xECnh ch\xE0o", "H\xE0nh Tr\xECnh"),
           stt("Nh\u1EDB m\u1ECDi l\u1EF1a ch\u1ECDn khi tho\xE1t", "Giao di\u1EC7n, t\xEDnh n\u0103ng, Workspace, ch\u1EB7ng Road Trip\u2026", true, "Lu\xF4n nh\u1EDB", "", "", null),
-          tg("privacy", "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0", "Gi\u1EA5u t\xEAn ng\u01B0\u1EDDi g\u1ECDi, n\u1ED9i dung tin nh\u1EAFn, th\xF4ng tin kh\xE1ch"),
-          info("Cu\u1ED9c g\u1ECDi \u0111\u1EBFn", 'Kh\xF4ng \u0111\u1ECDc t\xEAn ra loa \u2014 ch\u1EC9 b\xE1o "C\xF3 cu\u1ED9c g\u1ECDi"', "Chu\xF4ng theo nh\xF3m \u25B8"),
+          tg("privacy", "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0", 'B\u0103ng g\u1ECDi ch\u1EC9 ghi "Cu\u1ED9c g\u1ECDi \u0111\u1EBFn", tin nh\u1EAFn ch\u1EC9 ghi "Tin nh\u1EAFn m\u1EDBi" \u2014 kh\xF4ng hi\u1EC7n t\xEAn'),
+          ch("callSty", "Ki\u1EC3u b\u0103ng cu\u1ED9c g\u1ECDi t\u1EDBi", "Tin nh\u1EAFn m\u1EDBi d\xF9ng c\xF9ng ki\u1EC3u", [["big", "N\xFAt L\u1EDBn"], ["oneui", "One UI 9"], ["tom", "Tom's Car"], ["island", "\u0110\u1EA3o Nh\u1ECF"], ["ios6", "iOS 6"]]),
+          tg("awayHide", "Ra kh\u1ECFi xe l\xE0 gi\u1EA5u h\u1EBFt", "Kh\xF4ng n\u1ED1i Bluetooth xe, kh\xF4ng c\u1EAFm DeX \u2192 kh\xF4ng hi\u1EC7n cu\u1ED9c g\u1ECDi, tin nh\u1EAFn"),
+          stt("Tr\u1EA3 l\u1EDDi nhanh", "C\xE1c c\xE2u c\xF3 s\u1EB5n khi b\u1EA5m \u21A9 Tr\u1EA3 L\u1EDDi tr\xEAn b\u0103ng tin nh\u1EAFn", false, "", (C.quickReplies || []).length + " c\xE2u", "S\u1EEDa", () => self.setState({ dlg: "qr", qrEdit: (C.quickReplies || []).concat(["", "", "", ""]).slice(0, 4) })),
           tg("autoSms", "T\u1EEB ch\u1ED1i th\xEC t\u1EF1 nh\u1EAFn l\u1EA1i", '"M\xECnh \u0111ang l\xE1i xe, l\xE1t g\u1ECDi l\u1EA1i nha"'),
           ch("msgKeep", "T\u1EF1 xo\xE1 tin nh\u1EAFn \u0111\xE3 l\u01B0u (WhatsApp, Messenger\u2026)", "Tin b\u1EAFt t\u1EEB th\xF4ng b\xE1o", [[7, "7 ng\xE0y"], [30, "30 ng\xE0y"], [0, "Kh\xF4ng xo\xE1"]])
         ] },
@@ -914,10 +966,13 @@ window.__AppComp = function() {
           tg("clkBlink", 'D\u1EA5u ":" nh\u1EA5p nh\xE1y', "Xe ch\u1EA1y th\xEC t\u1EF1 \u0111\u1EE9ng y\xEAn")
         ] },
         nhac: { label: "Nh\u1EA1c", icon: "M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z", desc: "App nh\u1EA1c m\u1EB7c \u0111\u1ECBnh, thanh nh\u1EA1c ki\u1EC3u Tom\u2019s Jukebox", rows: [
-          ch("musicApp", "App nh\u1EA1c m\u1EB7c \u0111\u1ECBnh", "B\u1EA5m \u25B6 khi ch\u01B0a c\xF3 nh\u1EA1c l\xE0 ph\xE1t app n\xE0y (kh\xF4ng c\u1EA7n tho\xE1t ra)", [["jukebox", "Tom's Jukebox"], ["com.spotify.music", "Spotify"], ["com.google.android.apps.youtube.music", "YouTube Music"]]),
-          tg("autoPlay", "T\u1EF1 ph\xE1t nh\u1EA1c khi m\u1EDF Tom\u2019s Car", "Ph\xE1t ti\u1EBFp b\xE0i \u0111ang nghe d\u1EDF"),
+          ch("musicApp", "Ngu\u1ED3n nh\u1EA1c", "Tom\u2019s Car: nh\u1EA1c trong m\xE1y, radio, podcast c\xF3 s\u1EB5n trong app \xB7 ho\u1EB7c \u0111i\u1EC1u khi\u1EC3n app nh\u1EA1c kh\xE1c", [["builtin", "Tom's Car (c\xF3 s\u1EB5n)"], ["jukebox", "Tom's Jukebox"], ["com.spotify.music", "Spotify"], ["com.google.android.apps.youtube.music", "YouTube Music"]]),
+          tg("autoPlay", "T\u1EF1 ph\xE1t ti\u1EBFp khi l\xEAn xe", "M\u1EDF Tom\u2019s Car l\xE0 ph\xE1t ti\u1EBFp b\xE0i / \u0111\xE0i / t\u1EADp podcast \u0111ang nghe d\u1EDF (m\u1EB7c \u0111\u1ECBnh t\u1EAFt)"),
           tg("jbFollow", "Theo Tom\u2019s Jukebox", "M\xE0u thanh th\u1EDDi gian, s\xF3ng nh\u1EA1c, n\xFAt\u2026 l\u1EA5y theo giao di\u1EC7n \u0111ang ch\u1ECDn b\xEAn Tom\u2019s Jukebox"),
-          tg("vizOn", "S\xF3ng nh\u1EA1c tr\xEAn vi\xEAn thu\u1ED1c", "Xe ch\u1EA1y th\xEC s\xF3ng t\u1EF1 d\u1ECBu l\u1EA1i"),
+          tg("vizOn", "S\xF3ng nh\u1EA1c tr\xEAn vi\xEAn thu\u1ED1c", "Xe ch\u1EA1y th\xEC s\xF3ng t\u1EF1 d\u1ECBu l\u1EA1i \xB7 m\xE0u s\xF3ng theo h\xECnh b\xECa album"),
+          sld("barAlpha", "\u0110\u1ED9 trong su\u1ED1t thanh nh\u1EA1c", "K\xE9o qua tr\xE1i cho thanh nh\u1EA1c trong h\u01A1n, th\u1EA5y b\u1EA3n \u0111\u1ED3 ph\xEDa sau", 30, 100, 90, "%"),
+          sld("waveOp", "\u0110\u1ED9 \u0111\u1EADm s\xF3ng nh\u1EA1c", "S\xF3ng \u1EDF m\xE9p d\u01B0\u1EDBi thanh nh\u1EA1c", 20, 100, 90, "%"),
+          sld("waveH", "\u0110\u1ED9 cao s\xF3ng nh\u1EA1c", "S\xF3ng th\u1EA5p hay cao l\xEAn trong thanh nh\u1EA1c", 12, 70, 34, " px"),
           info("Tom's Jukebox", "C\u1EA7n b\u1EA3n 0.9.5 tr\u1EDF l\xEAn \u0111\u1EC3 Tom\u2019s Car ph\xE1t ng\u1EA7m v\xE0 xem th\u01B0 vi\u1EC7n", window.__jbLook ? "\u0110\xE3 n\u1ED1i \u2713" : APP ? "Ch\u01B0a th\u1EA5y" : "B\u1EA3n m\u1EABu"),
           stt("Quy\u1EC1n \u0111\u1ECDc b\xE0i \u0111ang ph\xE1t", "\u0110\u1EC3 hi\u1EC7n t\xEAn b\xE0i, th\u1EDDi gian", APP ? !!PM.notif : S.perm, "\u0110\xE3 c\u1EA5p", "Ch\u01B0a c\u1EA5p", "C\u1EA5p Quy\u1EC1n", () => {
             if (APP) tcn("perm", "notif");
@@ -940,6 +995,8 @@ window.__AppComp = function() {
           stt("C\u1EE5c OBD-II", LV.obd ? "\u0110\xE3 n\u1ED1i \xB7 " + (LV.obd.protocol || "") : "Veepeak OBDCheck BLE (Bluetooth)", !!LV.obd, "\u0110\xE3 n\u1ED1i", "Ch\u01B0a n\u1ED1i", "Ch\u1ECDn C\u1EE5c OBD", () => tcn("settings")),
           tg("kbLock", "Kho\xE1 b\xE0n ph\xEDm khi xe ch\u1EA1y", "T\u1EAFt = g\xF5 \u0111\u1ECBa ch\u1EC9 l\xFAc n\xE0o c\u0169ng \u0111\u01B0\u1EE3c (m\u1EB7c \u0111\u1ECBnh)"),
           tg("spWarn", "Nh\u1EAFc khi ch\u1EA1y qu\xE1 t\u1ED1c \u0111\u1ED9", "Ch\u1EC9 nh\u1EAFc khi bi\u1EBFt ch\u1EAFc s\u1ED1 gi\u1EDBi h\u1EA1n, qu\xE1 3 km/g, m\u1ED7i \u0111o\u1EA1n \u0111\u01B0\u1EDDng 1 l\u1EA7n"),
+          ch("spPanel", "B\u1EA3ng t\u1ED1c \u0111\u1ED9 (d\u01B0\u1EDBi La B\xE0n)", "Ch\u1EA1m v\xE0o b\u1EA3ng tr\xEAn b\u1EA3n \u0111\u1ED3 c\u0169ng \u0111\u1ED5i ki\u1EC3u", [["a", "A \xB7 2 \xF4"], ["b", "B \xB7 V\xF2ng cung"], ["c", "C \xB7 S\u1ED1 trong bi\u1EC3n"], ["off", "T\u1EAFt"]]),
+          ch("spTol", "V\u01B0\u1EE3t bao nhi\xEAu m\u1EDBi b\xE1o", "B\u1EA3ng \u0111\u1ECF + ti\u1EBFng ting khi v\u01B0\u1EE3t qu\xE1 m\u1EE9c n\xE0y", [[0, "0 km/g"], [3, "3 km/g"], [5, "5 km/g"]]),
           ch("navBanner", "B\u0103ng ch\u1EC9 \u0111\u01B0\u1EDDng", "Ch\u1EA1m v\xE0o b\u0103ng khi \u0111ang ch\u1EA1y c\u0169ng \u0111\u1ED5i \u0111\u01B0\u1EE3c", [["auto", "G\u1ECDn, t\u1EF1 to khi g\u1EA7n ch\u1ED7 r\u1EBD"], ["big", "Lu\xF4n l\u1EDBn"], ["hide", "\u1EA8n, ch\u1EC9 \u0111\u1ECDc gi\u1ECDng"]]),
           ch("spSrc", "Ngu\u1ED3n t\u1ED1c \u0111\u1ED9", "\u0110\u1ED3ng h\u1ED3 tapl\xF4 th\u01B0\u1EDDng ch\u1EC9 cao h\u01A1n th\u1EF1c t\u1EBF v\xE0i km/g", [["gps", "GPS (m\u1EB7c \u0111\u1ECBnh)"], ["obd", "OBD-II"]]),
           info("H\u1ED3 s\u01A1 xe", "M\xE1y d\u1EA7u \xB7 c\u1ED5ng OBD 16 ch\xE2n", "Toyota HiAce 200 \xB7 04/2006"),
@@ -985,8 +1042,8 @@ window.__AppComp = function() {
             if (!NV1) return;
             const v = window.TC_VERSION || "";
             const d2 = /* @__PURE__ */ new Date();
-            const nm = "TomsCar-chuyen-di-" + d2.getFullYear() + ("0" + (d2.getMonth() + 1)).slice(-2) + ("0" + d2.getDate()).slice(-2) + "-" + ("0" + d2.getHours()).slice(-2) + ("0" + d2.getMinutes()).slice(-2) + ".json";
-            tcn("sharefile", JSON.stringify({ name: nm, subject: "Chuy\u1EBFn \u0111i Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || "" }) }));
+            const nm2 = "TomsCar-chuyen-di-" + d2.getFullYear() + ("0" + (d2.getMonth() + 1)).slice(-2) + ("0" + d2.getDate()).slice(-2) + "-" + ("0" + d2.getHours()).slice(-2) + ("0" + d2.getMinutes()).slice(-2) + ".json";
+            tcn("sharefile", JSON.stringify({ name: nm2, subject: "Chuy\u1EBFn \u0111i Tom's Car " + v, text: NV1.recExport({ app: v, device: LV.device || "" }) }));
           }), { stC: "#8FC3D3" }),
           tg("tripLog", "Nh\u1EADt k\xFD H\xE0nh Tr\xECnh", "T\u1EF1 ghi ch\u1ED7 \u0111\u1EADu h\u01A1n 3 ph\xFAt \u2014 ch\u1EC9 l\u01B0u trong m\xE1y n\xE0y, kh\xF4ng g\u1EEDi \u0111i \u0111\xE2u"),
           { isChoice: true, label: "N\xFAt t\xECm nhanh (H\xE0nh Tr\xECnh)", hint: "Ch\u1EA1m \u0111\u1EC3 b\u1EADt/t\u1EAFt t\u1EEBng n\xFAt \u2014 k\u1EBFt qu\u1EA3 hi\u1EC7n ngay tr\xEAn b\u1EA3n \u0111\u1ED3, \u0111ang ch\u1EC9 \u0111\u01B0\u1EDDng th\xEC t\xECm d\u1ECDc \u0111\u01B0\u1EDDng", opts: Object.keys(QC).map((k) => {
@@ -1043,7 +1100,8 @@ window.__AppComp = function() {
         return { label: GRP[k].label, icon: GRP[k].icon, on: on ? "true" : "false", bg: on ? "rgba(251,176,64,0.16)" : "transparent", fg: on ? "#FFE2A8" : "#CFE6EE", ring: on ? "inset 0 0 0 1px #FBB040" : "none", mark: w ? "\u26A0" : "\u2713", markC: w ? "#FFD08A" : "#7BD88F", pick: () => self.setState({ grp: k }) };
       });
       const G = GRP[S.grp];
-      const rows = G.rows.map((r) => Object.assign({ isToggle: false, isChoice: false, isStatus: false, isInfo: false, hint: "", opts: [], hasAct: false, on: "false", trackBg: "", knobX: 0, stateL: "", stateC: "", toggle: () => {
+      const rows = G.rows.map((r) => Object.assign({ isToggle: false, isChoice: false, isSlider: false, min: 0, max: 100, valL: "", slide: () => {
+      }, isStatus: false, isInfo: false, hint: "", opts: [], hasAct: false, on: "false", trackBg: "", knobX: 0, stateL: "", stateC: "", toggle: () => {
       }, stL: "", stC: "", actL: "", val: "" }, r, { act: r.act || (() => {
       }) }));
       const LT = LV.trip || null;
@@ -1243,8 +1301,8 @@ window.__AppComp = function() {
         const x = r.x, i = r.i, sx = r.sx, isEnd = r.isEnd;
         const many = g.length > 1;
         const nameOk = isEnd || i === nextIdx || z >= 1.8;
-        const nm = isEnd ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0];
-        const label = many ? circ(g[0].i + 1) + "\u2013" + circ(g[g.length - 1].i + 1) + (nameOk ? " " + nm : "") : isEnd ? "\u{1F3C1} " + nm : circ(i + 1) + (nameOk ? " " + nm : "");
+        const nm2 = isEnd ? x.name : (x.town || x.name).replace(/ (VIC|SA|NSW|QLD|ACT|WA|TAS|NT)$/, "").split(" (")[0];
+        const label = many ? circ(g[0].i + 1) + "\u2013" + circ(g[g.length - 1].i + 1) + (nameOk ? " " + nm2 : "") : isEnd ? "\u{1F3C1} " + nm2 : circ(i + 1) + (nameOk ? " " + nm2 : "");
         const wpx = (label.length * 6.2 + 10) / z;
         let lv = 0;
         while (lv < 2 && sx - wpx / 2 < lastEnd[lv]) lv++;
@@ -1709,11 +1767,32 @@ window.__AppComp = function() {
         del: () => self.save({ wsList: S.wsList.filter((_, k) => k !== i) })
       }));
       const callSec = CALL && CALL.state === "talk" ? Math.floor((S.now - (CALL.since || S.now)) / 1e3) : 0;
+      const inCar = !APP || !C.awayHide || !!LV.bt || !!LV.dex;
+      const ringNow = !!CALL && CALL.state === "ring" && inCar, csty = C.callSty || "big";
+      const cnm = priv ? "Cu\u1ED9c g\u1ECDi \u0111\u1EBFn" : APP ? CALL && (CALL.name || CALL.number) || "S\u1ED1 l\u1EA1" : "Anh Minh (m\u1EABu)";
       const cb = {
+        ringA: ringNow && csty === "big",
+        ringB: ringNow && csty === "oneui",
+        ringC: ringNow && csty === "tom",
+        ringD: ringNow && csty === "island",
+        ringE: ringNow && csty === "ios6",
+        talkOn: !!CALL && CALL.state === "talk" && inCar,
+        subS: priv ? "\u0111ang g\u1ECDi t\u1EDBi" : "cu\u1ED9c g\u1ECDi \u0111\u1EBFn" + (APP && CALL && CALL.name && CALL.number ? " \xB7 " + CALL.number : ""),
+        ini: priv ? "?" : cnm.split(" ").filter(Boolean).slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join("") || "?",
+        slDown: (e) => {
+          self.__slX = e.clientX;
+        },
+        slUp: (e) => {
+          if (self.__slX != null && e.clientX - self.__slX > 80) {
+            if (APP) tcn("call", "answer");
+            else self.setState({ call: "talk", callAt: Date.now() });
+          }
+          self.__slX = null;
+        },
         on: !!CALL,
         ring: !!CALL && CALL.state === "ring",
         talk: !!CALL && CALL.state === "talk",
-        name: priv ? "C\xF3 cu\u1ED9c g\u1ECDi" : APP ? CALL && (CALL.name || CALL.number) || "S\u1ED1 l\u1EA1" : "Anh Minh (m\u1EABu)",
+        name: cnm,
         group: APP ? CALL && CALL.group || "S\u1ED1 L\u1EA1" : "Kh\xE1ch H\xE0ng",
         state: CALL && CALL.state === "ring" ? "\u0111ang g\u1ECDi t\u1EDBi \xB7 chu\xF4ng nh\xF3m Kh\xE1ch H\xE0ng" : p2(Math.floor(callSec / 60)) + ":" + p2(callSec % 60),
         sub: priv ? "Ch\u1EBF \u0110\u1ED9 Ri\xEAng T\u01B0: \u0111\xE3 gi\u1EA5u t\xEAn v\xE0 th\xF4ng tin kh\xE1ch \xB7 kh\xF4ng \u0111\u1ECDc t\xEAn ra loa" : APP ? (CALL && CALL.number ? CALL.number + " \xB7 " : "") + 'kh\xF4ng \u0111\u1ECDc t\xEAn ra loa, ch\u1EC9 b\xE1o "C\xF3 cu\u1ED9c g\u1ECDi"' : `Tom's Shield: L\u1EAFp camera \u2013 Tarneit (m\u1EABu) \xB7 kh\xF4ng \u0111\u1ECDc t\xEAn ra loa, ch\u1EC9 b\xE1o "C\xF3 cu\u1ED9c g\u1ECDi"`,
@@ -1744,6 +1823,33 @@ window.__AppComp = function() {
         spkL: S.spkCar ? "Loa Xe" : "\u0110i\u1EC7n Tho\u1EA1i"
       };
       const toastOn = !!S.toast && S.now - S.toastAt < 4e3;
+      window.tcNewMsg = (j) => {
+        try {
+          const o = typeof j === "string" ? JSON.parse(j) : j;
+          self.setState({ nmsg: o, nmsgAt: Date.now(), nmRep: false });
+          if (APP) tcn("msgs");
+        } catch (e) {
+        }
+      };
+      const NMG = S.nmsg, nmLive = !!NMG && inCar && (S.now - (S.nmsgAt || 0) < (S.nmRep ? 25e3 : 5e3) || S.nmRep);
+      const QR = C.quickReplies && C.quickReplies.length ? C.quickReplies : ["\u0110ang l\xE1i xe, l\xE1t g\u1ECDi l\u1EA1i nha", "M\xECnh s\u1EAFp t\u1EDBi r\u1ED3i", "OK, c\u1EA3m \u01A1n"];
+      const nm = {
+        on: nmLive && !(NMG && S.nmClosed === NMG.at),
+        title: NMG ? priv ? "Tin nh\u1EAFn m\u1EDBi" : "Tin nh\u1EAFn m\u1EDBi t\u1EEB " + NMG.who : "",
+        touch: () => self.setState({ nmsgAt: Date.now() }),
+        close: () => self.setState({ nmClosed: NMG && NMG.at, nmRep: false }),
+        read: () => {
+          if (NMG) tcn("say", (priv ? "Tin nh\u1EAFn m\u1EDBi: " : NMG.who + " nh\u1EAFn: ") + NMG.text);
+          self.setState({ nmsgAt: Date.now() });
+        },
+        repOn: !!S.nmRep,
+        replyTap: () => self.setState({ nmRep: !S.nmRep, nmsgAt: Date.now() }),
+        quick: QR.map((t) => ({ t, send: () => {
+          if (NMG) tcn("reply", JSON.stringify({ key: NMG.key, text: t }));
+          self.setState({ nmClosed: NMG && NMG.at, nmRep: false });
+          self.toast('\u0110\xE3 tr\u1EA3 l\u1EDDi: "' + t + '"');
+        } }))
+      };
       const MAPP = { sms: ["SMS", "#1F5FAE", "S"], wa: ["WhatsApp", "#1E8E5A", "W"], msgr: ["Messenger", "#6B4BD8", "M"], signal: ["Signal", "#2D6FD6", "Si"], tg: ["Telegram", "#2A9BD6", "T"] };
       const GROUPC = { "Kh\xE1ch H\xE0ng": "#FFD08A", "Gia \u0110\xECnh": "#9FE3B0", "B\u1EA1n B\xE8": "#A9D8F0", "S\u1ED1 L\u1EA1": "#C9C9C9" };
       const ini = (n) => n.split(" ").filter((w) => /^[A-Za-zÀ-ỹ]/.test(w)).map((w) => w.charAt(0).toUpperCase()).join(".").slice(0, 5) + ".";
@@ -1829,25 +1935,226 @@ window.__AppComp = function() {
         if (tabOk === "lists") rowsRaw = [["\u0110i Adelaide", "24 b\xE0i"], ["Nh\u1EA1c X\u01B0a", "58 b\xE0i"], ["L\xE1i \u0110\xEAm", "31 b\xE0i"], ["Y\xEAu Th\xEDch", "120 b\xE0i"]].map(([t, sub]) => ({ t, s: sub, letter: "\u2261", tile: "#1B3A52", rad: "6px" }));
         if (tabOk === "albums") rowsRaw = ["A", "B", "C", "D", "E"].map((x) => ({ t: "Album m\u1EABu " + x, s: "Ngh\u1EC7 s\u0129 m\u1EABu", letter: x, tile: "#2A2440", rad: "6px" }));
       }
+      const BI = (C.musicApp || "builtin") === "builtin";
+      const ML = S.musL || {};
+      const musReq = (o) => {
+        const k = JSON.stringify(o);
+        if (APP && !(k in ML)) {
+          self.__musPend = self.__musPend || {};
+          if (!self.__musPend[k] || Date.now() - self.__musPend[k] > 2e4) {
+            self.__musPend[k] = Date.now();
+            tcn("mus", JSON.stringify(Object.assign({}, o, { req: k })));
+          }
+        }
+        return ML[k];
+      };
+      const musDrop = (o) => {
+        const k = JSON.stringify(o);
+        const n = Object.assign({}, self.state.musL || {});
+        delete n[k];
+        if (self.__musPend) delete self.__musPend[k];
+        self.setState({ musL: n });
+      };
+      window.tcMus = (j) => {
+        try {
+          const o = typeof j === "string" ? JSON.parse(j) : j;
+          if (o.say) self.say(o.say);
+          if (o.req && o.req.charAt(0) === "{") self.setState({ musL: Object.assign({}, self.state.musL || {}, { [o.req]: o.items || o }) });
+        } catch (e) {
+        }
+      };
+      window.tcMusMsg = (j) => {
+        try {
+          self.toast((typeof j === "string" ? JSON.parse(j) : j).t);
+        } catch (e) {
+        }
+      };
+      const ST_CODE = { "Victoria": "VIC", "New South Wales": "NSW", "Queensland": "QLD", "South Australia": "SA", "Western Australia": "WA", "Tasmania": "TAS", "Northern Territory": "NT", "Australian Capital Territory": "ACT" };
+      const auSt = ST_CODE[LV.place && LV.place.state || ""] || (LV.place && /^[A-Z]{2,3}$/.test(LV.place.state || "") ? LV.place.state : "") || "VIC";
+      if (APP && BI && self.__musSt !== auSt) {
+        if (self.__musSt) tcn("mus", JSON.stringify({ cmd: "radioState", state: auSt }));
+        self.__musSt = auSt;
+      }
+      let biTabs = null, biBack = null, biActs = [], biSearch = true, biFoot = "";
+      if (BI) {
+        const pg = APP ? musReq({ cmd: "podGroups" }) || [] : [{ k: "follow", t: "\u2B50 Theo D\xF5i" }, { k: "vnnews", t: "Tin T\u1EE9c Vi\u1EC7t Nam" }];
+        biTabs = {
+          music: [["songs", "B\xE0i H\xE1t"], ["albums", "Album"], ["artists", "Ngh\u1EC7 S\u0129"], ["folders", "Th\u01B0 M\u1EE5c"], ["favs", "Y\xEAu Th\xEDch"], ["queue", "\u0110ang Ph\xE1t"], ["lyr", "L\u1EDDi B\xE0i H\xE1t"]],
+          radio: [["near", "G\u1EA7n \u0110\xE2y"], ["fav", "Y\xEAu Th\xEDch"], ["au", "\xDAc"], ["vn", "Vi\u1EC7t Nam"], ["recs", "Th\xE2u Radio"]],
+          podcast: [["follow", "Theo D\xF5i"]].concat(pg.filter((g) => g.k !== "follow").map((g) => [g.k, g.t]), [["psearch", "T\xECm"], ["dl", "\u0110\xE3 T\u1EA3i"]])
+        };
+      }
+      const biTab = BI ? biTabs[S.src].some((t) => t[0] === S.mpTab) ? S.mpTab : biTabs[S.src][0][0] : "";
+      if (BI && APP) {
+        const fld = (t) => (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
+        const q2 = (S.mpQ || "").trim();
+        const fq = fld(q2);
+        const flt = (arr) => !fq ? arr : arr.filter((r) => fld((r.t || "") + " " + (r.s || "")).indexOf(fq) >= 0);
+        const wait = (L, empty) => L == null ? [{ t: "\u0110ang t\u1EA3i\u2026", s: "", letter: "\u2026", tile: "#2B2B2B", rad: "50%" }] : L.length ? null : [{ t: empty, s: "", letter: "\u2013", tile: "#2B2B2B", rad: "50%" }];
+        const curTitle = MD && MD.builtin ? MD.title : "";
+        const D = S.musDrill, P = S.musPod;
+        if (S.src === "music" && D && biTab === D.tab) {
+          const o = { cmd: "lib", view: D.view, key: D.key };
+          const L = musReq(o);
+          biBack = { label: D.t, run: () => self.setState({ musDrill: null, panelAt: Date.now() }) };
+          biActs = [{ label: "\u25B6 Ph\xE1t H\u1EBFt", run: () => tcn("mus", JSON.stringify({ cmd: "playLib", view: D.view, key: D.key })) }, { label: "\u292E Tr\u1ED9n", run: () => tcn("mus", JSON.stringify({ cmd: "playLib", view: D.view, key: D.key, shuffle: true })) }];
+          rowsRaw = wait(L, "Kh\xF4ng c\xF3 b\xE0i") || flt(L).map((r) => ({ t: r.t, s: r.s + (r.d ? " \xB7 " + r.d : ""), letter: "\u266A", tile: "#3A2A10", rad: "6px", cur: r.t === curTitle, run: () => tcn("mus", JSON.stringify({ cmd: "playLib", view: D.view, key: D.key, id: r.id })) }));
+        } else if (S.src === "music" && biTab === "queue") {
+          const L = musReq({ cmd: "queue", at: S.musQAt || 0 });
+          rowsRaw = wait(L, "Ch\u01B0a ph\xE1t b\xE0i n\xE0o \u2014 ch\u1ECDn b\xE0i \u1EDF tab B\xE0i H\xE1t") || flt(L).map((r) => ({ t: r.t, s: r.s, letter: String(r.i + 1), tile: "#3A2A10", rad: "6px", cur: r.on, run: () => tcn("mus", JSON.stringify({ cmd: "jump", i: r.i })) }));
+          biSearch = false;
+        } else if (S.src === "music" && biTab === "lyr") {
+          const L = musReq({ cmd: "lyrics", t: curTitle });
+          biSearch = false;
+          const lines = L && L.lines || [];
+          if (MD && self.__mdPos !== MD.pos) {
+            self.__mdPos = MD.pos;
+            self.__mdAt = Date.now();
+          }
+          const pos2 = (MD && MD.pos || 0) + (MD && MD.playing && self.__mdAt ? Date.now() - self.__mdAt : 0);
+          let curI = -1;
+          lines.forEach((l, i) => {
+            if (l.ms >= 0 && l.ms <= pos2 + 300) curI = i;
+          });
+          rowsRaw = L == null ? [{ t: "\u0110ang t\xECm l\u1EDDi b\xE0i h\xE1t\u2026", s: "", lyr: true }] : !lines.length ? [{ t: L.note || "Ch\u01B0a c\xF3 l\u1EDDi", s: "", lyr: true }] : lines.slice(Math.max(0, curI - 2), curI < 0 ? 60 : curI + 12).map((l, i2) => ({ t: l.t || "\u266A", s: "", lyr: true, cur: lines.indexOf(l) === curI }));
+          biFoot = "L\u1EDDi t\u1EEB LRCLIB \xB7 t\u1EF1 cu\u1ED9n theo b\xE0i";
+        } else if (S.src === "music") {
+          const isGrp = /^(albums|artists|folders)$/.test(biTab);
+          const L = musReq({ cmd: "lib", view: biTab });
+          if (!isGrp) biActs = [{ label: "\u292E Tr\u1ED9n T\u1EA5t C\u1EA3", run: () => tcn("mus", JSON.stringify({ cmd: "playLib", view: biTab, shuffle: true })) }];
+          rowsRaw = wait(L, biTab === "favs" ? "Ch\u01B0a c\xF3 b\xE0i y\xEAu th\xEDch \u2014 b\u1EA5m \u2605 b\xEAn c\u1EA1nh b\xE0i" : "Ch\u01B0a th\u1EA5y nh\u1EA1c trong m\xE1y (c\u1EA7n cho ph\xE9p \u0111\u1ECDc nh\u1EA1c)") || flt(L).slice(0, 300).map((r) => isGrp ? { t: r.t, s: r.s, letter: (r.t || "?").charAt(0), tile: biTab === "albums" ? "#2A2440" : biTab === "artists" ? "#24402A" : "#1B3A52", rad: biTab === "artists" ? "50%" : "6px", run: () => self.setState({ musDrill: { tab: biTab, view: r.kind, key: r.key, t: r.t }, mpQ: "", panelAt: Date.now() }) } : {
+            t: r.t,
+            s: r.s + (r.d ? " \xB7 " + r.d : ""),
+            letter: "\u266A",
+            tile: "#3A2A10",
+            rad: "6px",
+            cur: r.t === curTitle,
+            run: () => tcn("mus", JSON.stringify({ cmd: "playLib", view: biTab, id: r.id })),
+            a2L: r.fav ? "\u2605" : "\u2606",
+            a2C: r.fav ? "#FBB040" : "#5E8496",
+            a2: () => {
+              tcn("mus", JSON.stringify({ cmd: "fav", id: String(r.id) }));
+              musDrop({ cmd: "lib", view: biTab });
+              musDrop({ cmd: "lib", view: "favs" });
+            }
+          });
+          if (!isGrp && L) biFoot = L.length + " b\xE0i trong m\xE1y";
+        } else if (S.src === "radio" && biTab === "recs") {
+          const o = { cmd: "recs" };
+          const L = musReq(o);
+          rowsRaw = wait(L, "Ch\u01B0a c\xF3 b\u1EA3n th\xE2u \u2014 \u0111ang nghe radio th\xEC b\u1EA5m \u23FA tr\xEAn thanh nh\u1EA1c") || flt(L.filter((r) => r.type !== "pod")).map((r) => ({ t: r.t, s: r.s, letter: "\u23FA", tile: "#5A1A1A", rad: "50%", run: () => tcn("mus", JSON.stringify({ cmd: "playFile", path: r.path, t: r.t })), a2L: "\u{1F5D1}", a2C: "#FF9A9E", a2: () => {
+            tcn("mus", JSON.stringify({ cmd: "delFile", path: r.path, req: JSON.stringify(o) }));
+          } }));
+        } else if (S.src === "radio") {
+          const o = q2 ? { cmd: "radioList", tab: "search", q: q2 } : { cmd: "radioList", tab: biTab, state: auSt };
+          const L = musReq(o);
+          const curSt = MD && MD.builtin && MD.kind === "radio" ? MD.station : "";
+          rowsRaw = wait(L, biTab === "fav" ? "Ch\u01B0a c\xF3 \u0111\xE0i y\xEAu th\xEDch \u2014 b\u1EA5m \u2605" : "Kh\xF4ng th\u1EA5y \u0111\xE0i") || L.map((r) => ({
+            id: "r:" + r.n,
+            t: r.t,
+            s: r.s,
+            letter: (r.t || "?").charAt(0),
+            tile: "#2B2B2B",
+            rad: "50%",
+            cur: r.n === curSt,
+            run: () => tcn("mus", JSON.stringify({ cmd: "radioPlay", name: r.n })),
+            a2L: r.fav ? "\u2605" : "\u2606",
+            a2C: r.fav ? "#FBB040" : "#5E8496",
+            a2: () => {
+              tcn("mus", JSON.stringify({ cmd: "radioFav", name: r.n }));
+              musDrop(o);
+              musDrop({ cmd: "radioList", tab: "fav", state: auSt });
+            }
+          }));
+          biFoot = biTab === "near" ? "\u0110ang \u1EDF bang " + auSt + " \xB7 \u0111i Road Trip qua bang kh\xE1c app t\u1EF1 \u0111\u1ED5i qua \u0111\xE0i c\xF9ng lo\u1EA1i" : "Radio qua m\u1EA1ng \xB7 ~30\u201360 MB/gi\u1EDD";
+        } else if (S.src === "podcast" && P) {
+          const o = { cmd: "podEps", feed: P.feed, id: P.id };
+          const L = musReq(o);
+          const fl = musReq({ cmd: "podList", group: "follow" }) || [];
+          const isF = fl.some((x) => x.feed === P.feed);
+          biBack = { label: P.t, run: () => self.setState({ musPod: null, panelAt: Date.now() }) };
+          biActs = [
+            { label: "\u2B07 T\u1EA3i T\u1EA5t C\u1EA3", run: () => {
+              tcn("mus", JSON.stringify({ cmd: "dlAll", feed: P.feed, id: P.id, pod: P.t }));
+              self.toast("\u0110ang t\u1EA3i 10 t\u1EADp m\u1EDBi nh\u1EA5t c\u1EE7a " + P.t + "\u2026");
+            } },
+            { label: isF ? "\u2605 \u0110ang Theo D\xF5i" : "\u2606 Theo D\xF5i", run: () => {
+              tcn("mus", JSON.stringify({ cmd: "podFollow", feed: P.feed, id: P.id, t: P.t, s: P.s || "", img: P.img || "" }));
+              setTimeout(() => musDrop({ cmd: "podList", group: "follow" }), 300);
+            } }
+          ];
+          rowsRaw = wait(L, "Ch\u01B0a l\u1EA5y \u0111\u01B0\u1EE3c danh s\xE1ch t\u1EADp") || flt(L).map((r) => ({
+            t: r.t,
+            s: [r.date, r.dur, r.dl ? "\u0111\xE3 t\u1EA3i" : ""].filter(Boolean).join(" \xB7 "),
+            letter: r.dl ? "\u2713" : "P",
+            tile: r.dl ? "#1E5A3A" : "#7A4BB5",
+            rad: "8px",
+            cur: MD && MD.podUrl === r.url,
+            run: () => tcn("mus", JSON.stringify({ cmd: "podPlay", url: r.url, t: r.t, pod: P.t })),
+            a2L: r.dl ? "\u2713" : "\u2B07 T\u1EA3i",
+            a2C: r.dl ? "#7BD88F" : "#FFD08A",
+            a2: () => {
+              if (r.dl) return;
+              tcn("mus", JSON.stringify({ cmd: "dl", url: r.url, t: r.t, pod: P.t }));
+              setTimeout(() => musDrop(o), 15e3);
+            }
+          }));
+          biFoot = "T\u1EADp \u0111\xE3 t\u1EA3i t\u1EF1 xo\xE1 sau 3 ng\xE0y \xB7 \u23EE l\xF9i 15 gi\xE2y \xB7 \u23ED t\u1EDBi 30 gi\xE2y";
+        } else if (S.src === "podcast" && biTab === "dl") {
+          const o = { cmd: "recs" };
+          const L = musReq(o);
+          rowsRaw = wait(L, "Ch\u01B0a t\u1EA3i t\u1EADp n\xE0o") || flt(L.filter((r) => r.type === "pod")).map((r) => ({ t: r.t, s: r.s, letter: "\u2713", tile: "#1E5A3A", rad: "8px", run: () => tcn("mus", JSON.stringify({ cmd: "playFile", path: r.path, t: r.t, type: "pod" })), a2L: "\u{1F5D1}", a2C: "#FF9A9E", a2: () => tcn("mus", JSON.stringify({ cmd: "delFile", path: r.path, req: JSON.stringify(o) })) }));
+        } else if (S.src === "podcast") {
+          const o = biTab === "psearch" ? { cmd: "podList", group: "search", q: q2 } : { cmd: "podList", group: biTab };
+          const L = biTab === "psearch" && !q2 ? [] : musReq(o);
+          rowsRaw = wait(L, biTab === "psearch" ? "G\xF5 t\xEAn k\xEAnh podcast \u0111\u1EC3 t\xECm" : biTab === "follow" ? "Ch\u01B0a theo d\xF5i k\xEAnh n\xE0o \u2014 m\u1EDF m\u1ED9t k\xEAnh r\u1ED3i b\u1EA5m \u2606 Theo D\xF5i" : "Kh\xF4ng t\u1EA3i \u0111\u01B0\u1EE3c danh m\u1EE5c \u2014 ki\u1EC3m tra m\u1EA1ng") || (biTab === "psearch" ? L : flt(L)).map((r) => ({ t: r.t, s: r.s, letter: (r.t || "P").charAt(0), tile: "#7A4BB5", rad: "8px", run: () => self.setState({ musPod: r, mpQ: "", panelAt: Date.now() }) }));
+        }
+      }
       const radioRows = (arr) => arr.map(([id, t, sub, letter, tile]) => ({ id, t, s: sub, letter, tile, rad: "50%", isRadio: true }));
       if (!APP && S.src === "radio") rowsRaw = radioRows(tabOk === "near" ? NEAR : tabOk === "fav" ? allRadio.filter((r) => S.favs[r[0]]) : RADIO[tabOk] || []);
       if (!APP && S.src === "podcast") rowsRaw = [1, 2, 3, 4, 5].map((i) => ({ t: "Podcast m\u1EABu " + i, s: tabOk === "pnew" ? "T\u1EADp m\u1EDBi \xB7 " + (20 + i * 7) + " ph" : "\u0110\xE3 theo d\xF5i", letter: "P", tile: "#7A4BB5", rad: "8px" }));
       const maxRows = drive ? 6 : 99;
       const curT = APP ? S.src === "radio" ? LV.radio && LV.radio.name : MD && MD.title : S.nowT || DEF_NOW[S.src][0];
       const mpOpen = S.mpOpen && !(drive && S.now - S.panelAt > 8e3);
+      const mpA = C.mpAlpha != null ? C.mpAlpha : 88;
+      if (!self.__mpOut && typeof document !== "undefined") {
+        self.__mpOut = 1;
+        document.addEventListener("pointerdown", (e) => {
+          if (self.state.mpOpen && e.target && e.target.closest && !e.target.closest('section[aria-label="Ch\u1ECDn b\xE0i v\xE0 \u0111\xE0i"], .jbpill')) self.setState({ mpOpen: false });
+        }, true);
+      }
       const mp = {
         open: mpOpen,
         touch: () => self.setState({ panelAt: Date.now() }),
         close: () => self.setState({ mpOpen: false }),
+        w: drive ? 470 : 440,
+        h: drive ? 350 : 340,
+        alpha: (mpA / 100).toFixed(2),
+        alphaV: mpA,
+        setAlpha: (e) => self.setS("mpAlpha", +e.target.value),
+        backOn: !!biBack || biActs.length > 0,
+        backL: biBack ? biBack.label : "",
+        back: biBack ? biBack.run : () => {
+        },
+        backShow: !!biBack,
+        acts: biBack || biActs.length ? biActs : [],
+        searchOn: BI ? biSearch : true,
+        footOn: !drive,
         srcs: [["music", "Nh\u1EA1c"], ["radio", "Radio"], ["podcast", "Podcast"]].map(([k, label]) => {
           const on = S.src === k;
           return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => {
-            if (APP && k === "podcast") tcn("media", "jbquery");
-            self.setState({ src: k, mpTab: TABS[k][0][0], nowT: "", nowS: "", mpQ: "", panelAt: Date.now() });
+            if (APP && k === "podcast" && !BI) tcn("media", "jbquery");
+            self.setState({ src: k, mpTab: (BI ? biTabs : TABS)[k][0][0], nowT: "", nowS: "", mpQ: "", musDrill: null, musPod: null, panelAt: Date.now() });
           } };
         }),
         srcNote: S.src === "music" ? APP ? "Ngu\u1ED3n: " + (MD && MD.app || "app nh\u1EA1c \u0111ang ph\xE1t") : "Ngu\u1ED3n: Tom's Jukebox" : S.src === "radio" ? "Radio qua m\u1EA1ng \xB7 ~30\u201360 MB/gi\u1EDD" : "Podcast",
-        tabs: TABS[S.src].map(([k, label]) => {
+        tabs: BI ? biTabs[S.src].map(([k, label]) => {
+          const on = biTab === k;
+          return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => {
+            if (k === "recs" || k === "dl") musDrop({ cmd: "recs" });
+            self.setState({ mpTab: k, musDrill: null, musPod: null, mpQ: "", musQAt: k === "queue" ? Date.now() : S.musQAt, panelAt: Date.now() });
+          } };
+        }) : TABS[S.src].map(([k, label]) => {
           const on = tabOk === k;
           return { label, on: on ? "true" : "false", bg: on ? ON.bg : OFF.bg, fg: on ? ON.fg : OFF.fg, pick: () => {
             if (k === "radio") self.setState({ src: "radio", mpTab: "near", panelAt: Date.now() });
@@ -1858,11 +2165,14 @@ window.__AppComp = function() {
         q: S.mpQ || "",
         setQ: (e) => self.setState({ mpQ: e.target.value, panelAt: Date.now() }),
         searchBg: drive ? "#0A1822" : "#0D2C40",
-        regionOn: S.src === "radio" && tabOk === "near",
+        regionOn: !BI && S.src === "radio" && tabOk === "near",
         regionL: APP ? "V\xF9ng hi\u1EC7n t\u1EA1i: " + (S.radioLists && S.radioLists.region || LV.place && LV.place.suburb || "\u2026") + " (theo GPS) \xB7 T\u1EF1 \u0111\u1ED5i \u0111\xE0i theo v\xF9ng: M\u1EDF" : "V\xF9ng hi\u1EC7n t\u1EA1i: " + regName + " (theo GPS \xB7 m\u1EABu) \xB7 T\u1EF1 \u0111\u1ED5i \u0111\xE0i theo v\xF9ng: M\u1EDF",
-        rows: rowsRaw.slice(0, maxRows).map((r) => {
-          const cur = playing && r.t === curT;
-          return Object.assign({ isRadio: false, id: "" }, r, { bg: r.hdr ? "transparent" : cur ? "rgba(251,176,64,0.14)" : "rgba(13,44,64,0.55)", st: cur ? "\u0110ANG PH\xC1T" : "", stC: "#FFD08A", play: r.hdr ? () => {
+        rows: rowsRaw.slice(0, BI && S.mpTab === "lyr" ? 99 : maxRows).map((r) => {
+          const cur = r.cur != null ? r.lyr ? r.cur : r.cur && playing : playing && r.t === curT;
+          return Object.assign({ isRadio: false, id: "" }, r, { tileShow: r.lyr ? "none" : "flex", fg: r.lyr ? cur ? "#FBB040" : "#CFE6EE" : "#E8F1F5", align: r.lyr ? "center" : "left", ws: r.lyr ? "normal" : "nowrap", a2On: !!r.a2, isRadio: BI ? false : !!r.isRadio, bg: r.hdr || r.lyr ? "transparent" : cur ? "rgba(251,176,64,0.14)" : "rgba(13,44,64,0.55)", st: cur && !r.lyr ? "\u0110ANG PH\xC1T" : "", stC: "#FFD08A", play: r.run ? () => {
+            r.run();
+            self.setState({ panelAt: Date.now() });
+          } : r.hdr ? () => {
           } : r.retry ? () => {
             tcn("media", "jbquery");
             self.toast("\u0110ang h\u1ECFi l\u1EA1i Tom\u2019s Jukebox\u2026");
@@ -1874,7 +2184,7 @@ window.__AppComp = function() {
         }),
         fs: drive ? 18 : 15,
         rowPad: drive ? "10px 8px" : "6px 8px",
-        foot: drive ? "Xe \u0111ang ch\u1EA1y: ch\u1EEF to, t\u1ED1i \u0111a 6 d\xF2ng, t\u1EF1 \u0111\xF3ng sau 8 gi\xE2y kh\xF4ng \u0111\u1EE5ng." : S.src === "music" ? `Tom's Jukebox: \u0111\u1EE7 4 tab. Spotify / YouTube Music: ch\u1EC9 th\u1EA5y h\xE0ng ch\u1EDD n\u1EBFu app cho ph\xE9p, c\xF2n l\u1EA1i c\xF3 n\xFAt "M\u1EDF trong \u2026".` : S.src === "radio" ? 'M\u1EA5t s\xF3ng (vd Kaniva \u2192 Keith) app s\u1EBD h\u1ECFi: "Chuy\u1EC3n sang nh\u1EA1c trong m\xE1y?"' : "Podcast l\u1EA5y t\u1EEB Tom\u2019s Jukebox \xB7 \u23EE l\xF9i 15 gi\xE2y \xB7 \u23ED t\u1EDBi 30 gi\xE2y."
+        foot: BI ? biFoot || (S.src === "music" ? "Nh\u1EA1c trong m\xE1y \xB7 n\xFAt tr\xEAn v\xF4 l\u0103ng, tai nghe v\xE0 m\xE0n h\xECnh kho\xE1 \u0111\u1EC1u \u0111i\u1EC1u khi\u1EC3n \u0111\u01B0\u1EE3c" : S.src === "podcast" ? "B\u1EA5m v\xF4 k\xEAnh \u0111\u1EC3 xem t\u1EADp \xB7 \u2B07 T\u1EA3i t\u1EEBng t\u1EADp ho\u1EB7c \u2B07 T\u1EA3i T\u1EA5t C\u1EA3 (10 t\u1EADp m\u1EDBi nh\u1EA5t) \xB7 t\u1EF1 xo\xE1 sau 3 ng\xE0y" : "Radio qua m\u1EA1ng") : drive ? "Xe \u0111ang ch\u1EA1y: ch\u1EEF to, t\u1ED1i \u0111a 6 d\xF2ng, t\u1EF1 \u0111\xF3ng sau 8 gi\xE2y kh\xF4ng \u0111\u1EE5ng." : S.src === "music" ? `Tom's Jukebox: \u0111\u1EE7 4 tab. Spotify / YouTube Music: ch\u1EC9 th\u1EA5y h\xE0ng ch\u1EDD n\u1EBFu app cho ph\xE9p, c\xF2n l\u1EA1i c\xF3 n\xFAt "M\u1EDF trong \u2026".` : S.src === "radio" ? 'M\u1EA5t s\xF3ng (vd Kaniva \u2192 Keith) app s\u1EBD h\u1ECFi: "Chuy\u1EC3n sang nh\u1EA1c trong m\xE1y?"' : "Podcast l\u1EA5y t\u1EEB Tom\u2019s Jukebox \xB7 \u23EE l\xF9i 15 gi\xE2y \xB7 \u23ED t\u1EDBi 30 gi\xE2y."
       };
       const sayV = (t, sens) => {
         self.setState({ va: false });
@@ -1916,11 +2226,17 @@ window.__AppComp = function() {
           sayV("D\u1EA1");
         } },
         { t: "T\u1EAFt nh\u1EA1c", re: /((tắt|dừng|ngưng|ngừng|thôi) ?(nhạc|bài|hát|đài|radio|phát)|^(tắt|dừng|ngưng|ngừng|pause|stop)$|stop (the )?music|pause music)/, run: () => {
-          if (S.src === "radio") tcn("radio", "stop");
+          if (BI) tcn("media", "pause");
+          else if (S.src === "radio") tcn("radio", "stop");
           else tcn("media", "pause");
           sayV("D\u1EA1, \u0111\xE3 t\u1EAFt");
         } },
         { t: "B\u1EADt playlist \u2026", re: /(bật|mở|phát|cho (?:mình |tui |tôi |em )?nghe|nghe|chơi) (playlist|danh sách|album|ca sĩ|nghệ sĩ|nhạc của|bài hát|bài) (.+)$/, run: (m) => {
+          if (BI) {
+            self.setState({ va: false, src: "music" });
+            tcn("mus", JSON.stringify({ cmd: "voice", kind: "music", q: /^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim()) ? "" : m[3].trim(), req: "v" }));
+            return;
+          }
           if (/^(hát|nhạc|nhạc đi|đi|lên)$/.test(m[3].trim())) {
             self.setState({ src: "music" });
             tcn("media", "play");
@@ -1933,7 +2249,8 @@ window.__AppComp = function() {
         } },
         { t: "Tr\u1ED9n b\xE0i", re: /(trộn bài|ngẫu nhiên|shuffle)/, run: () => {
           self.setState({ src: "music" });
-          tcn("media", "jb:" + JSON.stringify({ kind: "shuffle", name: "" }));
+          if (BI) tcn("mus", JSON.stringify({ cmd: "playLib", view: "songs", shuffle: true }));
+          else tcn("media", "jb:" + JSON.stringify({ kind: "shuffle", name: "" }));
           sayV("D\u1EA1, ph\xE1t ng\u1EABu nhi\xEAn");
         } },
         { t: "B\u1EADt nh\u1EA1c", re: /((bật|mở|phát|chơi|cho (?:mình |tui |tôi |em )?nghe|nghe) ?(nhạc|bài hát|bài|music)|^play|play music|resume|tiếp tục (phát|nghe|nhạc)|^(bật|mở) lên$)/, run: () => {
@@ -1941,7 +2258,33 @@ window.__AppComp = function() {
           tcn("media", "play");
           sayV("D\u1EA1, ph\xE1t nh\u1EA1c n\xE8");
         } },
+        { t: "Nghe podcast \u2026", re: /(nghe|mở|bật|phát) ?(podcast|pót ?cát|bót ?cát)(?: (?:của |kênh )?(.+))?$/, run: (m) => {
+          if (!BI) {
+            self.setState({ va: false, src: "podcast", mpOpen: true, panelAt: Date.now() });
+            return self.say("D\u1EA1, m\u1EDF danh s\xE1ch podcast");
+          }
+          self.setState({ va: false, src: "podcast" });
+          tcn("mus", JSON.stringify({ cmd: "voice", kind: "podcast", q: (m[3] || "").replace(/(mới nhất|tập mới)/g, "").trim(), req: "v" }));
+        } },
+        { t: "M\u1EDF \u0111\xE0i \u2026", re: /(mở|bật|nghe|phát) (đài|radio|kênh) (?!vùng này|gần đây|địa phương)(.+)$/, run: (m) => {
+          if (!BI) return CMDS.find((x) => x.t === "Nghe \u0111\xE0i v\xF9ng n\xE0y").run(m);
+          self.setState({ va: false, src: "radio" });
+          tcn("mus", JSON.stringify({ cmd: "voice", kind: "radio", q: m[3].trim(), req: "v" }));
+        } },
+        { t: "Th\xE2u \u0111\xE0i", re: /(thâu|ghi âm|thu âm) (đài|radio)/, run: () => {
+          if (BI) {
+            tcn("mus", JSON.stringify({ cmd: "rec" }));
+            sayV("D\u1EA1");
+          } else sayV("D\u1EA1, ch\u1EC9 th\xE2u \u0111\u01B0\u1EE3c khi nghe radio trong Tom\u2019s Car");
+        } },
         { t: "Nghe \u0111\xE0i v\xF9ng n\xE0y", re: /(đài|radio|ra đi ô)/, run: () => {
+          if (BI) {
+            self.setState({ va: false, src: "radio", mpOpen: true, mpTab: "near", panelAt: Date.now() });
+            const L = (self.state.musL || {})[JSON.stringify({ cmd: "radioList", tab: "near", state: auSt })];
+            const n2 = L && L[0];
+            if (n2) tcn("mus", JSON.stringify({ cmd: "radioPlay", name: n2.n }));
+            return self.say(n2 ? "D\u1EA1, \u0111ang m\u1EDF " + n2.n : "D\u1EA1, m\u1EDF danh s\xE1ch \u0111\xE0i v\xF9ng n\xE0y");
+          }
           self.setState({ va: false, src: "radio", mpOpen: true, mpTab: "near", panelAt: Date.now() });
           const n = S.radioLists && S.radioLists.near && S.radioLists.near[0] || null;
           if (APP && n) tcn("radio", JSON.stringify({ url: n.url, name: n.name }));
@@ -1957,10 +2300,14 @@ window.__AppComp = function() {
         } },
         { t: "\u0110\u1ECDc tin nh\u1EAFn", re: /(đọc tin|tin nhắn|read message)/, run: () => {
           if (priv) return sayV("\u0110ang b\u1EADt Ri\xEAng T\u01B0 n\xEAn kh\xF4ng \u0111\u1ECDc tin nh\u1EAFn");
-          const m = (S.msgs || [])[0];
-          sayV(m ? m[0] + " nh\u1EAFn: " + m[3] : "D\u1EA1, kh\xF4ng c\xF3 tin nh\u1EAFn m\u1EDBi", true);
+          const n0 = S.nmsg, m = (S.msgs || [])[0];
+          sayV(n0 && (!m || n0.at >= (m[4] || 0)) ? (priv ? "Tin nh\u1EAFn m\u1EDBi: " : n0.who + " nh\u1EAFn: ") + n0.text : m ? (priv ? "Tin nh\u1EAFn m\u1EDBi: " : m[0] + " nh\u1EAFn: ") + m[3] : "D\u1EA1, kh\xF4ng c\xF3 tin nh\u1EAFn m\u1EDBi", true);
         } },
-        { t: "Nghe m\xE1y", re: /^(nghe|nghe máy|answer)$/, run: () => {
+        { t: "D\u1EEBng ch\u1EC9 \u0111\u01B0\u1EDDng", re: /(dừng|tắt|thôi|huỷ|hủy|ngưng) (chỉ đường|dẫn đường|đường đi|lộ trình)|stop navigation/, run: () => {
+          self.setState({ va: false, wp: [] });
+          if (NV) NV.stop();
+        } },
+        { t: "Nghe m\xE1y", re: /^(nghe|nghe máy|nghe máy đi|bắt máy|answer)$/, run: () => {
           tcn("call", "answer");
           self.setState({ va: false });
         } },
@@ -2061,7 +2408,6 @@ window.__AppComp = function() {
         ["Thanh tr\xEAn c\xF9ng: T\xECm Ch\u1ED7 sau Workspace DeX", "Thanh b\u1EA3n m\u1EABu", "search"],
         ["T\xECm Ch\u1ED7: logo t\u1EEBng h\xE3ng (t\u1EF1 l\u1EA5y, nh\u1EDB s\u1EB5n)", "T\xECm Ch\u1ED7", "search"],
         ["Cu\u1ED9c g\u1ECDi \u0111\u1EBFn: thanh m\u1ECFng, kh\xF4ng \u0111\u1ECDc t\xEAn, ri\xEAng t\u01B0", 'B\u1EA5m "G\u1ECDi Th\u1EED"', "call"],
-        ["Tab Li\xEAn L\u1EA1c: l\u1ECBch s\u1EED cu\u1ED9c g\u1ECDi + tin nh\u1EAFn c\xE1c app", "Li\xEAn L\u1EA1c", "contacts"],
         ["S\u1ED1 t\u1ED1c \u0111\u1ED9: m\xE0u theo gi\u1EDBi h\u1EA1n, v\xF2ng cung, 7 ki\u1EC3u, c\u1EE1 s\u1ED1", "M\xE0n H\xECnh Ch\xEDnh / C\xE0i \u0110\u1EB7t \u2192 Giao Di\u1EC7n", "home"],
         ["Canh gi\u1EEFa con s\u1ED1 trong \u0111\u1ED3ng h\u1ED3 t\u1ED1c \u0111\u1ED9", "M\xE0n H\xECnh Ch\xEDnh", "home"],
         ["Gi\u1EDBi h\u1EA1n t\u1ED1c \u0111\u1ED9 theo v\xF9ng + b\xE1o tr\u01B0\u1EDBc + bi\u1EC3n to khi \u0111\u1ED5i", "M\xE0n H\xECnh Ch\xEDnh \u2192 \xF4 B\u1EA3n M\u1EABu", "home"],
@@ -2140,8 +2486,8 @@ window.__AppComp = function() {
         hl: WX && WX.hi != null ? "\u2191" + Math.round(WX.hi) + "\xB0  \u2193" + Math.round(WX.lo) + "\xB0" : "",
         desc: WX ? (WXVI[wk] || "") + (WX.rain ? " \xB7 " + Math.round(WX.rain) + "%" : "") : "\u0110ang l\u1EA5y\u2026",
         aria: WX ? wxT + " " + (WXVI[wk] || "") : "\u0111ang l\u1EA5y",
-        open: () => self.setState({ fcOpen: true, last: Date.now() })
-        // #130: the forecast, not the idle screen
+        open: () => self.setState({ idleOn: true, idleAt: Date.now() })
+        // 0.9.15 (#135): the weather opens the idle screen again
       };
       window.__wxState = { kind: wk, tod, calm: drive && !!C.calm, drive };
       const THEMEMAP = { outback: "au", coast: "au", melb: "au", neonau: "neon", dandenong: "au", yarra: "au", snow: "au", sgold: "retro", synth: "neon", cyber: "neon", minimal: "minimal", rally: "led" };
@@ -2413,22 +2759,35 @@ window.__AppComp = function() {
       };
       const JL = window.__jbLook || {};
       const jbBar = C.jbFollow && JL.barColour ? JL.barColour : "#FBB040";
+      const barA = (C.barAlpha != null ? C.barAlpha : 90) / 100;
+      const artC = MD && /^#[0-9a-f]{6}$/i.test(MD.col || "") ? MD.col : "";
+      const artC2 = artC ? (() => {
+        const n = parseInt(artC.slice(1), 16);
+        const mix = (v) => Math.round(v + (255 - v) * 0.45);
+        return "rgb(" + mix(n >> 16) + "," + mix(n >> 8 & 255) + "," + mix(n & 255) + ")";
+      })() : "";
       const jb = {
         posL: fmtT(MD && MD.pos),
         durL: fmtT(MD && MD.dur),
         ring: "#FBB040",
-        bg: "linear-gradient(180deg, rgba(40,62,80,0.88), rgba(9,26,38,0.92))",
-        w1: silk(8, 0),
-        w2: silk(6, 2.1),
-        wc1: "#5FD4F0",
-        wc2: "#FBB040",
-        waveOp: C.vizOn === false ? 0 : drive ? 0.35 : 0.8,
+        bg: "linear-gradient(180deg, rgba(40,62,80," + barA.toFixed(2) + "), rgba(9,26,38," + Math.min(1, barA + 0.04).toFixed(2) + "))",
+        w1: silk(11, 0),
+        w2: silk(8, 2.1),
+        wc1: artC || "#5FD4F0",
+        wc2: artC ? artC2 : "#FBB040",
+        waveOp: C.vizOn === false ? 0 : (C.waveOp != null ? C.waveOp : 90) / 100 * (drive ? 0.6 : 1),
+        waveH: C.waveH != null ? C.waveH : 34,
         discCls: playing && !drive ? "disc-on" : "",
         bar: jbBar,
-        rec: APP && playing && !!MD && MD.pkg === "com.tomstechsolutions.jukebox" && /radio|trực tiếp|live/i.test((MD.artist || "") + " " + (MD.title || "")),
+        rec: APP && BI && !!MD && MD.builtin && MD.kind === "radio" && playing || APP && playing && !!MD && MD.pkg === "com.tomstechsolutions.jukebox" && /radio|trực tiếp|live/i.test((MD.artist || "") + " " + (MD.title || "")),
         recTap: () => {
-          if (APP) tcn("media", "jb:" + JSON.stringify({ kind: "record", name: "" }));
-        }
+          if (!APP) return;
+          if (BI && MD && MD.builtin) {
+            tcn("mus", JSON.stringify({ cmd: "rec" }));
+            self.toast(MD.rec ? "\u0110\xE3 d\u1EEBng th\xE2u" : "B\u1EAFt \u0111\u1EA7u th\xE2u \u0111\xE0i " + (MD.station || ""));
+          } else tcn("media", "jb:" + JSON.stringify({ kind: "record", name: "" }));
+        },
+        recOn: !!(MD && MD.rec)
       };
       const idleMs = (C.idleMin == null ? 3 : C.idleMin) * 6e4;
       const NV0 = window.NAV, navOn0 = !!(NV0 && NV0.st && (NV0.st.active || NV0.st.route));
@@ -2622,7 +2981,7 @@ window.__AppComp = function() {
         }
       } else if (window.TCIdle && window.TCIdle.isOn()) window.TCIdle.hide();
       const NV = window.NAV || null;
-      if (S.scr === "trip") S.scr = "home";
+      if (S.scr === "trip" || S.scr === "contacts") S.scr = "home";
       const shell = !nar && (S.scr === "home" || S.scr === "rt");
       if (window.tcLangSync) window.tcLangSync(C.lang === "en" ? "en" : "vi");
       if (NV) {
@@ -2646,7 +3005,31 @@ window.__AppComp = function() {
       const night0 = sun0 && sun0.rise ? !(nowT0 > new Date(sun0.rise).getTime() && nowT0 < new Date(sun0.set).getTime()) : d.getHours() < 6 || d.getHours() >= 19;
       const toWp = (p) => ({ name: p.name, lat: p.lat, lon: p.lon, logo: p.logo || (NV ? NV.logoOf(p.name) : ""), st: p.st || "" });
       const wpList = S.wp || [];
+      const SH = (() => {
+        if (!self.__sh) {
+          try {
+            self.__sh = JSON.parse(localStorage.getItem("tc-shist") || "[]");
+          } catch (e) {
+            self.__sh = [];
+          }
+        }
+        return self.__sh;
+      })();
+      const shSave = (a) => {
+        self.__sh = a;
+        try {
+          localStorage.setItem("tc-shist", JSON.stringify(a));
+        } catch (e) {
+        }
+        self.setState({ shAt: Date.now() });
+      };
+      const shAdd = (p) => {
+        if (!p || p.lat == null || !p.name || /^Vị trí của Tom$/.test(p.name)) return;
+        shSave([{ name: p.name, sub: p.sub || p.st || "", lat: p.lat, lon: p.lon, logo: p.logo || "", at: Date.now() }].concat(SH.filter((x) => !(x.name === p.name && Math.abs(x.lat - p.lat) < 5e-4))).slice(0, 50));
+      };
+      const fold = (t) => (t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
       const planWp = (wp, start) => {
+        if (wp.length) shAdd(wp[wp.length - 1]);
         self.setState({ wp, nq: "", nRes: null, nField: "" });
         if (!NV) return;
         if (!wp.length) {
@@ -2740,10 +3123,12 @@ window.__AppComp = function() {
       const ctlTop = navAct && (C.navBanner === "big" || (C.navBanner || "auto") === "auto" && NV.st.toNext != null && NV.st.toNext < 200) ? 214 : navAct ? 160 : S.scr === "home" ? 200 : 138;
       const shortRd = (t) => (t || "").replace(/\bAvenue\b/g, "Ave").replace(/\bBoulevard\b/g, "Blvd").replace(/\bRoad\b/g, "Rd").replace(/\bDrive\b/g, "Dr").replace(/\bStreet\b/g, "St").replace(/\bHighway\b/g, "Hwy").replace(/\bFreeway\b/g, "Fwy").replace(/\bCourt\b/g, "Ct").replace(/\bCrescent\b/g, "Cres").replace(/\bParade\b/g, "Pde").replace(/\bService Road\b/g, "Service Rd");
       const waitGps = !!(APP && navAct && (!LV.fresh || Date.now() - (NV && NV.st.fixAt || 0) > 8e3));
+      if (waitGps && !self.__gpsWait) self.__gpsWait = Date.now();
+      else if (!waitGps) self.__gpsWait = 0;
       const nearTurn = !!(navAct && NV.st.toNext != null && NV.st.toNext < 200);
       const bnSize = C.navBanner === "big" ? "big" : C.navBanner === "hide" ? nearTurn ? "mini" : "tiny" : nearTurn ? "big" : "mini";
       const etaOpen = !!S.etaOpen;
-      const dropOpen = !!S.goOpen && S.scr === "home" && !navAct && !(S.nField === "go" && S.nRes && S.nRes.length);
+      const dropOpen = !!S.goOpen && S.scr === "home" && !navAct && !(S.nField === "go" && (S.nRes && S.nRes.length || (S.nq || "").trim()));
       const goAdd = !!S.goAdd && wpList.length > 0;
       const nv = {
         boxTap: () => {
@@ -2758,6 +3143,11 @@ window.__AppComp = function() {
           else self.toast("Ch\u01B0a ghi ch\u1ED7 \u0111\u1EADu xe n\xE0o \u2014 \u0111\u1EADu h\u01A1n 3 ph\xFAt l\xE0 app t\u1EF1 ghi");
         },
         openHomeSet: () => self.setState({ goMenu: false, dlg: "pe", peKind: "home", peQ: "", peRes: [] }),
+        shClear: () => {
+          shSave([]);
+          self.setState({ goMenu: false });
+          self.toast("\u0110\xE3 xo\xE1 l\u1ECBch s\u1EED t\xECm");
+        },
         addStop: () => self.setState({ goAdd: true, goOpen: true, nField: "go", nq: "", nRes: null }),
         stopsOn: wpList.length > 1,
         prevH: 560,
@@ -2777,11 +3167,14 @@ window.__AppComp = function() {
           } else if (navV) NV.start();
           else self.toast("G\xF5 ch\u1ED7 mu\u1ED1n t\u1EDBi tr\u01B0\u1EDBc nha");
         },
-        res: resFor("go", (p) => {
+        res: (S.nField === "go" && (S.nq || "").trim() ? SH.filter((x) => fold(x.name + " " + x.sub).indexOf(fold(S.nq.trim())) >= 0).slice(0, 4).map((x) => Object.assign(resRow(Object.assign({}, x, { sub: "\u{1F558} " + (x.sub || "\u0110\xE3 t\xECm tr\u01B0\u1EDBc \u0111\xE2y") }), () => {
+          self.setState({ goOpen: false, goAdd: false });
+          planWp(goAdd ? wpList.concat([toWp(x)]) : [toWp(x)], false);
+        }))) : []).concat(resFor("go", (p) => {
           self.setState({ goOpen: false, goAdd: false });
           planWp(goAdd ? wpList.concat([toWp(p)]) : [toWp(p)], false);
-        }),
-        resOn: S.nField === "go" && !!(S.nRes && S.nRes.length) && S.scr === "home",
+        }).filter((r) => !SH.some((x) => x.name === r.name && (S.nq || "").trim() && fold(x.name).indexOf(fold(S.nq.trim())) >= 0))),
+        resOn: S.nField === "go" && (S.nq || "").trim() && SH.some((x) => fold(x.name + " " + x.sub).indexOf(fold(S.nq.trim())) >= 0) || S.nField === "go" && !!(S.nRes && S.nRes.length) && S.scr === "home",
         micGo: () => {
           self.setState({ va: true, vaHeard: "", vaHint: "N\xF3i t\xEAn ch\u1ED7 ho\u1EB7c \u0111\u1ECBa ch\u1EC9\u2026 v\xED d\u1EE5 \u201C\u0111i t\u1EDBi Bunnings Sunshine\u201D" });
           tcn("voice", "start");
@@ -2796,10 +3189,22 @@ window.__AppComp = function() {
         navChipsOn: shell && navAct && mapShow,
         chips,
         chipsOn: shell && S.scr === "home" && !navAct && !navV && !arrived && mapShow && !dropOpen && !S.goMenu && !(S.nField === "go" && S.nRes && S.nRes.length),
-        bannerOn: shell && navAct && mapShow && !waitGps && bnSize === "big",
-        bnMini: shell && navAct && mapShow && !waitGps && bnSize === "mini",
-        bnTiny: shell && navAct && mapShow && !waitGps && bnSize === "tiny",
+        bannerOn: shell && navAct && mapShow && bnSize === "big",
+        bnMini: shell && navAct && mapShow && bnSize === "mini",
+        bnTiny: shell && navAct && mapShow && bnSize === "tiny",
         waitGps: shell && navAct && mapShow && waitGps,
+        gpsTop: ctlTop - 44,
+        cbS: (C.spPanel || "a") !== "off" ? 48 : 54,
+        cbG: (C.spPanel || "a") !== "off" ? 6 : 8,
+        zoomOn: !navAct || (C.spPanel || "a") === "off",
+        gpsL: S.now - (self.__gpsWait || S.now) > 3e4 ? "GPS y\u1EBFu \u2014 ra ch\u1ED7 tho\xE1ng tr\u1EDDi" : "\u0110ang ch\u1EDD GPS\u2026",
+        stopAsk: () => self.setState({ stopAsk: true }),
+        stopOn: !!S.stopAsk && navAct,
+        stopNo: () => self.setState({ stopAsk: false }),
+        stopYes: () => {
+          self.setState({ stopAsk: false, wp: [] });
+          NV && NV.stop();
+        },
         bnTap: () => self.setS("navBanner", C.navBanner === "big" ? "hide" : C.navBanner === "hide" ? "auto" : "big"),
         shortText: navV ? shortRd(navV.text) : "",
         thenShort: navV && navV.then ? shortRd(navV.then).replace(/^(Rẽ|Chếch|Giữ|Đi|Ra|Vô)[^ ]* [^ ]* (vô |theo )?/, "") : "",
@@ -2890,8 +3295,8 @@ window.__AppComp = function() {
         refollowL: "B\u1EA3n \u0111\u1ED3 s\u1EBD t\u1EF1 theo xe sau 10 gi\xE2y"
       };
       const unread0 = APP ? (S.msgs || []).reduce((a, m) => a + (m[5] || 0), 0) + (LV.missed || 0) : 3;
-      const tabGo = (scr) => () => self.setState({ scr, dlg: null, nq: "", nRes: null, nField: "", goOpen: false, goAdd: false, ntOpen: scr === "rt" ? S.ntOpen : false });
-      const tabs = [["home", "\u27A4 H\xE0nh Tr\xECnh"], ["rt", "\u{1F5FA} Road Trip"], ["contacts", "Li\xEAn L\u1EA1c"], ["search", "T\xECm Ch\u1ED7"]].map(([k, l]) => {
+      const tabGo = (scr) => () => S.scr === scr && scr === "rt" ? self.setState({ pnlMin: Object.assign({}, S.pnlMin || {}, { rt: !(S.pnlMin || {}).rt }) }) : self.setState({ scr, dlg: null, nq: "", nRes: null, nField: "", goOpen: false, goAdd: false, ntOpen: scr === "rt" ? S.ntOpen : false });
+      const tabs = [["home", "\u27A4 H\xE0nh Tr\xECnh"], ["rt", "\u{1F5FA} Road Trip"], ["search", "T\xECm Ch\u1ED7"]].map(([k, l]) => {
         const on = S.scr === k;
         return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "rgba(8,22,34,0.62)", fg: on ? "#2A1A00" : "#FFFFFF", ring: on ? "none" : "inset 0 0 0 1px rgba(255,255,255,0.22)", cls: on ? "" : "glt", badge: unread0, badgeOn: k === "contacts" && unread0 > 0, go: k === "contacts" ? () => {
           tabGo("contacts")();
@@ -2968,6 +3373,8 @@ window.__AppComp = function() {
           work ? { ic: "\u{1F4BC}", l: "Ch\u1ED7 L\xE0m", sub: kmTo(work) || work.name || "", go: () => pickPl(work, false) } : { ic: "\u{1F4BC}", l: "Ch\u1ED7 L\xE0m", sub: "Ch\u01B0a l\u01B0u \u2014 b\u1EA5m \u0111\u1EC3 \u0111\u1EB7t", go: () => self.setState({ dlg: "pe", peKind: "work", peQ: "", peRes: [] }) }
         ],
         quickOn: hjTab !== "log",
+        shOn: hjTab !== "log" && SH.length > 0,
+        sh: SH.slice(0, 6).map((x, i) => ({ name: x.name, sub: x.sub || kmTo(x), pick: () => pickPl(x, false), del: () => shSave(SH.filter((_, k) => k !== i)) })),
         habitOn: !!habit && !navV,
         habitL: habit ? "Gi\u1EDD n\xE0y Tom hay \u0111i " + habit.name : "",
         habitGo: () => habit && planWp([toWp(habit)], true),
@@ -3054,6 +3461,7 @@ window.__AppComp = function() {
         on: shell && S.scr === "rt" && !pnlMin,
         min: shell && S.scr === "rt" && pnlMin,
         toggle: togglePnl,
+        toggleStop: togglePnl,
         title: rt.title,
         legs: rt.legs,
         openTrips: rt.openTrips,
@@ -3302,7 +3710,7 @@ window.__AppComp = function() {
             const L0 = window.__liveLL && window.__liveLL();
             if (L0) {
               self.setState({ peBusy: null });
-              if (NV && NV.reverse) NV.reverse(L0).then((nm) => peSave({ name: nm || LV.place && (LV.place.street || LV.place.suburb), lat: L0[0], lon: L0[1] })).catch(() => peSave({ lat: L0[0], lon: L0[1] }));
+              if (NV && NV.reverse) NV.reverse(L0).then((nm2) => peSave({ name: nm2 || LV.place && (LV.place.street || LV.place.suburb), lat: L0[0], lon: L0[1] })).catch(() => peSave({ lat: L0[0], lon: L0[1] }));
               else peSave({ lat: L0[0], lon: L0[1] });
               return;
             }
@@ -3322,7 +3730,7 @@ window.__AppComp = function() {
           NV.onMapClick = (ll) => {
             NV.onMapClick = null;
             const p = [ll.lat, ll.lng];
-            NV.reverse(p).then((nm) => peSave({ name: nm, lat: p[0], lon: p[1] })).catch(() => peSave({ lat: p[0], lon: p[1] }));
+            NV.reverse(p).then((nm2) => peSave({ name: nm2, lat: p[0], lon: p[1] })).catch(() => peSave({ lat: p[0], lon: p[1] }));
           };
         },
         pickBar: !!S.pePick,
@@ -3532,6 +3940,47 @@ window.__AppComp = function() {
         daysOn: WXD7.length > 0,
         none: APP && !WX
       };
+      const lvC = (v) => v == null || v < 0 ? "#8FC3D3" : v < 20 ? "#FF8A8A" : v < 40 ? "#FFC46B" : "#7BD88F";
+      const B0 = LV.bat || (APP ? {} : { level: 71, charging: true, temp: 33.5, left: 48, src: "usb" });
+      const devRows = [{
+        ic: "\u{1F4F1}",
+        name: "\u0110i\u1EC7n tho\u1EA1i" + (LV.device ? " \xB7 " + LV.device : ""),
+        sub: [B0.charging ? "\u26A1 \u0110ang s\u1EA1c" + (B0.src === "wireless" ? " kh\xF4ng d\xE2y" : "") + (B0.left > 0 ? " \xB7 \u0111\u1EA7y sau ~" + (B0.left >= 60 ? Math.floor(B0.left / 60) + " gi\u1EDD " : "") + B0.left % 60 + " ph\xFAt" : "") : "Kh\xF4ng s\u1EA1c", B0.temp ? "Pin " + Math.round(B0.temp) + "\xB0C" + (B0.hot ? " \u2014 n\xF3ng!" : "") : ""].filter(Boolean).join(" \xB7 "),
+        lvOn: B0.level != null,
+        lv: (B0.level != null ? B0.level : "--") + "%",
+        pct: B0.level || 0,
+        c: B0.hot ? "#FF8A8A" : lvC(B0.level),
+        tap: () => {
+        }
+      }].concat((LV.devs || (APP ? [] : [{ name: "Galaxy Buds2 Pro", type: "audio", level: 64 }, { name: "XAV-AX3200", type: "audio", level: -1 }])).map((d2) => ({
+        ic: d2.type === "watch" ? "\u231A" : d2.type === "speaker" ? "\u{1F50A}" : d2.type === "audio" ? "\u{1F3A7}" : "\u{1F535}",
+        name: d2.name,
+        sub: (d2.type === "watch" ? "\u0110\u1ED3ng h\u1ED3" : d2.type === "speaker" ? "Loa Bluetooth" : d2.type === "audio" ? "Tai nghe / \xE2m thanh xe" : "Thi\u1EBFt b\u1ECB Bluetooth") + (d2.level >= 0 ? "" : " \xB7 kh\xF4ng b\xE1o pin"),
+        lvOn: d2.level >= 0,
+        lv: d2.level + "%",
+        pct: d2.level,
+        c: lvC(d2.level),
+        tap: () => tcn("btset")
+      }))).concat([LV.obd ? { ic: "\u{1F527}", name: "OBD-II \xB7 \u0111\xE3 n\u1ED1i", sub: (LV.obd.protocol || "") + (LV.obd.volt ? " \xB7 B\xECnh \u0111i\u1EC7n " + Number(LV.obd.volt).toFixed(1) + " V" : ""), lvOn: false, tap: () => {
+      } } : { ic: "\u{1F527}", name: "OBD-II", sub: LV.obdSt === "wait" ? "Ch\u01B0a n\u1ED1i \u2014 m\u1EDF m\xE1y xe \u0111\u1EC3 n\u1ED1i" : "Ch\u01B0a th\u1EA5y c\u1EE5c OBD", lvOn: false, tap: () => {
+      } }]).concat(LV.dex ? [{ ic: "\u{1F5A5}", name: "Samsung DeX", sub: "\u0110ang ch\u1EA1y tr\xEAn m\xE0n h\xECnh ngo\xE0i", lvOn: false, tap: () => {
+      } }] : []).concat((LV.usb || []).map((u) => ({ ic: "\u{1F50C}", name: u.name || "Thi\u1EBFt b\u1ECB USB", sub: "USB" + (u.maker ? " \xB7 " + u.maker : ""), lvOn: false, tap: () => {
+      } })));
+      const qr = {
+        on: S.dlg === "qr",
+        rows: (S.qrEdit || []).map((v, i) => ({ n: i + 1, v, set: (e) => {
+          const a = (self.state.qrEdit || []).slice();
+          a[i] = e.target.value;
+          self.setState({ qrEdit: a });
+        } })),
+        cancel: () => self.setState({ dlg: null }),
+        save: () => {
+          self.setS("quickReplies", (S.qrEdit || []).map((x) => x.trim()).filter(Boolean));
+          self.setState({ dlg: null });
+        }
+      };
+      const dev = { on: !!S.devOpen, open: () => self.setState({ devOpen: true, last: Date.now() }), close: () => self.setState({ devOpen: false }), stop: () => {
+      }, rows: devRows };
       const wsHid = navAct || spd > 15 ? !S.wsOpen : !!C.wsCol;
       window.__mapTouched = () => {
         if (shell && self.state.scr === "home" && !self.state.qc && !wsHid) {
@@ -3549,6 +3998,10 @@ window.__AppComp = function() {
         },
         cal,
         fc,
+        dev,
+        nm,
+        qr,
+        spp,
         rootW: nar || APP ? "100%" : "1280px",
         rootH: nar || APP ? "100%" : "720px",
         verL: window.TC_VERSION || "0.9.x-beta",
@@ -3747,7 +4200,7 @@ window.__AppComp = function() {
         srcMenuTap: () => self.setState({ srcMenu: !S.srcMenu }),
         srcMenu: [["music", "Nh\u1EA1c"], ["radio", "Radio"], ["podcast", "Podcast"]].map(([k, l]) => {
           const on = S.src === k;
-          return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "#0D2C40", fg: on ? "#2A1A00" : "#E8F1F5", pick: () => (APP && k === "podcast" && tcn("media", "jbquery"), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: "", mpTab: k === "radio" ? "near" : k === "music" ? "lists" : self.state.mpTab, panelAt: Date.now() })) };
+          return { label: l, on: on ? "true" : "false", bg: on ? "#FBB040" : "#0D2C40", fg: on ? "#2A1A00" : "#E8F1F5", fw: on ? 700 : 400, tc: on ? "#FFD08A" : "#8FC3D3", ul: on ? "underline" : "none", pick: () => (APP && k === "podcast" && !BI && tcn("media", "jbquery"), self.setState({ src: k, srcMenu: false, mpOpen: true, mpQ: "", musDrill: null, musPod: null, mpTab: BI ? biTabs[k][0][0] : k === "radio" ? "near" : k === "music" ? "lists" : self.state.mpTab, panelAt: Date.now() })) };
         }),
         townOn: !!(S.townSign && S.now - S.townSign.at < 6e3 && S.scr === "home"),
         townL: S.townSign ? S.townSign.name : "",
@@ -3803,26 +4256,37 @@ window.__AppComp = function() {
         musicW: drive ? 600 : 660,
         togglePlay: () => {
           if (APP) {
-            if (S.src === "radio") tcn("radio", playing ? "stop" : JSON.stringify({ url: LV.radio && LV.radio.url || "", name: LV.radio && LV.radio.name || "" }));
+            if (BI) tcn("media", "toggle");
+            else if (S.src === "radio") tcn("radio", playing ? "stop" : JSON.stringify({ url: LV.radio && LV.radio.url || "", name: LV.radio && LV.radio.name || "" }));
             else tcn("media", playing ? "pause" : "play");
           } else self.setState({ playing: !S.playing, perm: S.playing ? S.perm : true });
         },
         playLabel: playing ? "D\u1EEBng" : "Ph\xE1t",
         prevF: () => {
           if (!APP) return;
+          if (BI) {
+            if (MD && MD.kind === "podcast") tcn("mus", JSON.stringify({ cmd: "skip", ms: -15e3 }));
+            else tcn("media", "prev");
+            return;
+          }
           if (S.src === "podcast") tcn("media", "jb:" + JSON.stringify({ kind: "seek", name: "-15000" }));
           else tcn(S.src === "radio" ? "radio" : "media", "prev");
         },
         nextF: () => {
           if (!APP) return;
+          if (BI) {
+            if (MD && MD.kind === "podcast") tcn("mus", JSON.stringify({ cmd: "skip", ms: 3e4 }));
+            else tcn("media", "next");
+            return;
+          }
           if (S.src === "podcast") tcn("media", "jb:" + JSON.stringify({ kind: "seek", name: "30000" }));
           else tcn(S.src === "radio" ? "radio" : "media", "next");
         },
         prevLabel: S.src === "podcast" ? "L\xF9i 15 gi\xE2y" : S.src === "radio" ? "\u0110\xE0i tr\u01B0\u1EDBc" : "B\xE0i tr\u01B0\u1EDBc",
         nextLabel: S.src === "podcast" ? "T\u1EDBi 30 gi\xE2y" : S.src === "radio" ? "\u0110\xE0i k\u1EBF" : "B\xE0i k\u1EBF",
         playIcon: playing && !inCall ? "M7 5h4v14H7zM13 5h4v14h-4z" : "M8 5l11 7-11 7z",
-        songTitle: APP ? S.src === "radio" ? LV.radio && LV.radio.name || DEF_NOW.radio[2] : MD && MD.title || DEF_NOW.music[2] : S.playing ? S.nowT || DEF_NOW[S.src][0] : DEF_NOW[S.src][2],
-        songSub: inCall && playing ? "T\u1EA1m d\u1EEBng v\xEC c\xF3 cu\u1ED9c g\u1ECDi" : APP ? S.src === "radio" ? playing ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : LV.radio && LV.radio.err || "" : MD ? [MD.artist, MD.app].filter(Boolean).join(" \xB7 ") : "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t " + ({ "com.spotify.music": "Spotify", "com.google.android.apps.youtube.music": "YouTube Music" }[C.musicApp] || "Tom's Jukebox") : S.playing ? S.nowS || DEF_NOW[S.src][1] : S.perm ? "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t" : "",
+        songTitle: APP ? BI ? MD && MD.title || "Tom\u2019s Car \xB7 Nh\u1EA1c" : S.src === "radio" ? LV.radio && LV.radio.name || DEF_NOW.radio[2] : MD && MD.title || DEF_NOW.music[2] : S.playing ? S.nowT || DEF_NOW[S.src][0] : DEF_NOW[S.src][2],
+        songSub: inCall && playing ? "T\u1EA1m d\u1EEBng v\xEC c\xF3 cu\u1ED9c g\u1ECDi" : APP && BI ? MD ? MD.buffering ? "\u0110ang t\u1EA3i\u2026" : MD.rec ? "\u23FA \u0110ang th\xE2u \xB7 " + fmtT(MD.recSec * 1e3) : MD.err || [MD.artist, MD.kind === "radio" ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : MD.kind === "podcast" ? "Podcast" : ""].filter(Boolean).join(" \xB7 ") : "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t nh\u1EA1c trong m\xE1y" : APP ? S.src === "radio" ? playing ? "Radio \xB7 tr\u1EF1c ti\u1EBFp" : LV.radio && LV.radio.err || "" : MD ? [MD.artist, MD.app].filter(Boolean).join(" \xB7 ") : "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t " + ({ "com.spotify.music": "Spotify", "com.google.android.apps.youtube.music": "YouTube Music" }[C.musicApp] || "Tom's Jukebox") : S.playing ? S.nowS || DEF_NOW[S.src][1] : S.perm ? "B\u1EA5m \u25B6 \u0111\u1EC3 ph\xE1t" : "",
         showWave,
         waveBars,
         prog: APP ? MD && MD.pos != null && MD.dur ? Math.round(MD.pos / MD.dur * 100) : 0 : 38,
@@ -4007,6 +4471,7 @@ a{color:#5FD4F0}a:hover{color:#CFF6FF}
 @keyframes tf-fade{from{opacity:0}to{opacity:1}}
 .dimbox{transition:opacity .6s ease}
 .scrl{overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(95,212,240,0.6) transparent}
+@keyframes spbl{50%{transform:scale(1.07);filter:brightness(1.25)}}.spblink{animation:spbl 1s steps(1) infinite}
 .scrl::-webkit-scrollbar{width:5px}.scrl::-webkit-scrollbar-thumb{background:rgba(95,212,240,0.6);border-radius:3px}
 .rtlist{scrollbar-width:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}.rtlist::-webkit-scrollbar{width:12px}.rtlist::-webkit-scrollbar-track{background:rgba(255,255,255,0.05);border-radius:6px}.rtlist::-webkit-scrollbar-thumb{background:rgba(251,176,64,0.75);border-radius:6px;min-height:40px}
 input[type=range]{accent-color:#FBB040}
@@ -4065,7 +4530,7 @@ input[type=range]{accent-color:#FBB040}
           <div style="font-size: 28px; font-weight: 700; line-height: 1; font-family: Bahnschrift, 'Barlow Semi Condensed', sans-serif; text-shadow: 0 0 12px rgba(95,212,240,0.6)"><span style="color: #48B0C8">TOM'S</span> <span style="position: relative; display: inline-block; color: #FBB040">CAR<svg aria-hidden="true" viewBox="0 10 300 90" style="position: absolute; left: -0.5em; top: -0.56em; width: 2.7em; height: 1.1em; overflow: visible; pointer-events: none"><path d="M12 74 C60 46 104 22 160 20 C204 18 232 30 262 54 C236 36 206 28 162 30 C110 32 66 52 12 74 Z" fill="#FBB040"></path><path d="M96 58 C120 40 150 34 178 34 C204 34 222 42 236 54 C214 48 190 46 166 46 C140 46 118 50 96 58 Z" fill="#FBB040"></path><path d="M176 58 C214 54 256 56 290 64 C296 66 296 71 290 71 C254 63 216 60 176 58 Z" fill="#FBB040"></path><path d="M296 76 C292 82 286 86 276 88 C282 84 288 80 296 76 Z M200 86 C176 90 150 90 128 87 C150 87 176 87 200 86 Z M54 86 C40 86 26 82 16 76 C28 80 40 83 54 86 Z" fill="#FBB040"></path><path d="M58 86 C62 70 76 62 92 62 C108 62 120 72 124 86 C116 76 106 70 92 70 C78 70 66 76 58 86 Z" fill="#FBB040"></path><path d="M206 86 C210 70 224 62 240 62 C256 62 268 72 272 86 C264 76 254 70 240 70 C226 70 214 76 206 86 Z" fill="#FBB040"></path><path d="M281 63 L291 66 L282 67 Z" fill="#FFE9A8"></path></svg></span></div>
           <div style="font-size: 11px; color: #CFE6EE">Focus On One Thing And Do It Well</div>
         </div>
-        <div class="pnl gl" style="height: 58px; padding: 0 22px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 260px">
+        <div onClick="{{dev.open}}" role="button" aria-label="Thi\u1EBFt b\u1ECB \u0111ang k\u1EBFt n\u1ED1i" class="pnl gl" style="height: 58px; padding: 0 22px; display: flex; flex-direction: column; justify-content: center; flex-shrink: 1; min-width: 0; max-width: 260px; cursor: pointer">
           <span class="lbl">\u0110ANG CH\u1EA0Y TR\xCAN</span><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{street}}</span>
           <span role="group" aria-label="Pin thi\u1EBFt b\u1ECB" style="display: flex; gap: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden"><sc-for list="{{devList}}" as="dv" hint-placeholder-count="2"><span style="color: {{dv.c}}">{{dv.l}}</span></sc-for></span>
         </div>
@@ -4096,7 +4561,7 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- tab: H\xE0nh Tr\xECnh \xB7 Road Trip \xB7 Li\xEAn L\u1EA1c \xB7 T\xECm Ch\u1ED7 -->
       <div style="position: absolute; left: 20px; top: 90px; display: flex; gap: 8px; z-index: 6">
-        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="4"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
+        <sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3"><button onClick="{{tb.go}}" aria-pressed="{{tb.on}}" class="pill {{tb.cls}}" style="background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.ring}}; display: flex; align-items: center; gap: 6px; white-space: nowrap">{{tb.label}}<sc-if value="{{tb.badgeOn}}" hint-placeholder-val="{{ false }}"><span style="min-width: 18px; height: 18px; border-radius: 9px; background: #FBB040; color: #2A1A00; font-size: 11px; display: inline-flex; align-items: center; justify-content: center">{{tb.badge}}</span></sc-if></button></sc-for>
       </div>
 
       <!-- c\u1ED9t Workspace: tr\u1ED1ng l\u1EA7n \u0111\u1EA7u -->
@@ -4147,6 +4612,7 @@ input[type=range]{accent-color:#FBB040}
             <button onClick="{{nv.openLog}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F4D2} Nh\u1EADt K\xFD Chuy\u1EBFn \u0110i</button>
             <button onClick="{{nv.openPark}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F17F} Ch\u1ED7 \u0110\u1EADu Xe</button>
             <button onClick="{{nv.openHomeSet}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px">\u{1F3E0} \u0110\u1EB7t Nh\xE0 / Ch\u1ED7 L\xE0m</button>
+            <button onClick="{{nv.shClear}}" role="menuitem" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 15px; color: #FF9A9E">\u{1F558} Xo\xE1 L\u1ECBch S\u1EED T\xECm</button>
           </div>
         </sc-if>
       </sc-if>
@@ -4160,6 +4626,12 @@ input[type=range]{accent-color:#FBB040}
             <div style="flex-shrink: 0; padding: 8px 10px; border-radius: 10px; background: rgba(47,107,245,0.14); box-shadow: inset 0 0 0 1px rgba(47,107,245,0.55); display: flex; flex-direction: column; gap: 6px">
               <button onClick="{{hj.parkSee}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">\u{1F17F} {{hj.parkL}}</button>
               <div style="display: flex; gap: 6px; align-items: center"><span style="font-size: 11px; color: #8FC3D3">Nh\u1EAFc h\u1EBFt gi\u1EDD:</span><sc-for list="{{hj.parkRemind}}" as="k" hint-placeholder-count="3"><button onClick="{{k.tap}}" aria-pressed="{{k.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{k.bg}}; color: {{k.fg}}">{{k.l}}</button></sc-for><span style="font-size: 11px; color: #FFD08A">{{hj.parkR}}</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{hj.shOn}}" hint-placeholder-val="{{ false }}">
+            <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 2px">
+              <span class="lbl">\u{1F558} T\xCCM G\u1EA6N \u0110\xC2Y</span>
+              <sc-for list="{{hj.sh}}" as="h" hint-placeholder-count="3"><div style="display: flex; align-items: center; gap: 6px"><button onClick="{{h.pick}}" style="flex: 1; min-width: 0; border: 0; background: rgba(255,255,255,0.04); border-radius: 8px; padding: 7px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 8px"><span style="color: #8FC3D3">\u{1F558}</span><span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.name}}</span><span style="font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.sub}}</span></span></button><button onClick="{{h.del}}" aria-label="Xo\xE1 kh\u1ECFi l\u1ECBch s\u1EED" class="btn" style="width: 36px; height: 36px; padding: 0; color: #8FC3D3">\u2715</button></div></sc-for>
             </div>
           </sc-if>
           <div role="tablist" style="flex-shrink: 0; display: flex; gap: 4px"><sc-for list="{{hj.tabs}}" as="t" hint-placeholder-count="3"><button onClick="{{t.tap}}" role="tab" aria-selected="{{t.on}}" class="pill" style="flex: 1; height: 36px; padding: 0 4px; font-size: 14px; background: {{t.bg}}; color: {{t.fg}}">{{t.l}}</button></sc-for></div>
@@ -4241,7 +4713,15 @@ input[type=range]{accent-color:#FBB040}
         </button>
       </sc-if>
       <sc-if value="{{nv.waitGps}}" hint-placeholder-val="{{ false }}">
-        <div class="pnl" role="status" style="position: absolute; right: 20px; top: 88px; height: 52px; box-sizing: border-box; padding: 0 18px; display: flex; align-items: center; gap: 10px; background: rgba(60,72,82,0.92); z-index: 7; border-radius: 26px; color: #E8F1F5; font-size: 16px"><span style="width: 10px; height: 10px; border-radius: 5px; background: #FFC46B; animation: tw 1s steps(1) infinite alternate"></span>\u0110ang ch\u1EDD GPS\u2026</div>
+        <div class="pnl" role="status" style="position: absolute; right: 20px; top: {{nv.gpsTop}}px; height: 34px; box-sizing: border-box; padding: 0 12px; display: flex; align-items: center; gap: 8px; background: rgba(60,72,82,0.92); z-index: 7; border-radius: 17px; color: #E8F1F5; font-size: 13px"><span style="width: 8px; height: 8px; border-radius: 4px; background: #FFC46B; animation: tw 1s steps(1) infinite alternate"></span>{{nv.gpsL}}</div>
+      </sc-if>
+      <sc-if value="{{nv.stopOn}}" hint-placeholder-val="{{ false }}">
+        <div onClick="{{nv.stopNo}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.5); display: flex; align-items: center; justify-content: center; z-index: 22">
+          <div role="dialog" aria-label="D\u1EEBng ch\u1EC9 \u0111\u01B0\u1EDDng?" class="pnl fadein" style="width: 460px; box-sizing: border-box; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #06192A">
+            <span style="font-size: 22px; font-weight: 800">D\u1EEBng ch\u1EC9 \u0111\u01B0\u1EDDng?</span>
+            <div style="display: flex; gap: 10px"><button onClick="{{nv.stopNo}}" class="btn" style="flex: 1; height: 58px; font-size: 18px">Ch\u1EA1y Ti\u1EBFp</button><button onClick="{{nv.stopYes}}" class="btn btn-r" style="flex: 1; height: 58px; font-size: 18px">D\u1EEBng</button></div>
+          </div>
+        </div>
       </sc-if>
 
       <!-- th\u1EBB t\xF3m t\u1EAFt chuy\u1EBFn (xem tr\u01B0\u1EDBc, ch\u01B0a ch\u1EA1y) -->
@@ -4268,7 +4748,7 @@ input[type=range]{accent-color:#FBB040}
       </sc-if>
 
       <sc-if value="{{nv.etaMini}}" hint-placeholder-val="{{ false }}">
-        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Gi\u1EDD t\u1EDBi \u2014 ch\u1EA1m \u0111\u1EC3 hi\u1EC7n n\xFAt" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">\xB7 {{nv.left}} \xB7 {{nv.km}}</span></button></div>
+        <div style="position: absolute; right: 20px; bottom: 100px; display: flex; gap: 8px; z-index: 6; align-items: center"><button onClick="{{nv.voice}}" aria-label="{{nv.voiceA}}" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; pointer-events: auto">{{nv.voiceIc}}</button><button onClick="{{nv.etaTap}}" aria-label="Gi\u1EDD t\u1EDBi \u2014 ch\u1EA1m \u0111\u1EC3 hi\u1EC7n n\xFAt" class="pnl glb" style="position: relative; height: 46px; box-sizing: border-box; padding: 0 16px; display: flex; align-items: center; gap: 8px; z-index: 6; border: 0; border-radius: 23px; cursor: pointer; font-family: inherit; color: #E8F1F5; white-space: nowrap"><span class="tnum" style="font-size: 20px; font-weight: 800; color: #7BD88F">{{nv.eta}}</span><span style="font-size: 14px">\xB7 {{nv.left}} \xB7 {{nv.km}}</span></button><button onClick="{{nv.stopAsk}}" aria-label="D\u1EEBng ch\u1EC9 \u0111\u01B0\u1EDDng" class="pnl glb" style="width: 46px; height: 46px; border: 0; border-radius: 23px; padding: 0; font-size: 20px; cursor: pointer; color: #FF9A9E">\u2715</button></div>
       </sc-if>
       <!-- th\u1EBB gi\u1EDD t\u1EDBi (\u0111ang ch\u1EA1y) -->
       <sc-if value="{{nv.etaOn}}" hint-placeholder-val="{{ false }}">
@@ -4289,18 +4769,39 @@ input[type=range]{accent-color:#FBB040}
 
       <!-- n\xFAt b\u1EA3n \u0111\u1ED3: + \u2212 v\u1ECB tr\xED, c\u1EA3 chuy\u1EBFn, h\u01B0\u1EDBng -->
       <sc-if value="{{nv.ctlOn}}" hint-placeholder-val="{{ false }}">
-        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; gap: 8px; z-index: 5">
-          <button onClick="{{nv.zin}}" aria-label="Ph\xF3ng to" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">+</button>
-          <button onClick="{{nv.zout}}" aria-label="Thu nh\u1ECF" class="btn glr" style="width: 54px; height: 54px; padding: 0; font-size: 28px">\u2212</button>
-          <button onClick="{{nv.loc}}" aria-label="V\u1EC1 v\u1ECB tr\xED xe" class="btn glr" style="width: 54px; height: 54px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
-          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem c\u1EA3 chuy\u1EBFn" title="Xem c\u1EA3 chuy\u1EBFn" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
-          <button onClick="{{nv.lyTap}}" aria-label="Ki\u1EC3u b\u1EA3n \u0111\u1ED3: {{nv.lyName}}" aria-expanded="{{nv.lyOpen}}" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CFF6FF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z"></path><path d="m2 12 10 5 10-5"></path><path d="m2 16 10 5 10-5"></path></svg></button>
+        <div style="position: absolute; right: 20px; top: {{nv.ctlTop}}px; display: flex; flex-direction: column; align-items: flex-end; gap: {{nv.cbG}}px; z-index: 5">
+          <sc-if value="{{nv.zoomOn}}" hint-placeholder-val="{{ true }}"><button onClick="{{nv.zin}}" aria-label="Ph\xF3ng to" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; font-size: 28px">+</button>
+          <button onClick="{{nv.zout}}" aria-label="Thu nh\u1ECF" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; font-size: 28px">\u2212</button></sc-if>
+          <button onClick="{{nv.loc}}" aria-label="V\u1EC1 v\u1ECB tr\xED xe" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0; color: {{nv.locC}}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5" fill="currentColor"></circle><path d="M12 1v4M12 19v4M1 12h4M19 12h4"></path></svg></button>
+          <sc-if value="{{nv.fitOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{nv.fit}}" aria-label="Xem c\u1EA3 chuy\u1EBFn" title="Xem c\u1EA3 chuy\u1EBFn" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg></button></sc-if>
+          <button onClick="{{nv.lyTap}}" aria-label="Ki\u1EC3u b\u1EA3n \u0111\u1ED3: {{nv.lyName}}" aria-expanded="{{nv.lyOpen}}" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#CFF6FF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 8l10 5 10-5-10-5Z"></path><path d="m2 12 10 5 10-5"></path><path d="m2 16 10 5 10-5"></path></svg></button>
           <sc-if value="{{nv.lyOpen}}" hint-placeholder-val="{{ false }}">
             <div class="pnl glb" role="menu" aria-label="Ki\u1EC3u b\u1EA3n \u0111\u1ED3" style="position: absolute; right: 64px; top: 0; width: 190px; padding: 8px; display: flex; flex-direction: column; gap: 6px; z-index: 8">
               <sc-for list="{{nv.lyOpts}}" as="o" hint-placeholder-count="5"><button onClick="{{o.pick}}" role="menuitemradio" aria-checked="{{o.on}}" class="btn" style="height: 46px; justify-content: flex-start; padding: 0 12px; font-size: 16px; color: {{o.fg}}; background: {{o.bg}}">{{o.ic}} {{o.label}}</button></sc-for>
             </div>
           </sc-if>
-          <button onClick="{{nv.compass}}" aria-label="La b\xE0n \u2014 v\u1EC1 v\u1ECB tr\xED xe, theo h\u01B0\u1EDBng xe ch\u1EA1y" class="btn glr" style="width: 54px; height: 54px; padding: 0"><svg id="tccompassN" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="transition: transform 0.15s linear"><path d="M17 3 L22 17 L12 17 Z" fill="#FF5A4E"></path><path d="M17 31 L12 17 L22 17 Z" fill="#E8F1F5"></path><text x="17" y="12.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Overpass, sans-serif">N</text></svg></button>
+          <button onClick="{{nv.compass}}" aria-label="La b\xE0n \u2014 v\u1EC1 v\u1ECB tr\xED xe, theo h\u01B0\u1EDBng xe ch\u1EA1y" class="btn glr" style="width: {{nv.cbS}}px; height: {{nv.cbS}}px; padding: 0"><svg id="tccompassN" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true" style="transition: transform 0.15s linear"><path d="M17 3 L22 17 L12 17 Z" fill="#FF5A4E"></path><path d="M17 31 L12 17 L22 17 Z" fill="#E8F1F5"></path><text x="17" y="12.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="#FFFFFF" font-family="Overpass, sans-serif">N</text></svg></button>
+          <!-- 0.9.15 (#146): b\u1EA3ng t\u1ED1c \u0111\u1ED9 d\u01B0\u1EDBi La B\xE0n \u2014 3 ki\u1EC3u (b\u1EA5m \u0111\u1EC3 \u0111\u1ED5i ki\u1EC3u) -->
+          <sc-if value="{{spp.a}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 116px; border-radius: 18px; overflow: hidden; background: #FFFFFF; box-shadow: 0 8px 22px rgba(0,0,0,0.45); display: flex; flex-direction: column; align-items: center">
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="padding: 9px 0 7px"><span style="width: 80px; height: 80px; border-radius: 40px; border: 9px solid #D6202A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: #111111; font-family: Overpass, sans-serif">{{spp.lim}}</span></span></sc-if>
+              <span style="width: 100%; padding: 6px 0 9px; background: {{spp.bg}}; color: #FFFFFF; display: flex; flex-direction: column; align-items: center"><span class="tnum" style="font-size: 40px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; opacity: 0.85">km/g</span></span>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.b}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="position: relative; border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 140px; height: 140px; background: transparent">
+              <svg width="140" height="140" viewBox="0 0 120 120" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"><circle cx="60" cy="60" r="52" fill="rgba(8,22,32,0.92)"></circle><path d="M24.6 95.4A50 50 0 1 1 95.4 95.4" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="9" stroke-linecap="round"></path><path d="M24.6 95.4A50 50 0 1 1 95.4 95.4" fill="none" stroke="{{spp.arcC}}" stroke-width="9" stroke-linecap="round" pathLength="100" stroke-dasharray="{{spp.arc}} 100"></path></svg>
+              <span style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: {{spp.numC}}"><span class="tnum" style="font-size: 44px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; color: #CFE6EE">km/g</span></span>
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="position: absolute; right: -6px; top: -6px; width: 50px; height: 50px; border-radius: 25px; background: #FFFFFF; border: 6px solid #D6202A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; color: #111111">{{spp.lim}}</span></sc-if>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.c}}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{spp.cycle}}" aria-label="{{spp.aria}}" class="{{spp.blink}}" style="position: relative; border: 0; padding: 0; cursor: pointer; font-family: inherit; width: 136px; height: 136px; border-radius: 68px; box-sizing: border-box; border: 13px solid {{spp.cRing}}; background: {{spp.cBg}}; color: {{spp.cFg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 22px rgba(0,0,0,0.45)">
+              <sc-if value="{{spp.limOn}}" hint-placeholder-val="{{ true }}"><span style="position: absolute; top: -13px; background: {{spp.cRing}}; color: {{spp.cTag}}; font-size: 13px; font-weight: 800; padding: 0 8px; border-radius: 7px">{{spp.lim}}</span></sc-if>
+              <span class="tnum" style="font-size: 44px; font-weight: 800; line-height: 1">{{spp.v}}</span><span style="font-size: 12px; opacity: 0.75">km/g</span>
+            </button>
+          </sc-if>
+          <sc-if value="{{spp.aheadOn}}" hint-placeholder-val="{{ false }}"><span class="pnl glb" style="padding: 4px 10px; font-size: 13px; color: #FFD08A; white-space: nowrap">300 m n\u1EEFa: {{spp.ahead}}</span></sc-if>
         </div>
       </sc-if>
 
@@ -4374,9 +4875,9 @@ input[type=range]{accent-color:#FBB040}
       <sc-if value="{{rtp.on}}" hint-placeholder-val="{{ false }}">
         <section aria-label="Road Trip" class="pnl glb" style="position: absolute; left: 20px; top: 138px; width: 392px; bottom: 92px; box-sizing: border-box; padding: 12px; display: flex; flex-direction: column; gap: 7px; z-index: 6; overflow: hidden">
           <div style="display: flex; gap: 5px; flex-wrap: nowrap; flex-shrink: 0">
-            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 11px; font-size: 13px; white-space: nowrap; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
-            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 10px; white-space: nowrap">C\xE1c Chuy\u1EBFn \u25BE</button>
-            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button><button onClick="{{rtp.toggle}}" aria-label="Thu g\u1ECDn b\u1EA3ng" class="btn" style="width: 36px; height: 36px; padding: 0; flex-shrink: 0">\u25C0</button>
+            <sc-for list="{{rtp.legs}}" as="c" hint-placeholder-count="2"><button onClick="{{c.pick}}" aria-pressed="{{c.on}}" class="pill" style="height: 36px; padding: 0 9px; font-size: 13px; white-space: nowrap; flex-shrink: 1; min-width: 0; overflow: hidden; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button></sc-for>
+            <button onClick="{{rtp.openTrips}}" class="btn" style="height: 36px; font-size: 13px; padding: 0 8px; white-space: nowrap; flex-shrink: 1; min-width: 0">Chuy\u1EBFn \u25BE</button>
+            <button onClick="{{rtp.newTrip}}" aria-label="{{rtp.newA}}" class="btn" style="height: 36px; min-width: 40px; font-size: 13px; padding: 0 10px; color: #FFD08A; white-space: nowrap; margin-left: auto">{{rtp.newL}}</button>
           </div>
           <sc-if value="{{rtp.formOn}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 10px; border-radius: 10px; background: rgba(4,18,30,0.75); box-shadow: inset 0 0 0 1px rgba(251,176,64,0.5); display: flex; flex-direction: column; gap: 6px">
@@ -4392,7 +4893,7 @@ input[type=range]{accent-color:#FBB040}
           <sc-if value="{{rtp.mainOn}}" hint-placeholder-val="{{ true }}">
           <!-- 0.9.14 (#132): g\u1ECDn ph\xEDa tr\xEAn, \xF4 C\xE1c Ch\u1EB7ng Gh\xE9 chi\u1EBFm h\u1EBFt ch\u1ED7 c\xF2n l\u1EA1i -->
           <button onClick="{{rtp.openLog}}" aria-label="Ti\u1EBFn \u0111\u1ED9 chuy\u1EBFn \u2014 b\u1EA5m xem nh\u1EADt k\xFD" style="flex-shrink: 0; border: 0; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 6px 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; display: flex; flex-direction: column; gap: 4px; text-align: left">
-            <span style="font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.title}}</span>
+            <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{rtp.title}}</span><span onClick="{{rtp.toggleStop}}" role="button" aria-label="Thu g\u1ECDn b\u1EA3ng" style="flex-shrink: 0; width: 44px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 16px">\u25C0</span></span>
             <span class="tnum" style="font-size: 13px; font-weight: 700; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{rtp.sumL}}</span>
             <span style="display: flex; align-items: center; gap: 8px; width: 100%"><span style="flex: 1; display: block; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); overflow: hidden"><span style="display: block; height: 100%; width: {{rtp.pct}}%; background: linear-gradient(90deg, #7BD88F, #FBB040)"></span></span><span class="tnum" style="font-size: 12px; color: #CFE6EE; white-space: nowrap">{{rtp.pctL}}</span></span>
           </button>
@@ -4504,29 +5005,31 @@ input[type=range]{accent-color:#FBB040}
           <svg width="110" height="110" viewBox="0 0 150 150" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0"><circle cx="75" cy="75" r="62" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="9" stroke-dasharray="292 390" transform="rotate(135 75 75)" stroke-linecap="round"></circle><circle cx="75" cy="75" r="62" fill="none" stroke="{{dk.arcC2}}" stroke-width="9" stroke-dasharray="{{dk.arc2}}" transform="rotate(135 75 75)" stroke-linecap="round"></circle></svg>
           <span style="text-align: center; position: relative"><span class="tnum" style="display: block; font-size: 38px; font-weight: 200; line-height: 1; color: {{dk.numC}}">{{sb.num}}</span><span style="display: block; font-size: 9px; letter-spacing: 2px; opacity: 0.85; margin-top: 2px">{{dk.unit}}</span></span>
         </button>
-        <sc-if value="{{sb.limShow}}" hint-placeholder-val="{{ true }}"><button onClick="{{sb.limTap}}" aria-label="{{sb.limAria}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></button></sc-if>
+        <sc-if value="{{sb.limBottom}}" hint-placeholder-val="{{ true }}"><button onClick="{{sb.limTap}}" aria-label="{{sb.limAria}}" style="border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; position: absolute; left: 524px; bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 3px"><div style="width: 42px; height: 54px; background: #FFFFFF; border-radius: 5px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.35)"><div style="width: 36px; height: 36px; border-radius: 50%; border: 4px solid #D0202E; box-sizing: border-box; color: #111; font-family: Overpass, sans-serif; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center">{{sb.lim}}</div></div><span style="font-size: 12px; font-weight: 700; color: {{sb.limNoteC}}; white-space: nowrap; text-shadow: 0 1px 3px #000">{{sb.limNote}}</span></button></sc-if>
         <div style="position: absolute; left: 640px; bottom: 128px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none">
+          <sc-if value="{{sb.roadOn}}" hint-placeholder-val="{{ false }}"><div class="pnl glb" style="padding: 4px 12px; font-size: 13px; font-weight: 700; color: #E8F1F5; white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis">{{sb.road}}</div></sc-if>
           <sc-if value="{{sb.ahead}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 6px 14px; font-size: 14px; color: #FFD08A; text-align: center; white-space: nowrap">Ph\xEDa tr\u01B0\u1EDBc 300 m: {{sb.aheadL}}</div></sc-if>
           <sc-if value="{{sb.statsOpen}}" hint-placeholder-val="{{ false }}"><div class="pnl glb fadein" style="padding: 8px 14px; font-size: 13px; color: #CFE6EE; text-align: center; white-space: nowrap">{{sb.stats}}</div></sc-if>
         </div>
       </sc-if>
       <!-- thanh nh\u1EA1c: vi\xEAn thu\u1ED1c ki\u1EC3u Tom's Jukebox (\u0111\u0129a than tr\xE1i, t\xEAn gi\u1EEFa, \u23EE \u25B6 \u23ED b\xEAn ph\u1EA3i, thanh th\u1EDDi gian trong vi\xEAn thu\u1ED1c, s\xF3ng l\u1EE5a \u1EDF m\xE9p d\u01B0\u1EDBi) -->
       <div class="pnl dimbox jbpill {{mpCls}}" style="position: absolute; left: {{mpL}}; right: {{mpR}}; bottom: {{mpB}}px; width: {{mpW}}px; height: {{mpH}}px; padding: 0 12px 0 8px; box-sizing: border-box; border-radius: 40px; overflow: hidden; display: flex; align-items: center; gap: 12px; opacity: {{opMusic}}; box-shadow: inset 0 0 0 1.5px {{jb.ring}}; background: {{jb.bg}}">
-        <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 26px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.55"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.45"></path></svg>
+        <svg aria-hidden="true" class="jbwave" viewBox="0 0 400 40" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: {{jb.waveH}}px; pointer-events: none; opacity: {{jb.waveOp}}"><path class="w1" d="{{jb.w1}}" fill="{{jb.wc1}}" opacity="0.75"></path><path class="w2" d="{{jb.w2}}" fill="{{jb.wc2}}" opacity="0.6"></path></svg>
         <button onClick="{{togglePanel}}" aria-label="Danh s\xE1ch b\xE0i v\xE0 \u0111\xE0i" style="position: relative; width: 60px; height: 60px; border: 0; padding: 0; border-radius: 50%; flex-shrink: 0; cursor: pointer; background: transparent">
           <svg viewBox="0 0 60 60" width="60" height="60" aria-hidden="true" class="{{jb.discCls}}"><circle cx="30" cy="30" r="29" fill="#1A1A1A"></circle><circle cx="30" cy="30" r="22" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="17" fill="none" stroke="#2C2C2C" stroke-width="1"></circle><circle cx="30" cy="30" r="11" fill="#FBB040"></circle><circle cx="30" cy="30" r="3" fill="#2A1A00"></circle></svg>
         </button>
-        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; align-items: center">
-          <span style="max-width: 100%; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songTitle}}</span>
-          <span style="max-width: 100%; font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songSub}}</span>
+        <div style="position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; align-items: center">
+          <span style="max-width: 100%; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songTitle}}</span>
+          <span role="group" aria-label="Ch\u1ECDn ngu\u1ED3n nghe" style="display: flex; gap: 8px; font-size: 10px; letter-spacing: 0.5px"><sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="border: 0; padding: 0 2px; background: transparent; cursor: pointer; font-family: inherit; font-size: 10px; font-weight: {{o.fw}}; color: {{o.tc}}; text-decoration: {{o.ul}}">{{o.label}}</button></sc-for></span>
+          <span style="max-width: 100%; font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center">{{songSub}}</span>
           <div style="width: 100%; display: flex; align-items: center; gap: 8px; font-size: 11px; color: #CFE6EE" class="tnum">
             <span>{{jb.posL}}</span>
             <span style="position: relative; flex: 1; height: 4px; border-radius: 2px; background: rgba(0,0,0,0.45)"><span style="position: absolute; left: 0; top: 0; bottom: 0; width: {{prog}}%; border-radius: 2px; background: {{jb.bar}}"></span><span style="position: absolute; top: -4px; left: calc({{prog}}% - 6px); width: 12px; height: 12px; border-radius: 50%; background: #FFFFFF"></span></span>
             <span>{{jb.durL}}</span>
           </div>
         </div>
-        <button onClick="{{srcMenuTap}}" aria-label="Ch\u1ECDn ngu\u1ED3n nghe: nh\u1EA1c, radio, podcast" aria-expanded="{{srcMenuOn}}" class="pill" style="position: relative; height: 28px; padding: 0 8px; font-size: 10px; letter-spacing: 1px; background: rgba(13,44,64,0.8); color: #FFD08A; box-shadow: inset 0 0 0 1px rgba(251,176,64,0.6); flex-shrink: 0">{{srcL}} \u25BE</button>
-        <button onClick="{{vo.tap}}" aria-label="{{vo.aria}}" aria-expanded="{{vo.onA}}" class="jbbtn" style="width: 40px; height: 40px; flex-shrink: 0; font-size: 18px; line-height: 1">{{vo.icon}}</button>
+        
+        <button onClick="{{vo.tap}}" aria-label="{{vo.aria}}" aria-expanded="{{vo.onA}}" class="jbbtn" style="position: relative; width: 30px; height: 30px; flex-shrink: 0; font-size: 13px; line-height: 1">{{vo.icon}}</button>
         <sc-if value="{{needPerm}}" hint-placeholder-val="{{ false }}">
           <button onClick="{{grantPerm}}" class="btn" style="position: relative; height: 34px; font-size: 11px; color: #FFD08A; box-shadow: inset 0 0 0 1px #FBB040; flex-shrink: 0">\u26A0 C\u1EA5p quy\u1EC1n</button>
         </sc-if>
@@ -4543,16 +5046,16 @@ input[type=range]{accent-color:#FBB040}
 
 
       <sc-if value="{{vo.on}}" hint-placeholder-val="{{ false }}">
-        <div class="glc fadein" role="group" aria-label="\xC2m l\u01B0\u1EE3ng nh\u1EA1c" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 10px 14px; display: flex; align-items: center; gap: 12px">
-          <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 52px; height: 52px; font-size: 24px; line-height: 1">{{vo.icon}}</button>
-          <button onClick="{{vo.down}}" aria-label="Nh\u1ECF l\u1EA1i 10%" class="pill" style="width: 58px; height: 52px; font-size: 30px; font-weight: 700; background: #0D2C40; color: #FBB040">\u2212</button>
-          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="K\xE9o \u0111\u1EC3 ch\u1EC9nh \xE2m l\u01B0\u1EE3ng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 320px; height: 64px; touch-action: none; cursor: pointer">
-            <span style="position: absolute; left: 0; right: 0; top: 28px; height: 8px; border-radius: 4px; background: rgba(0,0,0,0.5)"></span>
-            <span style="position: absolute; left: 0; top: 28px; height: 8px; width: {{vo.p}}%; border-radius: 4px; background: #FBB040"></span>
-            <span style="position: absolute; top: 15px; left: calc({{vo.p}}% - 17px); width: 34px; height: 34px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
+        <div class="glc fadein" role="group" aria-label="\xC2m l\u01B0\u1EE3ng nh\u1EA1c" onPointerDown="{{vo.touch}}" style="pointer-events: auto; position: absolute; right: 20px; bottom: 96px; z-index: 9; padding: 6px 10px; display: flex; align-items: center; gap: 8px">
+          <button onClick="{{vo.mute}}" aria-label="{{vo.muteA}}" class="jbbtn" style="width: 38px; height: 38px; font-size: 17px; line-height: 1">{{vo.icon}}</button>
+          <button onClick="{{vo.down}}" aria-label="Nh\u1ECF l\u1EA1i 10%" class="pill" style="width: 40px; height: 38px; font-size: 22px; font-weight: 700; background: #0D2C40; color: #FBB040">\u2212</button>
+          <div onPointerDown="{{vo.drag}}" role="slider" aria-label="K\xE9o \u0111\u1EC3 ch\u1EC9nh \xE2m l\u01B0\u1EE3ng" aria-valuenow="{{vo.p}}" aria-valuemin="0" aria-valuemax="100" style="pointer-events: auto; position: relative; width: 220px; height: 44px; touch-action: none; cursor: pointer">
+            <span style="position: absolute; left: 0; right: 0; top: 19px; height: 6px; border-radius: 3px; background: rgba(0,0,0,0.5)"></span>
+            <span style="position: absolute; left: 0; top: 19px; height: 6px; width: {{vo.p}}%; border-radius: 3px; background: #FBB040"></span>
+            <span style="position: absolute; top: 10px; left: calc({{vo.p}}% - 12px); width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 4px rgba(0,0,0,0.5)"></span>
           </div>
-          <button onClick="{{vo.up}}" aria-label="To l\xEAn 10%" class="pill" style="width: 58px; height: 52px; font-size: 28px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
-          <span class="tnum" style="min-width: 58px; text-align: right; font-size: 20px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
+          <button onClick="{{vo.up}}" aria-label="To l\xEAn 10%" class="pill" style="width: 40px; height: 38px; font-size: 20px; font-weight: 700; background: #0D2C40; color: #FBB040">+</button>
+          <span class="tnum" style="min-width: 44px; text-align: right; font-size: 15px; font-weight: 700; color: #FFFFFF">{{vo.pL}}</span>
         </div>
       </sc-if>
       <sc-if value="{{srcMenuOn}}" hint-placeholder-val="{{ false }}">
@@ -4560,35 +5063,44 @@ input[type=range]{accent-color:#FBB040}
           <sc-for list="{{srcMenu}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" role="menuitem" aria-pressed="{{o.on}}" class="pill" style="height: 48px; padding: 0 18px; font-size: 15px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
         </div>
       </sc-if>
-      <!-- b\u1EA3ng ch\u1ECDn b\xE0i / \u0111\xE0i (tr\u01B0\u1EE3t l\xEAn t\u1EEB thanh nh\u1EA1c) -->
+      <!-- b\u1EA3ng ch\u1ECDn b\xE0i / \u0111\xE0i (tr\u01B0\u1EE3t l\xEAn t\u1EEB thanh nh\u1EA1c) \u2014 0.9.15 (#141): nh\u1ECF g\u1ECDn, ch\u1EC9nh \u0111\u1ED9 m\u1EDD, b\u1EA5m ra ngo\xE0i l\xE0 \u0111\xF3ng -->
       <sc-if value="{{mp.open}}" hint-placeholder-val="{{ false }}">
-        <section aria-label="Ch\u1ECDn b\xE0i v\xE0 \u0111\xE0i" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: 640px; height: 400px; z-index: 8; display: flex; flex-direction: column; background: #06192A">
-          <div style="padding: 12px 14px 8px; display: flex; align-items: center; gap: 6px">
-            <sc-for list="{{mp.srcs}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 32px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
-            <span style="margin-left: auto; font-size: 11px; color: #8FC3D3">{{mp.srcNote}}</span>
-            <button onClick="{{mp.close}}" aria-label="\u0110\xF3ng" class="btn" style="width: 36px; height: 36px; padding: 0">\u2715</button>
+        <section aria-label="Ch\u1ECDn b\xE0i v\xE0 \u0111\xE0i" class="pnl fadein" onPointerDown="{{mp.touch}}" style="position: absolute; right: 20px; bottom: 88px; width: {{mp.w}}px; height: {{mp.h}}px; z-index: 8; display: flex; flex-direction: column; background: rgba(6,25,42,{{mp.alpha}}); backdrop-filter: blur(8px)">
+          <div style="padding: 8px 10px 6px; display: flex; align-items: center; gap: 5px">
+            <sc-for list="{{mp.srcs}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="height: 28px; padding: 0 10px; font-size: 12px; background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
+            <label title="\u0110\u1ED9 m\u1EDD b\u1EA3ng" style="margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 11px; color: #8FC3D3">\u25D0<input type="range" min="30" max="100" value="{{mp.alphaV}}" onInput="{{mp.setAlpha}}" aria-label="\u0110\u1ED9 m\u1EDD b\u1EA3ng" style="width: 70px"></label>
+            <button onClick="{{mp.close}}" aria-label="\u0110\xF3ng" class="btn" style="width: 30px; height: 30px; padding: 0">\u2715</button>
           </div>
-          <div style="padding: 0 14px 8px; display: flex; align-items: center; gap: 6px">
-            <sc-for list="{{mp.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="height: 30px; font-size: 12px; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
-            <label style="flex: 1; display: flex"><span style="position: absolute; left: -9999px">T\xECm</span><input type="text" value="{{mp.q}}" onInput="{{mp.setQ}}" placeholder="{{mp.searchPh}}" disabled="{{kbLk}}" style="flex: 1; min-width: 0; height: 32px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
+          <div style="padding: 0 10px 6px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px">
+            <sc-for list="{{mp.tabs}}" as="t" hint-placeholder-count="4"><button onClick="{{t.pick}}" aria-pressed="{{t.on}}" class="pill" style="height: 26px; padding: 0 9px; font-size: 11px; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
           </div>
-          <sc-if value="{{mp.regionOn}}" hint-placeholder-val="{{ false }}">
-            <div style="margin: 0 14px 8px; padding: 6px 10px; border-radius: 6px; background: rgba(123,216,143,0.12); font-size: 12px; color: #BFF0CA">{{mp.regionL}}</div>
+          <sc-if value="{{mp.backOn}}" hint-placeholder-val="{{ false }}">
+            <div style="padding: 0 10px 6px; display: flex; align-items: center; gap: 6px">
+              <sc-if value="{{mp.backShow}}" hint-placeholder-val="{{ true }}"><button onClick="{{mp.back}}" class="btn" style="max-width: 180px; height: 28px; padding: 0 10px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">\u25C0 {{mp.backL}}</button></sc-if>
+              <sc-for list="{{mp.acts}}" as="x" hint-placeholder-count="1"><button onClick="{{x.run}}" class="btn" style="height: 28px; padding: 0 10px; font-size: 12px; color: #FFD08A">{{x.label}}</button></sc-for>
+            </div>
           </sc-if>
-          <div class="scrl" style="flex: 1; min-height: 0; padding: 0 10px 0 14px; display: flex; flex-direction: column; gap: 6px">
+          <sc-if value="{{mp.searchOn}}" hint-placeholder-val="{{ true }}">
+            <label style="padding: 0 10px 6px; display: flex"><span style="position: absolute; left: -9999px">T\xECm</span><input type="text" value="{{mp.q}}" onInput="{{mp.setQ}}" placeholder="{{mp.searchPh}}" disabled="{{kbLk}}" style="flex: 1; min-width: 0; height: 30px; padding: 0 10px; border: 0; border-radius: 6px; font-family: inherit; font-size: 13px; background: {{mp.searchBg}}; color: #E8F1F5"></label>
+          </sc-if>
+          <sc-if value="{{mp.regionOn}}" hint-placeholder-val="{{ false }}">
+            <div style="margin: 0 10px 6px; padding: 4px 8px; border-radius: 6px; background: rgba(123,216,143,0.12); font-size: 11px; color: #BFF0CA">{{mp.regionL}}</div>
+          </sc-if>
+          <div class="scrl" style="flex: 1; min-height: 0; padding: 0 6px 6px 10px; display: flex; flex-direction: column; gap: 4px">
             <sc-for list="{{mp.rows}}" as="r" hint-placeholder-count="6">
-              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 10px; padding: {{mp.rowPad}}; border-radius: 8px; background: {{r.bg}}">
-                <span aria-hidden="true" style="width: 38px; height: 38px; border-radius: {{r.rad}}; background: {{r.tile}}; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">{{r.letter}}</span>
-                <button onClick="{{r.play}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left">
-                  <span style="display: block; font-size: {{mp.fs}}px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.t}}</span>
-                  <span style="display: block; font-size: 12px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.s}}</span>
+              <div style="flex-shrink: 0; display: flex; align-items: center; gap: 8px; padding: {{mp.rowPad}}; border-radius: 8px; background: {{r.bg}}">
+                <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: {{r.rad}}; background: {{r.tile}}; color: #FFFFFF; font-size: 12px; font-weight: 700; display: {{r.tileShow}}; align-items: center; justify-content: center; flex-shrink: 0">{{r.letter}}</span>
+                <button onClick="{{r.play}}" style="flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; color: {{r.fg}}; text-align: {{r.align}}">
+                  <span style="display: block; font-size: {{mp.fs}}px; font-weight: 700; white-space: {{r.ws}}; overflow: hidden; text-overflow: ellipsis">{{r.t}}</span>
+                  <span style="display: block; font-size: 11px; color: #8FC3D3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.s}}</span>
                 </button>
-                <sc-if value="{{r.isRadio}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.fav}}" aria-label="Y\xEAu th\xEDch" aria-pressed="{{r.favOn}}" class="btn" style="width: 38px; height: 38px; padding: 0; color: {{r.favC}}">\u2605</button></sc-if>
-                <span style="font-size: 12px; font-weight: 700; color: {{r.stC}}; white-space: nowrap">{{r.st}}</span>
+                <sc-if value="{{r.isRadio}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.fav}}" aria-label="Y\xEAu th\xEDch" aria-pressed="{{r.favOn}}" class="btn" style="width: 32px; height: 32px; padding: 0; color: {{r.favC}}">\u2605</button></sc-if>
+                <sc-if value="{{r.a2On}}" hint-placeholder-val="{{ false }}"><button onClick="{{r.a2}}" class="btn" style="height: 30px; padding: 0 8px; font-size: 11px; color: {{r.a2C}}">{{r.a2L}}</button></sc-if>
+                <span style="font-size: 11px; font-weight: 700; color: {{r.stC}}; white-space: nowrap">{{r.st}}</span>
               </div>
             </sc-for>
           </div>
-          <div style="padding: 8px 14px 12px; font-size: 11px; color: #8FC3D3; line-height: 1.45">{{mp.foot}}</div>
+          <sc-if value="{{mp.footOn}}" hint-placeholder-val="{{ false }}"><div style="padding: 4px 10px 8px; font-size: 10px; color: #8FC3D3; line-height: 1.4">{{mp.foot}}</div></sc-if>
         </section>
       </sc-if>
 
@@ -4643,6 +5155,9 @@ input[type=range]{accent-color:#FBB040}
                   <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: 560px">
                     <sc-for list="{{r.opts}}" as="o" hint-placeholder-count="3"><button onClick="{{o.pick}}" aria-pressed="{{o.on}}" class="pill" style="background: {{o.bg}}; color: {{o.fg}}">{{o.label}}</button></sc-for>
                   </div>
+                </sc-if>
+                <sc-if value="{{r.isSlider}}" hint-placeholder-val="{{ false }}">
+                  <label style="display: flex; align-items: center; gap: 10px"><input type="range" min="{{r.min}}" max="{{r.max}}" step="1" value="{{r.val}}" onInput="{{r.slide}}" aria-label="{{r.label}}" style="width: 260px"><span class="tnum" style="min-width: 54px; text-align: right; font-size: 14px; font-weight: 700; color: #FFD08A">{{r.valL}}</span></label>
                 </sc-if>
                 <sc-if value="{{r.isStatus}}" hint-placeholder-val="{{ false }}">
                   <span style="font-size: 14px; font-weight: 700; color: {{r.stC}}">{{r.stL}}</span>
@@ -4925,23 +5440,60 @@ input[type=range]{accent-color:#FBB040}
       <div style="position: absolute; left: 20px; right: 20px; bottom: 16px; font-size: 12px; color: #8FC3D3; line-height: 1.5">{{ct.note}}</div>
     </sc-if>
 
-    <!-- ===== thanh cu\u1ED9c g\u1ECDi m\u1ECFng (n\u1EB1m tr\xEAn m\u1ECDi m\xE0n h\xECnh) ===== -->
-    <sc-if value="{{cb.on}}" hint-placeholder-val="{{ false }}">
-      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; height: 60px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 0 12px 0 16px; border-radius: 12px; background: #0B2A1E; box-shadow: 0 6px 24px rgba(0,0,0,0.55), inset 0 0 0 1px #7BD88F">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7BD88F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"></path></svg>
-        <div style="min-width: 0; flex: 1">
-          <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 17px; font-weight: 700">{{cb.name}}</span><span style="font-size: 11px; color: #2A1A00; background: #FFD08A; border-radius: 4px; padding: 0 6px">{{cb.group}}</span><span style="font-size: 12px; color: #BFF0CA">{{cb.state}}</span></div>
-          <div style="font-size: 12px; color: #CFE6EE; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.sub}}</div>
+    <!-- ===== 0.9.15 (#149): b\u0103ng cu\u1ED9c g\u1ECDi t\u1EDBi \u2014 5 ki\u1EC3u (C\xE0i \u0110\u1EB7t \u203A Cu\u1ED9c G\u1ECDi), gi\u1EA5u khi ra kh\u1ECFi xe ===== -->
+    <sc-if value="{{cb.ringA}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; z-index: 26; border-radius: 14px; padding: 10px; background: #111A20; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <div style="text-align: center; margin-bottom: 8px"><span style="font-size: 20px; font-weight: 800">{{cb.name}}</span> <span style="font-size: 13px; color: #A9B0B8">\xB7 {{cb.subS}}</span></div>
+        <div style="display: flex; gap: 10px"><button onClick="{{cb.decline}}" class="btn" style="flex: 1; height: 64px; font-size: 20px; background: #C8343A; color: #FFFFFF; box-shadow: none">\u2715 T\u1EEB Ch\u1ED1i</button><button onClick="{{cb.answer}}" class="btn" style="flex: 1; height: 64px; font-size: 20px; background: #2F9E5B; color: #FFFFFF; box-shadow: none">\u{1F4DE} Nghe</button></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringB}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 10px; width: 600px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 10px 10px 10px 12px; border-radius: 999px; background: #16191D; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <span style="width: 54px; height: 54px; border-radius: 27px; background: #4F7CFF; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0">{{cb.ini}}</span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 19px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span><span style="font-size: 13px; color: #A9B0B8">{{cb.subS}}</span></span>
+        <button onClick="{{cb.decline}}" aria-label="T\u1EEB ch\u1ED1i" style="width: 60px; height: 60px; border-radius: 30px; border: 0; background: #FF4B4B; color: #FFFFFF; font-size: 24px; cursor: pointer">\u2715</button>
+        <button onClick="{{cb.answer}}" aria-label="Nghe" style="width: 60px; height: 60px; border-radius: 30px; border: 0; background: #2FBF5B; color: #FFFFFF; font-size: 24px; cursor: pointer">\u{1F4DE}</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringC}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; top: 10px; width: 640px; z-index: 26; display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; background: #0D2C40; border-left: 7px solid #FBB040; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <span style="width: 52px; height: 52px; border-radius: 12px; background: #FBB040; color: #2A1A00; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0">\u{1F4DE}</span>
+        <span style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-size: 12px; color: #48B0C8; font-weight: 800; letter-spacing: 1px">CU\u1ED8C G\u1ECCI \u0110\u1EBEN</span><span style="font-size: 20px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span></span>
+        <button onClick="{{cb.decline}}" class="btn btn-r" style="height: 56px; width: 130px; font-size: 18px">T\u1EEB Ch\u1ED1i</button>
+        <button onClick="{{cb.answer}}" class="btn" style="height: 56px; width: 130px; font-size: 18px; background: #2F9E5B; color: #FFFFFF; box-shadow: none">Nghe</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringD}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; z-index: 26; display: flex; align-items: center; gap: 12px; padding: 6px 7px 6px 18px; border-radius: 999px; background: #000000; box-shadow: 0 10px 26px rgba(0,0,0,0.55)">
+        <span style="color: #2FBF5B; font-size: 18px">\u{1F4DE}</span><span style="font-size: 17px; font-weight: 700; max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span>
+        <button onClick="{{cb.decline}}" aria-label="T\u1EEB ch\u1ED1i" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #FF4B4B; color: #FFFFFF; font-size: 20px; cursor: pointer">\u2715</button>
+        <button onClick="{{cb.answer}}" aria-label="Nghe" style="width: 48px; height: 48px; border-radius: 24px; border: 0; background: #2FBF5B; color: #FFFFFF; font-size: 20px; cursor: pointer">\u{1F4DE}</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.ringE}}" hint-placeholder-val="{{ false }}">
+      <div role="alert" class="fadein" style="position: absolute; left: 20px; right: 20px; top: 8px; z-index: 26; border-radius: 12px; overflow: hidden; border: 1px solid #000000; box-shadow: 0 12px 30px rgba(0,0,0,0.55)">
+        <div style="background: #3B3B3B; padding: 10px 14px 6px; text-align: center"><div style="font-size: 21px; font-weight: 700">{{cb.name}}</div><div style="font-size: 13px; color: #CFCFCF">{{cb.subS}}</div></div>
+        <div style="background: #1C1C1C; padding: 10px 12px; display: flex; gap: 12px; align-items: center">
+          <button onClick="{{cb.decline}}" style="height: 54px; width: 160px; border-radius: 10px; border: 2px solid #D9D9D9; background: #C8302C; color: #FFFFFF; font-size: 18px; font-family: inherit; cursor: pointer">T\u1EEB Ch\u1ED1i</button>
+          <div onPointerDown="{{cb.slDown}}" onPointerUp="{{cb.slUp}}" style="flex: 1; height: 54px; border-radius: 10px; background: #0D0D0D; border: 1px solid #555555; display: flex; align-items: center; padding: 4px; gap: 14px; box-sizing: border-box; touch-action: none"><span style="width: 84px; height: 44px; border-radius: 8px; background: #D9D9D9; color: #2A8F2A; display: flex; align-items: center; justify-content: center; font-size: 22px">\u{1F4DE}</span><span style="color: #9A9A9A; font-size: 17px">tr\u01B0\u1EE3t \u0111\u1EC3 nghe</span></div>
+          <button onClick="{{cb.answer}}" aria-label="Nghe" style="height: 54px; width: 100px; border-radius: 10px; border: 2px solid #D9D9D9; background: #2A8F2A; color: #FFFFFF; font-size: 18px; font-family: inherit; cursor: pointer">Nghe</button>
         </div>
-        <sc-if value="{{cb.ring}}" hint-placeholder-val="{{ true }}">
-          <button onClick="{{cb.decline}}" class="btn btn-r" style="height: 46px; width: 120px; font-size: 16px">T\u1EEB Ch\u1ED1i</button>
-          <button onClick="{{cb.answer}}" class="btn" style="height: 46px; width: 120px; font-size: 16px; background: #1E8E4A; color: #FFFFFF; box-shadow: none">Nghe</button>
-        </sc-if>
-        <sc-if value="{{cb.talk}}" hint-placeholder-val="{{ false }}">
-          <button onClick="{{cb.mute}}" aria-pressed="{{cb.muteOn}}" class="btn" style="height: 46px; color: {{cb.muteC}}">{{cb.muteL}}</button>
-          <button onClick="{{cb.spk}}" class="btn" style="height: 46px">{{cb.spkL}}</button>
-          <button onClick="{{cb.hang}}" class="btn btn-r" style="height: 46px; width: 120px; font-size: 16px">G\xE1c M\xE1y</button>
-        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{cb.talkOn}}" hint-placeholder-val="{{ false }}">
+      <div role="status" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 8px; z-index: 26; display: flex; align-items: center; gap: 12px; padding: 6px 8px 6px 18px; border-radius: 999px; background: rgba(10,30,20,0.96); box-shadow: 0 10px 26px rgba(0,0,0,0.5)">
+        <span style="color: #7BD88F; font-size: 16px">\u{1F4DE}</span><span style="font-size: 16px; font-weight: 700; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cb.name}}</span><span class="tnum" style="font-size: 15px; color: #9FE3B0">{{cb.state}}</span>
+        <button onClick="{{cb.mute}}" aria-pressed="{{cb.muteOn}}" class="btn" style="height: 44px; color: {{cb.muteC}}">{{cb.muteL}}</button>
+        <button onClick="{{cb.spk}}" class="btn" style="height: 44px">{{cb.spkL}}</button>
+        <button onClick="{{cb.hang}}" class="btn btn-r" style="height: 44px; width: 110px">G\xE1c M\xE1y</button>
+      </div>
+    </sc-if>
+    <!-- 0.9.15 (#149): tin nh\u1EAFn m\u1EDBi \u2014 ch\u1EC9 t\xEAn ng\u01B0\u1EDDi g\u1EEDi, kh\xF4ng n\u1ED9i dung; \u{1F50A} \u0110\u1ECDc, \u21A9 Tr\u1EA3 l\u1EDDi nhanh -->
+    <sc-if value="{{nm.on}}" hint-placeholder-val="{{ false }}">
+      <div role="status" onPointerDown="{{nm.touch}}" class="fadein" style="position: absolute; left: 50%; transform: translateX(-50%); top: 10px; z-index: 25; width: 560px; box-sizing: border-box; padding: 10px 12px; border-radius: 16px; background: rgba(10,22,32,0.97); box-shadow: 0 12px 30px rgba(0,0,0,0.55); display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 10px"><span style="font-size: 22px">\u{1F4AC}</span><span style="flex: 1; min-width: 0; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{nm.title}}</span>
+          <button onClick="{{nm.read}}" class="btn" style="height: 46px; font-size: 15px">\u{1F50A} \u0110\u1ECDc</button><button onClick="{{nm.replyTap}}" aria-expanded="{{nm.repOn}}" class="btn" style="height: 46px; font-size: 15px">\u21A9 Tr\u1EA3 L\u1EDDi</button><button onClick="{{nm.close}}" aria-label="\u0110\xF3ng" class="btn" style="width: 46px; height: 46px; padding: 0">\u2715</button></div>
+        <sc-if value="{{nm.repOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{nm.quick}}" as="q" hint-placeholder-count="3"><button onClick="{{q.send}}" class="btn" style="height: 44px; font-size: 14px">{{q.t}}</button></sc-for></div></sc-if>
       </div>
     </sc-if>
     <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
@@ -5020,25 +5572,25 @@ input[type=range]{accent-color:#FBB040}
 
     <!-- ===== 0.9.14 (#130): l\u1ECBch th\xE1ng \u2014 b\u1EA5m \u0111\u1ED3ng h\u1ED3 ===== -->
     <sc-if value="{{cal.open}}" hint-placeholder-val="{{ false }}">
-      <div onClick="{{cal.close}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.72); display: flex; align-items: center; justify-content: center; z-index: 20">
-        <div role="dialog" aria-label="L\u1ECBch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 1180px; height: 640px; box-sizing: border-box; padding: 18px; display: flex; gap: 18px; background: #06192A">
+      <div onClick="{{cal.close}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.28); display: flex; align-items: flex-start; justify-content: center; padding-top: 92px; box-sizing: border-box; z-index: 20">
+        <div role="dialog" aria-label="L\u1ECBch" onClick="{{cal.stop}}" class="pnl fadein" style="width: 860px; height: 500px; box-sizing: border-box; padding: 12px; display: flex; gap: 12px; background: rgba(6,25,42,0.97); box-shadow: 0 18px 50px rgba(0,0,0,0.6)">
           <div onPointerDown="{{cal.down}}" onPointerUp="{{cal.up}}" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; touch-action: pan-y">
             <div style="display: flex; align-items: center; gap: 10px">
-              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Th\xE1ng tr\u01B0\u1EDBc" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u2039</button></sc-if>
-              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="N\u0103m tr\u01B0\u1EDBc" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u2039</button></sc-if>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.prev}}" aria-label="Th\xE1ng tr\u01B0\u1EDBc" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">\u2039</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.prevY}}" aria-label="N\u0103m tr\u01B0\u1EDBc" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">\u2039</button></sc-if>
               <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center">
-                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 26px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem c\u1EA3 n\u0103m" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 24px; font-weight: 800">{{cal.yearL}} \u25BE</button></div>
+                <div style="display: flex; align-items: baseline; gap: 10px"><sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 20px; font-weight: 800">{{cal.title}}</span></sc-if><button onClick="{{cal.yearTap}}" aria-label="Xem c\u1EA3 n\u0103m" style="border: 0; background: rgba(251,176,64,0.16); color: #FFD08A; border-radius: 10px; padding: 4px 12px; cursor: pointer; font-family: inherit; font-size: 18px; font-weight: 800">{{cal.yearL}} \u25BE</button></div>
                 <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #8FC3D3">{{cal.lunTitle}}</span></sc-if>
               </div>
-              <button onClick="{{cal.today}}" class="btn" style="height: 50px; font-size: 15px">H\xF4m Nay</button>
-              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Th\xE1ng sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u203A</button></sc-if>
-              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="N\u0103m sau" class="btn" style="width: 54px; height: 50px; padding: 0; font-size: 22px">\u203A</button></sc-if>
+              <button onClick="{{cal.today}}" class="btn" style="height: 42px; font-size: 14px">H\xF4m Nay</button>
+              <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}"><button onClick="{{cal.next}}" aria-label="Th\xE1ng sau" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">\u203A</button></sc-if>
+              <sc-if value="{{cal.year}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.nextY}}" aria-label="N\u0103m sau" class="btn" style="width: 46px; height: 42px; padding: 0; font-size: 22px">\u203A</button></sc-if>
             </div>
             <sc-if value="{{cal.month}}" hint-placeholder-val="{{ true }}">
               <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px"><sc-for list="{{cal.wk}}" as="w" hint-placeholder-count="7"><span style="text-align: center; font-size: 13px; font-weight: 700; color: #8FC3D3">{{w.l}}</span></sc-for></div>
               <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 4px">
                 <sc-for list="{{cal.cells}}" as="c" hint-placeholder-count="42"><button onClick="{{c.pick}}" style="position: relative; min-width: 0; border: 0; border-radius: 10px; cursor: pointer; font-family: inherit; color: #E8F1F5; background: {{c.bg}}; box-shadow: {{c.ring}}; opacity: {{c.op}}; padding: 4px 6px; display: flex; flex-direction: column; align-items: flex-start; overflow: hidden; text-align: left">
-                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 22px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 11px; color: {{c.lunC}}">{{c.lun}}</span></span>
+                  <span style="display: flex; width: 100%; align-items: baseline; gap: 4px"><span class="tnum" style="font-size: 17px; font-weight: 800; color: {{c.numC}}">{{c.n}}</span><span style="margin-left: auto; font-size: 10px; color: {{c.lunC}}">{{c.lun}}</span></span>
                   <sc-if value="{{c.holOn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 10px; line-height: 1.2; color: {{c.holC}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%">{{c.hol}}</span></sc-if>
                   <sc-if value="{{c.evOn}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; left: 6px; bottom: 5px; display: flex; align-items: center; gap: 3px; font-size: 10px; color: #5FD4F0"><span style="width: 7px; height: 7px; border-radius: 4px; background: #5FD4F0"></span>{{c.evN}}</span></sc-if>
                 </button></sc-for>
@@ -5052,10 +5604,10 @@ input[type=range]{accent-color:#FBB040}
                 </button></sc-for>
               </div>
             </sc-if>
-            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vu\u1ED1t qua l\u1EA1i \u0111\u1EC3 \u0111\u1ED5i th\xE1ng \xB7 b\u1EA5m s\u1ED1 n\u0103m \u0111\u1EC3 xem c\u1EA3 n\u0103m \xB7 s\u1ED1 \u0111\u1ECF = ng\xE0y ngh\u1EC9 \xB7 ch\u1EEF xanh l\xE1 = l\u1EC5 \xDAc (Victoria) \xB7 ch\u1EEF h\u1ED3ng = l\u1EC5 Vi\u1EC7t Nam</span>
+            <span style="font-size: 11px; color: #6F94A6; text-align: center">Vu\u1ED1t \u0111\u1EC3 \u0111\u1ED5i th\xE1ng \xB7 s\u1ED1 \u0111\u1ECF = ng\xE0y ngh\u1EC9 \xB7 xanh l\xE1 = l\u1EC5 \xDAc \xB7 h\u1ED3ng = l\u1EC5 Vi\u1EC7t</span>
           </div>
-          <div style="width: 330px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; padding-left: 18px; border-left: 1px solid rgba(255,255,255,0.1)">
-            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 20px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="\u0110\xF3ng l\u1ECBch" class="btn" style="width: 48px; height: 48px; padding: 0; font-size: 20px">\u2715</button></div>
+          <div style="width: 250px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; padding-left: 12px; border-left: 1px solid rgba(255,255,255,0.1)">
+            <div style="display: flex; align-items: flex-start; gap: 8px"><span style="flex: 1; font-size: 16px; font-weight: 800; line-height: 1.25">{{cal.selTitle}}</span><button onClick="{{cal.close}}" aria-label="\u0110\xF3ng l\u1ECBch" class="btn" style="width: 42px; height: 42px; padding: 0; font-size: 18px">\u2715</button></div>
             <span style="font-size: 14px; color: #FFD08A">{{cal.selLun}}</span>
             <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #CFE6EE"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="11" fill="rgba(200,210,235,0.18)"></circle><path d="{{cal.selMoon}}" fill="#F3EFDC"></path></svg>{{cal.selMoonL}}</span>
             <sc-if value="{{cal.selHolOn}}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 6px"><sc-for list="{{cal.selHol}}" as="h" hint-placeholder-count="1"><div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,0.05)"><span style="font-size: 11px; font-weight: 800; color: #06192A; background: {{h.c}}; border-radius: 4px; padding: 1px 6px">{{h.tag}}</span><span style="flex: 1; font-size: 15px; font-weight: 700">{{h.name}}</span><span style="font-size: 11px; color: #FF8A8A">{{h.off}}</span></div></sc-for></div></sc-if>
@@ -5066,6 +5618,34 @@ input[type=range]{accent-color:#FBB040}
               <sc-if value="{{cal.permOn}}" hint-placeholder-val="{{ false }}"><button onClick="{{cal.perm}}" class="btn btn-o" style="height: 46px">Cho Ph\xE9p \u0110\u1ECDc L\u1ECBch</button></sc-if>
             </div>
           </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.15 (#149): s\u1EEDa c\xE2u tr\u1EA3 l\u1EDDi nhanh ===== -->
+    <sc-if value="{{qr.on}}" hint-placeholder-val="{{ false }}">
+      <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.6); display: flex; align-items: center; justify-content: center; z-index: 30">
+        <div role="dialog" aria-label="Tr\u1EA3 l\u1EDDi nhanh" class="pnl fadein" style="width: 560px; box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #06192A">
+          <span style="font-size: 18px; font-weight: 800">C\xE2u Tr\u1EA3 L\u1EDDi Nhanh</span>
+          <sc-for list="{{qr.rows}}" as="q" hint-placeholder-count="4"><input type="text" value="{{q.v}}" onInput="{{q.set}}" placeholder="\u0110\u1EC3 tr\u1ED1ng n\u1EBFu kh\xF4ng c\u1EA7n" aria-label="C\xE2u {{q.n}}" style="height: 46px; border-radius: 10px; border: 1px solid #2B4252; background: #0A1E2C; color: #E8F1F5; padding: 0 12px; font-size: 15px; font-family: inherit"></sc-for>
+          <div style="display: flex; gap: 8px; justify-content: flex-end"><button onClick="{{qr.cancel}}" class="btn" style="height: 46px">Hu\u1EF7</button><button onClick="{{qr.save}}" class="btn btn-o" style="height: 46px">L\u01B0u</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===== 0.9.15 (#136): Thi\u1EBFt B\u1ECB \u0110ang K\u1EBFt N\u1ED1i \u2014 b\u1EA5m "\u0110ang Ch\u1EA1y Tr\xEAn" ===== -->
+    <sc-if value="{{dev.on}}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{dev.close}}" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(1,6,10,0.28); z-index: 20">
+        <div role="dialog" aria-label="Thi\u1EBFt b\u1ECB \u0111ang k\u1EBFt n\u1ED1i" onClick="{{dev.stop}}" class="pnl fadein" style="position: absolute; left: 220px; top: 92px; width: 440px; box-sizing: border-box; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: rgba(6,25,42,0.97); box-shadow: 0 18px 50px rgba(0,0,0,0.6)">
+          <div style="display: flex; align-items: center; gap: 8px"><span style="flex: 1; font-size: 18px; font-weight: 800">Thi\u1EBFt B\u1ECB \u0110ang K\u1EBFt N\u1ED1i</span><button onClick="{{dev.close}}" aria-label="\u0110\xF3ng" class="btn" style="width: 42px; height: 42px; padding: 0; font-size: 18px">\u2715</button></div>
+          <sc-for list="{{dev.rows}}" as="r" hint-placeholder-count="3">
+            <button onClick="{{r.tap}}" style="border: 0; cursor: pointer; font-family: inherit; color: #E8F1F5; text-align: left; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.05)">
+              <span style="width: 40px; height: 40px; border-radius: 10px; background: rgba(72,176,200,0.18); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0">{{r.ic}}</span>
+              <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span><span style="font-size: 12px; color: #8FC3D3">{{r.sub}}</span></span>
+              <sc-if value="{{r.lvOn}}" hint-placeholder-val="{{ false }}"><span style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0"><span class="tnum" style="font-size: 18px; font-weight: 800; color: {{r.c}}">{{r.lv}}</span><span style="width: 56px; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12); overflow: hidden"><span style="display: block; height: 100%; width: {{r.pct}}%; background: {{r.c}}"></span></span></span></sc-if>
+            </button>
+          </sc-for>
+          <span style="font-size: 11px; color: #6F94A6">B\u1EA5m v\xF4 thi\u1EBFt b\u1ECB Bluetooth \u0111\u1EC3 m\u1EDF ph\u1EA7n Bluetooth c\u1EE7a m\xE1y</span>
         </div>
       </div>
     </sc-if>

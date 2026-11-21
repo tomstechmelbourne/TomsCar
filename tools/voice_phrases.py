@@ -39,6 +39,13 @@ def phrases():
               'Quẹo gắt qua phải', 'Quẹo phải', 'Quẹo nhẹ qua phải', 'Quẹo nhẹ qua trái', 'Quẹo trái', 'Quẹo gắt qua trái', 'Quẹo',
               'Cuối đường quẹo phải', 'Cuối đường quẹo trái', 'Tới bùng binh', 'Ra khỏi bùng binh', 'Đang tìm đường mới', 'Mình chưa nghe rõ, nói lại giúp mình nha']:
         add(t, t.replace('40', 'bốn mươi'))
+    # 0.9.15 (#145): the road name is read in English right after these ("Quẹo trái vô … Taylors Road")
+    for t in ['Quẹo gắt qua phải', 'Quẹo phải', 'Quẹo nhẹ qua phải', 'Đi thẳng', 'Quẹo nhẹ qua trái', 'Quẹo trái', 'Quẹo gắt qua trái', 'Quay đầu', 'Đi tiếp',
+              'Nhập làn', 'Nhập làn bên phải', 'Nhập làn bên trái', 'Lên đường dẫn', 'Lên đường dẫn bên phải', 'Lên đường dẫn bên trái',
+              'Ra khỏi bùng binh', 'Cuối đường quẹo phải', 'Cuối đường quẹo trái']:
+        add(t + ' vô')
+    for t in ['Đi thẳng', 'Xuất phát', 'Giữ phải', 'Giữ trái', 'Giữ thẳng']:
+        add(t + ' theo')
     for i in range(1, 7): add(f'ra lối thứ {i}', f'ra lối thứ {["", "nhất", "hai", "ba", "tư", "năm", "sáu"][i]}')
     return P
 if __name__ == '__main__':

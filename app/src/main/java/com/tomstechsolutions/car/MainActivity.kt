@@ -216,6 +216,8 @@ class MainActivity : Activity() {
         voice.init()
         jukebox = Jukebox(this) { j -> main.post { js("tcJukebox", j) } }
         jukebox.start()
+        MediaListener.onNew = { o -> main.post { js("tcNewMsg", o.toString()) } }
+        Music.init(this) { fn, j -> js(fn, j) }   // 0.9.15 (#138): music built into Tom's Car
     }
 
     @Deprecated("file chooser result")
@@ -262,6 +264,7 @@ class MainActivity : Activity() {
         if (::radio.isInitialized) radio.stop()
         if (::voice.isInitialized) voice.release()
         if (::jukebox.isInitialized) jukebox.stop()
+        try { Music.saveLast(); Music.release() } catch (_: Exception) {}
         try { (getSystemService(Context.LOCATION_SERVICE) as LocationManager).removeUpdates(locListener) } catch (_: Exception) {}
         super.onDestroy()
     }
@@ -291,6 +294,7 @@ class MainActivity : Activity() {
     private fun askPermissions() {
         val want = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE)
         if (Build.VERSION.SDK_INT >= 31) want += Manifest.permission.BLUETOOTH_CONNECT
+        want += if (Build.VERSION.SDK_INT >= 33) Manifest.permission.READ_MEDIA_AUDIO else Manifest.permission.READ_EXTERNAL_STORAGE   // #138: songs in the phone
         val missing = want.filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
         if (missing.isNotEmpty()) requestPermissions(missing.toTypedArray(), 7)
     }
@@ -433,6 +437,8 @@ class MainActivity : Activity() {
         if (brg != null) o.put("bearing", brg.toDouble())
         if (l != null && fresh) { o.put("acc", l.accuracy.toDouble()); o.put("fix", fixSeq) }
         o.put("perms", perms())
+        o.put("dex", isDexNow())
+        usbList()?.let { o.put("usb", it) }
         phone.json()?.let { o.put("call", it) }
         o.put("missed", phone.missed)
         o.put("radio", radio.json())
@@ -447,9 +453,20 @@ class MainActivity : Activity() {
         val scale = i?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100
         val plugged = (i?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) != 0
         val temp = (i?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0) / 10.0
+        // 0.9.15 (#136): how long until full, where the phone can tell
+        val left = if (plugged && Build.VERSION.SDK_INT >= 28) try { (getSystemService(Context.BATTERY_SERVICE) as BatteryManager).computeChargeTimeRemaining() } catch (_: Exception) { -1L } else -1L
+        val src = when (i?.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) ?: 0) { BatteryManager.BATTERY_PLUGGED_AC -> "ac"; BatteryManager.BATTERY_PLUGGED_USB -> "usb"; BatteryManager.BATTERY_PLUGGED_WIRELESS -> "wireless"; else -> "" }
         return JSONObject().put("level", if (lvl >= 0) lvl * 100 / scale.coerceAtLeast(1) else 0)
-            .put("charging", plugged).put("hot", temp >= 42.0).put("temp", temp)
+            .put("charging", plugged).put("hot", temp >= 42.0).put("temp", temp).put("left", if (left > 0) left / 60000 else -1).put("src", src)
     }
+
+    private fun isDexNow(): Boolean = try { val cfg = resources.configuration; val c = cfg.javaClass; c.getField("semDesktopModeEnabled").getInt(cfg) == c.getField("SEM_DESKTOP_MODE_ENABLED").getInt(null) } catch (_: Exception) { false }
+    /** 0.9.15 (#136): USB things plugged into the phone (names only). */
+    private fun usbList(): JSONArray? = try {
+        val um = getSystemService(Context.USB_SERVICE) as android.hardware.usb.UsbManager
+        val arr = JSONArray(); um.deviceList.values.forEach { d -> arr.put(JSONObject().put("name", (if (Build.VERSION.SDK_INT >= 21) d.productName else null) ?: d.deviceName).put("maker", if (Build.VERSION.SDK_INT >= 21) (d.manufacturerName ?: "") else "")) }
+        if (arr.length() > 0) arr else null
+    } catch (_: Exception) { null }
 
     /** Connected Bluetooth devices with their battery level (when the device reports it). */
     @SuppressLint("MissingPermission")
@@ -496,7 +513,9 @@ class MainActivity : Activity() {
     }
 
     private fun media(): JSONObject? {
-        val c = controller() ?: return null
+        // 0.9.15 (#138): the built-in player first (when chosen, or when it is the one playing)
+        Music.state()?.let { st -> if (musicApp == "builtin" || st.optBoolean("playing")) return st }
+        val c = controller()?.takeUnless { it.packageName == packageName } ?: return null
         val md = c.metadata ?: return null
         val title = md.getString(MediaMetadata.METADATA_KEY_TITLE) ?: return null
         val app = try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(c.packageName, 0)).toString() } catch (_: Exception) { c.packageName }
@@ -515,6 +534,12 @@ class MainActivity : Activity() {
     }
 
     private fun mediaAction(a: String) {
+        if (musicApp == "builtin" && a in setOf("prev", "next", "pause", "play", "autoplay", "toggle")) {
+            if (::radio.isInitialized) radio.stop()
+            Music.cmd(if (a == "autoplay") "resume" else a)
+            main.postDelayed({ if (ready) push() }, 600); main.postDelayed({ if (ready) push() }, 2000)
+            return
+        }
         val c = controller()
         val playing = c?.playbackState?.state == PlaybackState.STATE_PLAYING
         val useJb = musicApp == "jukebox" && jukebox.installed()
@@ -675,7 +700,7 @@ class MainActivity : Activity() {
 
     private lateinit var jukebox: Jukebox
     /** Default music app chosen in Settings → Music ("jukebox" or a package name). */
-    private var musicApp = "jukebox"
+    private var musicApp = "builtin"
 
     private fun js(fn: String, json: String) = web.evaluateJavascript("window.$fn && $fn(" + JSONObject.quote(json) + ")", null)
 
@@ -809,9 +834,12 @@ class MainActivity : Activity() {
                         sendCrashIfAny()
                     }
                     "settings" -> settings()
+                    "btset" -> try { startActivity(Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } catch (_: Exception) {}
                     "chime" -> chime(arg)
+                    "ting" -> try { val tg = android.media.ToneGenerator(AudioManager.STREAM_MUSIC, 85); tg.startTone(android.media.ToneGenerator.TONE_PROP_BEEP2, 300); main.postDelayed({ tg.release() }, 600) } catch (_: Exception) {}
                     "cal" -> bg.execute { val j = monthAppts(arg); main.post { js("tcCal", JSONObject().put("key", try { JSONObject(arg).optString("key") } catch (_: Exception) { "" }).put("ev", j).toString()) } }
                     "media" -> mediaAction(arg)
+                    "mus" -> { Music.cmd(arg); main.postDelayed({ if (ready) push() }, 800) }
                     "launch" -> { Launcher.workspace(this@MainActivity, arg); Bubble.askOnce(this@MainActivity) }
                     "bubble" -> { Bubble.enabled = arg != "off"; if (!Bubble.enabled) Bubble.hide() }
                     // 0.9.13: share a trip recording as a file (Gmail, Drive…) and read the clipboard for the HERE key
